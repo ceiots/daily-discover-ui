@@ -1,0 +1,21 @@
+ 
+
+
+  body {
+    font-family: 'PingFang SC', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    background-color: #F8F9FA;
+    }
+    .nav-icon {
+    font-size: 20px;
+    }
+
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding-top: env(safe-area-inset-top);
+      margin-bottom: 60px;
+      background: linear-gradient(to right, #4f46e5, #7c3aed);
+      z-index: 50;
+    }

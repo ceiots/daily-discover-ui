@@ -1,0 +1,37 @@
+{
+    // 环境配置
+    "env": {
+      // 浏览器环境
+      "browser": true,
+      // ECMAScript 2021 环境
+      "es2021": true
+    },
+    // 继承的规则
+    "extends": [
+      // 使用 eslint 推荐的规则
+      "eslint:recommended",
+      // 使用 react 推荐的规则
+      "plugin:react/recommended"
+    ],
+    // 解析器选项
+    "parserOptions": {
+      // 启用对 JSX 的支持
+      "ecmaFeatures": {
+        "jsx": true
+      },
+      // ECMAScript 版本
+      "ecmaVersion": 12,
+      // 模块类型
+      "sourceType": "module"
+    },
+    // 插件
+    "plugins": [
+      // 使用 react 插件
+      "react"
+    ],
+    // 规则
+    "rules": {
+      // 禁用未使用变量的规则
+      "no-unused-vars": "off"
+    }
+}

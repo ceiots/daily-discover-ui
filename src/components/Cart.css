@@ -1,0 +1,17 @@
+/* Cart.css */
+.cart-container {
+    padding: 20px; /* Add padding */
+    background-color: #f9f9f9; /* Light background */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px; /* Space between items */
+    padding: 10px;
+    background-color: #fff; /* White background for items */
+    border-radius: 5px; /* Rounded corners for items */
+}
