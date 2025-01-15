@@ -18,7 +18,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-[375px] min-h-[762px] mx-auto bg-white">
+    <div className="relative min-h-[762px] mx-auto bg-white">
       <div className="relative h-[240px] overflow-hidden">
         <img
           src="https://ai-public.mastergo.com/ai/img_res/324091066d8ec34bedee07d709744310.jpg"
@@ -62,7 +62,7 @@ const LoginPage = () => {
           <a href="#" className="text-primary">立即注册</a>
         </div>
 
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <p className="text-center text-gray-400 text-sm mb-6">其他登录方式</p>
           <div className="flex justify-center gap-8">
             <button className="w-12 h-12 rounded-full bg-[#07C160] flex items-center justify-center">
@@ -75,9 +75,9 @@ const LoginPage = () => {
               <i className="fas fa-mobile-alt text-white text-xl"></i>
             </button>
           </div>
-        </div>
+        </div> */}
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs text-gray-400 mt-16">
           登录即表示同意
           <a href="#" className="text-primary">用户协议</a>
           和
