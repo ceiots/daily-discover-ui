@@ -1,8 +1,4 @@
-body {
-    background-color: #F8F8F8;
-    width: 375px;
-    min-height: 762px;
-}
+
 .profile-card {
     background: linear-gradient(135deg, #7B68EE, #9F8FEF);
     border-radius: 0 0 30px 30px;

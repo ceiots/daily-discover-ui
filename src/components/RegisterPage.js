@@ -91,8 +91,8 @@ const passwordRules = [
 ];
 
   return (
-    <div className="relative min-h-[762px] mx-auto bg-white">
-      <div className="relative h-[240px] overflow-hidden">
+    <div className="relative mx-auto bg-white">
+      <div className="relative overflow-hidden">
         <img
           src="https://ai-public.mastergo.com/ai/img_res/324091066d8ec34bedee07d709744310.jpg"
           className="w-full h-full object-cover"
@@ -104,7 +104,7 @@ const passwordRules = [
         </div>
       </div>
 
-      <div className=" bg-white rounded-xl shadow-lg p-8">
+      <div className=" bg-white rounded-xl shadow-lg p-5">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <div className="relative">
@@ -203,7 +203,7 @@ const passwordRules = [
           )}
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-2 text-center">
           <span className="text-gray-600">已有账号？</span>
           <a
             href="#"

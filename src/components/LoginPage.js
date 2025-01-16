@@ -40,7 +40,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-[762px] mx-auto bg-white">
+    <div className="relative mx-auto bg-white">
       <div className="relative h-[240px] overflow-hidden">
         <img
           src="https://ai-public.mastergo.com/ai/img_res/324091066d8ec34bedee07d709744310.jpg"
