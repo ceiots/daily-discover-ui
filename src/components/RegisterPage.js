@@ -9,7 +9,6 @@ const RegisterPage = () => {
     phoneNumber: "",
     password: "",
     confirmPassword: "",
-    verificationCode: "",
   });
 
   const [agreeToTerms, setAgreeToTerms] = useState(false); // 添加协议同意状态
@@ -54,16 +53,12 @@ const RegisterPage = () => {
       newErrors.confirmPassword = "两次输入的密码不一致";
     }
 
-    // 验证验证码
-    if (!formData.verificationCode) {
-      newErrors.verificationCode = "请输入验证码";
-    }
 
     // 验证用户协议
     if (!agreeToTerms) {
       newErrors.terms = "请阅读并同意用户协议和隐私政策";
     }
-
+    
     // 如果有错误，显示错误信息并返回
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
