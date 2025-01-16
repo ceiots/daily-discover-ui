@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
-import { useAuth } from '../App'; // 导入自定义钩子
-import { useNavigate } from 'react-router-dom'; // 导入 useNavigate
-import './LoginPage.css'; // 创建一个新的 CSS 文件来存放样式
+import React, { useState } from "react";
+import { useAuth } from "../App"; // 导入自定义钩子
+import { useNavigate } from "react-router-dom"; // 导入 useNavigate
+import "./LoginPage.css"; // 创建一个新的 CSS 文件来存放样式
+import axios from "axios";
+import { API_BASE_URL } from "../config";
 
 const LoginPage = () => {
   const { setIsLoggedIn } = useAuth();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate(); // 使用 useNavigate
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // 这里可以添加验证逻辑
-    // 假设验证成功后，设置登录状态
-    setIsLoggedIn(true);
-    navigate('/Calendar'); // 登录后跳转到 Discover 页面
+    try {
+      const user = {
+        phoneNumber: phoneNumber,
+        password: password,
+      };
+      const response = await axios.post(`${API_BASE_URL}/user/login`, user);
+      if (response.data.startsWith("登录成功")) {
+        setIsLoggedIn(true);
+        navigate("/Calendar"); // 登录后跳转到 Calendar 页面
+      } else {
+        alert(response.data); // 显示错误消息
+      }
+    } catch (error) {
+      console.error("登录时出错:", error);
+    }
+  };
+
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
+  // 处理注册的函数
+  const handleRegister = () => {
+    navigate("/Register");
   };
 
   return (
@@ -31,35 +53,45 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <div className="absolute top-[200px] left-0 right-0 bottom-0 rounded-t-[24px] bg-white px-6 pt-8 pb-6">
+      <div className=" bg-white rounded-xl shadow-lg p-8">
         <div className="space-y-4 mb-6">
           <div className="relative">
             <input
               type="text"
               placeholder="请输入手机号码"
-              className="w-full h-12 px-4 bg-gray-50 border-none rounded-md text-sm"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-3 bg-gray-50 border-none rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
             />
+            <i className="fas fa-envelope absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
+
           <div className="relative">
             <input
               type="password"
               placeholder="请输入密码"
-              className="w-full h-12 px-4 bg-gray-50 border-none rounded-md text-sm"
+              className="w-full px-4 py-3 bg-gray-50 border-none rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <i className="fas fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
         </div>
 
-        <button className="w-full h-12 bg-primary text-white text-center rounded-md" onClick={handleSubmit}>
+        <button
+          className="w-full h-12 bg-primary text-white text-center rounded-md"
+          onClick={handleSubmit}
+        >
           登录
         </button>
 
         <div className="flex justify-between items-center mt-4 text-sm">
-          <a href="#" className="text-gray-500">忘记密码？</a>
-          <a href="#" className="text-primary">立即注册</a>
+          <a href="#" className="text-gray-500" onClick={handleForgotPassword}>
+            忘记密码？
+          </a>
+          <a href="#" className="text-primary" onClick={handleRegister}>
+            立即注册
+          </a>
         </div>
 
         {/* <div className="mt-8">
@@ -79,13 +111,17 @@ const LoginPage = () => {
 
         <p className="text-center text-xs text-gray-400 mt-16">
           登录即表示同意
-          <a href="#" className="text-primary">用户协议</a>
+          <a href="#" className="text-primary">
+            用户协议
+          </a>
           和
-          <a href="#" className="text-primary">隐私政策</a>
+          <a href="#" className="text-primary">
+            隐私政策
+          </a>
         </p>
       </div>
     </div>
   );
 };
 
-export default LoginPage; 
+export default LoginPage;

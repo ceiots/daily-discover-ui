@@ -13,9 +13,12 @@ import OrderDetail from './components/OrderDetail';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
 import './App.css';
-
+import RegisterPage from './components/RegisterPage';
+import ForgotPasswordPage from './components/ForgotPasswordPage';
 // 创建一个上下文来管理登录状态和用户信息
 const AuthContext = createContext();
+
+const API_BASE_URL = 'http://localhost:8081/daily-discover';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 默认未登录
@@ -28,6 +31,8 @@ const App = () => {
         <NavBar />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/calendar" element={isLoggedIn ? <Calendar /> : <Navigate to="/login" />} />
           <Route path="/" element={<Discover />} />
           <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
