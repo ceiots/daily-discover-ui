@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../App"; // 导入自定义钩子
 import { useNavigate } from "react-router-dom"; // 导入 useNavigate
 import "./LoginPage.css"; // 创建一个新的 CSS 文件来存放样式
-import axios from "axios";
-import { API_BASE_URL } from "../config";
+import instance from "../utils/axios";
 
 const LoginPage = () => {
   const { setIsLoggedIn } = useAuth();
@@ -18,7 +17,7 @@ const LoginPage = () => {
         phoneNumber: phoneNumber,
         password: password,
       };
-      const response = await axios.post(`${API_BASE_URL}/user/login`, user);
+      const response = await instance.post("/user/login", user);
       if (response.data.startsWith("登录成功")) {
         setIsLoggedIn(true);
         navigate("/Calendar"); // 登录后跳转到 Calendar 页面

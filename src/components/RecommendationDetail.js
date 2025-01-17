@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./RecommendationDetail.css"; // Keep your existing styles
+import instance from "../utils/axios";
 
 const RecommendationDetail = () => {
   const { id } = useParams(); // Get the recommendation ID from the URL
@@ -17,8 +17,8 @@ const RecommendationDetail = () => {
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8081/daily-discover/recommendations/${id}` // Fetch data from backend
+        const response = await instance.get(
+          "/recommendations/${id}" 
         );
         setRecommendation(response.data);
       } catch (error) {
@@ -67,8 +67,8 @@ const RecommendationDetail = () => {
     };
 
     try {
-      await axios.post(
-        `http://localhost:8081/daily-discover/cart/add`,
+      await instance.post(
+        "/cart/add",
         cartItem
       );
       //navigate('/cart'); // Navigate to Cart.js

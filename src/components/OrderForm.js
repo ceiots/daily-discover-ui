@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import instance from "../utils/axios";
 
 const OrderForm = () => {
     const [address, setAddress] = useState('');
@@ -7,7 +7,7 @@ const OrderForm = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('/api/orders', { address, productId })
+        instance.post('/api/orders', { address, productId })
             .then(response => alert(`Order placed successfully! Warehouse: ${response.data.warehouseName}`))
             .catch(error => console.error('Error placing order:', error));
     };

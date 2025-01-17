@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./Cart.css";
+import instance from "../utils/axios";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -15,8 +15,8 @@ const Cart = () => {
     const fetchCartItems = async () => {
       try {
         const userId = 23; // Replace with actual user logic
-        const response = await axios.get(
-          `http://localhost:8081/daily-discover/cart/${userId}`
+        const response = await instance.get(
+          "/cart/${userId}"
         );
         setCartItems(response.data);
       } catch (error) {
@@ -71,8 +71,8 @@ const Cart = () => {
         quantity: newQuantity,
       };
       // Update the quantity in the backend
-      await axios.put(
-        `http://localhost:8081/daily-discover/cart/update/${itemId}`,
+      await instance.put(
+        "/cart/update/${itemId}",
         request
       );
       // Update the local state
@@ -108,7 +108,7 @@ const Cart = () => {
 
     try {
       await Promise.all(idsToDelete.map(id => 
-        axios.delete(`http://localhost:8081/daily-discover/cart/delete/${id}`)
+        instance.delete("/cart/delete/${id}")
       ));
       setCartItems((prevItems) => prevItems.filter(item => !idsToDelete.includes(item.id.toString())));
       setSelectedItems({}); // 清空选中状态

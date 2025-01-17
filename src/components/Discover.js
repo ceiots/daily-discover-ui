@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import { Link } from "react-router-dom";
 import "./Discover.css";
-import axios from "axios";
+import instance from "../utils/axios";
 
 const Discover = () => {
   const { isLoggedIn, userAvatar } = useAuth();
@@ -15,10 +15,11 @@ const Discover = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsResponse = await axios.get("http://localhost:8081/daily-discover/events");
-        const categoriesResponse = await axios.get("http://localhost:8081/daily-discover/categories");
-        const recommendationsResponse = await axios.get("http://localhost:8081/daily-discover/recommendations");
+        const eventsResponse = await instance.get("/events");
+        const categoriesResponse = await instance.get("/categories");
+        const recommendationsResponse = await instance.get("/recommendations");
 
+        console.log("eventsResponse:", eventsResponse.data);
         setEvents(eventsResponse.data);
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
@@ -89,7 +90,10 @@ const Discover = () => {
               <p className="text-red-500">{error}</p>
             ) : (
               events.map((event) => (
-                <div key={event.id} className="flex items-start space-x-4 pb-4 border-b border-gray-100">
+                <div
+                  key={event.id}
+                  className="flex items-start space-x-4 pb-4 border-b border-gray-100"
+                >
                   <img
                     src={event.imageUrl}
                     alt={event.title}
@@ -99,9 +103,7 @@ const Discover = () => {
                     <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
                       {event.category}
                     </span>
-                    <h3 className="text-sm font-medium my-2">
-                      {event.title}
-                    </h3>
+                    <h3 className="text-sm font-medium my-2">{event.title}</h3>
                     <p className="text-xs text-gray-500 line-clamp-2">
                       {event.description}
                     </p>
@@ -142,7 +144,10 @@ const Discover = () => {
         <div className="masonry pb-20">
           {recommendations.length > 0 ? (
             recommendations.map((recommendation) => (
-              <Link to={`/recommendation/${recommendation.id}`} key={recommendation.id}>
+              <Link
+                to={`/recommendation/${recommendation.id}`}
+                key={recommendation.id}
+              >
                 <div className="masonry-item">
                   <div className="bg-white rounded-lg overflow-hidden shadow-sm">
                     <img
@@ -157,14 +162,20 @@ const Discover = () => {
                           alt="店铺头像"
                           className="w-6 h-6 rounded-full"
                         />
-                        <span className="text-xs ml-2">{recommendation.shopName}</span>
+                        <span className="text-xs ml-2">
+                          {recommendation.shopName}
+                        </span>
                       </div>
                       <h3 className="text-sm font-medium mb-1">
                         {recommendation.title}
                       </h3>
                       <div className="flex items-center justify-between">
-                        <div className="text-primary text-sm font-medium">¥ {recommendation.price}</div>
-                        <div className="text-xs text-gray-400">已售 {recommendation.soldCount} </div>
+                        <div className="text-primary text-sm font-medium">
+                          ¥ {recommendation.price}
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          已售 {recommendation.soldCount}{" "}
+                        </div>
                       </div>
                     </div>
                   </div>

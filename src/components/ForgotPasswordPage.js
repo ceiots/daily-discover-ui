@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { API_BASE_URL } from "../config";
+import instance from "../utils/axios";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -45,8 +44,8 @@ const ForgotPasswordPage = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/user/reset-password-code`,
+      const response = await instance.post(
+        "/user/reset-password-code",
         {
           phoneNumber: formData.phoneNumber,
         }
@@ -102,8 +101,8 @@ const ForgotPasswordPage = () => {
     }
 
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/user/reset-password`,
+      const response = await instance.post(
+        "/user/reset-password",
         formData
       );
       if (response.data === "密码重置成功") {

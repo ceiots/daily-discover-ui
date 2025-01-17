@@ -18,7 +18,6 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 // 创建一个上下文来管理登录状态和用户信息
 const AuthContext = createContext();
 
-const API_BASE_URL = 'http://localhost:8081/daily-discover';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 默认未登录
