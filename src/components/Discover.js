@@ -18,8 +18,7 @@ const Discover = () => {
         const eventsResponse = await instance.get("/events");
         const categoriesResponse = await instance.get("/categories");
         const recommendationsResponse = await instance.get("/recommendations");
-
-        console.log("eventsResponse:", eventsResponse.data);
+        
         setEvents(eventsResponse.data);
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
