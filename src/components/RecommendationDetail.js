@@ -18,7 +18,7 @@ const RecommendationDetail = () => {
     const fetchRecommendation = async () => {
       try {
         const response = await instance.get(
-          "/recommendations/${id}" 
+          `/recommendations/${id}`
         );
         setRecommendation(response.data);
       } catch (error) {

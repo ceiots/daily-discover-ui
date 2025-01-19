@@ -16,7 +16,7 @@ const Cart = () => {
       try {
         const userId = 23; // Replace with actual user logic
         const response = await instance.get(
-          "/cart/${userId}"
+          `/cart/${userId}`
         );
         setCartItems(response.data);
       } catch (error) {
@@ -72,7 +72,7 @@ const Cart = () => {
       };
       // Update the quantity in the backend
       await instance.put(
-        "/cart/update/${itemId}",
+        `/cart/update/${itemId}`,
         request
       );
       // Update the local state
