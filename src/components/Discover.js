@@ -15,24 +15,16 @@ const Discover = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const currentDate = new Date().toLocaleDateString("zh-CN", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  });
+  const currentDate = new Date().toISOString().split('T')[0]; // 获取当前日期，格式为 YYYY-MM-DD
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsResponse = await instance.get(`/events`);
-        const categoriesResponse = await instance.get(
-          `/categories`
-        );
-        const recommendationsResponse = await instance.get(
-          `/recommendations`
-        );
+        // 获取当前日期的事件
+        const eventsResponse = await instance.get(`/events/date?date=${currentDate}`);
+        const categoriesResponse = await instance.get(`/categories`);
+        const recommendationsResponse = await instance.get(`/recommendations`);
 
-  
         setEvents(eventsResponse.data);
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
@@ -45,12 +37,12 @@ const Discover = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currentDate]);
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
-    console.log("Clicked event ID:", eventId);
-     navigate(`/event/${eventId}`);
+    const event = events.find((e) => e.id === eventId); // 找到对应的事件
+    navigate(`/event/${eventId}`, { state: { event, currentDate } }); // 传递事件数据和当前日期
   };
 
   const handleCategoryClick = async (categoryId) => {
@@ -168,10 +160,10 @@ const Discover = () => {
                 </div>
               ))
             )}
-            <button className="w-full mt-4 text-sm text-primary flex items-center justify-center">
+            {/* <button className="w-full mt-4 text-sm text-primary flex items-center justify-center">
               <span>查看更多历史事件</span>
               <i className="fas fa-chevron-right text-xs ml-1"></i>
-            </button>
+            </button> */}
           </div>
         </div>
 

@@ -1,48 +1,53 @@
 .nav-bar {
-    background: linear-gradient(to right, #766DE8, #8B84EA);
-    }
-    .search-bar {
-    background: rgba(255, 255, 255, 0.9);
-    }
-    .category-icon {
-    width: 48px;
-    height: 48px;
-    }
-    .masonry {
-    column-count: 2;
-    column-gap: 12px;
-    }
-    .masonry-item {
-    break-inside: avoid;
-    margin-bottom: 12px;
-    }
+  background: linear-gradient(to right, #766DE8, #8B84EA);
+}
 
-    .text-lg-title {
-        font-size: 1.125rem !important; /* 调整大号字体 */
-        line-height: 1.75rem !important;
-      }
+.search-bar {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.category-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.masonry {
+  column-count: 2;
+  column-gap: 12px;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 12px;
+}
+
+.text-lg-title {
+  font-size: 1.125rem !important;
+  /* 调整大号字体 */
+  line-height: 1.75rem !important;
+}
 
 
-      .discover-container {
-        height: 100vh;
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        background-color: #f9fafb;
-      }
-      
-      .nav-bar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        padding-top: env(safe-area-inset-top);
-        background: linear-gradient(to right, #4f46e5, #7c3aed);
-        z-index: 50;
-      }
-      
-      /* 状态栏背景延伸 */
+.discover-container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
+}
+
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: env(safe-area-inset-top);
+  background: linear-gradient(to right, #4f46e5, #7c3aed);
+  z-index: 50;
+}
+
+/* 状态栏背景延伸 */
 .status-bar-bg {
   position: fixed;
   top: 0;
@@ -58,4 +63,14 @@
   height: calc(100vh - 120px - env(safe-area-inset-top));
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+/* 添加无边框聚焦样式 */
+.no-focus-outline:focus {
+  outline: none;
+}
+
+input:focus {
+  outline: none; /* 禁用蓝色聚焦框 */
+  box-shadow: none; /* 禁用阴影效果 */
 }
