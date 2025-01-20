@@ -3,6 +3,7 @@ import { useAuth } from "../App";
 import { Link } from "react-router-dom";
 import "./Discover.css";
 import  instance  from "../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
   const { isLoggedIn, userAvatar } = useAuth();
@@ -11,6 +12,14 @@ const Discover = () => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const currentDate = new Date().toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +46,47 @@ const Discover = () => {
 
     fetchData();
   }, []);
+
+  // 点击事件处理函数
+  const handleEventClick = (eventId) => {
+    console.log("Clicked event ID:", eventId);
+     navigate(`/event/${eventId}`);
+  };
+
+  const handleCategoryClick = async (categoryId) => {
+    console.log("Clicked category ID:", categoryId);
+    try {
+        // 根据分类 ID 获取推荐内容
+        const response = await instance.get(`/recommendations?categoryId=${categoryId}`);
+        setRecommendations(response.data); // 更新推荐内容
+    } catch (error) {
+        console.error("Error fetching recommendations:", error);
+    }
+    // 不需要导航到分类页面，保持在当前页面
+  };
+
+  const handleRecommendationClick = (recommendationId) => {
+    console.log("Clicked recommendation ID:", recommendationId);
+    navigate(`/recommendation/${recommendationId}`);
+  };
+
+  const handleRefreshRecommendations = async () => {
+    try {
+      const response = await instance.get(`/recommendations/random`); // 假设后端有这个接口
+      setRecommendations(response.data); // 更新推荐内容
+    } catch (error) {
+      console.error("Error fetching random recommendations:", error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { value } = e.target;
+    setSearchTerm(value);
+  };
+
+  const filteredRecommendations = recommendations.filter(recommendation =>
+    recommendation.title.includes(searchTerm) || recommendation.shopName.includes(searchTerm)
+  );
 
   return (
     <div className="discover-container bg-gray-50 ">
@@ -77,6 +127,8 @@ const Discover = () => {
             type="text"
             placeholder="搜索节日、事件、商品"
             className="ml-2 w-full bg-transparent border-none focus:outline-none text-sm"
+            value={searchTerm}
+            onChange={handleInputChange}
           />
           <i className="fas fa-qrcode text-gray-400"></i>
         </div>
@@ -85,7 +137,7 @@ const Discover = () => {
         <div className="bg-white rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">历史的今天</h2>
-            <span className="text-sm text-gray-500">1 月 15 日</span>
+            <span className="text-sm text-gray-500">{currentDate}</span>
           </div>
           <div className="space-y-4">
             {loading ? (
@@ -97,6 +149,7 @@ const Discover = () => {
                 <div
                   key={event.id}
                   className="flex items-start space-x-4 pb-4 border-b border-gray-100"
+                  onClick={() => handleEventClick(event.id)}
                 >
                   <img
                     src={event.imageUrl}
@@ -122,9 +175,13 @@ const Discover = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-6 gap-4 overflow-x-auto whitespace-nowrap mb-6">
+        {/* <div className="grid grid-cols-6 gap-4 overflow-x-auto whitespace-nowrap mb-6">
           {categories.map((category) => (
-            <div key={category.id} className="flex flex-col items-center">
+            <div
+              key={category.id}
+              className="flex flex-col items-center"
+              onClick={() => handleCategoryClick(category.id)}
+            >
               <img
                 src={category.imageUrl}
                 alt={category.name}
@@ -133,58 +190,60 @@ const Discover = () => {
               <span className="text-xs mt-1">{category.name}</span>
             </div>
           ))}
-        </div>
+        </div> */}
 
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <i className="fas fa-crown text-primary"></i>
             <h3 className="text-base font-medium">今日推荐</h3>
           </div>
-          <button className="text-sm text-gray-500">
+          <button className="text-sm text-gray-500" onClick={handleRefreshRecommendations}>
             换一换 <i className="fas fa-sync-alt ml-1"></i>
           </button>
         </div>
 
         <div className="masonry pb-20">
-          {recommendations.length > 0 ? (
-            recommendations.map((recommendation) => (
-              <Link
-                to={`/recommendation/${recommendation.id}`}
+          {filteredRecommendations.length > 0 ? (
+            filteredRecommendations.map((recommendation) => (
+              <div
                 key={recommendation.id}
+                onClick={() => handleRecommendationClick(recommendation.id)}
               >
-                <div className="masonry-item">
-                  <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-                    <img
-                      src={recommendation.imageUrl}
-                      alt={recommendation.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-3">
-                      <div className="flex items-center mb-2">
-                        <img
-                          src={recommendation.shopAvatarUrl}
-                          alt="店铺头像"
-                          className="w-6 h-6 rounded-full"
-                        />
-                        <span className="text-xs ml-2">
-                          {recommendation.shopName}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-medium mb-1">
-                        {recommendation.title}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <div className="text-primary text-sm font-medium">
-                          ¥ {recommendation.price}
+                <Link to={`/recommendation/${recommendation.id}`}>
+                  <div className="masonry-item">
+                    <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+                      <img
+                        src={recommendation.imageUrl}
+                        alt={recommendation.title}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="p-3">
+                        <div className="flex items-center mb-2">
+                          <img
+                            src={recommendation.shopAvatarUrl}
+                            alt="店铺头像"
+                            className="w-6 h-6 rounded-full"
+                          />
+                          <span className="text-xs ml-2">
+                            {recommendation.shopName}
+                          </span>
                         </div>
-                        <div className="text-xs text-gray-400">
-                          已售 {recommendation.soldCount}{" "}
+                        <h3 className="text-sm font-medium mb-1">
+                          {recommendation.title}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <div className="text-primary text-sm font-medium">
+                            ¥ {recommendation.price}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            已售 {recommendation.soldCount}{" "}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </div>
             ))
           ) : (
             <p className="text-gray-500">没有推荐内容</p>

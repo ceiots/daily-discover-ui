@@ -15,6 +15,9 @@ import RecommendationDetail from "./components/RecommendationDetail"; // 导入�
 import './App.css';
 import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
+import EventDetail from "./components/EventDetail"; // 事件详情页面
+import CategoryPage from "./components/CategoryPage"; // 类别页面
+
 // 创建一个上下文来管理登录状态和用户信息
 const AuthContext = createContext();
 
@@ -40,6 +43,8 @@ const App = () => {
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/order-list" element={<OrderList />} />
           <Route path="/order-detail/:orderId" element={<OrderDetail />} />
+          <Route path="/event/:id" element={<EventDetail />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
         </Routes>
       </Router>
