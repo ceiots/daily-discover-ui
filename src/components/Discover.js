@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import { Link } from "react-router-dom";
 import "./Discover.css";
-import  instance  from "../utils/axios";
+import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
@@ -15,13 +15,15 @@ const Discover = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const currentDate = new Date().toISOString().split('T')[0]; // 获取当前日期，格式为 YYYY-MM-DD
+  const currentDate = new Date().toISOString().split("T")[0]; // 获取当前日期，格式为 YYYY-MM-DD
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // 获取当前日期的事件
-        const eventsResponse = await instance.get(`/events/date?date=${currentDate}`);
+        const eventsResponse = await instance.get(
+          `/events/date?date=${currentDate}`
+        );
         const categoriesResponse = await instance.get(`/categories`);
         const recommendationsResponse = await instance.get(`/recommendations`);
 
@@ -48,11 +50,13 @@ const Discover = () => {
   const handleCategoryClick = async (categoryId) => {
     console.log("Clicked category ID:", categoryId);
     try {
-        // 根据分类 ID 获取推荐内容
-        const response = await instance.get(`/recommendations?categoryId=${categoryId}`);
-        setRecommendations(response.data); // 更新推荐内容
+      // 根据分类 ID 获取推荐内容
+      const response = await instance.get(
+        `/recommendations?categoryId=${categoryId}`
+      );
+      setRecommendations(response.data); // 更新推荐内容
     } catch (error) {
-        console.error("Error fetching recommendations:", error);
+      console.error("Error fetching recommendations:", error);
     }
     // 不需要导航到分类页面，保持在当前页面
   };
@@ -71,13 +75,38 @@ const Discover = () => {
     }
   };
 
+  const handleSearch = async () => {
+    if (searchTerm.trim() === "") {
+      // 如果搜索框为空，重新获取所有事件
+      const eventsResponse = await instance.get(
+        `/events/date?date=${currentDate}`
+      );
+      setEvents(eventsResponse.data);
+      setRecommendations([]); // 清空推荐
+    } else {
+      // 根据关键字搜索事件
+      const searchResponse = await instance.get(
+        `/search/events?keyword=${searchTerm}`
+      );
+      setEvents(searchResponse.data);
+
+      // 根据关键字搜索推荐
+      const recommendationResponse = await instance.get(
+        `/search/recommendations?keyword=${searchTerm}`
+      );
+      setRecommendations(recommendationResponse.data);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { value } = e.target;
     setSearchTerm(value);
   };
 
-  const filteredRecommendations = recommendations.filter(recommendation =>
-    recommendation.title.includes(searchTerm) || recommendation.shopName.includes(searchTerm)
+  const filteredRecommendations = recommendations.filter(
+    (recommendation) =>
+      recommendation.title.includes(searchTerm) ||
+      recommendation.shopName.includes(searchTerm)
   );
 
   return (
@@ -117,7 +146,7 @@ const Discover = () => {
           <i className="fas fa-search text-gray-400"></i>
           <input
             type="text"
-            placeholder="搜索节日、事件、商品"
+            placeholder="搜索"
             className="ml-2 w-full bg-transparent border-none focus:outline-none text-sm"
             value={searchTerm}
             onChange={handleInputChange}
@@ -128,7 +157,9 @@ const Discover = () => {
       <div className="scrollable-content mt-28 px-4">
         <div className="bg-white rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">历史的今天</h2>
+            <h2 className="text-lg font-medium">
+              {searchTerm ? `搜索结果: ${searchTerm}` : "历史的今天"}
+            </h2>
             <span className="text-sm text-gray-500">{currentDate}</span>
           </div>
           <div className="space-y-4">
@@ -184,15 +215,20 @@ const Discover = () => {
           ))}
         </div> */}
 
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <i className="fas fa-crown text-primary"></i>
-            <h3 className="text-base font-medium">今日推荐</h3>
+        {searchTerm ? null : (
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <i className="fas fa-crown text-primary"></i>
+              <h3 className="text-base font-medium">今日推荐</h3>
+            </div>
+            <button
+              className="text-sm text-gray-500"
+              onClick={handleRefreshRecommendations}
+            >
+              换一换 <i className="fas fa-sync-alt ml-1"></i>
+            </button>
           </div>
-          <button className="text-sm text-gray-500" onClick={handleRefreshRecommendations}>
-            换一换 <i className="fas fa-sync-alt ml-1"></i>
-          </button>
-        </div>
+        )}
 
         <div className="masonry pb-20">
           {filteredRecommendations.length > 0 ? (
