@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import { Link } from "react-router-dom";
 import "./Discover.css";
-import instance from "../utils/axios";
+import  instance  from "../utils/axios";
 
 const Discover = () => {
   const { isLoggedIn, userAvatar } = useAuth();
@@ -15,10 +15,15 @@ const Discover = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsResponse = await instance.get("/events");
-        const categoriesResponse = await instance.get("/categories");
-        const recommendationsResponse = await instance.get("/recommendations");
-        
+        const eventsResponse = await instance.get(`/events`);
+        const categoriesResponse = await instance.get(
+          `/categories`
+        );
+        const recommendationsResponse = await instance.get(
+          `/recommendations`
+        );
+
+  
         setEvents(eventsResponse.data);
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
