@@ -74,3 +74,15 @@ input:focus {
   outline: none; /* 禁用蓝色聚焦框 */
   box-shadow: none; /* 禁用阴影效果 */
 }
+
+
+/* 如果是input元素 */
+.search-bar input,
+.search-bar input:focus,
+.search-bar input:focus-visible {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    -webkit-box-shadow: none !important;
+}

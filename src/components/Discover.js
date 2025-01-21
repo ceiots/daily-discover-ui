@@ -10,10 +10,12 @@ const Discover = () => {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [aiContents, setAiContents] = useState([]); // 新增状态用于存储 AI 生成内容
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [originalRecommendations, setOriginalRecommendations] = useState([]);
 
   const currentDate = new Date().toISOString().split("T")[0]; // 获取当前日期，格式为 YYYY-MM-DD
 
@@ -30,6 +32,7 @@ const Discover = () => {
         setEvents(eventsResponse.data);
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
+        setOriginalRecommendations(recommendationsResponse.data); // 存储原始推荐数据
       } catch (error) {
         setError("Error fetching data. Please try again later.");
         console.error("Error fetching data:", error);
@@ -76,26 +79,14 @@ const Discover = () => {
   };
 
   const handleSearch = async () => {
-    if (searchTerm.trim() === "") {
-      // 如果搜索框为空，重新获取所有事件
-      const eventsResponse = await instance.get(
-        `/events/date?date=${currentDate}`
-      );
-      setEvents(eventsResponse.data);
-      setRecommendations([]); // 清空推荐
-    } else {
-      // 根据关键字搜索事件
-      const searchResponse = await instance.get(
-        `/search/events?keyword=${searchTerm}`
-      );
-      setEvents(searchResponse.data);
-
-      // 根据关键字搜索推荐
-      const recommendationResponse = await instance.get(
-        `/search/recommendations?keyword=${searchTerm}`
-      );
-      setRecommendations(recommendationResponse.data);
+    // 调用 AI 接口获取生成内容
+    try {
+      const aiResponse = await instance.post('/ai/generate', searchTerm);
+      setAiContents(aiResponse.data); // 更新 AI 生成内容
+    } catch (error) {
+      console.error("Error fetching AI content:", error);
     }
+    navigate('/search-results', { state: { searchTerm } }); // 跳转到搜索结果页面
   };
 
   const handleInputChange = (e) => {
@@ -115,7 +106,7 @@ const Discover = () => {
         <div className="flex items-center justify-between">
           <h1 className="text-white text-lg-title font-medium">每日发现</h1>
           <div className="flex items-center space-x-4">
-            <i className="fas fa-bell text-white"></i>
+            {/* <i className="fas fa-bell text-white"></i> */}
             <div className="relative">
               <Link to="/cart" className="flex items-center">
                 <i className="fas fa-shopping-cart text-white"></i>
@@ -146,57 +137,62 @@ const Discover = () => {
           <i className="fas fa-search text-gray-400"></i>
           <input
             type="text"
-            placeholder="搜索"
-            className="ml-2 w-full bg-transparent border-none focus:outline-none text-sm"
+            placeholder="搜索节日、事件、商品"
+            className="ml-2 w-full bg-transparent border-none focus:outline-none text-sm no-outline"
             value={searchTerm}
             onChange={handleInputChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch(); // 按下回车键时触发搜索
+              }
+            }}
           />
-          <i className="fas fa-qrcode text-gray-400"></i>
+          <i onClick={handleSearch} className="fas fa-qrcode text-gray-400 ml-2"></i>
         </div>
       </nav>
       <div className="scrollable-content mt-28 px-4">
-        <div className="bg-white rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">
-              {searchTerm ? `搜索结果: ${searchTerm}` : "历史的今天"}
-            </h2>
-            <span className="text-sm text-gray-500">{currentDate}</span>
-          </div>
-          <div className="space-y-4">
-            {loading ? (
-              <p>Loading events...</p>
-            ) : error ? (
-              <p className="text-red-500">{error}</p>
-            ) : (
-              events.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-start space-x-4 pb-4 border-b border-gray-100"
-                  onClick={() => handleEventClick(event.id)}
-                >
-                  <img
-                    src={event.imageUrl}
-                    alt={event.title}
-                    className="w-24 h-24 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
-                      {event.category}
-                    </span>
-                    <h3 className="text-sm font-medium my-2">{event.title}</h3>
-                    <p className="text-xs text-gray-500 line-clamp-2">
-                      {event.description}
-                    </p>
+        {events.length > 0 && (
+          <div className="bg-white rounded-lg p-4 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-medium">历史的今天</h2>
+              <span className="text-sm text-gray-500">{currentDate}</span>
+            </div>
+            <div className="space-y-4">
+              {loading ? (
+                <p>Loading events...</p>
+              ) : error ? (
+                <p className="text-red-500">{error}</p>
+              ) : (
+                events.map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-start space-x-4 pb-4 border-b border-gray-100"
+                    onClick={() => handleEventClick(event.id)}
+                  >
+                    <img
+                      src={event.imageUrl}
+                      alt={event.title}
+                      className="w-24 h-24 rounded-lg object-cover"
+                    />
+                    <div className="flex-1">
+                      <span className="text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">
+                        {event.category}
+                      </span>
+                      <h3 className="text-sm font-medium my-2">{event.title}</h3>
+                      <p className="text-xs text-gray-500 line-clamp-2">
+                        {event.description}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-            {/* <button className="w-full mt-4 text-sm text-primary flex items-center justify-center">
-              <span>查看更多历史事件</span>
-              <i className="fas fa-chevron-right text-xs ml-1"></i>
-            </button> */}
+                ))
+              )}
+              {/* <button className="w-full mt-4 text-sm text-primary flex items-center justify-center">
+                <span>查看更多历史事件</span>
+                <i className="fas fa-chevron-right text-xs ml-1"></i>
+              </button> */}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* <div className="grid grid-cols-6 gap-4 overflow-x-auto whitespace-nowrap mb-6">
           {categories.map((category) => (
@@ -215,8 +211,7 @@ const Discover = () => {
           ))}
         </div> */}
 
-        {searchTerm ? null : (
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 mt-5">
             <div className="flex items-center gap-2">
               <i className="fas fa-crown text-primary"></i>
               <h3 className="text-base font-medium">今日推荐</h3>
@@ -228,14 +223,13 @@ const Discover = () => {
               换一换 <i className="fas fa-sync-alt ml-1"></i>
             </button>
           </div>
-        )}
-
-        <div className="masonry pb-20">
-          {filteredRecommendations.length > 0 ? (
-            filteredRecommendations.map((recommendation) => (
+        
+        <div className="masonry pb-16">
+          {originalRecommendations.length > 0 ? (
+            originalRecommendations.map((recommendation) => (
               <div
                 key={recommendation.id}
-                onClick={() => handleRecommendationClick(recommendation.id)}
+                /* onClick={() => handleRecommendationClick(recommendation.id)} */
               >
                 <Link to={`/recommendation/${recommendation.id}`}>
                   <div className="masonry-item">
@@ -277,6 +271,8 @@ const Discover = () => {
             <p className="text-gray-500">没有推荐内容</p>
           )}
         </div>
+
+        
       </div>
     </div>
   );
