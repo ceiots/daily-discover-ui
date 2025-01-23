@@ -33,6 +33,7 @@ const Discover = () => {
         setCategories(categoriesResponse.data);
         setRecommendations(recommendationsResponse.data);
         setOriginalRecommendations(recommendationsResponse.data); // 存储原始推荐数据
+      
       } catch (error) {
         setError("Error fetching data. Please try again later.");
         console.error("Error fetching data:", error);
@@ -46,6 +47,7 @@ const Discover = () => {
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
+    console.log("Clicked event ID:", events);
     const event = events.find((e) => e.id === eventId); // 找到对应的事件
     navigate(`/event/${eventId}`, { state: { event, currentDate } }); // 传递事件数据和当前日期
   };
