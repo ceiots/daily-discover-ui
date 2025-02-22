@@ -28,7 +28,11 @@ const SearchResultsPage = () => {
   const fetchAIContent = async () => {
     try {
       const response = await instance.post('/ai/generate', searchInput, { responseType: 'stream' });
-      const reader = response.data.getReader();
+      if (!response.body) {
+        throw new Error('ReadableStream not yet supported in this browser.');
+      }
+
+      const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let receivedText = '';
 
@@ -61,7 +65,8 @@ const SearchResultsPage = () => {
     setLoading(true); // 开始加载状态
     setError(null); // 清除之前的错误
     // 重新获取搜索结果和 AI 内容
-    await Promise.all([fetchSearchResults(), fetchAIContent()]);
+    fetchSearchResults();
+    fetchAIContent();
   };
 
   // 合并事件和推荐内容

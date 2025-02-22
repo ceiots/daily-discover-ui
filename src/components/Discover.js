@@ -47,7 +47,6 @@ const Discover = () => {
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
-    console.log("Clicked event ID:", events);
     const event = events.find((e) => e.id === eventId); // 找到对应的事件
     navigate(`/event/${eventId}`, { state: { event, currentDate } }); // 传递事件数据和当前日期
   };
@@ -81,13 +80,6 @@ const Discover = () => {
   };
 
   const handleSearch = async () => {
-    // 调用 AI 接口获取生成内容
-    try {
-      const aiResponse = await instance.post('/ai/generate', searchTerm);
-      setAiContents(aiResponse.data); // 更新 AI 生成内容
-    } catch (error) {
-      console.error("Error fetching AI content:", error);
-    }
     navigate('/search-results', { state: { searchTerm } }); // 跳转到搜索结果页面
   };
 
