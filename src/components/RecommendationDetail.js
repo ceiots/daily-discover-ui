@@ -20,7 +20,9 @@ const RecommendationDetail = () => {
         const response = await instance.get(
           `/recommendations/${id}`
         );
+        
         setRecommendation(response.data);
+        
       } catch (error) {
         setError(
           "Error fetching recommendation details. Please try again later."
@@ -83,6 +85,43 @@ const RecommendationDetail = () => {
     navigate("/payment"); // Navigate to payment.js
   };
 
+  // Function to render product details
+  const renderProductDetails = (details) => {
+    return details.map((item, index) => {
+      if (item.type === 'image') {
+        return <img key={index} src={item.content} alt="Product Detail" className="w-full h-auto mb-4" />;
+      } else if (item.type === 'text') {
+        return <div key={index} className="text-sm text-gray-800 leading-relaxed mb-4 font-light">{item.content}</div>;
+      } else if (item.title && item.content) {
+        return (
+          <div key={index} className="mb-4">
+            <h4 className="text-base font-semibold mb-2">{item.title}</h4>
+            <p className="text-sm text-gray-700 leading-relaxed font-light">{item.content}</p>
+          </div>
+        );
+      } 
+      return null;
+    });
+  };
+
+  // Function to render specifications
+  const renderSpecifications = () => {
+    return recommendation.specifications.map((spec, index) => (
+      <div key={index} className="mb-4">
+        <h4 className="text-base font-semibold mb-2">{spec.name}</h4>
+        <div className="flex flex-wrap gap-2">
+          {spec.values.map((value, idx) => (
+            <button
+              key={idx}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+      </div>
+    ));
+  };
+
   return (
     <div className="bg-gray-100">
       <div className="max-w-[375px] mx-auto bg-white min-h-screen relative">
@@ -102,30 +141,66 @@ const RecommendationDetail = () => {
               alt={recommendation.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center">
-              <div className="flex space-x-1">
-                {/* <div className="w-2 h-2 rounded-full bg-primary"></div>
-                <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                <div className="w-2 h-2 rounded-full bg-gray-300"></div> */}
+          </div>
+
+        <div className="bg-white px-4 py-4 mt-2">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h1 className="text-lg font-medium leading-tight">
+              {recommendation.title}
+            </h1>
+            <div className="flex items-center mt-2">
+              <span className="text-2xl font-semibold text-primary">¥ {recommendation.price}</span>
+              <span className="text-gray-400 text-sm ml-2">已售 {recommendation.soldCount}</span>
+            </div>
+          </div>
+          <button className="w-8 h-8 flex items-center justify-center ml-2">
+            <i className="ri-heart-line text-xl text-gray-400"></i>
+          </button>
+        </div>
+        <div className="flex items-center mt-3 text-sm text-gray-500">
+          <span className="mr-4">快递：免运费</span>
+        </div>
+      </div>
+
+      <div className="my-0 w-full h-2 bg-gray-100"></div>
+    
+      <div className="bg-white mt-2 px-4 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-medium">规格选择</h2>
+          <span className="text-sm text-gray-500">已选：基础套装 + 大楷</span>
+        </div>
+    
+        <div>
+            {recommendation.specifications.map((spec, index) => (
+              <div key={index} className="mb-4">
+                <div className="text-sm text-gray-600 mb-2">{spec.name}</div>
+                <div className="flex flex-wrap gap-3 specs-item">
+                  {spec.values.map((value, idx) => (
+                    <React.Fragment key={idx}>
+                      <input
+                        type="radio"
+                        name={spec.name}
+                        id={`${spec.name}-${idx}`}
+                        className="hidden"
+                        // Add any necessary default checked logic here
+                      />
+                      <label
+                        htmlFor={`${spec.name}-${idx}`}
+                        className="px-4 py-2 border rounded-full text-sm cursor-pointer"
+                      >
+                        {value}
+                      </label>
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-          <div className="p-4 bg-white">
-            <h2 className="text-xl font-semibold mb-2 tracking-tight">
-              {recommendation.title} {/* Use fetched data */}
-            </h2>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-2xl font-bold text-primary tracking-tight">
-                ¥ {recommendation.price} {/* Use fetched data */}
-              </span>
-              <span className="text-sm text-gray-500 font-light">
-                已售 {recommendation.soldCount} {/* Use fetched data */}
-              </span>
-            </div>
-            <button className="text-primary border border-primary rounded-full px-3 py-1 text-sm">
-              <i className="far fa-heart mr-1"></i>收藏
-            </button>
-          </div>
+      </div>
+
+      <div className="my-0 w-full h-2 bg-gray-100"></div>
+
           <div className="p-4 bg-white mt-2 flex items-center justify-between">
             <div className="flex items-center">
               <img
@@ -161,16 +236,6 @@ const RecommendationDetail = () => {
               </button>
               <button
                 className={`flex-1 py-3 text-center ${
-                  activeTab === "specifications"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-500"
-                }`}
-                onClick={() => setActiveTab("specifications")}
-              >
-                规格参数
-              </button>
-              <button
-                className={`flex-1 py-3 text-center ${
                   activeTab === "purchaseNotice"
                     ? "text-primary border-b-2 border-primary"
                     : "text-gray-500"
@@ -186,43 +251,26 @@ const RecommendationDetail = () => {
                   <h3 className="text-lg font-medium tracking-wide mb-3">
                     产品详情
                   </h3>
-                  <div
+                  {renderProductDetails(recommendation.productDetails)} {/* Render product details */}
+                  {/* <div
                     className="text-sm text-gray-700 leading-relaxed mb-4 font-light"
                     dangerouslySetInnerHTML={{
                       __html: recommendation.productDetails,
-                    }} // Use fetched data
-                  />
+                    }} // Use fetched data 
+                  /> */}
                 </>
               )}
-              {activeTab === "specifications" && (
-                <>
-                  <h3 className="text-lg font-medium tracking-wide mb-3">
-                    规格参数
-                  </h3>
-                  <ul className="list-disc list-inside text-sm text-gray-700 mb-4 font-light">
-                    {recommendation.specifications &&
-                    recommendation.specifications.length > 0 ? (
-                      recommendation.specifications.map((spec, index) => (
-                        <li key={index}>{spec}</li> // Use fetched data
-                      ))
-                    ) : (
-                      <li>暂无规格参数</li> // Fallback message if no specifications
-                    )}
-                  </ul>
-                </>
-              )}
+ 
               {activeTab === "purchaseNotice" && (
                 <>
-                  <h3 className="text-lg font-medium tracking-wide mb-3">
-                    购买须知
-                  </h3>
-                  <p className="text-sm text-gray-700 leading-relaxed mb-4 font-light">
-                    {recommendation.purchaseNotice} {/* Use fetched data */}
-                  </p>
+                  {renderProductDetails(recommendation.purchaseNotices)}
                 </>
               )}
             </div>
           </div>
+
+          <div className="my-0 w-full h-2 bg-gray-100"></div>
+          
           <div className="mt-2 bg-white p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium tracking-wide">用户评论</h3>
@@ -358,6 +406,13 @@ const RecommendationDetail = () => {
           {/* <button className="flex items-center justify-center w-10 h-10 mr-2">
             <i className="fas fa-comments text-gray-600 text-xl"></i>
           </button> */}
+          <button
+            className="w-12 h-12 flex flex-col items-center justify-center text-gray-500"
+          >
+            <i className="ri-customer-service-2-line text-xl"></i>
+            <span className="text-xs mt-0.5">客服</span>
+          </button>
+          
           <button
             className="flex-1 bg-secondary text-primary py-2 rounded-full mr-2 !rounded-button"
             onClick={handleAddToCart}
