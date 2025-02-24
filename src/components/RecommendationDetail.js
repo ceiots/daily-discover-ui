@@ -13,6 +13,23 @@ const RecommendationDetail = () => {
   const [quantity, setQuantity] = useState(1); // State for quantity
   const [selectedVariant, setSelectedVariant] = useState(""); // State for selected variant
   const navigate = useNavigate(); // Create navigate object
+  // 初始化选择状态
+  const [selectedSpecs, setSelectedSpecs] = useState({});
+
+  // 处理选择变化
+  const handleSpecChange = (specName, value) => {
+    setSelectedSpecs((prevSpecs) => ({
+      ...prevSpecs,
+      [specName]: value,
+    }));
+  };
+
+  // 生成“已选”文字
+  const getSelectedText = () => {
+    return Object.entries(selectedSpecs)
+      .map(([specName, value]) => `${specName}: ${value}`)
+      .join(' + ');
+  };
 
   useEffect(() => {
     const fetchRecommendation = async () => {
@@ -168,7 +185,7 @@ const RecommendationDetail = () => {
       <div className="bg-white mt-2 px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-medium">规格选择</h2>
-          <span className="text-sm text-gray-500">已选：基础套装 + 大楷</span>
+          <span className="text-sm text-gray-500">已选：{getSelectedText() || '请选择'}</span>
         </div>
     
         <div>
@@ -183,7 +200,7 @@ const RecommendationDetail = () => {
                         name={spec.name}
                         id={`${spec.name}-${idx}`}
                         className="hidden"
-                        // Add any necessary default checked logic here
+                        onChange={() => handleSpecChange(spec.name, value)}
                       />
                       <label
                         htmlFor={`${spec.name}-${idx}`}
@@ -270,7 +287,7 @@ const RecommendationDetail = () => {
           </div>
 
           <div className="my-0 w-full h-2 bg-gray-100"></div>
-          
+
           <div className="mt-2 bg-white p-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium tracking-wide">用户评论</h3>
