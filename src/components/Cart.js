@@ -118,28 +118,8 @@ const Cart = () => {
     document.getElementById('totalItems').textContent = count;
   };
 
-  function showConfirmOrder() {
-    document.getElementById("confirmOrderModal").classList.remove("hidden");
-  }
-
-  function hideConfirmOrder() {
-    document.getElementById("confirmOrderModal").classList.add("hidden");
-  }
-
-  function editAddress() {
-    // 编辑地址的逻辑
-  }
-
   function submitOrder() {
-    const toast = document.createElement("div");
-    toast.className =
-      "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white px-6 py-3 rounded-lg";
-    toast.textContent = "订单提交成功";
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.remove();
-      hideConfirmOrder();
-    }, 2000);
+    navigate('/payment'); // 跳转到订单确认页面
   }
 
   const handleDelete = async () => {
@@ -218,8 +198,8 @@ const Cart = () => {
                   alt={item.productName}
                 />
                 <div className="flex-1">
-                  <h3 className="text-sm font-medium mb-1">{item.productName}</h3>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <h3 className="text-sm font-medium mb-1" style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>{item.productName}</h3>
+                  <p className="text-xs text-gray-500 mb-2" style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
                     规格：{item.specifications.map(spec => `${spec.name}-${spec.values.join(', ')}`).join('，')}
                   </p>
                   <div className="flex items-center justify-between">
@@ -257,113 +237,12 @@ const Cart = () => {
           <div className="text-sm">
             合计: <span className="text-primary font-medium" id="totalPrice">¥ 0</span>
           </div>
-          <button className="bg-primary text-white px-6 py-2 !rounded-button" onClick={showConfirmOrder}>
+          <button className="bg-primary text-white px-6 py-2 !rounded-button" onClick={submitOrder}>
             结算 (<span id="totalItems">0</span>)
           </button>
         </div>
       </footer>
-
-          <div>
-            <div
-              id="confirmOrderModal"
-              className="fixed inset-0 bg-black bg-opacity-50 z-50 hidden"
-            >
-              <div className="w-[375px] bg-white absolute bottom-0 rounded-t-2xl">
-                <div className="p-4 border-b">
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium">确认订单</span>
-                    <button
-                      onClick="hideConfirmOrder()"
-                      className="w-8 h-8 flex items-center justify-center"
-                    >
-                      <i className="ri-close-line text-xl"></i>
-                    </button>
-                  </div>
-                </div>
-                <div className="p-4 space-y-4">
-                  <div
-                    className="bg-gray-50 p-4 rounded-lg flex items-center"
-                    onClick="editAddress()"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center">
-                        <span className="font-medium">张先生</span>
-                        <span className="ml-4 text-gray-500">138****8888</span>
-                      </div>
-                      <p className="text-sm text-gray-500 mt-1">
-                        浙江省杭州市西湖区文三路 443 号
-                      </p>
-                    </div>
-                    <i className="ri-arrow-right-s-line text-xl text-gray-400"></i>
-                  </div>
-                  <div className="space-y-4">
-                    <div
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <span className="text-gray-500">支付方式</span>
-                      <div className="flex items-center">
-                        <span>微信支付</span>
-                        <i
-                          className="ri-arrow-right-s-line text-xl text-gray-400 ml-2"
-                        ></i>
-                      </div>
-                    </div>
-
-                    <div
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <span className="text-gray-500">优惠券</span>
-                      <div className="flex items-center">
-                        <span className="text-primary">暂无可用</span>
-                        <i
-                          className="ri-arrow-right-s-line text-xl text-gray-400 ml-2"
-                        ></i>
-                      </div>
-                    </div>
-
-                    <div
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                    >
-                      <span className="text-gray-500">配送方式</span>
-                      <div className="flex items-center">
-                        <span>快递配送</span>
-                        <i
-                          className="ri-arrow-right-s-line text-xl text-gray-400 ml-2"
-                        ></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">商品金额</span>
-                      <span>¥468.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">运费</span>
-                      <span>¥0.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">优惠金额</span>
-                      <span className="text-primary">-¥0.00</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 border-t">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-500">实付金额</span>
-                    <span className="text-primary text-xl font-medium">¥468.00</span>
-                  </div>
-                  <button
-                    className="w-full bg-primary text-white h-12 !rounded-button"
-                    onClick="submitOrder()"
-                  >
-                    提交订单
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>  
+          
     </div>
   );
 };
