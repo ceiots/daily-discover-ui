@@ -98,17 +98,17 @@ const RecommendationDetail = () => {
   }
 
     const cartItem = {
-      user_id: 23, // Replace with actual user logic
-      product_id: id,
-      product_name: recommendation.title,
-      product_image: recommendation.imageUrl,
+      userId: 23, // Replace with actual user logic
+      productId: id,
+      productName: recommendation.title,
+      productImage: recommendation.imageUrl,
       specifications: transformedSpecs,
       price: recommendation.price,
       quantity: quantity,
       shopName: recommendation.shopName,
       shopAvatarUrl: recommendation.shopAvatarUrl
     };
-    console.log(id+' dsaf:'+JSON.stringify(cartItem));
+    console.log(' dsaf:'+JSON.stringify(cartItem.shopAvatarUrl));
 
     try {
       await instance.post(
