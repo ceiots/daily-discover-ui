@@ -11,17 +11,34 @@ const RecommendationDetail = () => {
   const [activeTab, setActiveTab] = useState("introduction"); // State to track active tab
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const [quantity, setQuantity] = useState(1); // State for quantity
-  const [selectedVariant, setSelectedVariant] = useState(""); // State for selected variant
+  //const [selectedVariant, setSelectedVariant] = useState(""); // State for selected variant
   const navigate = useNavigate(); // Create navigate object
   // 初始化选择状态
-  const [selectedSpecs, setSelectedSpecs] = useState({});
+   const [selectedSpecs, setSelectedSpecs] = useState({});
+   // 初始化转换后的规格数组
+   const [transformedSpecs, setTransformedSpecs] = useState([]);
+ 
 
   // 处理选择变化
-  const handleSpecChange = (specName, value) => {
-    setSelectedSpecs((prevSpecs) => ({
-      ...prevSpecs,
+   const handleSpecChange = (specName, value) => {
+    // 更新选择状态
+    const updatedSpecs = {
+      ...selectedSpecs,
       [specName]: value,
+    };
+    setSelectedSpecs(updatedSpecs);
+
+    // 转换为所需格式
+    const transformed = recommendation.specifications.map(spec => ({
+      ...spec,
+      values: [updatedSpecs[spec.name]].filter(Boolean), // 只保留选中的值
     }));
+
+    // 更新转换后的规格数组
+    setTransformedSpecs(transformed);
+
+    console.log("Selected Specs:", updatedSpecs);
+    console.log("Transformed Specs:", transformed);
   };
 
   // 生成“已选”文字
@@ -68,22 +85,30 @@ const RecommendationDetail = () => {
 
   // Function to conf// Function to confirm adding to cart
   const confirmAddToCart = async () => {
-    if (!selectedVariant) {
-      alert("请选择规格"); // Alert if no variant is selected
-      return;
-    }
+   // 检查是否所有规格都已选择
+  const isAllSpecsSelected = () => {
+    return recommendation.specifications.every(
+      (spec) => Object.prototype.hasOwnProperty.call(selectedSpecs, spec.name) && selectedSpecs[spec.name]
+    );
+  };
+
+  if (!isAllSpecsSelected()) {
+    //alert("请选择所有规格"); // Alert if not all variants are selected
+    return;
+  }
 
     const cartItem = {
       user_id: 23, // Replace with actual user logic
-      product_id: recommendation.id,
+      product_id: id,
       product_name: recommendation.title,
       product_image: recommendation.imageUrl,
-      product_variant: selectedVariant,
+      specifications: transformedSpecs,
       price: recommendation.price,
       quantity: quantity,
       shopName: recommendation.shopName,
       shopAvatarUrl: recommendation.shopAvatarUrl
     };
+    console.log(id+' dsaf:'+JSON.stringify(cartItem));
 
     try {
       await instance.post(
@@ -182,41 +207,16 @@ const RecommendationDetail = () => {
 
       <div className="my-0 w-full h-2 bg-gray-100"></div>
     
-      <div className="bg-white mt-2 px-4 py-4">
+      {/* <div className="bg-white mt-2 px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-medium">规格选择</h2>
           <span className="text-sm text-gray-500">已选：{getSelectedText() || '请选择'}</span>
         </div>
     
-        <div>
-            {recommendation.specifications.map((spec, index) => (
-              <div key={index} className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">{spec.name}</div>
-                <div className="flex flex-wrap gap-3 specs-item">
-                  {spec.values.map((value, idx) => (
-                    <React.Fragment key={idx}>
-                      <input
-                        type="radio"
-                        name={spec.name}
-                        id={`${spec.name}-${idx}`}
-                        className="hidden"
-                        onChange={() => handleSpecChange(spec.name, value)}
-                      />
-                      <label
-                        htmlFor={`${spec.name}-${idx}`}
-                        className="px-4 py-2 border rounded-full text-sm cursor-pointer"
-                      >
-                        {value}
-                      </label>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-      </div>
+        
+      </div> 
 
-      <div className="my-0 w-full h-2 bg-gray-100"></div>
+      <div className="my-0 w-full h-2 bg-gray-100"></div>*/}
 
           <div className="p-4 bg-white mt-2 flex items-center justify-between">
             <div className="flex items-center">
@@ -351,7 +351,7 @@ const RecommendationDetail = () => {
                   </button>
                 </div>
                 
-                <div className="mb-4">
+                {/* <div className="mb-4">
                   <p className="mb-2">套装类型</p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -385,7 +385,38 @@ const RecommendationDetail = () => {
                       高级套装
                     </button>
                   </div>
+                </div> */}
+
+                <div>
+                  {recommendation.specifications.map((spec, index) => (
+                    <div key={index} className="mb-4">
+                      <div className="text-sm text-gray-600 mb-2">{spec.name}</div>
+                      <div className="flex flex-wrap gap-3 specs-item">
+                        {spec.values.map((value, idx) => (
+                          <React.Fragment key={idx}>
+                            <input
+                              type="radio"
+                              name={spec.name}
+                              id={`${spec.name}-${idx}`}
+                              className="hidden"
+                              onChange={() => handleSpecChange(spec.name, value)}
+                              checked={selectedSpecs[spec.name] === value}
+                            />
+                            <label
+                              htmlFor={`${spec.name}-${idx}`}
+                              className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${
+                                selectedSpecs[spec.name] === value ? 'bg-primary text-white' : ''
+                              }`}
+                            >
+                              {value}
+                            </label>
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
                 <div className="mb-4">
                   <p className="mb-2">数量</p>
                   <div className="flex items-center">

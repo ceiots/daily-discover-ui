@@ -28,6 +28,7 @@
     "chart.js": "^4.4.7",
     "chartjs-adapter-date-fns": "^3.0.0",
     "cors": "^2.8.5",
+    "daily-discover-ui": "file:",
     "dompurify": "^3.2.3",
     "formik": "^2.4.6",
     "leaflet": "^1.9.4",

@@ -11,6 +11,7 @@ const Cart = () => {
   const [selectAll, setSelectAll] = useState(false); // State to track if all items are selected
   const [showDropdown, setShowDropdown] = useState(false); // 控制下拉菜单的显示
 
+
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
@@ -18,6 +19,7 @@ const Cart = () => {
         const response = await instance.get(
           `/cart/${userId}`
         );
+        console.log(response.data);
         setCartItems(response.data);
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -156,53 +158,48 @@ const Cart = () => {
                   {item.shopName}
                 </span>
               </div>
-              <div className="flex items-center ml-2">
-                <input
-                  type="checkbox"
-                  checked={!!selectedItems[item.id]} // Check if the item is selected
-                  onChange={() => handleCheckboxChange(item.id)} // Handle checkbox change
-                  className="mr-4"
-                />
-                <img
-                  src={item.product_image} // Use the actual image URL
-                  className="w-20 h-20 object-cover rounded-lg"
-                  alt={item.product_name}
-                />
-                <div className="flex-1 ml-4">
-                  <h3 className="text-gray-900 text-[11px] mb-1">
-                    {item.product_name}
-                  </h3>
-                  <span className="inline-block py-0.5 bg-secondary text-[10px] text-primary rounded-md">
-                    {item.product_variant}
-                  </span>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-gray-400 text-sm font-medium">
-                      ¥ {item.price}
-                    </span>
-                    <div className="flex items-center gap-4 mr-12">
-                      <button className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button opacity-50 cursor-not-allowed">
-                        <i
-                          className="fas fa-minus text-[10px] text-gray-300"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
-                          }
-                        ></i>
-                      </button>
-                      <span className="text-gray-400 text-xs">
-                        {item.quantity}
-                      </span>
-                      <button className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button opacity-50 cursor-not-allowed">
-                        <i
-                          className="fas fa-plus text-[10px] text-gray-300"
-                          onClick={() =>
-                            updateQuantity(item.id, item.quantity + 1)
-                          }
-                        ></i>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
+                    <div className="flex gap-4">
+                            <input type="checkbox" className="product-checkbox w-5 h-5 rounded border-gray-300" 
+                                checked={!!selectedItems[item.id]} // Check if the item is selected
+                                onChange={() => handleCheckboxChange(item.id)} // Handle checkbox change
+                                data-shop-id="{item.id}" 
+                                data-product-id="{item.id}"
+                                data-price="{item.price}"/>
+                            <img src={item.productImage} className="w-20 h-20 rounded object-cover" alt={item.productName}/>
+                            <div className="flex-1">
+                                <h3 className="text-sm font-medium mb-1">{item.productName}</h3>
+                                <p className="text-xs text-gray-500 mb-2">
+                                    规格：{item.specifications.map(spec => `${spec.name}-${spec.values.join(', ')}`).join('，')}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-primary">¥ ${item.price}</span>
+                                    <div className="flex items-center gap-4 mr-12">
+                                    <button className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button opacity-50 cursor-not-allowed">
+                                      <i
+                                        className="fas fa-minus text-[10px] text-gray-300"
+                                        onClick={() =>
+                                          updateQuantity(item.id, item.quantity - 1)
+                                        }
+                                      ></i>
+                                    </button>
+                                    <span className="text-gray-400 text-xs">
+                                      {item.quantity}
+                                    </span>
+                                    <button className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button opacity-50 cursor-not-allowed">
+                                      <i
+                                        className="fas fa-plus text-[10px] text-gray-300"
+                                        onClick={() =>
+                                          updateQuantity(item.id, item.quantity + 1)
+                                        }
+                                      ></i>
+                                    </button>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+
+
             </div>
           ))
         ) : (
