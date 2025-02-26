@@ -38,27 +38,43 @@ const Cart = () => {
       ...prev,
       [id]: !prev[id],
     }));
+
+    // Update shop selection based on item selection
+    const item = cartItems.find((item) => item.id === id);
+    if (item) {
+      const shopChecked = Object.values(selectedItems).filter(
+        (_, itemId) => cartItems[itemId].shopId === item.shopId
+      ).every(Boolean);
+
+      setSelectedShops((prev) => ({
+        ...prev,
+        [item.shopId]: shopChecked,
+      }));
+    }
+
+    setSelectAll(Object.values(selectedItems).every(Boolean));
+    updateTotal();
   };
 
   const handleShopCheckboxChange = (shopId) => {
+    console.log(shopId);
     const shopChecked = !selectedShops[shopId];
     const newSelectedItems = { ...selectedItems };
-
+  
+    // Update the selection state for items belonging to the current shop
     cartItems.forEach((item) => {
       if (item.shopId === shopId) {
         newSelectedItems[item.id] = shopChecked;
       }
     });
-
+  
     setSelectedItems(newSelectedItems);
     setSelectedShops((prev) => ({
       ...prev,
       [shopId]: shopChecked,
     }));
-
-    setSelectAll(Object.values(newSelectedItems).every(Boolean));
-    updateTotal();
   };
+  
 
   const handleSelectAllChange = (e) => {
     const checked = e.target.checked;
@@ -100,7 +116,17 @@ const Cart = () => {
       alert("请选择要结算的商品！");
       return;
     }
-    console.log("Selected items for checkout:", selectedCartItems);
+
+    // Extract shop information for selected items
+    /* const shopInfo = {};
+    selectedCartItems.forEach((item) => {
+      shopInfo[item.shopId] = {
+        shopName: item.shopName,
+        shopAvatarUrl: item.shopAvatarUrl,
+      };
+    }); */
+
+    navigate('/payment', { state: { selectedItems: selectedCartItems } });
   };
 
   const updateTotal = () => {
@@ -117,10 +143,6 @@ const Cart = () => {
     document.getElementById('totalPrice').textContent = `¥ ${total.toFixed(2)}`;
     document.getElementById('totalItems').textContent = count;
   };
-
-  function submitOrder() {
-    navigate('/payment'); // 跳转到订单确认页面
-  }
 
   const handleDelete = async () => {
     const idsToDelete = Object.keys(selectedItems).filter(id => selectedItems[id]);
@@ -169,12 +191,6 @@ const Cart = () => {
                 </div>
               )}
               <div className="shop-checkbox flex items-center mb-4">
-                {/* <input
-                  type="checkbox"
-                  className="mr-4"
-                  checked={selectedShops[item.shopId]}
-                  onChange={() => handleShopCheckboxChange(item.shopId)}
-                /> */}
                 <img
                   src={item.shopAvatarUrl}
                   className="w-6 h-6 rounded-full"
@@ -237,12 +253,11 @@ const Cart = () => {
           <div className="text-sm">
             合计: <span className="text-primary font-medium" id="totalPrice">¥ 0</span>
           </div>
-          <button className="bg-primary text-white px-6 py-2 !rounded-button" onClick={submitOrder}>
+          <button className="bg-primary text-white px-6 py-2 !rounded-button" onClick={handleCheckout}>
             结算 (<span id="totalItems">0</span>)
           </button>
         </div>
       </footer>
-          
     </div>
   );
 };

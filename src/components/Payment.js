@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Payment = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { selectedItems, shopInfo } = location.state || { selectedItems: [], shopInfo: {} };
 
   const [address, setAddress] = useState({
     name: "张文杰",
@@ -11,43 +13,79 @@ const Payment = () => {
   });
 
   const [paymentMethod, setPaymentMethod] = useState("支付宝");
-  const [quantities, setQuantities] = useState({
-    item1: 1,
-    item2: 1,
-    item3: 1,
-  });
+  const [clientIp, setClientIp] = useState("");
+
+  useEffect(() => {
+    // Fetch client IP address from an external API
+    // Note: This is a placeholder. In a real application, you would use an actual API.
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => setClientIp(data.ip))
+      .catch(error => console.error('Error fetching client IP:', error));
+  }, []);
 
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleEditAddress = () => {
-    // 打开地址编辑对话框的逻辑
     console.log("Edit address");
-  };
-
-  const handleQuantityChange = (item, amount) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [item]: Math.max(0, prev[item] + amount),
-    }));
   };
 
   const handlePaymentChange = (method) => {
     setPaymentMethod(method);
   };
 
-  const handleConfirmPayment = () => {
-    // 处理确认支付逻辑
-    console.log("Confirm payment with", paymentMethod);
+  const handleConfirmPayment = async () => {
+    const orderNo = generateOrderNumber();
+
+    try {
+      const response = await fetch('/payment/confirm', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1,
+          itemIds: selectedItems.map(item => item.id),
+          payType: paymentMethod === "支付宝" ? '1' : '2',
+          orderNo,
+          totalAmount: calculateTotal(),
+          subject: '订单支付',
+          clientIp,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.code === 200) {
+        alert('支付成功: ' + result.data.message);
+        if (result.data.payForm) {
+          document.write(result.data.payForm);
+        } else if (result.data.codeUrl) {
+          window.open(result.data.codeUrl, '_blank');
+        }
+        navigate('/order-confirmation');
+      } else {
+        alert('支付失败: ' + result.message);
+      }
+    } catch (error) {
+      console.error('支付请求失败', error);
+      alert('支付请求失败，请稍后重试');
+    }
   };
 
   const calculateTotal = () => {
-    const prices = { item1: 300, item2: 468, item3: 288 };
-    return Object.keys(quantities).reduce(
-      (total, key) => total + quantities[key] * prices[key],
+    return selectedItems.reduce(
+      (total, item) => total + item.price * item.quantity,
       0
     );
+  };
+
+  const generateOrderNumber = () => {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    return `ORD${timestamp}${random}`;
   };
 
   return (
@@ -79,109 +117,35 @@ const Payment = () => {
               <i className="ri-arrow-right-s-line text-gray-400"></i>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-gray-100">
-            <div className="flex items-center mb-2">
-              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
-                <i className="ri-store-2-line text-white text-sm"></i>
+          {selectedItems.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg p-3 border border-gray-100">
+              <div className="flex items-center mt-2 pb-2">
+                <img
+                  src={item.shopAvatarUrl}
+                  className="w-6 h-6 rounded-full"
+                  alt={item.shopName}
+                />
+                <span className="ml-2 text-sm text-gray-600">
+                  {item.shopName}
+                </span>
               </div>
-              <span className="ml-2 text-sm font-medium">国家文物局</span>
-            </div>
-            <div className="flex items-start space-x-3 pb-2 border-b border-gray-100">
-              <img
-                src="https://public.readdy.ai/ai/img_res/7c193ee857fff69d7fd31a0dd0c7d937.jpg"
-                className="w-20 h-20 object-cover rounded"
-                alt="茶具"
-              />
-              <div className="flex-1">
-                <h3 className="text-sm mb-1">陕西发现首个完整西周时期贵族墓园</h3>
-                <p className="text-xs text-gray-500">规格：毛笔型号-小楷，颜色-蓝色</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-primary font-medium">¥ 300</span>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item1", -1)}
-                    >
-                      -
-                    </button>
-                    <span className="text-sm">{quantities.item1}</span>
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item1", 1)}
-                    >
-                      +
-                    </button>
+              <div className="flex items-start space-x-3 border-b border-gray-100">
+                <img
+                  src={item.productImage}
+                  className="w-20 h-20 object-cover rounded"
+                  alt={item.productName}
+                />
+                <div className="flex-1">
+                  <h3 className="text-sm mb-1">{item.productName}</h3>
+                  <p className="text-xs text-gray-500">规格：{item.specifications.map(spec => `${spec.name}-${spec.values.join(', ')}`).join('，')}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-primary font-medium">¥ {item.price}</span>
+                    <span className="text-sm">数量: {item.quantity}</span>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="bg-white rounded-lg p-3 border border-gray-100">
-            <div className="flex items-center mb-2">
-              <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                <i className="ri-store-2-line text-white text-sm"></i>
-              </div>
-              <span className="ml-2 text-sm font-medium">品茗轩旗舰店</span>
-            </div>
-            <div className="flex items-start space-x-3 pb-2 border-b border-gray-100">
-              <img
-                src="https://public.readdy.ai/ai/img_res/2bc3e5e8ad165e912bd6a192c02a239e.jpg"
-                className="w-20 h-20 object-cover rounded"
-                alt="兵马俑"
-              />
-              <div className="flex-1">
-                <h3 className="text-sm mb-1">景德镇手绘青花瓷茶具套装</h3>
-                <p className="text-xs text-gray-500">规格：毛笔型号-中楷，颜色-蓝色</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-primary font-medium">¥ 468</span>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item2", -1)}
-                    >
-                      -
-                    </button>
-                    <span className="text-sm">{quantities.item2}</span>
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item2", 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <img
-                src="https://public.readdy.ai/ai/img_res/b9535ccc4d6d0134c46e6606e90408a4.jpg"
-                className="w-20 h-20 object-cover rounded"
-                alt="毛笔"
-              />
-              <div className="flex-1">
-                <h3 className="text-sm mb-1">狼毫毛笔书法套装</h3>
-                <p className="text-xs text-gray-500">规格：毛笔型号-大楷，颜色-黑色</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-primary font-medium">¥ 288</span>
-                  <div className="flex items-center space-x-3">
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item3", -1)}
-                    >
-                      -
-                    </button>
-                    <span className="text-sm">{quantities.item3}</span>
-                    <button
-                      className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center"
-                      onClick={() => handleQuantityChange("item3", 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          ))}
           <div className="bg-white rounded-lg p-3 border border-gray-100">
             <h3 className="text-sm font-medium mb-2">支付方式</h3>
             <div className="space-y-3">
@@ -215,14 +179,14 @@ const Payment = () => {
           </div>
         </div>
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-5 flex items-center justify-between">
-        <div className="flex items-center">
-          <span className="text-sm text-gray-500">合计：</span>
-          <span className="text-lg font-medium text-primary ml-1">¥ {calculateTotal().toFixed(2)}</span>
+          <div className="flex items-center">
+            <span className="text-sm text-gray-500">合计：</span>
+            <span className="text-lg font-medium text-primary ml-1">¥ {calculateTotal().toFixed(2)}</span>
+          </div>
+          <button className="px-8 py-2 bg-primary text-white text-sm rounded-button" onClick={handleConfirmPayment}>
+            确认支付
+          </button>
         </div>
-        <button className="px-8 py-2 bg-primary text-white text-sm rounded-button" onClick={handleConfirmPayment}>
-          确认支付
-        </button>
-      </div>
       </main>
     </div>
   );
