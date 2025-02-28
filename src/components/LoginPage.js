@@ -1,31 +1,85 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../App"; // 导入自定义钩子
 import { useNavigate } from "react-router-dom"; // 导入 useNavigate
+import { Input } from "antd";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import "./LoginPage.css"; // 创建一个新的 CSS 文件来存放样式
 import instance from "../utils/axios";
 
 const LoginPage = () => {
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, setUserInfo } = useAuth(); // 添加setUserInfo
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // 添加记住密码状态
+  const [loading, setLoading] = useState(false); // 添加加载状态
+  const [errorMsg, setErrorMsg] = useState(""); // 添加错误信息状态
+  const [showPassword, setShowPassword] = useState(false); // 添加显示密码状态
   const navigate = useNavigate(); // 使用 useNavigate
+
+  // 组件加载时检查本地存储的登录信息
+  useEffect(() => {
+    const savedPhone = localStorage.getItem("rememberedPhone");
+    const savedPassword = localStorage.getItem("rememberedPassword");
+
+    if (savedPhone && savedPassword) {
+      setPhoneNumber(savedPhone);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+
     try {
       const user = {
         phoneNumber: phoneNumber,
         password: password,
       };
       const response = await instance.post("/user/login", user);
-      if (response.data.startsWith("登录成功")) {
+
+      // 处理登录成功
+      if (response.data.code === 200 || response.data.startsWith("登录成功")) {
+        // 如果记住密码，保存到本地存储
+        if (rememberMe) {
+          localStorage.setItem("rememberedPhone", phoneNumber);
+          localStorage.setItem("rememberedPassword", password);
+        } else {
+          localStorage.removeItem("rememberedPhone");
+          localStorage.removeItem("rememberedPassword");
+        }
+
+        // 保存JWT令牌
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+          instance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${response.data.token}`;
+        }
+
+        // 保存用户信息
+        if (response.data.userInfo) {
+          setUserInfo(response.data.userInfo);
+          localStorage.setItem(
+            "userInfo",
+            JSON.stringify(response.data.userInfo)
+          );
+        }
+
         setIsLoggedIn(true);
         navigate("/Calendar"); // 登录后跳转到 Calendar 页面
       } else {
-        alert(response.data); // 显示错误消息
+        setErrorMsg(
+          response.data.message || response.data || "登录失败，请检查账号密码"
+        );
       }
     } catch (error) {
       console.error("登录时出错:", error);
+      setErrorMsg(error.response?.data?.message || "登录失败，请稍后再试");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,85 +93,119 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative mx-auto bg-white">
-      <div className="relative h-[240px] overflow-hidden">
-        <img
-          src="https://ai-public.mastergo.com/ai/img_res/324091066d8ec34bedee07d709744310.jpg"
-          className="w-full h-full object-cover"
-          alt="背景图"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40 flex flex-col justify-center items-center text-white">
-          <h1 className="text-2xl font-medium mb-2">每日发现</h1>
-          <p className="text-sm opacity-90">发现生活中的美好时刻</p>
+    <div className="w-[375px] h-screen overflow-hidden mx-auto">
+      <div className="relative w-full h-full bg-gray-100">
+        <div className="absolute inset-0">
+          <img
+            src="https://public.readdy.ai/ai/img_res/9b7a0931512c6a31d9411ce057a66af7.jpg"
+            className="w-full h-full object-cover"
+            alt="背景"
+          />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
-      </div>
+                   
+        <div className="relative vertical-center">
+          <h1 className="text-xl font-bold text-white mb-2 text-center">每日发现</h1>
+          <p className="text-white/90 text-sm mb-6 text-center">发现生活中的美好时刻</p>
 
-      <div className=" bg-white rounded-xl shadow-lg p-8">
-        <div className="space-y-4 mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="请输入手机号码"
-              className="w-full px-4 py-3 bg-gray-50 border-none rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-            <i className="fas fa-envelope absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          </div>
+          <div className="login-container w-full flex flex-col items-center">
+            {errorMsg && (
+              <div className="error-message mb-2 p-2 rounded-md text-sm">
+                {errorMsg}
+              </div>
+            )}
 
-          <div className="relative">
-            <input
-              type="password"
-              placeholder="请输入密码"
-              className="w-full px-4 py-3 bg-gray-50 border-none rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <i className="fas fa-lock absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <div className="relative input-field mb-2 w-full">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
+                <i className="ri-smartphone-line text-gray-400" />
+              </div>
+              <Input
+                type="tel"
+                className="w-full h-10 pl-10 pr-4 rounded-lg bg-white/50 border-none text-sm"
+                placeholder="请输入手机号"
+                maxLength={11}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+            </div>
+
+            <div className="relative input-field mb-4 w-full">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center">
+                <i className="ri-lock-line text-gray-400" />
+              </div>
+              <Input
+                type={showPassword ? "text" : "password"}
+                className="w-full h-10 pl-10 pr-12 rounded-lg bg-white/50 border-none text-sm"
+                placeholder="请输入密码"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <i
+                  className={`ri-${
+                    showPassword ? "eye-off" : "eye"
+                  }-line text-gray-400`}
+                />
+              </button>
+            </div>
+
+            <button
+              className={`rounded-button w-full h-10 mb-2 flex items-center justify-center ${
+                loading ? "opacity-70" : ""
+              }`}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? <span className="animate-spin mr-2">⟳</span> : "登录"}
+            </button>
+
+            <div className="flex justify-between items-center text-xs mb-2">
+              <a
+                href="#"
+                className="text-gray-500"
+                onClick={handleForgotPassword}
+              >
+                忘记密码？
+              </a>
+              <a href="#" className="text-primary" onClick={handleRegister}>
+                立即注册
+              </a>
+            </div>
+
+            <div className="text-center text-xs text-gray-500">
+              登录即表示同意
+              <a href="#" className="text-primary">
+                {" "}
+                《用户协议》{" "}
+              </a>
+              和
+              <a href="#" className="text-primary">
+                {" "}
+                《隐私政策》{" "}
+              </a>
+            </div>
           </div>
         </div>
 
-        <button
-          className="w-full h-12 bg-primary text-white text-center rounded-md"
-          onClick={handleSubmit}
-        >
-          登录
-        </button>
-
-        <div className="flex justify-between items-center mt-4 text-sm">
-          <a href="#" className="text-gray-500" onClick={handleForgotPassword}>
-            忘记密码？
+        <div className="fixed bottom-0 left-0 right-0 h-16 bottom-nav flex items-center justify-around px-6">
+          <a href="#" className="flex flex-col items-center text-primary">
+            <i className="ri-compass-3-line text-xl" />
+            <span className="text-xs mt-1">发现</span>
           </a>
-          <a href="#" className="text-primary" onClick={handleRegister}>
-            立即注册
+          <a
+            href="#"
+            className="flex items-center justify-center w-14 h-14 bg-primary rounded-full -mt-6"
+          >
+            <i className="ri-add-line text-2xl text-white" />
+          </a>
+          <a href="#" className="flex flex-col items-center text-gray-400">
+            <i className="ri-calendar-line text-xl" />
+            <span className="text-xs mt-1">日历</span>
           </a>
         </div>
-
-        {/* <div className="mt-8">
-          <p className="text-center text-gray-400 text-sm mb-6">其他登录方式</p>
-          <div className="flex justify-center gap-8">
-            <button className="w-12 h-12 rounded-full bg-[#07C160] flex items-center justify-center">
-              <i className="fab fa-weixin text-white text-xl"></i>
-            </button>
-            <button className="w-12 h-12 rounded-full bg-[#12B7F5] flex items-center justify-center">
-              <i className="fab fa-qq text-white text-xl"></i>
-            </button>
-            <button className="w-12 h-12 rounded-full bg-[#FF6B6B] flex items-center justify-center">
-              <i className="fas fa-mobile-alt text-white text-xl"></i>
-            </button>
-          </div>
-        </div> */}
-
-        <p className="text-center text-xs text-gray-400 mt-16">
-          登录即表示同意
-          <a href="#" className="text-primary">
-            用户协议
-          </a>
-          和
-          <a href="#" className="text-primary">
-            隐私政策
-          </a>
-        </p>
       </div>
     </div>
   );

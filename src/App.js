@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import PropTypes from 'prop-types'; // Import PropTypes
+import instance from './utils/axios';
 import Calendar from './components/Calendar';
 import Discover from './components/Discover';
 import NavBar from './components/NavBar';
@@ -20,15 +22,103 @@ import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 
 // 创建一个上下文来管理登录状态和用户信息
+// 创建认证上下文
 const AuthContext = createContext();
 
+// 导出useAuth函数，移到前面以便在ProtectedRoute中使用
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
 
-const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 默认未登录
-  const [userAvatar, setUserAvatar] = useState("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg"); // 默认头像
+// 新增 AuthProvider 组件
+const AuthProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userAvatar, setUserAvatar] = useState("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = localStorage.getItem("token");
+      const savedUserInfo = localStorage.getItem("userInfo");
+
+      if (token) {
+        instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          setIsLoggedIn(true);
+          if (savedUserInfo) {
+            const parsedUserInfo = JSON.parse(savedUserInfo);
+            setUserInfo(parsedUserInfo);
+            if (parsedUserInfo.avatar) {
+              setUserAvatar(parsedUserInfo.avatar);
+            }
+          }
+        } catch (error) {
+          console.error("Token验证失败:", error);
+          localStorage.removeItem("token");
+          localStorage.removeItem("userInfo");
+        }
+      }
+      setLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setUserInfo(null);
+    setUserAvatar("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
+    delete instance.defaults.headers.common['Authorization'];
+  };
+
+  const value = {
+    isLoggedIn,
+    setIsLoggedIn,
+    userInfo,
+    setUserInfo,
+    logout,
+    loading,
+    userAvatar,
+    setUserAvatar
+  };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userAvatar, setUserAvatar }}>
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// 新增受保护路由组件
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn, loading } = useAuth();
+
+  if (loading) {
+    return <div>加载中...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
+
+// Define propTypes for ProtectedRoute
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
       <Router>
         <CommonHelmet />
         <NavBar />
@@ -36,9 +126,9 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/calendar" element={isLoggedIn ? <Calendar /> : <Navigate to="/login" />} />
+          <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
           <Route path="/" element={<Discover />} />
-          <Route path="/profile" element={isLoggedIn ? <Profile /> : <Navigate to="/login" />} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
@@ -46,17 +136,12 @@ const App = () => {
           <Route path="/order-detail/:orderId" element={<OrderDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
-          <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
+          <Route path="/recommendation/:id" element={<RecommendationDetail/>} />
           <Route path="/search-results" element={<SearchResultsPage />} />
         </Routes>
       </Router>
-    </AuthContext.Provider>
+    </AuthProvider>
   );
-};
-
-// 创建一个自定义钩子来使用 AuthContext
-export const useAuth = () => {
-  return useContext(AuthContext);
 };
 
 export default App;

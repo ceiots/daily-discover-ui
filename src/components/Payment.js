@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import instance from "../utils/axios";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Payment = () => {
   useEffect(() => {
     // Fetch client IP address from an external API
     // Note: This is a placeholder. In a real application, you would use an actual API.
-    fetch('https://api.ipify.org?format=json')
+    fetch('https://ipapi.co/json/')
       .then(response => response.json())
       .then(data => setClientIp(data.ip))
       .catch(error => console.error('Error fetching client IP:', error));
@@ -40,24 +41,18 @@ const Payment = () => {
     const orderNo = generateOrderNumber();
 
     try {
-      const response = await fetch('/payment/confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: 1,
+
+      const response = await instance.post('/payment/confirm', {
+          userId: 23,
           itemIds: selectedItems.map(item => item.id),
           payType: paymentMethod === "支付宝" ? '1' : '2',
           orderNo,
           totalAmount: calculateTotal(),
           subject: '订单支付',
           clientIp,
-        }),
       });
 
-      const result = await response.json();
-
+      const result = response.data; 
       if (result.code === 200) {
         alert('支付成功: ' + result.data.message);
         if (result.data.payForm) {
@@ -162,7 +157,7 @@ const Payment = () => {
                   className="w-4 h-4 accent-primary"
                 />
               </div>
-              <div className="flex items-center justify-between">
+              { <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <i className="ri-wechat-pay-line text-2xl text-green-500"></i>
                   <span className="ml-2 text-sm">微信支付</span>
@@ -174,7 +169,7 @@ const Payment = () => {
                   onChange={() => handlePaymentChange("微信支付")}
                   className="w-4 h-4 accent-primary"
                 />
-              </div>
+              </div> }
             </div>
           </div>
         </div>
