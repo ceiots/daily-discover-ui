@@ -104,9 +104,9 @@ const LoginPage = () => {
           <div className="absolute inset-0 bg-black/30" />
         </div>
                    
-        <div className="relative vertical-center">
-          <h1 className="text-xl font-bold text-white mb-2 text-center">每日发现</h1>
-          <p className="text-white/90 text-sm mb-6 text-center">发现生活中的美好时刻</p>
+        <div className="relative flex flex-col items-center justify-center min-h-screen px-6 vertical-center">
+          <h1 className="text-xl font-bold text-white mb-2">每日发现</h1>
+          <p className="text-white/90 text-sm mb-7">发现生活中的美好时刻</p>
 
           <div className="login-container w-full flex flex-col items-center">
             {errorMsg && (
@@ -190,7 +190,7 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 h-16 bottom-nav flex items-center justify-around px-6">
+        <div className="fixed bottom-0 left-0 right-0 h-13 bottom-nav flex items-center justify-around px-6 bg-white/90">
           <a href="#" className="flex flex-col items-center text-primary">
             <i className="ri-compass-3-line text-xl" />
             <span className="text-xs mt-1">发现</span>
