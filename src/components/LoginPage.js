@@ -41,7 +41,7 @@ const LoginPage = () => {
       const response = await instance.post("/user/login", user);
 
       // 处理登录成功
-      if (response.data.code === 200 || response.data.startsWith("登录成功")) {
+      if (response.data.code === 200 && response.data.message == "登录成功") {
         // 如果记住密码，保存到本地存储
         if (rememberMe) {
           localStorage.setItem("rememberedPhone", phoneNumber);

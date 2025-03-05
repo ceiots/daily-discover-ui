@@ -37,27 +37,26 @@ const ForgotPasswordPage = () => {
       [name]: value,
     }));
   };
-
   const handleGetVerificationCode = async () => {
     if (!isValidPhoneNumber(formData.phoneNumber)) {
-      setErrors({ ...errors, phoneNumber: "请输入正确的手机号" });
-      return;
+        setErrors({ ...errors, phoneNumber: "请输入正确的手机号" });
+        return;
     }
-
     try {
-      const response = await instance.post(
-        "/user/reset-password-code",
-        {
-          phoneNumber: formData.phoneNumber,
+        const response = await instance.post("/user/reset-password-code", {
+            phoneNumber: formData.phoneNumber
+        });
+        console.log("fasdf:" + JSON.stringify(response.data));
+        if (response.data.code === 200) {
+            setIsVerificationCodeSent(true);
+            setCountdown(60);
+        } else {
+            alert(response.data.message);
         }
-      );
-      setIsVerificationCodeSent(true);
-      setCountdown(60);
     } catch (error) {
-      alert(error.response?.data?.message || "获取验证码失败");
+        alert(error.response?.data?.message || "获取验证码失败");
     }
-  };
-
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
 
