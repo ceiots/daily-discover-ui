@@ -16,6 +16,7 @@ const Cart = () => {
       try {
         const userId = 23; // Replace with actual user logic
         const response = await instance.get(`/cart/${userId}`);
+        console.log(response.data);
         setCartItems(response.data);
       } catch (error) {
         console.error("Error fetching cart items:", error);
@@ -201,7 +202,7 @@ const Cart = () => {
                 </span>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex gap-4">{/* 商品图片和详情区域 */}
                 <input
                   type="checkbox"
                   className="product-checkbox w-5 h-5 rounded border-gray-300"
@@ -214,7 +215,7 @@ const Cart = () => {
                   alt={item.productName}
                 />
                 <div className="flex-1">
-                  <h3 className="text-sm font-medium mb-1" style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>{item.productName}</h3>
+                  <h3 className="text-sm font-medium mb-1 mr-8" style={{ wordWrap: 'break-word' }}>{item.productName}</h3>
                   <p className="text-xs text-gray-500 mb-2" style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
                     规格：{item.specifications.map(spec => `${spec.name}-${spec.values.join(', ')}`).join('，')}
                   </p>
@@ -222,14 +223,14 @@ const Cart = () => {
                     <span className="text-primary">¥ {item.price}</span>
                     <div className="flex items-center gap-4 mr-12">
                       <button
-                        className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button"
+                        className="w-5 h-5 flex items-center justify-center border border-gray-300"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       >
                         <i className="fas fa-minus text-[10px] text-gray-300"></i>
                       </button>
                       <span className="text-gray-400 text-xs">{item.quantity}</span>
                       <button
-                        className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded-button"
+                        className="w-5 h-5 flex items-center justify-center border border-gray-300"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         <i className="fas fa-plus text-[10px] text-gray-300"></i>

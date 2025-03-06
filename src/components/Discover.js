@@ -7,6 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
   const { isLoggedIn, userAvatar } = useAuth();
+  // 将日期定义提升到组件顶部
+  const currentDate = new Date().toISOString().split("T")[0];
+  
+  // 状态声明
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
@@ -16,34 +20,62 @@ const Discover = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [originalRecommendations, setOriginalRecommendations] = useState([]);
+  const [cartItemCount, setCartItemCount] = useState(0); // 购物车数量状态
 
-  const currentDate = new Date().toISOString().split("T")[0]; // 获取当前日期，格式为 YYYY-MM-DD
-
+  // 合并后的统一数据请求逻辑
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
-        // 获取当前日期的事件
-        const eventsResponse = await instance.get(
-          `/events/date?date=${currentDate}`
-        );
-        const categoriesResponse = await instance.get(`/categories`);
-        const recommendationsResponse = await instance.get(`/recommendations`);
+        const [eventsRes, categoriesRes, recommendationsRes] = await Promise.all([
+          instance.get(`/events/date?date=${currentDate}`),
+          instance.get('/categories'),
+          instance.get('/recommendations')
+        ]);
 
-        setEvents(eventsResponse.data);
-        setCategories(categoriesResponse.data);
-        setRecommendations(recommendationsResponse.data);
-        setOriginalRecommendations(recommendationsResponse.data); // 存储原始推荐数据
-      
+        setEvents(eventsRes.data);
+        setCategories(categoriesRes.data);
+        const recData = recommendationsRes.data;
+        setRecommendations(recData);
+        setOriginalRecommendations(recData);
       } catch (error) {
-        setError("Error fetching data. Please try again later.");
-        console.error("Error fetching data:", error);
+        setError("数据加载失败，请稍后重试");
+        console.error("Data loading error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [currentDate]);
+    const fetchCartData = async () => {
+      
+      // 修正字符串拼接错误
+      if (!isLoggedIn) {
+        setCartItemCount(0);
+        return;
+      }
+      
+      try {
+        // 修正字符串拼接错误
+        console.log("Loading3" + isLoggedIn.userId);
+        // 修正后的前端调用
+        // 在fetchCartData方法中修正调用
+        const cartRes = await instance.get(`/cart/${isLoggedIn.userId}/count`);
+
+        console.log("cartRes" + cartRes);
+        setCartItemCount(cartRes.data);
+      } catch (error) {
+        console.error("购物车数据加载失败:", error);
+        alert("购物车信息加载失败");
+      }
+    };
+
+    // 合并执行逻辑
+    const initializeData = async () => {
+      await fetchInitialData();
+      await fetchCartData();
+    };
+    
+    initializeData();
+  }, [currentDate, isLoggedIn?.userId]); // 保留依赖项
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
@@ -105,7 +137,7 @@ const Discover = () => {
               <Link to="/cart" className="flex items-center">
                 <i className="fas fa-shopping-cart text-white"></i>
                 <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  3
+                  {cartItemCount}
                 </span>
               </Link>
             </div>
@@ -114,15 +146,21 @@ const Discover = () => {
               className="w-8 h-8 rounded-full overflow-hidden"
             >
               {isLoggedIn ? (
-                <img
-                  src={userAvatar}
-                  alt="用户头像"
-                  className="w-full h-full object-cover"
-                />
+                <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
+                  <img
+                    src={userAvatar}
+                    alt="用户头像"
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
               ) : (
-                <div className="nav-icon text-white">
-                  <i className="fas fa-user-circle text-xl"></i>
-                </div>
+                // 未登录时直接显示可点击的登录文字链接
+                <button 
+                  onClick={() => navigate('/login')}
+                  className="text-white text-sm"
+                >
+                  立即登录
+                </button>
               )}
             </Link>
           </div>

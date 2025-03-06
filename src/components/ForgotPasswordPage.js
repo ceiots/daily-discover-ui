@@ -46,7 +46,7 @@ const ForgotPasswordPage = () => {
         const response = await instance.post("/user/reset-password-code", {
             phoneNumber: formData.phoneNumber
         });
-        console.log("fasdf:" + JSON.stringify(response.data));
+       
         if (response.data.code === 200) {
             setIsVerificationCodeSent(true);
             setCountdown(60);
