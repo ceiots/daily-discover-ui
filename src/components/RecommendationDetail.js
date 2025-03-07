@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./RecommendationDetail.css"; // Keep your existing styles
 import instance from "../utils/axios";
+import { useAuth } from "../App"; // 添加上下文导入
 
 const RecommendationDetail = () => {
+  const { isLoggedIn } = useAuth(); // 获取登录状态
   const { id } = useParams(); // Get the recommendation ID from the URL
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -85,6 +87,14 @@ const RecommendationDetail = () => {
 
   // Function to conf// Function to confirm adding to cart
   const confirmAddToCart = async () => {
+
+    // 添加登录状态校验
+    if (!isLoggedIn?.status) {
+      navigate('/login');
+      return;
+    }
+
+
    // 检查是否所有规格都已选择
   const isAllSpecsSelected = () => {
     return recommendation.specifications.every(
@@ -98,7 +108,7 @@ const RecommendationDetail = () => {
   }
 
     const cartItem = {
-      userId: 23, // Replace with actual user logic
+      userId: isLoggedIn.userInfo.id, // 动态获取用户ID
       productId: id,
       productName: recommendation.title,
       productImage: recommendation.imageUrl,

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
+import { useAuth } from "../App"; // 添加useAuth导入
 import instance from "../utils/axios";
 
 const Cart = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth(); // 获取登录状态
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
@@ -14,21 +16,32 @@ const Cart = () => {
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const userId = 23; // Replace with actual user logic
+        const userId = isLoggedIn?.userInfo?.id;
+        if (!userId) {
+          console.error("用户未登录");
+          navigate("/login");
+          return;
+        }
+
         const response = await instance.get(`/cart/${userId}`);
         console.log(response.data);
         setCartItems(response.data);
+
+        // 数据加载完成后立即计算总价
+        updateTotal(); 
       } catch (error) {
         console.error("Error fetching cart items:", error);
       }
     };
 
-    fetchCartItems();
+    if (isLoggedIn.status) { // 仅在登录时获取数据
+      fetchCartItems();
+    } else{
+      setCartItems([]);
+      setSelectedItems({});
+      updateTotal();
+    }
   }, []);
-
-  useEffect(() => {
-    updateTotal(); // Ensure total is updated whenever selectedItems or cartItems change
-  }, [selectedItems, cartItems]);
 
   const handleBack = () => {
     navigate(-1);

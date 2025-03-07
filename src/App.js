@@ -32,7 +32,11 @@ export const useAuth = () => {
 
 // 新增 AuthProvider 组件
 const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState({
+    status: false,
+    userId: null,
+    userInfo: {}
+  });
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userAvatar, setUserAvatar] = useState("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
@@ -41,11 +45,20 @@ const AuthProvider = ({ children }) => {
     const checkLoginStatus = async () => {
       const token = localStorage.getItem("token");
       const savedUserInfo = localStorage.getItem("userInfo");
-
+     
       if (token) {
         instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
-          setIsLoggedIn(true);
+
+           // 统一解析逻辑
+           const parsedUserInfo = savedUserInfo ? JSON.parse(savedUserInfo) : {};
+          
+           // 保持数据结构一致性
+           setIsLoggedIn({
+             status: true,
+             userInfo: parsedUserInfo
+           });
+ 
           if (savedUserInfo) {
             const parsedUserInfo = JSON.parse(savedUserInfo);
             setUserInfo(parsedUserInfo);
@@ -63,7 +76,7 @@ const AuthProvider = ({ children }) => {
     };
 
     checkLoginStatus();
-  }, []);
+  }, []); // 状态更新后会触发
 
   const logout = () => {
     setIsLoggedIn(false);
@@ -99,11 +112,6 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return <div>加载中...</div>;
   }
-
-  if (!isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
-
   return children;
 };
 

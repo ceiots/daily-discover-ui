@@ -45,37 +45,29 @@ const Discover = () => {
       }
     };
 
-    const fetchCartData = async () => {
-      
-      // 修正字符串拼接错误
-      if (!isLoggedIn) {
-        setCartItemCount(0);
-        return;
-      }
-      
+    const fetchCartData = async (userId) => {
       try {
-        // 修正字符串拼接错误
-        console.log("Loading3" + isLoggedIn.userId);
-        // 修正后的前端调用
-        // 在fetchCartData方法中修正调用
-        const cartRes = await instance.get(`/cart/${isLoggedIn.userId}/count`);
-
-        console.log("cartRes" + cartRes);
+        const cartRes = await instance.get(`/cart/${userId}/count`);
         setCartItemCount(cartRes.data);
       } catch (error) {
-        console.error("购物车数据加载失败:", error);
-        alert("购物车信息加载失败");
+        console.error("获取购物车数量失败:", error);
       }
     };
 
     // 合并执行逻辑
     const initializeData = async () => {
       await fetchInitialData();
-      await fetchCartData();
+      // 仅在登录状态有效时获取购物车数据
+      console.log("Clicked event ID:",isLoggedIn?.userInfo?.id);
+      if (isLoggedIn?.status && isLoggedIn?.userInfo?.id) {
+        await fetchCartData(isLoggedIn.userInfo.id);
+      } else {
+        setCartItemCount(0); // 未登录时重置为0
+      }
     };
     
     initializeData();
-  }, [currentDate, isLoggedIn?.userId]); // 保留依赖项
+  }, [currentDate]); // 保留依赖项
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
@@ -142,10 +134,10 @@ const Discover = () => {
               </Link>
             </div>
             <Link
-              to={isLoggedIn ? "/profile" : "/login"}
+              to={isLoggedIn.status ? "/profile" : "/login"}
               className="w-8 h-8 rounded-full overflow-hidden"
             >
-              {isLoggedIn ? (
+              {isLoggedIn.status ? (
                 <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
                   <img
                     src={userAvatar}
@@ -159,7 +151,7 @@ const Discover = () => {
                   onClick={() => navigate('/login')}
                   className="text-white text-sm"
                 >
-                  立即登录
+                  登录
                 </button>
               )}
             </Link>

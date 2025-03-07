@@ -58,17 +58,24 @@ const LoginPage = () => {
             "Authorization"
           ] = `Bearer ${response.data.token}`;
         }
-
+        console.log("localStorage.setItemtoken", localStorage.getItem("token"));
+  
         // 保存用户信息
         if (response.data.userInfo) {
-          setUserInfo(response.data.userInfo);
-          localStorage.setItem(
-            "userInfo",
-            JSON.stringify(response.data.userInfo)
-          );
+          const userData = {
+            ...response.data.userInfo
+          };
+          
+          // 正确存储用户信息
+          localStorage.setItem("userInfo", JSON.stringify(userData));
+          
+          // 更新全局登录状态
+          setIsLoggedIn({
+            status: true,
+            userInfo: userData
+          });
         }
 
-        setIsLoggedIn(true);
         navigate("/Calendar"); // 登录后跳转到 Calendar 页面
       } else {
         setErrorMsg(
