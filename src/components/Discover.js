@@ -58,7 +58,7 @@ const Discover = () => {
     const initializeData = async () => {
       await fetchInitialData();
       // 仅在登录状态有效时获取购物车数据
-      console.log("Clicked event ID:",isLoggedIn?.userInfo?.id);
+      console.log(isLoggedIn+" Clicked event ID:",isLoggedIn?.userInfo?.id);
       if (isLoggedIn?.status && isLoggedIn?.userInfo?.id) {
         await fetchCartData(isLoggedIn.userInfo.id);
       } else {

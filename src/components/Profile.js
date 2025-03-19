@@ -1,92 +1,91 @@
-import React from 'react';
-import { useAuth } from '../App';
-import { Link } from 'react-router-dom';
-import './Profile.css';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from "../App"; // 添加useAuth导入
+import instance from '../utils/axios';
 
 const Profile = () => {
-  const { userAvatar } = useAuth();
+  const { userInfo } = useAuth();
+  const [activeTab, setActiveTab] = useState('all');
+  const [orders, setOrders] = useState([]);
+
+  const ORDER_TABS = [
+    { id: 'all', name: '全部' },
+    { id: 0, name: '待付款' },
+    { id: 1, name: '待发货' },
+    { id: 2, name: '待收货' },
+    { id: 3, name: '已完成' }
+  ];
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await instance.get(`/orders/user?status=${activeTab}`);
+        setOrders(response.data);
+      } catch (error) {
+        console.error('获取订单失败:', error);
+      }
+    };
+    fetchOrders();
+  }, [activeTab]);
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      await instance.post(`/orders/${orderId}/cancel`);
+      setOrders(orders.filter(order => order.id !== orderId));
+    } catch (error) {
+      console.error('取消订单失败:', error);
+    }
+  };
 
   return (
-    <body>
-    <div className="profile-card px-4 pt-12 pb-6 text-white">
-        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-xl font-medium">个人中心</h1>
-            <div className="flex gap-4">
-                <i className="fas fa-bell text-lg"></i>
-                <i className="fas fa-cog text-lg"></i>
+    <div className="w-[375px] min-h-screen mx-auto bg-gray-50">
+      {/* 用户信息头部... */}
+
+      {/* 订单导航 */}
+      <div className="px-4 mt-6">
+        <div className="flex overflow-x-auto order-tab gap-4 pb-2">
+          {ORDER_TABS.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-full ${
+                activeTab === tab.id 
+                  ? 'bg-primary text-white' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 订单列表 */}
+      <div className="px-4 mt-4">
+        {orders.map(order => (
+          <div key={order.id} className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-gray-500">订单号：{order.orderNumber}</span>
+              <span className="text-primary text-sm">{order.statusStr}</span>
+            </div>
+            {/* 订单商品项... */}
+            <div className="flex justify-end gap-2 mt-4">
+              {order.status === 0 && (
+                <button 
+                  onClick={() => handleCancelOrder(order.id)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  取消订单
+                </button>
+              )}
+              <button className="px-4 py-2 bg-primary text-white rounded-lg text-sm">
+                立即支付
+              </button>
             </div>
           </div>
-          <div className="flex items-center">
-            <img src={userAvatar} alt="用户头像" className="w-20 h-20 rounded-full object-cover mr-4" />
-            <div>
-                <h2 className="text-lg font-medium">陈明远</h2>
-                <p className="text-sm opacity-80">分享生活，记录精彩</p>
-            </div>
-        </div>
-
-        <div className="flex justify-between text-center mb-6">
-            <div className="stats-item flex-1">
-                <div className="text-lg font-medium">268</div>
-                <div className="text-sm opacity-80">关注</div>
-            </div>
-            <div className="stats-item flex-1">
-                <div className="text-lg font-medium">5.8k</div>
-                <div className="text-sm opacity-80">粉丝</div>
-            </div>
-            <div className="stats-item flex-1">
-                <div className="text-lg font-medium">12.6k</div>
-                <div className="text-sm opacity-80">获赞</div>
-            </div>
-        </div>
+        ))}
+      </div>
     </div>
-
-    <div className="px-4 mt-6">
-        <div className="feature-grid">
-            <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <i className="fas fa-heart text-primary"></i>
-                </div>
-                <span className="text-sm text-gray-600">我的收藏</span>
-            </div>
-            <div className="text-center">
-                <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <i className="fas fa-history text-primary"></i>
-                </div>
-                <span className="text-sm text-gray-600">浏览历史</span>
-            </div>
-            <div className="text-center">
-                <Link to="/order-list" className="flex flex-col items-center">
-                    <div className="w-12 h-12 mx-auto mb-2 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <i className="fas fa-shopping-bag text-primary"></i>
-                    </div>
-                    <span className="text-sm text-gray-600">我的订单</span>
-                </Link>
-            </div>
-        </div>
-        <div className="discover-section">
-            <h3 className="text-lg font-medium mb-4">每日发现</h3>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-lg overflow-hidden shadow-sm">
-                    <img src="https://ai-public.mastergo.com/ai/img_res/3e73b4a61ccc12d2fb627d75d31dad9a.jpg" 
-                         className="w-full h-40 object-cover" alt="发现"/>
-                    <div className="p-2">
-                        <h4 className="text-sm font-medium">探索城市之美</h4>
-                        <p className="text-xs text-gray-500 mt-1">发现身边的精彩故事</p>
-                    </div>
-                </div>
-                <div className="rounded-lg overflow-hidden shadow-sm">
-                    <img src="https://ai-public.mastergo.com/ai/img_res/0f8e1c23603b2658a7ca17b2333e6492.jpg" 
-                         className="w-full h-40 object-cover" alt="发现"/>
-                    <div className="p-2">
-                        <h4 className="text-sm font-medium">美食探店</h4>
-                        <p className="text-xs text-gray-500 mt-1">寻找城市味蕾</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
   );
 };
 
-export default Profile; 
+export default Profile;

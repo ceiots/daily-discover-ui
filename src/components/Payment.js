@@ -54,12 +54,12 @@ const Payment = () => {
 
       const result = response.data; 
       if (result.code === 200) {
-        alert('支付成功: ' + result.data.message);
-        if (result.data.payForm) {
+        //alert('支付成功: ' + JSON.stringify(result.data));
+        /* if (result.data.payForm) {
           document.write(result.data.payForm);
         } else if (result.data.codeUrl) {
           window.open(result.data.codeUrl, '_blank');
-        }
+        } */
         navigate('/order-confirmation');
       } else {
         alert('支付失败: ' + result.message);
@@ -174,13 +174,15 @@ const Payment = () => {
           </div>
         </div>
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-5 flex items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex-1 flex items-center">
             <span className="text-sm text-gray-500">合计：</span>
             <span className="text-lg font-medium text-primary ml-1">¥ {calculateTotal().toFixed(2)}</span>
           </div>
-          <button className="px-8 py-2 bg-primary text-white text-sm rounded-button" onClick={handleConfirmPayment}>
-            确认支付
-          </button>
+          <div className="flex-1 flex justify-end">
+            <button className="px-8 bg-primary text-white text-sm rounded-button" onClick={handleConfirmPayment}>
+              确认支付
+            </button>
+          </div>
         </div>
       </main>
     </div>
