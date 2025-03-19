@@ -39,10 +39,8 @@ const Payment = () => {
 
   const handleConfirmPayment = async () => {
     const orderNo = generateOrderNumber();
-    // 从 localStorage 中获取当前登录用户的 userId
     const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : null;
     if (!userId) {
-        // 若未获取到 userId，可根据实际情况处理，这里简单提示
         alert('未获取到用户 ID，请重新登录');
         navigate('/login');
         return;
@@ -50,18 +48,18 @@ const Payment = () => {
 
     try {
         const response = await instance.post('/payment/confirm', {
-            userId: userId, // 使用动态获取的 userId
+            userId: userId,
             itemIds: selectedItems.map(item => item.id),
             payType: paymentMethod === "支付宝" ? '1' : '2',
             orderNo,
             totalAmount: calculateTotal(),
             subject: '订单支付',
             clientIp,
+            items: selectedItems // 新增，传递商品信息
         });
 
         const result = response.data; 
         if (result.code === 200) {
-            // 支付成功后创建订单
             const createOrderResponse = await instance.post('/order/create', {
                 userId,
                 orderNo,
@@ -72,12 +70,12 @@ const Payment = () => {
                     name: address.name,
                     phone: address.phone,
                     address: address.address
-                }
+                },
+                items: selectedItems // 新增，传递商品信息
             });
 
             const createOrderResult = createOrderResponse.data;
             if (createOrderResult.code === 200) {
-                // 订单创建成功，跳转到订单确认页面
                 navigate('/order-confirmation', {
                     state: {
                         orderNo
@@ -90,7 +88,14 @@ const Payment = () => {
             alert('支付失败: ' + result.message);
         }
     } catch (error) {
-        console.error('支付请求失败', error);
+        if (error.response) {
+            console.error('支付请求失败，服务器响应状态码:', error.response.status);
+            console.error('服务器响应数据:', error.response.data);
+        } else if (error.request) {
+            console.error('支付请求失败，没有收到服务器响应');
+        } else {
+            console.error('支付请求失败，设置请求时出错:', error.message);
+        }
         alert('支付请求失败，请稍后重试');
     }
 };
@@ -105,7 +110,7 @@ const Payment = () => {
   const generateOrderNumber = () => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
-    return `${timestamp}${random}`;
+    return `ORD${timestamp}${random}`;
   };
 
   return (
