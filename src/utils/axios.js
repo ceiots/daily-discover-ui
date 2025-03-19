@@ -11,36 +11,51 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(
-  config => {
-    // 从localStorage获取token
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+    config => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    },
+    error => {
+        console.error('Request error:', error);
+        return Promise.reject(error);
     }
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
 );
 
 // 响应拦截器
 instance.interceptors.response.use(
-  response => {
-    return response;
-  },
-  error => {
-    // 处理401未授权错误
-    if (error.response && error.response.status === 401) {
-      // 清除本地token
-      localStorage.removeItem('token');
-      localStorage.removeItem('userInfo');
-      
-      // 重定向到登录页
-      window.location.href = '/login';
+    response => {
+        return response;
+    },
+    error => {
+        if (error.response) {
+            switch (error.response.status) {
+                case 401:
+                    // 清除本地存储的认证信息
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userInfo');
+                    // 重定向到登录页
+                    window.location.href = '/login';
+                    break;
+                case 403:
+                    console.error('没有权限访问该资源');
+                    break;
+                case 500:
+                    console.error('服务器错误');
+                    break;
+                default:
+                    console.error('请求失败:', error.response.data);
+            }
+        } else if (error.request) {
+            console.error('网络错误，请检查网络连接');
+        } else {
+            console.error('请求配置错误:', error.message);
+        }
+        return Promise.reject(error);
     }
-    return Promise.reject(error);
-  }
 );
 
 export default instance;

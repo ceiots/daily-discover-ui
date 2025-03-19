@@ -60,8 +60,8 @@ const Discover = () => {
     const initializeData = async () => {
       await fetchInitialData();
       // 仅在登录状态有效时获取购物车数据
-      console.log(isLoggedIn + " Clicked event ID:", isLoggedIn?.userInfo?.id);
-      if (isLoggedIn?.status && isLoggedIn?.userInfo?.id) {
+      console.log(isLoggedIn + " Clicked event ID:", (isLoggedIn?.userInfo?.id === undefined));
+      if (isLoggedIn?.userInfo?.id) {
         await fetchCartData(isLoggedIn.userInfo.id);
       } else {
         setCartItemCount(0); // 未登录时重置为0
@@ -136,10 +136,10 @@ const Discover = () => {
               </Link>
             </div>
             <Link
-              to={isLoggedIn?.userInfo?.id === undefined ? "/profile" : "/login"}
+              to={isLoggedIn?.userInfo?.id ? "/profile" : "/login"}
               className="w-8 h-8 rounded-full overflow-hidden"
             >
-              {isLoggedIn?.userInfo?.id === undefined ? (
+              {isLoggedIn?.userInfo?.id ? (
                 <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
                   <img
                     src={userAvatar}
@@ -148,7 +148,6 @@ const Discover = () => {
                   />
                 </Link>
               ) : (
-                // 未登录时直接显示可点击的登录文字链接
                 <button 
                   onClick={() => navigate('/login')}
                   className="text-white text-sm"
