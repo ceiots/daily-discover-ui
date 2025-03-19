@@ -43,8 +43,6 @@ const OrderConfirmation = () => {
             }
         };
 
-        console.log('location.state?.orderNo:', location.state?.orderNo);
-
         if (location.state?.orderNo) {
             fetchOrder();
         } else {

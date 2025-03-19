@@ -44,7 +44,7 @@ const Payment = () => {
     if (!userId) {
         // 若未获取到 userId，可根据实际情况处理，这里简单提示
         alert('未获取到用户 ID，请重新登录');
-        navigate('/login')
+        navigate('/login');
         return;
     }
 
@@ -61,17 +61,31 @@ const Payment = () => {
 
         const result = response.data; 
         if (result.code === 200) {
-            //alert('支付成功: ' + JSON.stringify(result.data));
-            /* if (result.data.payForm) {
-                document.write(result.data.payForm);
-            } else if (result.data.codeUrl) {
-                window.open(result.data.codeUrl, '_blank');
-            } */
+            // 支付成功后创建订单
+            const createOrderResponse = await instance.post('/order/create', {
+                userId,
+                orderNo,
+                itemIds: selectedItems.map(item => item.id),
+                totalAmount: calculateTotal(),
+                payType: paymentMethod === "支付宝" ? '1' : '2',
+                address: {
+                    name: address.name,
+                    phone: address.phone,
+                    address: address.address
+                }
+            });
+
+            const createOrderResult = createOrderResponse.data;
+            if (createOrderResult.code === 200) {
+                // 订单创建成功，跳转到订单确认页面
                 navigate('/order-confirmation', {
-                  state: {
-                    orderNo
-                  }
-              });
+                    state: {
+                        orderNo
+                    }
+                });
+            } else {
+                alert('订单创建失败: ' + createOrderResult.message);
+            }
         } else {
             alert('支付失败: ' + result.message);
         }
@@ -91,7 +105,7 @@ const Payment = () => {
   const generateOrderNumber = () => {
     const timestamp = Date.now();
     const random = Math.floor(Math.random() * 1000);
-    return `ORD${timestamp}${random}`;
+    return `${timestamp}${random}`;
   };
 
   return (
