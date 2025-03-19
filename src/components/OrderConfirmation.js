@@ -26,11 +26,12 @@ const OrderConfirmation = () => {
         const fetchOrder = async () => {
             try {
                 setLoading(true);
-                const orderId = location.state?.orderId;
-                if (!orderId) {
+                const orderNo = location.state?.orderNo;
+                console.log('orderNo:', orderNo);
+                if (!orderNo) {
                     throw new Error('无效的订单 ID');
                 }
-                const response = await instance.get(`/orders/${orderId}`);
+                const response = await instance.get(`/orders/${orderNo}`);
                 console.log('获取订单详情成功:', response.data);
                 setOrder(response.data);
                 setError(null);
@@ -42,9 +43,9 @@ const OrderConfirmation = () => {
             }
         };
 
-        console.log('location.state?.orderId:', location.state?.orderId);
+        console.log('location.state?.orderNo:', location.state?.orderNo);
 
-        if (location.state?.orderId) {
+        if (location.state?.orderNo) {
             fetchOrder();
         } else {
             setError('未接收到有效的订单ID，请返回重试。');

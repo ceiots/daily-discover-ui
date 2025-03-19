@@ -29,11 +29,10 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "cors": "^2.8.5",
     "daily-discover-ui": "file:",
-    "dompurify": "^3.2.3",
+    "dompurify": "^3.2.4",
     "formik": "^2.4.6",
     "leaflet": "^1.9.4",
     "mapbox-gl": "^3.8.0",
-    "my-react-app": "file:",
     "ol": "^10.2.1",
     "path-browserify": "^1.0.1",
     "react": "^18.3.1",
@@ -96,5 +95,9 @@
     "postcss": "^8.4.49",
     "react-app-rewired": "^2.2.1",
     "tailwindcss": "^3.4.17"
+  },
+  "resolutions": {
+    "nth-check": "^2.1.1",
+    "postcss": "^8.4.49"
   }
 }

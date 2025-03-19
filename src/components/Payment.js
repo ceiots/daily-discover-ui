@@ -39,36 +39,47 @@ const Payment = () => {
 
   const handleConfirmPayment = async () => {
     const orderNo = generateOrderNumber();
+    // 从 localStorage 中获取当前登录用户的 userId
+    const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : null;
+    if (!userId) {
+        // 若未获取到 userId，可根据实际情况处理，这里简单提示
+        alert('未获取到用户 ID，请重新登录');
+        navigate('/login')
+        return;
+    }
 
     try {
+        const response = await instance.post('/payment/confirm', {
+            userId: userId, // 使用动态获取的 userId
+            itemIds: selectedItems.map(item => item.id),
+            payType: paymentMethod === "支付宝" ? '1' : '2',
+            orderNo,
+            totalAmount: calculateTotal(),
+            subject: '订单支付',
+            clientIp,
+        });
 
-      const response = await instance.post('/payment/confirm', {
-          userId: 23,
-          itemIds: selectedItems.map(item => item.id),
-          payType: paymentMethod === "支付宝" ? '1' : '2',
-          orderNo,
-          totalAmount: calculateTotal(),
-          subject: '订单支付',
-          clientIp,
-      });
-
-      const result = response.data; 
-      if (result.code === 200) {
-        //alert('支付成功: ' + JSON.stringify(result.data));
-        /* if (result.data.payForm) {
-          document.write(result.data.payForm);
-        } else if (result.data.codeUrl) {
-          window.open(result.data.codeUrl, '_blank');
-        } */
-        navigate('/order-confirmation');
-      } else {
-        alert('支付失败: ' + result.message);
-      }
+        const result = response.data; 
+        if (result.code === 200) {
+            //alert('支付成功: ' + JSON.stringify(result.data));
+            /* if (result.data.payForm) {
+                document.write(result.data.payForm);
+            } else if (result.data.codeUrl) {
+                window.open(result.data.codeUrl, '_blank');
+            } */
+                navigate('/order-confirmation', {
+                  state: {
+                    orderNo
+                  }
+              });
+        } else {
+            alert('支付失败: ' + result.message);
+        }
     } catch (error) {
-      console.error('支付请求失败', error);
-      alert('支付请求失败，请稍后重试');
+        console.error('支付请求失败', error);
+        alert('支付请求失败，请稍后重试');
     }
-  };
+};
 
   const calculateTotal = () => {
     return selectedItems.reduce(

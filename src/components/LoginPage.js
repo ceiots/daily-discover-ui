@@ -54,6 +54,7 @@ const LoginPage = () => {
         // 保存JWT令牌
         if (response.data.token) {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("userId", response.data.data.userId);
           instance.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.data.token}`;
