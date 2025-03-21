@@ -8,10 +8,12 @@ const Payment = () => {
   const { selectedItems, shopInfo } = location.state || { selectedItems: [], shopInfo: {} };
 
   const [address, setAddress] = useState({
+    // 保留姓名
     name: "张文杰",
     phone: "13812345678",
-    address: "浙江省杭州市西湖区文三路 478 号创意产业园区",
-  });
+    // 简化地址信息
+    address: "浙江省杭州市西湖区文三路 478 号创意产业园区"
+});
 
   const [paymentMethod, setPaymentMethod] = useState("支付宝");
   const [clientIp, setClientIp] = useState("");
@@ -69,7 +71,11 @@ const Payment = () => {
                 address: {
                     name: address.name,
                     phone: address.phone,
-                    address: address.address
+                    address: address.address,
+                    city: address.city,
+                    area: address.area,
+                    addr: address.addr,
+                    consignee: address.consignee
                 },
                 items: selectedItems.map(item => ({
                     id: item.id,
