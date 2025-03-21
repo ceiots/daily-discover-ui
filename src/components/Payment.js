@@ -71,11 +71,7 @@ const Payment = () => {
                 address: {
                     name: address.name,
                     phone: address.phone,
-                    address: address.address,
-                    city: address.city,
-                    area: address.area,
-                    addr: address.addr,
-                    consignee: address.consignee
+                    address: address.address
                 },
                 items: selectedItems.map(item => ({
                     id: item.id,
@@ -86,6 +82,7 @@ const Payment = () => {
             });
 
             const createOrderResult = createOrderResponse.data;
+            console.log('订单创建结果:', createOrderResult);
             if (createOrderResult.code === 200) {
                 navigate('/order-confirmation', {
                     state: {
