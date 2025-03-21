@@ -71,7 +71,12 @@ const Payment = () => {
                     phone: address.phone,
                     address: address.address
                 },
-                items: selectedItems // 新增，传递商品信息
+                items: selectedItems.map(item => ({
+                    id: item.id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    specifications: item.specifications
+                })) // 新增，传递商品数量、价格及规格信息
             });
 
             const createOrderResult = createOrderResponse.data;
