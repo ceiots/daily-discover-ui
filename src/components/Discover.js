@@ -130,9 +130,9 @@ const Discover = () => {
             <div className="relative">
               <Link to="/cart" className="flex items-center">
                 <i className="fas fa-shopping-cart text-white"></i>
-                <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {/* <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                   {cartItemCount}
-                </span>
+                </span>*/}
               </Link>
             </div>
             <Link
