@@ -26,52 +26,51 @@ const Cart = () => {
         const response = await instance.get(`/cart/${userId}`);
         console.log(response.data);
         setCartItems(response.data);
-
-        // 数据加载完成后立即计算总价
-        updateTotal(); 
       } catch (error) {
         console.error("Error fetching cart items:", error);
       }
     };
 
-    if (isLoggedIn.status) { // 仅在登录时获取数据
+    if (isLoggedIn.status) {
       fetchCartItems();
-    } else{
+    } else {
       setCartItems([]);
       setSelectedItems({});
-      updateTotal();
     }
-  }, []);
+  }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    updateTotal();
+  }, [selectedItems, cartItems]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleCheckboxChange = (id) => {
+    // Bug 修复：修改了对象展开语法和多余括号的问题
     setSelectedItems((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-
+  
     // Update shop selection based on item selection
     const item = cartItems.find((item) => item.id === id);
     if (item) {
-      const shopChecked = Object.values(selectedItems).filter(
-        (_, itemId) => cartItems[itemId].shopId === item.shopId
-      ).every(Boolean);
-
+      const shopItems = cartItems.filter((i) => i.shopId === item.shopId);
+      const shopChecked = shopItems.every((i) => selectedItems[i.id]);
+  
       setSelectedShops((prev) => ({
         ...prev,
         [item.shopId]: shopChecked,
       }));
     }
-
+  
     setSelectAll(Object.values(selectedItems).every(Boolean));
     updateTotal();
   };
 
   const handleShopCheckboxChange = (shopId) => {
-    console.log(shopId);
     const shopChecked = !selectedShops[shopId];
     const newSelectedItems = { ...selectedItems };
   
@@ -87,6 +86,9 @@ const Cart = () => {
       ...prev,
       [shopId]: shopChecked,
     }));
+  
+    setSelectAll(Object.values(newSelectedItems).every(Boolean));
+    updateTotal();
   };
   
 
@@ -146,16 +148,21 @@ const Cart = () => {
   const updateTotal = () => {
     let total = 0;
     let count = 0;
-
+  
     cartItems.forEach((item) => {
-      if (selectedItems[item.id]) {
+      if (selectedItems[item.id] === true) {  // 明确检查是否为 true
         total += item.price * item.quantity;
         count += item.quantity;
       }
     });
-
-    document.getElementById('totalPrice').textContent = `¥ ${total.toFixed(2)}`;
-    document.getElementById('totalItems').textContent = count;
+  
+    const totalPriceElement = document.getElementById('totalPrice');
+    const totalItemsElement = document.getElementById('totalItems');
+    
+    if (totalPriceElement && totalItemsElement) {
+      totalPriceElement.textContent = `¥ ${total.toFixed(2)}`;
+      totalItemsElement.textContent = count;
+    }
   };
 
   const handleDelete = async () => {
@@ -219,7 +226,7 @@ const Cart = () => {
                 <input
                   type="checkbox"
                   className="product-checkbox w-5 h-5 rounded border-gray-300"
-                  checked={!!selectedItems[item.id]}
+                  checked={selectedItems[item.id]}
                   onChange={() => handleCheckboxChange(item.id)}
                 />
                 <img
