@@ -25,8 +25,6 @@ const OrderConfirmation = () => {
     // 修改请求路径和参数名称
     useEffect(() => {
         const fetchOrder = async () => {
-            const orderNo = location.state?.orderNo;  // 保持参数名称为orderNo
-            const response = await instance.get(`/order/${orderNo}`); // 保持路径为/order
             try {
                 setLoading(true);
                 const orderNo = location.state?.orderNo;
