@@ -22,6 +22,27 @@ const OrderConfirmation = () => {
         navigate('/');
     };
 
+    // 支付方式映射
+    const paymentMethodMap = {
+        '1': '支付宝',
+        '2': '微信支付',
+        '3': '银行卡'
+    };
+
+    // 格式化日期时间
+    const formatDateTime = (dateString) => {
+        if (!dateString) return '暂无数据';
+        const date = new Date(dateString);
+        return date.toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    };
+
     // 修改请求路径和参数名称
     useEffect(() => {
         const fetchOrder = async () => {
@@ -89,7 +110,7 @@ const OrderConfirmation = () => {
                     <h2 className="text-base font-medium mb-2">支付成功</h2>
                     {order && (
                         <div className="text-[#7B66FF] text-2xl font-semibold">
-                            ¥{order.paymentAmount?.toFixed(2)}
+                            ¥{order.paymentAmount?.toFixed(2) || '0.00'}
                         </div>
                     )}
                 </div>
@@ -98,30 +119,34 @@ const OrderConfirmation = () => {
                     <div className="bg-white rounded-lg p-4 space-y-4">
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">订单编号</span>
-                            <span className="text-gray-700 text-sm">{order.id}</span>
+                            <span className="text-gray-700 text-sm">{order.orderNumber || '暂无数据'}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">支付时间</span>
-                            <span className="text-gray-700 text-sm">{order.paymentTime}</span>
+                            <span className="text-gray-700 text-sm">{formatDateTime(order.paymentTime)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">支付方式</span>
                             <div className="flex items-center">
-                                {order.paymentMethod === '支付宝' && (
+                                {paymentMethodMap[order.paymentMethod] === '支付宝' && (
                                     <i className="fab fa-alipay text-[#1677FF] mr-1"></i>
                                 )}
-                                {order.paymentMethod === '微信支付' && (
+                                {paymentMethodMap[order.paymentMethod] === '微信支付' && (
                                     <i className="fab fa-weixin text-[#07C160] mr-1"></i>
                                 )}
-                                <span className="text-gray-700 text-sm">{order.paymentMethod}</span>
+                                <span className="text-gray-700 text-sm">
+                                    {paymentMethodMap[order.paymentMethod] || '未知支付方式'}
+                                </span>
                             </div>
                         </div>
-                        <div className="flex justify-between items-center">
+                        {/* <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">商品列表</span>
                             <span className="text-gray-700 text-sm">
-                                {order.items?.map(item => item.productName).join(', ')}
+                                {order.items && order.items.length > 0 
+                                    ? order.items.map(item => item.productName || '未命名商品').join(', ')
+                                    : '暂无商品信息'}
                             </span>
-                        </div>
+                        </div> */}
                     </div>
                 )}
             </div>
