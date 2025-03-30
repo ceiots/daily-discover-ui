@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from "../App"; // 添加useAuth导入
+import { useAuth } from "../App";
 import instance from '../utils/axios';
 
 const Profile = () => {
@@ -37,8 +37,48 @@ const Profile = () => {
   };
 
   return (
-    <div className="w-[375px] min-h-screen mx-auto bg-gray-50">
-      {/* 用户信息头部... */}
+    <div className="w-[375px] min-h-screen mx-auto bg-gray-50 pb-[60px]">
+      {/* 用户信息头部 */}
+      <div className="profile-card h-[180px] pt-8 px-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="avatar w-16 h-16 rounded-full bg-white overflow-hidden">
+              <img 
+                src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/default-avatar.jpg"} 
+                className="w-full h-full object-cover"
+                alt="用户头像"
+              />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-white text-lg font-medium">{userInfo?.nickname || '未登录'}</h3>
+              <p className="text-white/80 text-sm mt-1">ID: {userInfo?.id || '--'}</p>
+            </div>
+          </div>
+          <button className="text-white text-sm">设置</button>
+        </div>
+      </div>
+
+      {/* 服务网格 */}
+      <div className="px-4 mt-4">
+        <div className="bg-white rounded-lg p-4 grid grid-cols-4 gap-4">
+          {[
+            { icon: 'ri-heart-line', name: '我的收藏' },
+            { icon: 'ri-coupon-line', name: '优惠券' },
+            { icon: 'ri-shopping-cart-line', name: '购物车' },
+            { icon: 'ri-gift-line', name: '积分商城' },
+            { icon: 'ri-wallet-line', name: '我的钱包' },
+            { icon: 'ri-customer-service-line', name: '联系客服' },
+            { icon: 'ri-feedback-line', name: '意见反馈' },
+          ].map((item, index) => (
+            <div key={index} className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center bg-gray-100 rounded-full">
+                <i className={`${item.icon} text-xl text-gray-600`} />
+              </div>
+              <span className="text-xs">{item.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* 订单导航 */}
       <div className="px-4 mt-6">
@@ -84,6 +124,7 @@ const Profile = () => {
           </div>
         ))}
       </div>
+      
     </div>
   );
 };

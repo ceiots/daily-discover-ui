@@ -1,187 +1,291 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=375px, initial-scale=1.0">
-    <title>个人中心</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
-    <style>
-        :where([class^="ri-"])::before { content: "\f3c2"; }
-        .order-tab::-webkit-scrollbar { display: none; }
-        .gradient-bg {
-            background: linear-gradient(180deg, #8B5CF6 0%, #7C3AED 100%);
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#7C3AED',
-                        secondary: '#F3F4F6'
-                    },
-                    borderRadius: {
-                        'none': '0px',
-                        'sm': '4px',
-                        DEFAULT: '8px',
-                        'md': '12px',
-                        'lg': '16px',
-                        'xl': '20px',
-                        '2xl': '24px',
-                        '3xl': '32px',
-                        'full': '9999px',
-                        'button': '8px'
-                    }
-                }
-            }
-        }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375px, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>个人中心</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<script>
+tailwind.config = {
+theme: {
+extend: {
+colors: {
+primary: '#7160FF',
+secondary: '#FF9F2E'
+},
+borderRadius: {
+'none': '0px',
+'sm': '4px',
+DEFAULT: '8px',
+'md': '12px',
+'lg': '16px',
+'xl': '20px',
+'2xl': '24px',
+'3xl': '32px',
+'full': '9999px',
+'button': '8px'
+}
+}
+}
+}
+</script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body { background-color: #F8F8F8; }
+.order-status-tab.active {
+color: #7160FF;
+border-bottom: 2px solid #7160FF;
+}
+.tab-bar-item.active {
+color: #7160FF;
+}
+.tab-bar-item.active i {
+color: #7160FF;
+}
+.product-item {
+cursor: pointer;
+}
+.service-item, .order-item {
+transition: all 0.2s;
+}
+.service-item:active, .order-item:active {
+transform: scale(0.95);
+}
+</style>
 </head>
-<body class="w-[375px] min-h-screen bg-gray-50 mx-auto">
-    <div class="gradient-bg fixed top-0 left-0 right-0 h-[240px] rounded-b-[32px] z-0"></div>
-    
-    <header class="fixed top-0 left-0 right-0 px-4 py-3 flex justify-between items-center z-10">
-        <h1 class="text-white text-lg font-medium">个人中心</h1>
-        <div class="flex gap-4">
-            <div class="w-8 h-8 flex items-center justify-center">
-                <i class="ri-notification-3-line text-white text-xl"></i>
-            </div>
-            <div class="w-8 h-8 flex items-center justify-center">
-                <i class="ri-settings-3-line text-white text-xl"></i>
-            </div>
+<body class="w-[375px] min-h-screen mx-auto pb-[60px]">
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm">
+<div class="w-[375px] mx-auto flex items-center justify-between px-4 h-[48px]">
+<h1 class="text-lg font-medium">个人中心</h1>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-search-line text-xl"></i>
+</div>
+</div>
+</nav>
+<main class="mt-[56px] px-4 space-y-4">
+  <!-- 用户信息卡片 -->
+  <div class="bg-primary rounded-lg p-4 text-white">
+    <div class="flex items-center space-x-4">
+      <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
+        <img src="https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg" class="w-full h-full object-cover" alt="用户头像">
+      </div>
+      <div class="flex-1">
+        <div class="text-lg font-medium">陈雅婷</div>
+        <div class="text-sm opacity-90">会员等级：黄金会员</div>
+      </div>
+      <div class="w-8 h-8 flex items-center justify-center">
+        <i class="ri-settings-3-line text-xl"></i>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 mt-4 text-center">
+      <div class="space-y-1">
+        <div class="text-lg font-medium">1280</div>
+        <div class="text-xs opacity-90">我的积分</div>
+      </div>
+      <div class="space-y-1">
+        <div class="text-lg font-medium">8</div>
+        <div class="text-xs opacity-90">优惠券</div>
+      </div>
+      <div class="space-y-1">
+        <div class="text-lg font-medium">¥50</div>
+        <div class="text-xs opacity-90">账户余额</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 订单管理 -->
+  <div class="bg-white rounded-lg p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-base font-medium">我的订单</div>
+      <div class="text-xs text-gray-500 flex items-center">
+        查看全部订单 <i class="ri-arrow-right-s-line ml-1"></i>
+      </div>
+    </div>
+    <div class="grid grid-cols-5 text-center">
+      <div class="order-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-10 h-10 flex items-center justify-center relative">
+          <i class="ri-wallet-3-line text-xl text-gray-700"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">2</span>
         </div>
-    </header>
-
-    <main class="pt-[60px] px-4 pb-[80px] relative z-[1]">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-16 h-16 rounded-full overflow-hidden">
-                <img src="https://public.readdy.ai/ai/img_res/aefaabd53dbbd35334f5b16df09d1130.jpg" class="w-full h-full object-cover" alt="avatar">
-            </div>
-            <div class="flex-1">
-                <h2 class="text-white text-lg font-medium mb-1">陈明远</h2>
-                <p class="text-white/80 text-sm">分享生活，记录精彩</p>
-            </div>
+        <span class="text-xs">待付款</span>
+      </div>
+      <div class="order-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-10 h-10 flex items-center justify-center">
+          <i class="ri-truck-line text-xl text-gray-700"></i>
         </div>
-
-        <div class="flex justify-between text-center text-white mb-8">
-            <div>
-                <div class="text-lg font-medium">268</div>
-                <div class="text-sm opacity-80">关注</div>
-            </div>
-            <div>
-                <div class="text-lg font-medium">5.8k</div>
-                <div class="text-sm opacity-80">粉丝</div>
-            </div>
-            <div>
-                <div class="text-lg font-medium">12.6k</div>
-                <div class="text-sm opacity-80">获赞</div>
-            </div>
+        <span class="text-xs">待发货</span>
+      </div>
+      <div class="order-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-10 h-10 flex items-center justify-center relative">
+          <i class="ri-inbox-archive-line text-xl text-gray-700"></i>
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">1</span>
         </div>
-
-        <div class="grid grid-cols-3 gap-4 mb-6">
-            <div class="bg-white rounded-lg p-4 text-center cursor-pointer">
-                <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-                    <i class="ri-heart-line text-primary text-xl"></i>
-                </div>
-                <div class="text-sm">我的收藏</div>
-            </div>
-            <div class="bg-white rounded-lg p-4 text-center cursor-pointer">
-                <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-                    <i class="ri-time-line text-primary text-xl"></i>
-                </div>
-                <div class="text-sm">浏览历史</div>
-            </div>
-            <div class="bg-white rounded-lg p-4 text-center cursor-pointer">
-                <div class="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-                    <i class="ri-shopping-bag-line text-primary text-xl"></i>
-                </div>
-                <div class="text-sm">我的订单</div>
-            </div>
+        <span class="text-xs">待收货</span>
+      </div>
+      <div class="order-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-10 h-10 flex items-center justify-center">
+          <i class="ri-chat-1-line text-xl text-gray-700"></i>
         </div>
-
-        <div class="bg-white rounded-lg p-4 mb-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium">我的订单</h3>
-                <a href="#" class="text-sm text-gray-500">查看全部</a>
-            </div>
-            <div class="order-tab flex gap-6 overflow-x-auto pb-2">
-                <button class="flex flex-col items-center min-w-[60px] cursor-pointer">
-                    <div class="w-8 h-8 flex items-center justify-center mb-1">
-                        <i class="ri-wallet-3-line text-primary text-xl"></i>
-                    </div>
-                    <span class="text-xs">待付款</span>
-                </button>
-                <button class="flex flex-col items-center min-w-[60px] cursor-pointer">
-                    <div class="w-8 h-8 flex items-center justify-center mb-1">
-                        <i class="ri-truck-line text-primary text-xl"></i>
-                    </div>
-                    <span class="text-xs">待发货</span>
-                </button>
-                <button class="flex flex-col items-center min-w-[60px] cursor-pointer">
-                    <div class="w-8 h-8 flex items-center justify-center mb-1">
-                        <i class="ri-box-3-line text-primary text-xl"></i>
-                    </div>
-                    <span class="text-xs">待收货</span>
-                </button>
-                <button class="flex flex-col items-center min-w-[60px] cursor-pointer">
-                    <div class="w-8 h-8 flex items-center justify-center mb-1">
-                        <i class="ri-chat-smile-2-line text-primary text-xl"></i>
-                    </div>
-                    <span class="text-xs">待评价</span>
-                </button>
-                <button class="flex flex-col items-center min-w-[60px] cursor-pointer">
-                    <div class="w-8 h-8 flex items-center justify-center mb-1">
-                        <i class="ri-service-line text-primary text-xl"></i>
-                    </div>
-                    <span class="text-xs">售后</span>
-                </button>
-            </div>
+        <span class="text-xs">待评价</span>
+      </div>
+      <div class="order-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-10 h-10 flex items-center justify-center">
+          <i class="ri-customer-service-2-line text-xl text-gray-700"></i>
         </div>
-
-        <div class="bg-white rounded-lg p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium">每日发现</h3>
-                <a href="#" class="text-sm text-gray-500">更多</a>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="rounded-lg overflow-hidden cursor-pointer">
-                    <img src="https://public.readdy.ai/ai/img_res/a018997dcc513ab1301828f09dec9098.jpg" class="w-full h-32 object-cover" alt="discover">
-                    <div class="mt-2">
-                        <p class="text-sm line-clamp-2">现代建筑之美</p>
-                    </div>
-                </div>
-                <div class="rounded-lg overflow-hidden cursor-pointer">
-                    <img src="https://public.readdy.ai/ai/img_res/63a4c4eaa2a271fc4be5ce46ff5adef9.jpg" class="w-full h-32 object-cover" alt="discover">
-                    <div class="mt-2">
-                        <p class="text-sm line-clamp-2">精致美食探索</p>
-                    </div>
-                </div>
-            </div>
+        <span class="text-xs">售后</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 我的服务 -->
+  <div class="bg-white rounded-lg p-4">
+    <div class="text-base font-medium mb-3">我的服务</div>
+    <div class="grid grid-cols-4 gap-y-4">
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/cd9080a28513d62910830645c40aab58.jpg" class="w-full h-full object-cover" alt="地址管理">
         </div>
-    </main>
-
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-between items-center px-6 py-2 z-10">
-        <a href="#" class="flex flex-col items-center">
-            <div class="w-6 h-6 flex items-center justify-center">
-                <i class="ri-compass-3-line text-gray-400"></i>
-            </div>
-            <span class="text-xs mt-1 text-gray-400">发现</span>
-        </a>
-        <div class="relative -mt-6">
-            <button class="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg">
-                <i class="ri-add-line text-white text-2xl"></i>
-            </button>
+        <span class="text-xs">地址管理</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/dbc44988f5c99f32a1c1ee7412fbba35.jpg" class="w-full h-full object-cover" alt="我的收藏">
         </div>
-        <a href="#" class="flex flex-col items-center">
-            <div class="w-6 h-6 flex items-center justify-center">
-                <i class="ri-calendar-line text-gray-400"></i>
-            </div>
-            <span class="text-xs mt-1 text-gray-400">日历</span>
-        </a>
-    </nav>
+        <span class="text-xs">我的收藏</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/9eff0e45f6ff14d4aaa12b3be82f20fd.jpg" class="w-full h-full object-cover" alt="优惠券">
+        </div>
+        <span class="text-xs">优惠券</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/0a123b33fc2c67bb522bcbafe353e1ea.jpg" class="w-full h-full object-cover" alt="购物车">
+        </div>
+        <span class="text-xs">购物车</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/53037345ad836010cf384a85fadbac6a.jpg" class="w-full h-full object-cover" alt="积分商城">
+        </div>
+        <span class="text-xs">积分商城</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/90073da34afb4471265da18a254c47ec.jpg" class="w-full h-full object-cover" alt="我的钱包">
+        </div>
+        <span class="text-xs">我的钱包</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/7a113086b48c5e0133282226db445fd4.jpg" class="w-full h-full object-cover" alt="联系客服">
+        </div>
+        <span class="text-xs">联系客服</span>
+      </div>
+      <div class="service-item flex flex-col items-center space-y-1 cursor-pointer">
+        <div class="w-12 h-12 flex items-center justify-center">
+          <img src="https://public.readdy.ai/ai/img_res/d7fc2f18b0e07eaad3561dbbe1244a7c.jpg" class="w-full h-full object-cover" alt="意见反馈">
+        </div>
+        <span class="text-xs">意见反馈</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 最近浏览 -->
+  <div class="bg-white rounded-lg p-4">
+    <div class="flex items-center justify-between mb-3">
+      <div class="text-base font-medium">最近浏览</div>
+      <div class="text-xs text-gray-500 flex items-center">
+        查看更多 <i class="ri-arrow-right-s-line ml-1"></i>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="product-item space-y-1">
+        <div class="aspect-square rounded overflow-hidden">
+          <img src="https://public.readdy.ai/ai/img_res/f405f8c4224c6d59389a4262f9f527d3.jpg" class="w-full h-full object-cover" alt="毛笔套装">
+        </div>
+        <div class="text-xs line-clamp-2">精品红木毛笔套装 初学者入门书法工具</div>
+        <div class="text-xs text-primary">¥ 299.00</div>
+      </div>
+      <div class="product-item space-y-1">
+        <div class="aspect-square rounded overflow-hidden">
+          <img src="https://public.readdy.ai/ai/img_res/68a0db3c83781be759e4b8979f4e38c2.jpg" class="w-full h-full object-cover" alt="茶具套装">
+        </div>
+        <div class="text-xs line-clamp-2">景德镇手绘青花瓷茶具套装 家用功夫茶杯</div>
+        <div class="text-xs text-primary">¥ 368.00</div>
+      </div>
+      <div class="product-item space-y-1">
+        <div class="aspect-square rounded overflow-hidden">
+          <img src="https://public.readdy.ai/ai/img_res/774fa972c97f4339bccb95a25f9c566b.jpg" class="w-full h-full object-cover" alt="丝巾">
+        </div>
+        <div class="text-xs line-clamp-2">苏州丝绸真丝围巾 女士春秋季百搭长款丝巾</div>
+        <div class="text-xs text-primary">¥ 199.00</div>
+      </div>
+    </div>
+  </div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+<div class="w-[375px] mx-auto grid grid-cols-4 h-[60px]">
+<div class="tab-bar-item flex flex-col items-center justify-center space-y-1">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-5-line text-xl"></i>
+</div>
+<span class="text-xs">首页</span>
+</div>
+<div class="tab-bar-item flex flex-col items-center justify-center space-y-1">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-compass-3-line text-xl"></i>
+</div>
+<span class="text-xs">发现</span>
+</div>
+<div class="tab-bar-item flex flex-col items-center justify-center space-y-1">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-shopping-cart-line text-xl"></i>
+</div>
+<span class="text-xs">购物车</span>
+</div>
+<div class="tab-bar-item active flex flex-col items-center justify-center space-y-1">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-3-line text-xl"></i>
+</div>
+<span class="text-xs">我的</span>
+</div>
+</div>
+</div>
+<script>
+// 底部导航切换
+document.querySelectorAll('.tab-bar-item').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelector('.tab-bar-item.active').classList.remove('active');
+    tab.classList.add('active');
+  });
+});
+// 订单管理点击事件
+document.querySelectorAll('.order-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // 这里可以添加跳转到订单页面的逻辑
+    console.log('跳转到订单页面');
+  });
+});
+// 服务项点击事件
+document.querySelectorAll('.service-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // 这里可以添加跳转到相应服务页面的逻辑
+    console.log('跳转到服务页面');
+  });
+});
+// 最近浏览商品点击事件
+document.querySelectorAll('.product-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // 这里可以添加跳转到商品详情页的逻辑
+    console.log('跳转到商品详情页');
+  });
+});
+</script>
 </body>
 </html>
