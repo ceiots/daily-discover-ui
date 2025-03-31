@@ -4850,7 +4850,7 @@ csstype@^3.0.2, csstype@^3.1.3, csstype@3.1.3:
   version "0.1.0"
   resolved "file:"
   dependencies:
-    "@ant-design/icons" "^5.5.2"
+    "@ant-design/icons" "^5.6.1"
     "@capacitor/android" "^6.2.0"
     "@emotion/react" "^11.13.5"
     "@emotion/styled" "^11.13.5"
@@ -4865,6 +4865,7 @@ csstype@^3.0.2, csstype@^3.1.3, csstype@3.1.3:
     "@mui/material" "^6.1.9"
     "@react-three/drei" "^9.117.2"
     "@react-three/fiber" "^8.17.10"
+    "@remixicon/react" "^4.6.0"
     "@testing-library/jest-dom" "^5.17.0"
     "@testing-library/react" "^13.4.0"
     "@testing-library/user-event" "^13.5.0"
@@ -4888,7 +4889,7 @@ csstype@^3.0.2, csstype@^3.1.3, csstype@3.1.3:
     react-dom "^18.3.1"
     react-feather "^2.0.10"
     react-helmet "^6.1.0"
-    react-icons "^5.4.0"
+    react-icons "^5.5.0"
     react-image-gallery "^1.3.0"
     react-leaflet "^4.2.1"
     react-map-gl "^7.1.7"
@@ -6358,6 +6359,11 @@ fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmmirror.com/fs.realpath/-/fs.realpath-1.0.0.tgz"
   integrity sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==
+
+fsevents@^2.3.2, fsevents@~2.3.2:
+  version "2.3.3"
+  resolved "https://registry.npmmirror.com/fsevents/-/fsevents-2.3.3.tgz"
+  integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
 function-bind@^1.1.2:
   version "1.1.2"
@@ -11000,7 +11006,7 @@ react-helmet@^6.1.0:
     react-fast-compare "^3.1.1"
     react-side-effect "^2.1.0"
 
-react-icons@^5.4.0, react-icons@^5.5.0:
+react-icons@^5.5.0:
   version "5.5.0"
   resolved "https://registry.npmmirror.com/react-icons/-/react-icons-5.5.0.tgz"
   integrity sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==

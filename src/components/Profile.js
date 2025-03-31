@@ -39,7 +39,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await instance.get(`/orders/user?status=${activeTab}`);
+        const response = await instance.get(`/order/user?status=${activeTab}`);
         setOrders(response.data);
       } catch (error) {
         console.error("获取订单失败:", error);
@@ -70,7 +70,7 @@ const Profile = () => {
             />
           </div>
           <div className="flex-1">
-            <div className="text-lg font-medium">{profileInfo?.name || '加载中...'}</div>
+            <div className="text-lg font-medium">{profileInfo?.nickname || '加载中...'}</div>
             <div className="text-sm opacity-90">会员等级：{profileInfo?.memberLevel || '加载中...'}</div>
           </div>
           <div className="w-8 h-8 flex items-center justify-center">
