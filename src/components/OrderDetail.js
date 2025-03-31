@@ -13,10 +13,11 @@ const OrderDetail = () => {
   useEffect(() => {
     const fetchOrderDetail = () => {
       setTimeout(() => {
+        // 模拟不同状态的订单
         const mockOrderDetail = {
           id: "DD20250331001",
           shopName: "墨香阁文房四宝",
-          status: "pending",
+          status: "pending", // 可以是 pending, processing, shipped, completed, canceled
           statusText: "待付款",
           orderNumber: "DD20250331001",
           createTime: "2025-03-30 14:30:25",
@@ -41,7 +42,7 @@ const OrderDetail = () => {
               image: "https://public.readdy.ai/ai/img_res/f405f8c4224c6d59389a4262f9f527d3.jpg"
             }
           ],
-          logistics: {
+          logistics: orderId.endsWith('3') ? {
             company: "韵达快递",
             number: "YD895674231568",
             status: "运输中",
@@ -54,7 +55,7 @@ const OrderDetail = () => {
               { time: "2025-03-29 08:20", status: "已发出", location: "苏州转运中心" },
               { time: "2025-03-28 20:15", status: "已揽收", location: "苏州市姑苏区" }
             ]
-          },
+          } : null,
           invoice: {
             type: "电子普通发票",
             title: "个人",
@@ -62,7 +63,28 @@ const OrderDetail = () => {
           }
         };
         
-        console.log(`获取订单详情，订单ID: ${orderId}`);
+        // 根据订单ID的最后一位数字设置不同的订单状态（仅用于演示）
+        if (orderId.endsWith('1')) {
+          mockOrderDetail.status = "pending";
+          mockOrderDetail.statusText = "待付款";
+          mockOrderDetail.logistics = null;
+        } else if (orderId.endsWith('2')) {
+          mockOrderDetail.status = "processing";
+          mockOrderDetail.statusText = "待发货";
+          mockOrderDetail.logistics = null;
+        } else if (orderId.endsWith('3')) {
+          mockOrderDetail.status = "shipped";
+          mockOrderDetail.statusText = "待收货";
+        } else if (orderId.endsWith('4')) {
+          mockOrderDetail.status = "completed";
+          mockOrderDetail.statusText = "已完成";
+        } else {
+          mockOrderDetail.status = "canceled";
+          mockOrderDetail.statusText = "已取消";
+          mockOrderDetail.logistics = null;
+        }
+        
+        console.log(`获取订单详情，订单ID: ${orderId}, 状态: ${mockOrderDetail.statusText}`);
         setOrderDetail(mockOrderDetail);
         setLoading(false);
       }, 500);
@@ -73,6 +95,17 @@ const OrderDetail = () => {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  // 复制订单号
+  const copyOrderNumber = () => {
+    navigator.clipboard.writeText(orderDetail.orderNumber)
+      .then(() => {
+        alert("订单号已复制到剪贴板");
+      })
+      .catch(err => {
+        console.error('复制失败: ', err);
+      });
   };
 
   // 根据订单状态获取对应的操作按钮
@@ -117,8 +150,26 @@ const OrderDetail = () => {
             </button>
           </div>
         );
+      case "canceled":
+        return (
+          <button className="w-full py-2.5 text-xs border border-gray-300 rounded-full">
+            删除订单
+          </button>
+        );
       default:
         return null;
+    }
+  };
+
+  // 获取状态卡片的背景颜色
+  const getStatusCardBgColor = (status) => {
+    switch (status) {
+      case "pending": return "bg-primary";
+      case "processing": return "bg-blue-500";
+      case "shipped": return "bg-indigo-500";
+      case "completed": return "bg-green-500";
+      case "canceled": return "bg-gray-500";
+      default: return "bg-primary";
     }
   };
 
@@ -168,7 +219,7 @@ const OrderDetail = () => {
       {/* 订单内容 */}
       <main className="mt-[44px] px-4 space-y-3 pb-4">
         {/* 订单状态卡片 */}
-        <div className="bg-primary text-white p-4 rounded-lg">
+        <div className={`${getStatusCardBgColor(orderDetail.status)} text-white p-4 rounded-lg`}>
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">{orderDetail.statusText}</span>
             {orderDetail.status === "pending" && (
@@ -178,7 +229,8 @@ const OrderDetail = () => {
             )}
           </div>
           
-          {orderDetail.logistics && (
+          {/* 物流信息 - 仅在待收货和已完成状态显示 */}
+          {(orderDetail.status === "shipped" || orderDetail.status === "completed") && orderDetail.logistics && (
             <div 
               className="mt-3 text-xs" 
               onClick={() => setShowLogistics(!showLogistics)}
@@ -267,7 +319,10 @@ const OrderDetail = () => {
             </div>
             <div className="flex items-center">
               <span>{orderDetail.orderNumber}</span>
-              <button className="ml-2 text-primary text-[10px] border border-primary rounded-full px-1.5 py-0.5">
+              <button 
+                onClick={copyOrderNumber}
+                className="ml-2 text-primary text-[10px] border border-primary rounded-full px-1.5 py-0.5"
+              >
                 复制
               </button>
             </div>
@@ -279,23 +334,31 @@ const OrderDetail = () => {
             </div>
             <span>{orderDetail.createTime}</span>
           </div>
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center">
-              <FaCreditCard className="text-gray-500 mr-2" />
-              <span className="text-gray-600">支付方式</span>
+          
+          {/* 支付方式 - 仅在已支付的订单中显示 */}
+          {orderDetail.status !== "pending" && orderDetail.status !== "canceled" && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center">
+                <FaCreditCard className="text-gray-500 mr-2" />
+                <span className="text-gray-600">支付方式</span>
+              </div>
+              <span>{orderDetail.paymentMethod}</span>
             </div>
-            <span>{orderDetail.paymentMethod}</span>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center">
-              <FaFileInvoice className="text-gray-500 mr-2" />
-              <span className="text-gray-600">发票信息</span>
+          )}
+          
+          {/* 发票信息 - 仅在已支付的订单中显示 */}
+          {orderDetail.status !== "pending" && orderDetail.status !== "canceled" && (
+            <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center">
+                <FaFileInvoice className="text-gray-500 mr-2" />
+                <span className="text-gray-600">发票信息</span>
+              </div>
+              <div className="flex items-center text-primary">
+                <span>{orderDetail.invoice.type}</span>
+                <FaChevronRight className="ml-1 text-xs" />
+              </div>
             </div>
-            <div className="flex items-center text-primary">
-              <span>{orderDetail.invoice.type}</span>
-              <FaChevronRight className="ml-1 text-xs" />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* 金额信息 */}
@@ -323,38 +386,9 @@ const OrderDetail = () => {
             </div>
           </div>
         </div>
-
-        {/* 推荐商品 */}
-        {/* <div className="bg-white rounded-lg p-4">
-          <h3 className="text-sm font-medium mb-3">猜你喜欢</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded overflow-hidden">
-              <img 
-                src="https://public.readdy.ai/ai/img_res/3ae9ce0fe3398798e7c3a00636dac53b.jpg" 
-                alt="推荐商品" 
-                className="w-full h-24 object-cover"
-              />
-              <div className="p-2">
-                <p className="text-xs line-clamp-2">紫砂茶壶套装 原矿紫泥手工刻绘功夫茶具</p>
-                <p className="text-xs text-primary mt-1">¥528.00</p>
-              </div>
-            </div>
-            <div className="rounded overflow-hidden">
-              <img 
-                src="https://public.readdy.ai/ai/img_res/68a0db3c83781be759e4b8979f4e38c2.jpg" 
-                alt="推荐商品" 
-                className="w-full h-24 object-cover"
-              />
-              <div className="p-2">
-                <p className="text-xs line-clamp-2">景德镇手绘青花瓷茶具套装 家用功夫茶杯</p>
-                <p className="text-xs text-primary mt-1">¥368.00</p>
-              </div>
-            </div>
-          </div>
-        </div> */}
       </main>
 
-      {/* 底部操作按钮 */}
+      {/* 底部操作按钮 - 不同状态显示不同按钮 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100">
         {getOrderActions(orderDetail)}
       </div>
