@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import instance from "../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { userInfo } = useAuth();
   const [activeTab, setActiveTab] = useState("all");
   const [orders, setOrders] = useState([]);
+  const navigate = useNavigate(); // 引入 useNavigate 钩子
 
   const ORDER_TABS = [
     { id: "all", name: "全部" },
@@ -62,7 +64,10 @@ const Profile = () => {
       <div className="bg-white rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="text-base font-medium">我的订单</div>
-          <div className="text-xs text-gray-500 flex items-center">
+          <div 
+            className="text-xs text-gray-500 flex items-center cursor-pointer"
+            onClick={() => navigate('/order-list')} // 添加点击事件处理函数
+          >
             查看全部订单 <i className="ri-arrow-right-s-line ml-1"></i>
           </div>
         </div>
