@@ -7,7 +7,26 @@ const Profile = () => {
   const { userInfo } = useAuth();
   const [activeTab, setActiveTab] = useState("all");
   const [orders, setOrders] = useState([]);
-  const navigate = useNavigate(); // 引入 useNavigate 钩子
+  const [profileInfo, setProfileInfo] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          navigate('/login');
+          return;
+        }
+        const response = await instance.get(`/user/info?userId=${userId}`);
+        setProfileInfo(response.data);
+      } catch (error) {
+        console.error("获取用户信息失败:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, [navigate]);
 
   const ORDER_TABS = [
     { id: "all", name: "全部" },
@@ -45,14 +64,14 @@ const Profile = () => {
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
             <img
-              src="https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"
+              src={profileInfo?.avatar || "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"}
               className="w-full h-full object-cover"
               alt="用户头像"
             />
           </div>
           <div className="flex-1">
-            <div className="text-lg font-medium">陈雅婷</div>
-            <div className="text-sm opacity-90">会员等级：黄金会员</div>
+            <div className="text-lg font-medium">{profileInfo?.name || '加载中...'}</div>
+            <div className="text-sm opacity-90">会员等级：{profileInfo?.memberLevel || '加载中...'}</div>
           </div>
           <div className="w-8 h-8 flex items-center justify-center">
             <i className="ri-settings-3-line text-xl"></i>
