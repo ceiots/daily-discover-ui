@@ -19,37 +19,24 @@ import ForgotPasswordPage from './components/ForgotPasswordPage';
 import EventDetail from "./components/EventDetail"; // 事件详情页面
 import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
+import PropTypes from 'prop-types';
 
 // 创建一个上下文来管理登录状态和用户信息
 // 创建认证上下文
 const AuthContext = createContext();
 
-// 导出useAuth函数
+// 导出useAuth函数，移到前面以便在ProtectedRoute中使用
 export const useAuth = () => {
   return useContext(AuthContext);
 };
 
-// 受保护路由组件
-const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn, loading } = useAuth();
-
-  if (loading) {
-    return <div>加载中...</div>;
-  }
-
-  if (!isLoggedIn) {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
-};
-
-// AuthProvider组件
+// 新增 AuthProvider 组件
 const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userAvatar, setUserAvatar] = useState("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = localStorage.getItem("token");
@@ -105,6 +92,21 @@ const AuthProvider = ({ children }) => {
   );
 };
 
+// 新增受保护路由组件
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn, loading } = useAuth();
+
+  if (loading) {
+    return <div>加载中...</div>;
+  }
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
+
 const App = () => {
   return (
     <AuthProvider>
@@ -131,6 +133,14 @@ const App = () => {
       </Router>
     </AuthProvider>
   );
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired
 };
 
 export default App;
