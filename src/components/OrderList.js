@@ -311,7 +311,7 @@ const OrderList = () => {
                   </div>
                   
                   {/* 订单内容 */}
-                  <Link to={`/orders/${order.id}`}>
+                  <Link to={`/order/${order.id}`}>
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center gap-2 pb-2 border-b border-gray-100">
                         <img
