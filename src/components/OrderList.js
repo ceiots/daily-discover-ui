@@ -1,10 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaSearch } from "react-icons/fa";
+import instance from "../utils/axios";
+import { useAuth } from "../App";
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
   const navigate = useNavigate();
+  const { isLoggedIn, userInfo } = useAuth();
+  
+  // 状态定义
+  const [orderData, setOrderData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [size, setSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   
   // 状态映射表
   const statusMap = {
@@ -22,126 +34,46 @@ const OrderList = () => {
   
   // 当 URL 参数变化时更新选中状态
   useEffect(() => {
-    console.log("status:", status);
     if (status && statusMap[status]) {
       setSelectedStatus(statusMap[status]);
     } else {
       setSelectedStatus("全部");
     }
   }, [status]);
-
-  // 从 test.html 迁移过来的模拟订单数据
-  const orderData = [
-    {
-      id: "DD20250331001",
-      date: "2025-03-30",
-      status: "待付款",
-      statusText: "待付款",
-      totalAmount: 299.0,
-      paymentDeadline: "23:59:59",
-      shopName: "墨香阁文房四宝",
-      countdown: "23:45:12",
-      items: [
-        {
-          id: 1,
-          name: "精品红木毛笔套装 初学者入门书法工具",
-          price: 299.0,
-          quantity: 1,
-          specs: "高档礼盒装",
-          attributes: "狼毫/红木",
-          image:
-            "https://public.readdy.ai/ai/img_res/f405f8c4224c6d59389a4262f9f527d3.jpg",
-        },
-      ],
-      actions: ["cancel", "pay"],
-    },
-    {
-      id: "DD20250329002",
-      date: "2025-03-29",
-      status: "待发货",
-      statusText: "待发货",
-      totalAmount: 368.0,
-      shopName: "景德镇陶瓷旗舰店",
-      items: [
-        {
-          id: 2,
-          name: "景德镇手绘青花瓷茶具套装 家用功夫茶杯",
-          price: 368.0,
-          quantity: 1,
-          specs: "一壶六杯",
-          attributes: "青花瓷/手绘",
-          image:
-            "https://public.readdy.ai/ai/img_res/68a0db3c83781be759e4b8979f4e38c2.jpg",
-        },
-      ],
-      actions: ["remind"],
-    },
-    {
-      id: "DD20250328003",
-      date: "2025-03-28",
-      status: "待收货",
-      statusText: "待收货",
-      totalAmount: 199.0,
-      deliveryCompany: "顺丰速运",
-      trackingNumber: "SF1234567890",
-      shopName: "苏州丝绸专卖店",
-      items: [
-        {
-          id: 3,
-          name: "苏州丝绸真丝围巾 女士春秋季百搭长款丝巾",
-          price: 199.0,
-          quantity: 1,
-          specs: "175cm×55cm",
-          attributes: "100%桑蚕丝/蓝色",
-          image:
-            "https://public.readdy.ai/ai/img_res/774fa972c97f4339bccb95a25f9c566b.jpg",
-        },
-      ],
-      actions: ["track", "confirm"],
-    },
-    {
-      id: "DD20250327004",
-      date: "2025-03-27",
-      status: "已完成",
-      statusText: "已完成",
-      totalAmount: 528.0,
-      shopName: "宜兴紫砂艺术馆",
-      items: [
-        {
-          id: 4,
-          name: "紫砂茶壶套装 原矿紫泥手工刻绘功夫茶具",
-          price: 528.0,
-          quantity: 1,
-          specs: "280ml容量",
-          attributes: "原矿紫泥/手工刻绘",
-          image:
-            "https://public.readdy.ai/ai/img_res/3ae9ce0fe3398798e7c3a00636dac53b.jpg",
-        },
-      ],
-      actions: ["review", "rebuy"],
-    },
-    {
-      id: "DD20250326005",
-      date: "2025-03-26",
-      status: "已完成",
-      statusText: "已完成",
-      totalAmount: 158.0,
-      shopName: "锦绣坊民族服饰",
-      items: [
-        {
-          id: 5,
-          name: "中国风刺绣手提包 女士复古民族风单肩包",
-          price: 158.0,
-          quantity: 1,
-          specs: "中号25cm×18cm",
-          attributes: "棉麻材质/红色",
-          image:
-            "https://public.readdy.ai/ai/img_res/e12b714f698b2f6659f1edccfd350e5d.jpg",
-        },
-      ],
-      actions: ["review", "rebuy"],
-    },
-  ];
+  
+  // 获取订单数据
+  useEffect(() => {
+    if (isLoggedIn && userInfo?.id) {
+      const fetchOrders = async () => {
+        try {
+          setLoading(true);
+          // 确保status是整数类型
+          const statusParam = parseInt(status) || 0;
+          // 添加分页参数
+          const response = await instance.get(`/order/user/${userInfo.id}?status=${statusParam}&page=${page}&size=${size}&sort=createdAt,desc`);
+          
+          // 检查响应格式并设置数据
+          if (response.data && response.data.data) {
+            setOrderData(response.data.data.content || []);
+            setTotalPages(response.data.data.totalPages || 0);
+            setTotalElements(response.data.data.totalElements || 0);
+          } else {
+            setOrderData([]);
+            setTotalPages(0);
+            setTotalElements(0);
+          }
+          setError(null);
+        } catch (error) {
+          console.error("获取订单数据失败:", error);
+          setError("获取订单数据失败，请稍后重试");
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchOrders();
+    }
+  }, [isLoggedIn, userInfo, status, page, size]);
 
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
@@ -236,6 +168,14 @@ const OrderList = () => {
     selectedStatus === "全部"
       ? orderData
       : orderData.filter((order) => order.status === selectedStatus);
+
+  if (loading) {
+    return <div>加载中...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
@@ -399,6 +339,29 @@ const OrderList = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        
+        {/* 分页控件 */}
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center mt-4 pb-4">
+            <button 
+              onClick={() => setPage(Math.max(0, page - 1))}
+              disabled={page === 0}
+              className={`px-3 py-1 text-xs rounded-l-md ${page === 0 ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white'}`}
+            >
+              上一页
+            </button>
+            <span className="px-3 py-1 text-xs bg-gray-100">
+              {page + 1} / {totalPages}
+            </span>
+            <button 
+              onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+              disabled={page >= totalPages - 1}
+              className={`px-3 py-1 text-xs rounded-r-md ${page >= totalPages - 1 ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white'}`}
+            >
+              下一页
+            </button>
           </div>
         )}
       </main>
