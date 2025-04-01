@@ -74,6 +74,8 @@ const LoginPage = () => {
           refreshUserInfo();
         }
 
+        // 确保登录状态更新后再跳转
+        await new Promise(resolve => setTimeout(resolve, 100)); // 短暂延迟确保状态更新
         navigate('/Calendar'); // 登录后跳转到 Calendar 页面
       } else {
         setErrorMsg(

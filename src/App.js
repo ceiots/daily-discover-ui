@@ -66,7 +66,6 @@ const AuthProvider = ({ children }) => {
       refreshUserInfo: async () => {
         try {
           const userId = localStorage.getItem('userId');
-          console
           if (userId) {
             const response = await instance.get(`/user/info?userId=${userId}`);
             setUserInfo(response.data);
@@ -99,7 +98,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return <div>加载中...</div>;
   }
-
+ console.log("ProtectedRoute isLoggedIn:", isLoggedIn); 
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }

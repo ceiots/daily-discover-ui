@@ -5,17 +5,26 @@ import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const { userInfo, refreshUserInfo, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
+  // 新增登录态校验
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoggedIn, navigate]);
 
   // 组件加载时强制刷新
   useEffect(() => {
-    if (isLoggedIn) {
+    // 确保只有在已登录且没有用户信息时才刷新
+    if (isLoggedIn && (!userInfo || !userInfo.id)) {
       refreshUserInfo();
     }
-  }, [isLoggedIn, refreshUserInfo]);
+  }, [isLoggedIn, refreshUserInfo, userInfo]);
+
   const [activeTab, setActiveTab] = useState("all");
   const [orders, setOrders] = useState([]);
   const [profileInfo, setProfileInfo] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -28,15 +37,20 @@ const Profile = () => {
         const response = await instance.get(`/user/info?userId=${userId}`);
         setProfileInfo(response.data);
         
-        // 刷新全局用户信息
-        refreshUserInfo();
+        // 只有当全局用户信息不存在时才刷新
+        if (!userInfo || !userInfo.id) {
+          refreshUserInfo();
+        }
       } catch (error) {
         console.error("获取用户信息失败:", error);
       }
     };
 
-    fetchUserProfile();
-  }, [navigate, refreshUserInfo]);
+    // 只有在已登录状态下才获取用户信息
+    if (isLoggedIn) {
+      fetchUserProfile();
+    }
+  }, [navigate, refreshUserInfo, isLoggedIn, userInfo]);
 
   const ORDER_TABS = [
     { id: "all", name: "全部" },

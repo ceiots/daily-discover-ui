@@ -12,7 +12,7 @@ const Discover = () => {
   // 组件加载时检查用户信息
   useEffect(() => {
     // 如果已登录但没有用户信息，尝试刷新用户信息
-    if (isLoggedIn && (!userInfo || !userInfo.nickname)) {
+    if (isLoggedIn && userInfo && !userInfo.nickname) {
       const userId = localStorage.getItem('userId');
       if (userId) {
         refreshUserInfo();
@@ -36,7 +36,7 @@ const Discover = () => {
 
   // 合并后的统一数据请求逻辑
   useEffect(() => {
-    console.log("isLoggedIn:", isLoggedIn);
+    
     const fetchInitialData = async () => {
       try {
         const [eventsRes, categoriesRes, recommendationsRes] = await Promise.all([
@@ -140,32 +140,29 @@ const Discover = () => {
             <div className="relative">
               <Link to="/cart" className="flex items-center">
                 <i className="fas fa-shopping-cart text-white"></i>
-                {/* <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {cartItemCount}
-                </span>*/}
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-3 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
               </Link>
             </div>
-            <Link
-              to={isLoggedIn ? "/profile" : "/login"}  // 修改判断条件
-              className="w-8 h-8 rounded-full overflow-hidden"
-            >
-              {isLoggedIn ? (  // 简化判断逻辑
-                <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
-                  <img
-                    src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"}
-                    alt="用户头像"
-                    className="w-full h-full object-cover"
-                  />
-                </Link>
-              ) : (
-                <button 
-                  onClick={() => navigate('/login')}
-                  className="text-white text-sm"
-                >
-                  登录
-                </button>
-              )}
-            </Link>
+            {isLoggedIn && userInfo ? (
+              <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
+                <img
+                  src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"}
+                  alt="用户头像"
+                  className="w-full h-full object-cover"
+                />
+              </Link>
+            ) : (
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-white text-sm"
+              >
+                登录
+              </button>
+            )}
           </div>
         </div>
         <div className="search-bar mt-3 px-4 py-2 rounded-lg flex items-center">
