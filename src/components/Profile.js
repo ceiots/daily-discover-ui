@@ -22,7 +22,7 @@ const Profile = () => {
     }
   }, [isLoggedIn, refreshUserInfo, userInfo]);
 
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -33,7 +33,7 @@ const Profile = () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem("userId");
-        console.log("userId11:", userId);
+        
         if (!userId) {
           navigate("/login");
           return;
@@ -60,11 +60,11 @@ const Profile = () => {
   }, [navigate, refreshUserInfo, isLoggedIn, userInfo]);
 
   const ORDER_TABS = [
-    { id: "all", name: "全部" },
-    { id: 0, name: "待付款" },
-    { id: 1, name: "待发货" },
-    { id: 2, name: "待收货" },
-    { id: 3, name: "已完成" },
+    { id: 0, name: "全部" },
+    { id: 1, name: "待付款" },
+    { id: 2, name: "待发货" },
+    { id: 3, name: "待收货" },
+    { id: 4, name: "已完成" },
   ];
 
   useEffect(() => {
@@ -76,14 +76,14 @@ const Profile = () => {
           navigate("/login");
           return;
         }
-        // 在请求中传递 userId 和 activeTab
+       /*  // 在请求中传递 userId 和 activeTab
         const response = await instance.get(
           `/order/user?status=${activeTab}&userId=${userId}`
         );
         console.log("订单查response:", JSON.stringify(response));
-        setOrders(response.data);
+        setOrders(response.data); */
       } catch (error) {
-        if (error.response && error.response.status === 401) {
+        /* if (error.response && error.response.status === 401) {
           // 尝试刷新用户信息并重试请求
           try {
             await refreshUserInfo();
@@ -96,7 +96,7 @@ const Profile = () => {
           }
         } else {
           setError("获取订单失败");
-        }
+        } */
       } finally {
         setLoading(false);
       }
@@ -104,22 +104,15 @@ const Profile = () => {
     fetchOrders();
   }, [activeTab, refreshUserInfo]);
 
-  // 在登录成功后立即检查
-  console.log(
-    "登录后立即检查 - token:",
-    localStorage.getItem("token"),
-    "userId:",
-    localStorage.getItem("userId")
-  );
 
   // 在页面加载时检查
   useEffect(() => {
-    console.log(
+    /* console.log(
       "页面加载检查 - token:",
       localStorage.getItem("token"),
       "userId:",
       localStorage.getItem("userId")
-    );
+    ); */
   }, []);
 
   return (
@@ -163,7 +156,7 @@ const Profile = () => {
           </div> */}
         </div>
         {loading && <div>加载中...</div>}
-        {error && <div>{error}</div>}
+       {/*  {error && <div>{error}</div>} */}
         <div className="grid grid-cols-5 text-center">
           {ORDER_TABS.map((tab) => (
             <div
@@ -173,25 +166,39 @@ const Profile = () => {
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div className="w-10 h-10 flex items-center justify-center relative">
+              <div 
+                className="w-10 h-10 flex items-center justify-center relative"
+                onClick={(e) => {
+                  e.stopPropagation(); // 防止触发父元素的 onClick
+                  navigate(`/order-list/${tab.id}`);
+                }}
+              >
                 {/* 根据不同状态显示不同图标 */}
                 {tab.id === 0 && (
-                  <i className="ri-wallet-3-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 1 && (
-                  <i className="ri-truck-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 2 && (
-                  <i className="ri-inbox-archive-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 3 && (
-                  <i className="ri-check-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === "all" && (
                   <i className="ri-list-unordered text-xl text-gray-700"></i>
                 )}
+                {tab.id === 1 && (
+                  <i className="ri-wallet-3-line text-xl text-gray-700"></i>
+                )}
+                {tab.id === 2 && (
+                  <i className="ri-truck-line text-xl text-gray-700"></i>
+                )}
+                {tab.id === 3 && (
+                  <i className="ri-inbox-archive-line text-xl text-gray-700"></i>
+                )}
+                {tab.id === 4 && (
+                  <i className="ri-check-line text-xl text-gray-700"></i>
+                )}
               </div>
-              <span className="text-xs">{tab.name}</span>
+              <span 
+                className="text-xs"
+                onClick={(e) => {
+                  e.stopPropagation(); // 防止触发父元素的 onClick
+                  navigate(`/order-list/${tab.id}`);
+                }}
+              >
+                {tab.name}
+              </span>
             </div>
           ))}
         </div>

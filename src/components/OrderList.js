@@ -1,14 +1,41 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaSearch } from "react-icons/fa";
 
 const OrderList = () => {
+  const { status } = useParams(); // 获取 URL 参数
+  const navigate = useNavigate();
+  
+  // 状态映射表
+  const statusMap = {
+    "0": "全部",
+    "1": "待付款",
+    "2": "待发货",
+    "3": "待收货",
+    "4": "已完成"
+  };
+  
+  // 根据 URL 参数设置初始状态
+  const [selectedStatus, setSelectedStatus] = useState(
+    status ? statusMap[status] || "全部" : "全部"
+  );
+  
+  // 当 URL 参数变化时更新选中状态
+  useEffect(() => {
+    console.log("status:", status);
+    if (status && statusMap[status]) {
+      setSelectedStatus(statusMap[status]);
+    } else {
+      setSelectedStatus("全部");
+    }
+  }, [status]);
+
   // 从 test.html 迁移过来的模拟订单数据
   const orderData = [
     {
       id: "DD20250331001",
       date: "2025-03-30",
-      status: "pending",
+      status: "待付款",
       statusText: "待付款",
       totalAmount: 299.0,
       paymentDeadline: "23:59:59",
@@ -31,7 +58,7 @@ const OrderList = () => {
     {
       id: "DD20250329002",
       date: "2025-03-29",
-      status: "processing",
+      status: "待发货",
       statusText: "待发货",
       totalAmount: 368.0,
       shopName: "景德镇陶瓷旗舰店",
@@ -52,7 +79,7 @@ const OrderList = () => {
     {
       id: "DD20250328003",
       date: "2025-03-28",
-      status: "shipped",
+      status: "待收货",
       statusText: "待收货",
       totalAmount: 199.0,
       deliveryCompany: "顺丰速运",
@@ -75,7 +102,7 @@ const OrderList = () => {
     {
       id: "DD20250327004",
       date: "2025-03-27",
-      status: "completed",
+      status: "已完成",
       statusText: "已完成",
       totalAmount: 528.0,
       shopName: "宜兴紫砂艺术馆",
@@ -96,7 +123,7 @@ const OrderList = () => {
     {
       id: "DD20250326005",
       date: "2025-03-26",
-      status: "completed",
+      status: "已完成",
       statusText: "已完成",
       totalAmount: 158.0,
       shopName: "锦绣坊民族服饰",
@@ -115,14 +142,6 @@ const OrderList = () => {
       actions: ["review", "rebuy"],
     },
   ];
-
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const navigate = useNavigate();
-
-  const filteredOrders =
-    selectedStatus === "all"
-      ? orderData
-      : orderData.filter((order) => order.status === selectedStatus);
 
   const handleStatusChange = (status) => {
     setSelectedStatus(status);
@@ -153,7 +172,7 @@ const OrderList = () => {
   // 根据订单状态获取对应的操作按钮
   const getOrderActions = (order) => {
     switch (order.status) {
-      case "pending": // 待付款
+      case "待付款": // 待付款
         return (
           <>
             <button 
@@ -169,7 +188,7 @@ const OrderList = () => {
             </button>
           </>
         );
-      case "processing": // 待发货
+      case "待发货": // 待发货
         return (
           <button 
             className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full"
@@ -177,7 +196,7 @@ const OrderList = () => {
             提醒发货
           </button>
         );
-      case "shipped": // 待收货
+      case "待收货": // 待收货
         return (
           <>
             <button 
@@ -192,7 +211,7 @@ const OrderList = () => {
             </button>
           </>
         );
-      case "completed": // 已完成
+      case "已完成": // 已完成
         return (
           <>
             <button 
@@ -213,6 +232,11 @@ const OrderList = () => {
     }
   };
 
+  const filteredOrders =
+    selectedStatus === "全部"
+      ? orderData
+      : orderData.filter((order) => order.status === selectedStatus);
+
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
       {/* 导航栏 */}
@@ -229,41 +253,56 @@ const OrderList = () => {
         <div className="flex justify-between px-4">
           <button
             className={`${
-              selectedStatus === "all" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "全部" ? "text-primary border-primary border-b-2" : "text-gray-500"
             } py-2 px-2 text-xs`}
-            onClick={() => handleStatusChange("all")}
+            onClick={() => {
+              handleStatusChange("全部");
+              navigate("/order-list/0", { replace: true });
+            }}
           >
             全部
           </button>
           <button
             className={`${
-              selectedStatus === "pending" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待付款" ? "text-primary border-primary border-b-2" : "text-gray-500"
             } py-2 px-2 text-xs`}
-            onClick={() => handleStatusChange("pending")}
+            onClick={() => {
+              handleStatusChange("待付款");
+              navigate("/order-list/1", { replace: true });
+            }}
           >
             待付款
           </button>
           <button
             className={`${
-              selectedStatus === "processing" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待发货" ? "text-primary border-primary border-b-2" : "text-gray-500"
             } py-2 px-2 text-xs`}
-            onClick={() => handleStatusChange("processing")}
+            onClick={() => {
+              handleStatusChange("待发货");
+              navigate("/order-list/2", { replace: true });
+            }}
           >
             待发货
           </button>
           <button
             className={`${
-              selectedStatus === "shipped" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待收货" ? "text-primary border-primary border-b-2" : "text-gray-500"
             } py-2 px-2 text-xs`}
-            onClick={() => handleStatusChange("shipped")}
+            onClick={() => {
+              handleStatusChange("待收货");
+              navigate("/order-list/3", { replace: true });
+            }}
           >
             待收货
           </button>
           <button
             className={`${
-              selectedStatus === "completed" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "已完成" ? "text-primary border-primary border-b-2" : "text-gray-500"
             } py-2 px-2 text-xs`}
-            onClick={() => handleStatusChange("completed")}
+            onClick={() => {
+              handleStatusChange("已完成");
+              navigate("/order-list/4", { replace: true });
+            }}
           >
             已完成
           </button>
@@ -303,8 +342,8 @@ const OrderList = () => {
                       <span className="text-xs">{order.shopName}</span>
                     </div>
                     <span className={`text-xs ${
-                      order.status === "pending" ? "text-red-500" : 
-                      order.status === "completed" ? "text-green-500" : "text-primary"
+                      order.status === "待付款" ? "text-red-500" : 
+                      order.status === "已完成" ? "text-green-500" : "text-primary"
                     }`}>
                       {order.statusText}
                     </span>
@@ -344,7 +383,7 @@ const OrderList = () => {
                   </div>
                   
                   {/* 倒计时 - 仅待付款订单显示 */}
-                  {order.status === "pending" && (
+                  {order.status === "待付款" && (
                     <div className="flex items-center mt-1">
                       <div className="text-[10px] text-red-500">
                         <i className="ri-time-line mr-1"></i>

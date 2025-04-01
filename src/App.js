@@ -9,7 +9,8 @@ import Profile from './components/Profile';
 import Cart from './components/Cart';
 import Payment from './components/Payment';
 import OrderConfirmation from './components/OrderConfirmation';
-import OrderList from './components/OrderList';
+import { lazy, Suspense } from 'react';
+const OrderList = lazy(() => import('./components/OrderList'));
 import OrderDetail from './components/OrderDetail';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
@@ -170,7 +171,14 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route path="/order-list" element={<OrderList />} />
+          <Route 
+            path="/order-list/:status" 
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <OrderList />
+              </Suspense>
+            } 
+          />
           <Route path="/order/:orderId" element={<OrderDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
