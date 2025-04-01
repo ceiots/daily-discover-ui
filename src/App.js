@@ -21,11 +21,10 @@ import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
 
-// 创建一个上下文来管理登录状态和用户信息
 // 创建认证上下文
 const AuthContext = createContext();
 
-// 导出useAuth函数，移到前面以便在ProtectedRoute中使用
+// 导出useAuth函数，确保可以在其他组件中使用
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -34,60 +33,51 @@ export const useAuth = () => {
 const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userAvatar, setUserAvatar] = useState("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
+  const [userLoading, setUserLoading] = useState(true); // 新增加载状态
 
+  // 初始化时加载用户信息
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      const token = localStorage.getItem("token");
-      const savedUserInfo = localStorage.getItem("userInfo");
-      
-      if (token) {
-        instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        try {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const response = await instance.get('/user/info');
+          setUserInfo(response.data);
           setIsLoggedIn(true);
-          if (savedUserInfo) {
-            const parsedUserInfo = JSON.parse(savedUserInfo);
-            setUserInfo(parsedUserInfo);
-            if (parsedUserInfo.avatar) {
-              setUserAvatar(parsedUserInfo.avatar);
-            }
-          }
-        } catch (error) {
-          console.error("Token验证失败:", error);
-          localStorage.removeItem("token");
-          localStorage.removeItem("userInfo");
         }
+      } catch (error) {
+        console.error("用户信息加载失败:", error);
+      } finally {
+        setUserLoading(false);
       }
-      setLoading(false);
     };
-    
-    checkLoginStatus();
+    checkAuth();
   }, []);
 
-  const logout = () => {
-    setIsLoggedIn(false);
-    setUserInfo(null);
-    setUserAvatar("https://ai-public.mastergo.com/ai/img_res/e988c22c8c382a5c01a13a35609b2b3c.jpg");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userInfo");
-    delete instance.defaults.headers.common['Authorization'];
-  };
-
-  const value = {
-    isLoggedIn,
-    setIsLoggedIn,
-    userInfo,
-    setUserInfo,
-    logout,
-    loading,
-    userAvatar,
-    setUserAvatar
-  };
-
   return (
-    <AuthContext.Provider value={value}>
-      {children}
+    <AuthContext.Provider value={{ 
+      isLoggedIn,
+      userInfo,
+      userLoading, // 暴露加载状态
+      refreshUserInfo: async () => {
+        try {
+          const response = await instance.get('/user/info');
+          setUserInfo(response.data);
+        } catch (error) {
+          console.error("用户信息刷新失败:", error);
+        }
+      },
+      logout: () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        setUserInfo(null);
+      },
+      userAvatar: userInfo?.avatar || '',
+      setUserAvatar: (newAvatar) => {
+        setUserInfo(prev => ({...prev, avatar: newAvatar}));
+      }
+    }}>
+      {!userLoading && children}
     </AuthContext.Provider>
   );
 };

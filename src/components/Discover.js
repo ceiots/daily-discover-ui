@@ -6,7 +6,20 @@ import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 
 const Discover = () => {
-  const { isLoggedIn, userAvatar } = useAuth();
+  const { isLoggedIn, userInfo, refreshUserInfo } = useAuth();
+  const navigate = useNavigate();
+
+  // 组件加载时检查用户信息
+  useEffect(() => {
+    // 如果已登录但没有用户信息，尝试刷新用户信息
+    if (isLoggedIn && (!userInfo || !userInfo.nickname)) {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        refreshUserInfo();
+      }
+    }
+  }, [isLoggedIn, userInfo, refreshUserInfo]);
+
   // 将日期定义提升到组件顶部
   const currentDate = new Date().toISOString().split("T")[0];
   
@@ -17,7 +30,6 @@ const Discover = () => {
   const [aiContents, setAiContents] = useState([]); // 新增状态用于存储 AI 生成内容
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [originalRecommendations, setOriginalRecommendations] = useState([]);
   const [cartItemCount, setCartItemCount] = useState(0); // 购物车数量状态
@@ -45,31 +57,28 @@ const Discover = () => {
       }
     };
 
-    const fetchCartData = async (userId) => {
+    const fetchCartData = async () => {
       try {
-        // 移除错误的提前使用 cartRes 的代码
-        const cartRes = await instance.get(`/cart/${userId}/count`);
-        console.log("Cart data:", cartRes.data);
-        setCartItemCount(cartRes.data);
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          const cartRes = await instance.get(`/cart/${userId}/count`);
+          setCartItemCount(cartRes.data);
+        }
       } catch (error) {
         console.error("获取购物车数量失败:", error);
       }
     };
 
     // 合并执行逻辑
-    const initializeData = async () => {
-      await fetchInitialData();
-      // 仅在登录状态有效时获取购物车数据
-      console.log(isLoggedIn + " Clicked event ID:", (isLoggedIn?.userInfo?.id === undefined));
-      if (isLoggedIn?.userInfo?.id) {
-        await fetchCartData(isLoggedIn.userInfo.id);
-      } else {
-        setCartItemCount(0); // 未登录时重置为0
-      }
-    };
+    fetchInitialData();
     
-    initializeData();
-  }, [currentDate]); // 保留依赖项
+    // 只有在登录状态下才获取购物车数据
+    if (isLoggedIn) {
+      fetchCartData();
+    } else {
+      setCartItemCount(0);
+    }
+  }, [currentDate, isLoggedIn]); // 添加isLoggedIn作为依赖项
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
@@ -136,13 +145,13 @@ const Discover = () => {
               </Link>
             </div>
             <Link
-              to={isLoggedIn?.userInfo?.id ? "/profile" : "/login"}
+              to={isLoggedIn ? "/profile" : "/login"}  // 修改判断条件
               className="w-8 h-8 rounded-full overflow-hidden"
             >
-              {isLoggedIn?.userInfo?.id ? (
+              {isLoggedIn ? (  // 简化判断逻辑
                 <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
                   <img
-                    src={userAvatar}
+                    src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"}
                     alt="用户头像"
                     className="w-full h-full object-cover"
                   />

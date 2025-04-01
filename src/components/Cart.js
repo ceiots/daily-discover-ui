@@ -1,43 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
-import { useAuth } from "../App"; // 添加useAuth导入
+import { useAuth } from "../App"; // 确保正确导入
 import instance from "../utils/axios";
 
 const Cart = () => {
+  const { isLoggedIn, userInfo } = useAuth();
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth(); // 获取登录状态
   const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedItems, setSelectedItems] = useState({});
   const [selectAll, setSelectAll] = useState(false);
   const [selectedShops, setSelectedShops] = useState({});
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
+    // 检查用户是否登录
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+
+    // 获取购物车数据
     const fetchCartItems = async () => {
       try {
-        const userId = isLoggedIn?.userInfo?.id;
+        const userId = userInfo?.id || localStorage.getItem("userId");
         if (!userId) {
-          console.error("用户未登录");
-          navigate("/login");
-          return;
+          throw new Error("用户ID不存在");
         }
-
+        
         const response = await instance.get(`/cart/${userId}`);
-        console.log(response.data);
         setCartItems(response.data);
+        setLoading(false);
       } catch (error) {
-        console.error("Error fetching cart items:", error);
+        console.error("获取购物车数据失败:", error);
+        setError("获取购物车数据失败，请稍后重试");
+        setLoading(false);
       }
     };
 
-    if (isLoggedIn.status) {
-      fetchCartItems();
-    } else {
-      setCartItems([]);
-      setSelectedItems({});
-    }
-  }, [isLoggedIn, navigate]);
+    fetchCartItems();
+  }, [isLoggedIn, navigate, userInfo]);
 
   useEffect(() => {
     updateTotal();

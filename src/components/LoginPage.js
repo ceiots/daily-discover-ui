@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../App"; // 导入自定义钩子
-import { useNavigate } from "react-router-dom"; // 导入 useNavigate
-import { Input } from "antd";
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
-import "./LoginPage.css"; // 创建一个新的 CSS 文件来存放样式
-import instance from "../utils/axios";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../App'; // 导入自定义钩子
+import { useNavigate } from 'react-router-dom'; // 导入 useNavigate
+import { Input } from 'antd';
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import './LoginPage.css'; // 创建一个新的 CSS 文件来存放样式
+import instance from '../utils/axios';
 
 const LoginPage = () => {
-  const { setIsLoggedIn, setUserInfo } = useAuth(); // 添加setUserInfo
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const { refreshUserInfo } = useAuth(); // 替换 setIsLoggedIn, setUserInfo
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false); // 添加记住密码状态
   const [loading, setLoading] = useState(false); // 添加加载状态
-  const [errorMsg, setErrorMsg] = useState(""); // 添加错误信息状态
+  const [errorMsg, setErrorMsg] = useState(''); // 添加错误信息状态
   const [showPassword, setShowPassword] = useState(false); // 添加显示密码状态
   const navigate = useNavigate(); // 使用 useNavigate
 
   // 组件加载时检查本地存储的登录信息
   useEffect(() => {
-    const savedPhone = localStorage.getItem("rememberedPhone");
-    const savedPassword = localStorage.getItem("rememberedPassword");
+    const savedPhone = localStorage.getItem('rememberedPhone');
+    const savedPassword = localStorage.getItem('rememberedPassword');
 
     if (savedPhone && savedPassword) {
       setPhoneNumber(savedPhone);
@@ -31,73 +31,70 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMsg("");
+    setErrorMsg('');
 
     try {
       const user = {
         phoneNumber: phoneNumber,
         password: password,
       };
-      const response = await instance.post("/user/login", user);
+      const response = await instance.post('/user/login', user);
 
       // 处理登录成功
-      if (response.data.code === 200 && response.data.message == "登录成功") {
+      if (response.data.code === 200 && response.data.message === '登录成功') {
         // 如果记住密码，保存到本地存储
         if (rememberMe) {
-          localStorage.setItem("rememberedPhone", phoneNumber);
-          localStorage.setItem("rememberedPassword", password);
+          localStorage.setItem('rememberedPhone', phoneNumber);
+          localStorage.setItem('rememberedPassword', password);
         } else {
-          localStorage.removeItem("rememberedPhone");
-          localStorage.removeItem("rememberedPassword");
+          localStorage.removeItem('rememberedPhone');
+          localStorage.removeItem('rememberedPassword');
         }
 
         // 保存JWT令牌
         if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
-          localStorage.setItem("userId", response.data.userInfo.id);
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('userId', response.data.userInfo.id);
           instance.defaults.headers.common[
-            "Authorization"
+            'Authorization'
           ] = `Bearer ${response.data.token}`;
         }
-        console.log("localStorage.setItemtoken", localStorage.getItem("token"));
-  
+        console.log('localStorage.setItemtoken', localStorage.getItem('token'));
+
         // 保存用户信息
         if (response.data.userInfo) {
           const userData = {
-            ...response.data.userInfo
+            ...response.data.userInfo,
           };
-          
+
           // 正确存储用户信息
-          localStorage.setItem("userInfo", JSON.stringify(userData));
-          
+          localStorage.setItem('userInfo', JSON.stringify(userData));
+
           // 更新全局登录状态
-          setIsLoggedIn({
-            status: true,
-            userInfo: userData
-          });
+          refreshUserInfo();
         }
 
-        navigate("/Calendar"); // 登录后跳转到 Calendar 页面
+        navigate('/Calendar'); // 登录后跳转到 Calendar 页面
       } else {
         setErrorMsg(
-          response.data.message || response.data || "登录失败，请检查账号密码"
+          response.data.message || response.data || '登录失败，请检查账号密码'
         );
       }
     } catch (error) {
-      console.error("登录时出错:", error);
-      setErrorMsg(error.response?.data?.message || "登录失败，请稍后再试");
+      console.error('登录时出错:', error);
+      setErrorMsg(error.response?.data?.message || '登录失败，请稍后再试');
     } finally {
       setLoading(false);
     }
   };
 
   const handleForgotPassword = () => {
-    navigate("/forgot-password");
+    navigate('/forgot-password');
   };
 
   // 处理注册的函数
   const handleRegister = () => {
-    navigate("/Register");
+    navigate('/Register');
   };
 
   return (

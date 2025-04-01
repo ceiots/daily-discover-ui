@@ -4,7 +4,14 @@ import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const { userInfo } = useAuth();
+  const { userInfo, refreshUserInfo, isLoggedIn } = useAuth();
+
+  // 组件加载时强制刷新
+  useEffect(() => {
+    if (isLoggedIn) {
+      refreshUserInfo();
+    }
+  }, [isLoggedIn, refreshUserInfo]);
   const [activeTab, setActiveTab] = useState("all");
   const [orders, setOrders] = useState([]);
   const [profileInfo, setProfileInfo] = useState(null);
@@ -20,13 +27,16 @@ const Profile = () => {
         }
         const response = await instance.get(`/user/info?userId=${userId}`);
         setProfileInfo(response.data);
+        
+        // 刷新全局用户信息
+        refreshUserInfo();
       } catch (error) {
         console.error("获取用户信息失败:", error);
       }
     };
 
     fetchUserProfile();
-  }, [navigate]);
+  }, [navigate, refreshUserInfo]);
 
   const ORDER_TABS = [
     { id: "all", name: "全部" },
