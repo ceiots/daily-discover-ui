@@ -33,6 +33,7 @@ instance.interceptors.response.use(
         if (error.response) {
             switch (error.response.status) {
                 case 401:
+                    console.error('401 错误：用户身份验证信息无效或过期，清除本地存储并跳转登录页');
                     // 清除本地存储的认证信息
                     localStorage.removeItem('token');
                     localStorage.removeItem('userId');

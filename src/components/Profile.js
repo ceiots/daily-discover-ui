@@ -30,6 +30,7 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       try {
         const userId = localStorage.getItem('userId');
+        console.log('userId11:', userId);
         if (!userId) {
           navigate('/login');
           return;
@@ -37,6 +38,7 @@ const Profile = () => {
         const response = await instance.get(`/user/info?userId=${userId}`);
         setProfileInfo(response.data);
         
+        console.log('userInfo:', userInfo);
         // 只有当全局用户信息不存在时才刷新
         if (!userInfo || !userInfo.id) {
           refreshUserInfo();
@@ -66,20 +68,30 @@ const Profile = () => {
         const response = await instance.get(`/order/user?status=${activeTab}`);
         setOrders(response.data);
       } catch (error) {
-        console.error("获取订单失败:", error);
+        if (error.response && error.response.status === 401) {
+          // 尝试刷新用户信息并重试请求
+          try {
+            await refreshUserInfo();
+            const newResponse = await instance.get(`/order/user?status=${activeTab}`);
+            setOrders(newResponse.data);
+          } catch (newError) {
+            console.error("重试获取订单失败:", newError);
+          }
+        } else {
+          console.error("获取订单失败:", error);
+        }
       }
     };
     fetchOrders();
-  }, [activeTab]);
+  }, [activeTab, refreshUserInfo]);
 
-  const handleCancelOrder = async (orderId) => {
-    try {
-      await instance.post(`/orders/${orderId}/cancel`);
-      setOrders(orders.filter((order) => order.id !== orderId));
-    } catch (error) {
-      console.error("取消订单失败:", error);
-    }
-  };
+  // 在登录成功后立即检查
+  console.log('登录后立即检查 - token:', localStorage.getItem('token'), 'userId:', localStorage.getItem('userId'));
+
+  // 在页面加载时检查
+  useEffect(() => {
+    console.log('页面加载检查 - token:', localStorage.getItem('token'), 'userId:', localStorage.getItem('userId'));
+  }, []);
 
   return (
     <div className="w-full min-h-screen mx-auto bg-gray-50 pb-[60px]">

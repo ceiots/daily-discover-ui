@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
         
         if (token && userId) {
           // 确保userId是有效值
-          if (userId === 'null' || userId === 'undefined') {
+          if (!userId || userId === 'null' || userId === 'undefined') {
             console.error('无效的userId:', userId);
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
@@ -66,6 +66,21 @@ const AuthProvider = ({ children }) => {
       }
     };
     checkAuth();
+  }, []);
+
+  // 添加一个自定义事件监听器来更新认证状态
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (token && userId) {
+        setIsLoggedIn(true);
+        // 更新用户信息...
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (
