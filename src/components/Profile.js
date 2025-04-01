@@ -72,7 +72,7 @@ const Profile = () => {
         }
         // 在请求中传递 userId 和 activeTab
         const response = await instance.get(`/order/user?status=${activeTab}&userId=${userId}`);
-        console.log('response:', response);
+        console.log('订单查response:', JSON.stringify(response));
         setOrders(response.data); 
       } catch (error) {
         if (error.response && error.response.status === 401) {
