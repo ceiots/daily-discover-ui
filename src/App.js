@@ -40,13 +40,17 @@ const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (token) {
-          const response = await instance.get('/user/info');
+        const userId = localStorage.getItem('userId');
+        console.log("checkAuth userId:", userId);
+        if (token && userId) {
+          const response = await instance.get(`/user/info?userId=${userId}`);
           setUserInfo(response.data);
           setIsLoggedIn(true);
         }
       } catch (error) {
         console.error("用户信息加载失败:", error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
       } finally {
         setUserLoading(false);
       }
@@ -61,14 +65,20 @@ const AuthProvider = ({ children }) => {
       userLoading, // 暴露加载状态
       refreshUserInfo: async () => {
         try {
-          const response = await instance.get('/user/info');
-          setUserInfo(response.data);
+          const userId = localStorage.getItem('userId');
+          console
+          if (userId) {
+            const response = await instance.get(`/user/info?userId=${userId}`);
+            setUserInfo(response.data);
+            setIsLoggedIn(true);
+          }
         } catch (error) {
           console.error("用户信息刷新失败:", error);
         }
       },
       logout: () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('userId');
         setIsLoggedIn(false);
         setUserInfo(null);
       },

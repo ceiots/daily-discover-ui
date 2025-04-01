@@ -36,6 +36,7 @@ const Discover = () => {
 
   // 合并后的统一数据请求逻辑
   useEffect(() => {
+    console.log("isLoggedIn:", isLoggedIn);
     const fetchInitialData = async () => {
       try {
         const [eventsRes, categoriesRes, recommendationsRes] = await Promise.all([
@@ -71,7 +72,7 @@ const Discover = () => {
 
     // 合并执行逻辑
     fetchInitialData();
-    
+   
     // 只有在登录状态下才获取购物车数据
     if (isLoggedIn) {
       fetchCartData();
