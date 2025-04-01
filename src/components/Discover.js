@@ -147,8 +147,18 @@ const Discover = () => {
                 )}
               </Link>
             </div>
-            {isLoggedIn && userInfo ? (
-              <Link to="/profile" className="w-8 h-8 rounded-full overflow-hidden">
+            {isLoggedIn ? (
+              <Link 
+                to="/profile" 
+                className="w-8 h-8 rounded-full overflow-hidden"
+                onClick={(e) => {
+                  // 检查登录状态，如果未登录则跳转到登录页
+                  if (!isLoggedIn || !localStorage.getItem('userId')) {
+                    e.preventDefault();
+                    navigate('/login');
+                  }
+                }}
+              >
                 <img
                   src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"}
                   alt="用户头像"

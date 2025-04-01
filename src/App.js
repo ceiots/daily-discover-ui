@@ -41,11 +41,21 @@ const AuthProvider = ({ children }) => {
       try {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
-        console.log("checkAuth userId:", userId);
+        
+        console.log("初始化检查 - token:", !!token, "userId:", userId);
+        
         if (token && userId) {
-          const response = await instance.get(`/user/info?userId=${userId}`);
-          setUserInfo(response.data);
-          setIsLoggedIn(true);
+          // 确保userId是有效值
+          if (userId === 'null' || userId === 'undefined') {
+            console.error('无效的userId:', userId);
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            setIsLoggedIn(false);
+          } else {
+            const response = await instance.get(`/user/info?userId=${userId}`);
+            setUserInfo(response.data);
+            setIsLoggedIn(true);
+          }
         }
       } catch (error) {
         console.error("用户信息加载失败:", error);

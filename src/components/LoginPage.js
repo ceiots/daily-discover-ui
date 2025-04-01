@@ -42,41 +42,30 @@ const LoginPage = () => {
 
       // 处理登录成功
       if (response.data.code === 200 && response.data.message === '登录成功') {
-        // 如果记住密码，保存到本地存储
-        if (rememberMe) {
-          localStorage.setItem('rememberedPhone', phoneNumber);
-          localStorage.setItem('rememberedPassword', password);
-        } else {
-          localStorage.removeItem('rememberedPhone');
-          localStorage.removeItem('rememberedPassword');
-        }
-
-        // 保存JWT令牌
-        if (response.data.token) {
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('userId', response.data.userInfo.id);
-          instance.defaults.headers.common[
-            'Authorization'
-          ] = `Bearer ${response.data.token}`;
-        }
-        console.log('localStorage.setItemtoken', localStorage.getItem('token'));
-
+        // 先清除可能存在的旧数据
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        
+        // 保存新数据
+        const userId = response.data.userInfo.id;
+        const token = response.data.token;
+        
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', userId);
+        
+        // 设置请求头
+        instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         // 保存用户信息
-        if (response.data.userInfo) {
-          const userData = {
-            ...response.data.userInfo,
-          };
-
-          // 正确存储用户信息
-          localStorage.setItem('userInfo', JSON.stringify(userData));
-
-          // 更新全局登录状态
-          refreshUserInfo();
-        }
-
-        // 确保登录状态更新后再跳转
-        await new Promise(resolve => setTimeout(resolve, 100)); // 短暂延迟确保状态更新
-        navigate('/Calendar'); // 登录后跳转到 Calendar 页面
+        localStorage.setItem('userInfo', JSON.stringify(response.data.userInfo));
+        
+        console.log('登录成功，保存的用户ID:', userId);
+        
+        // 使用await等待refreshUserInfo完成
+        await refreshUserInfo();
+        
+        // 导航到首页
+        navigate('/');
       } else {
         setErrorMsg(
           response.data.message || response.data || '登录失败，请检查账号密码'
