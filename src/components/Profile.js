@@ -64,15 +64,22 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const userId = localStorage.getItem('userId');
       try {
-        const response = await instance.get(`/order/user?status=${activeTab}`);
-        setOrders(response.data);
+        if (!userId) {
+          navigate('/login');
+          return;
+        }
+        // 在请求中传递 userId 和 activeTab
+        const response = await instance.get(`/order/user?status=${activeTab}&userId=${userId}`);
+        console.log('response:', response);
+        setOrders(response.data); 
       } catch (error) {
         if (error.response && error.response.status === 401) {
           // 尝试刷新用户信息并重试请求
           try {
             await refreshUserInfo();
-            const newResponse = await instance.get(`/order/user?status=${activeTab}`);
+            const newResponse = await instance.get(`/order/user?status=${activeTab}&userId=${userId}`);
             setOrders(newResponse.data);
           } catch (newError) {
             console.error("重试获取订单失败:", newError);

@@ -39,32 +39,55 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // 从本地存储中获取 token 和 userId
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
         
         console.log("初始化检查 - token:", !!token, "userId:", userId);
         
+        // 检查 token 和 userId 是否存在
         if (token && userId) {
-          // 确保userId是有效值
+          // 确保 userId 是有效值
           if (!userId || userId === 'null' || userId === 'undefined') {
-            console.error('无效的userId:', userId);
+            console.error('无效的 userId:', userId);
+            // 清除本地存储中的无效数据
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             setIsLoggedIn(false);
           } else {
+            // 设置请求头中的 Authorization 字段
+            instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+            // 向服务器请求用户信息
             const response = await instance.get(`/user/info?userId=${userId}`);
-            setUserInfo(response.data);
-            setIsLoggedIn(true);
+
+            // 检查响应状态
+            if (response.status === 200) {
+              // 更新用户信息和登录状态
+              setUserInfo(response.data);
+              setIsLoggedIn(true);
+            } else {
+              console.error('用户信息请求失败:', response.statusText);
+              // 清除本地存储中的无效数据
+              localStorage.removeItem('token');
+              localStorage.removeItem('userId');
+              setIsLoggedIn(false);
+            }
           }
         }
       } catch (error) {
         console.error("用户信息加载失败:", error);
+        // 清除本地存储中的无效数据
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        setIsLoggedIn(false);
       } finally {
+        // 加载完成，设置加载状态为 false
         setUserLoading(false);
       }
     };
+  
+    // 调用检查认证状态的函数
     checkAuth();
   }, []);
 

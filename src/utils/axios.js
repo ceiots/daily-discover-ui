@@ -16,6 +16,11 @@ instance.interceptors.request.use(
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
+        // 新添加的代码：从本地存储中获取 userId 并添加到请求头
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            config.headers['userId'] = userId;
+        }
         return config;
     },
     error => {
