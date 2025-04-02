@@ -50,10 +50,11 @@ const OrderList = () => {
           // 确保status是整数类型
           const statusParam = parseInt(status) || 0;
           // 添加分页参数
-          const response = await instance.get(`/order/user/${userInfo.id}?status=${statusParam}&page=${page}&size=${size}&sort=createdAt,desc`);
+          const response = await instance.get(`/order/user/${userInfo.id}?status=${statusParam}&page=${page}&size=${size}&sort=created_at,desc`);
           
           // 检查响应格式并设置数据
           if (response.data && response.data.data) {
+            console.log(response.data.data);
             setOrderData(response.data.data.content || []);
             setTotalPages(response.data.data.totalPages || 0);
             setTotalElements(response.data.data.totalElements || 0);
@@ -169,13 +170,13 @@ const OrderList = () => {
       ? orderData
       : orderData.filter((order) => order.status === selectedStatus);
 
-  if (loading) {
+  /* if (loading) {
     return <div>加载中...</div>;
-  }
+  } */
 
-  if (error) {
+/*   if (error) {
     return <div>{error}</div>;
-  }
+  } */
 
   return (
     <div className="bg-gray-50 min-h-screen pb-16">
@@ -304,7 +305,7 @@ const OrderList = () => {
                             {item.specs} | {item.attributes}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-primary">¥{item.price.toFixed(2)}</span>
+                            <span className="text-xs text-primary">¥{item?.price ? item.price.toFixed(2) : '0.00'}</span>
                             <span className="text-[10px] text-gray-500">x{item.quantity}</span>
                           </div>
                         </div>
@@ -318,7 +319,7 @@ const OrderList = () => {
                       {order.date}
                     </div>
                     <div className="text-[10px]">
-                      共{order.items.length}件商品 合计: <span className="text-primary">¥{order.totalAmount.toFixed(2)}</span>
+                      共{order.items.length}件商品 合计: <span className="text-primary">¥{order?.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}</span>
                     </div>
                   </div>
                   

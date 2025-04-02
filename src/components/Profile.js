@@ -261,16 +261,6 @@ const Profile = () => {
           <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
             <div className="w-12 h-12 flex items-center justify-center">
               <img
-                src="https://public.readdy.ai/ai/img_res/90073da34afb4471265da18a254c47ec.jpg"
-                className="w-full h-full object-cover"
-                alt="我的钱包"
-              />
-            </div>
-            <span className="text-xs">我的钱包</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
                 src="https://public.readdy.ai/ai/img_res/7a113086b48c5e0133282226db445fd4.jpg"
                 className="w-full h-full object-cover"
                 alt="联系客服"
