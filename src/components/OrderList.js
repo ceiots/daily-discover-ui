@@ -54,7 +54,7 @@ const OrderList = () => {
           
           // 检查响应格式并设置数据
           if (response.data && response.data.data) {
-            console.log(response.data.data);
+            console.log("查询："+JSON.stringify(response.data.data));
             setOrderData(response.data.data.content || []);
             setTotalPages(response.data.data.totalPages || 0);
             setTotalElements(response.data.data.totalElements || 0);
