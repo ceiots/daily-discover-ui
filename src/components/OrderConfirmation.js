@@ -15,7 +15,13 @@ const OrderConfirmation = () => {
     };
 
     const handleViewOrder = () => {
-        navigate('/order-list'); // 假设跳转到订单列表页，根据实际情况修改
+        const orderNo = location.state?.orderNo;
+        console.log('orderNo:', orderNo); // 打印订单号以确认是否正确获取到订单号
+        if (orderNo) {
+            navigate('/order/${orderNo}'); // 传入订单号
+        } else {
+            console.error('未获取到订单号');
+        }
     };
 
     const handleReturnHome = () => {

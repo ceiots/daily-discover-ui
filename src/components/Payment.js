@@ -49,6 +49,7 @@ const Payment = () => {
     }
 
     try {
+      
         const response = await instance.post('/payment/confirm', {
             userId: userId,
             itemIds: selectedItems.map(item => item.id),
@@ -75,6 +76,7 @@ const Payment = () => {
                 },
                 items: selectedItems.map(item => ({
                     id: item.id,
+                    productId: item.productId,
                     quantity: item.quantity,
                     price: item.price,
                     specifications: item.specifications

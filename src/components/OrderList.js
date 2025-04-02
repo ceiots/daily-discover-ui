@@ -41,24 +41,37 @@ const OrderList = () => {
     }
   }, [status]);
   
+  const handleStatusChange = (status) => {
+    setSelectedStatus(status);
+    // 确保 status 参数正确更新
+    const statusKey = Object.keys(statusMap).find(key => statusMap[key] === status);
+    console.log("statusKey:", statusKey); // 打印 statusKey 以确认其值
+    if (statusKey) {
+      navigate(`/order-list/${statusKey}`, { replace: true });
+    } else {
+      console.error("未找到匹配的 statusKey:", status);
+    }
+  };
+  
   // 获取订单数据
   useEffect(() => {
     if (isLoggedIn && userInfo?.id) {
       const fetchOrders = async () => {
         try {
           setLoading(true);
-          // 确保status是整数类型
+          // 确保 status 是整数类型
           const statusParam = parseInt(status) || 0;
           // 添加分页参数
           const response = await instance.get(`/order/user/${userInfo.id}?status=${statusParam}&page=${page}&size=${size}&sort=created_at,desc`);
-          
+  
           // 检查响应格式并设置数据
           if (response.data && response.data.data) {
-            console.log("查询："+JSON.stringify(response.data.data));
+            console.log("查询：" + JSON.stringify(response.data.data));
             setOrderData(response.data.data.content || []);
             setTotalPages(response.data.data.totalPages || 0);
             setTotalElements(response.data.data.totalElements || 0);
           } else {
+            console.error("响应数据格式错误:", response.data);
             setOrderData([]);
             setTotalPages(0);
             setTotalElements(0);
@@ -75,10 +88,6 @@ const OrderList = () => {
       fetchOrders();
     }
   }, [isLoggedIn, userInfo, status, page, size]);
-
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-  };
 
   const handleFavorite = (orderId) => {
     console.log(`收藏订单: ${orderId}`);
@@ -165,10 +174,22 @@ const OrderList = () => {
     }
   };
 
+  // 将 selectedStatus 转换为对应的数字状态
+  const getStatusNumber = (statusText) => {
+    return Object.keys(statusMap).find(key => statusMap[key] === statusText);
+  };
+
   const filteredOrders =
     selectedStatus === "全部"
       ? orderData
-      : orderData.filter((order) => order.status === selectedStatus);
+      : orderData.filter((order) => {
+          const statusNumber = getStatusNumber(selectedStatus);
+          // 检查 order.status 是否为 null 或 undefined
+          return order.status != null && order.status.toString() === statusNumber;
+        });
+
+  // 检查筛选后的订单数量
+  console.log("filteredOrders 数量:", filteredOrders.length);
 
   /* if (loading) {
     return <div>加载中...</div>;
@@ -209,7 +230,6 @@ const OrderList = () => {
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待付款");
-              navigate("/order-list/1", { replace: true });
             }}
           >
             待付款
@@ -220,7 +240,6 @@ const OrderList = () => {
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待发货");
-              navigate("/order-list/2", { replace: true });
             }}
           >
             待发货
@@ -231,7 +250,6 @@ const OrderList = () => {
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待收货");
-              navigate("/order-list/3", { replace: true });
             }}
           >
             待收货
@@ -242,7 +260,6 @@ const OrderList = () => {
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("已完成");
-              navigate("/order-list/4", { replace: true });
             }}
           >
             已完成
@@ -295,14 +312,14 @@ const OrderList = () => {
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center gap-2 pb-2 border-b border-gray-100">
                         <img
-                          src={item.image}
+                          src={item.imageUrl}
                           className="w-16 h-16 object-cover rounded"
                           alt={item.name}
                         />
                         <div className="flex-1">
                           <h3 className="text-xs mb-1 line-clamp-2">{item.name}</h3>
                           <p className="text-[10px] text-gray-500 mb-1">
-                            {item.specs} | {item.attributes}
+                            {item.specs}
                           </p>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-primary">¥{item?.price ? item.price.toFixed(2) : '0.00'}</span>
