@@ -179,7 +179,7 @@ const App = () => {
               </Suspense>
             } 
           />
-          <Route path="/order/:orderId" element={<OrderDetail />} />
+          <Route path="/order/:orderNumber" element={<OrderDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 

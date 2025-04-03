@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaSearch } from "react-icons/fa";
 import instance from "../utils/axios";
@@ -18,19 +18,77 @@ const OrderList = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   
-  // 状态映射表
+  // 状态映射表 - 修改为更清晰的数字映射
   const statusMap = {
-    "0": "全部",
-    "1": "待付款",
-    "2": "待发货",
-    "3": "待收货",
-    "4": "已完成"
+    0: "全部",
+    1: "待付款",
+    2: "待发货",
+    3: "待收货",
+    4: "已完成",
+    5: "已取消"
+  };
+  
+  // 反向映射表，用于从文字状态获取状态码
+  const reverseStatusMap = {
+    "全部": "0",
+    "待付款": "1",
+    "待发货": "2",
+    "待收货": "3",
+    "已完成": "4",
+    "已取消": "5"
   };
   
   // 根据 URL 参数设置初始状态
   const [selectedStatus, setSelectedStatus] = useState(
     status ? statusMap[status] || "全部" : "全部"
   );
+  
+  // 将获取订单的逻辑定义为函数
+  const fetchOrders = async (statusParam = status) => {
+    if (!isLoggedIn || !userInfo?.id) return;
+    
+    try {
+      setLoading(true);
+      // 确保 status 是整数类型
+      const statusValue = parseInt(statusParam) || 0;
+      // 添加分页参数
+      const response = await instance.get(
+        `/order/user/${userInfo.id}?status=${statusValue}&page=${page}&size=${size}&sort=created_at,desc`
+      );
+
+      console.log("查询响应:", response.data);
+      
+      // 检查响应格式并设置数据
+      if (response.data && response.data.data) {
+        setOrderData(response.data.data.content || []);
+        setTotalPages(response.data.data.totalPages || 0);
+        setTotalElements(response.data.data.totalElements || 0);
+      } else {
+        setOrderData([]);
+        setTotalPages(0);
+        setTotalElements(0);
+      }
+      setError(null);
+    } catch (error) {
+      console.error("获取订单数据失败:", error);
+      setError("获取订单数据失败，请稍后重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  // 修改状态切换处理函数
+  const handleStatusChange = (statusText) => {
+    setSelectedStatus(statusText);
+    // 从文字状态获取状态码
+    const statusCode = reverseStatusMap[statusText];
+    console.log("statusCode:", statusCode); // 打印状态码以确认
+    navigate(`/order-list/${statusCode}`, { replace: true });
+    
+    // 重置页码并获取新数据
+    setPage(0);
+    fetchOrders(statusCode);
+  };
   
   // 当 URL 参数变化时更新选中状态
   useEffect(() => {
@@ -41,52 +99,9 @@ const OrderList = () => {
     }
   }, [status]);
   
-  const handleStatusChange = (status) => {
-    setSelectedStatus(status);
-    // 确保 status 参数正确更新
-    const statusKey = Object.keys(statusMap).find(key => statusMap[key] === status);
-    console.log("statusKey:", statusKey); // 打印 statusKey 以确认其值
-    if (statusKey) {
-      navigate(`/order-list/${statusKey}`, { replace: true });
-    } else {
-      console.error("未找到匹配的 statusKey:", status);
-    }
-  };
-  
   // 获取订单数据
   useEffect(() => {
-    if (isLoggedIn && userInfo?.id) {
-      const fetchOrders = async () => {
-        try {
-          setLoading(true);
-          // 确保 status 是整数类型
-          const statusParam = parseInt(status) || 0;
-          // 添加分页参数
-          const response = await instance.get(`/order/user/${userInfo.id}?status=${statusParam}&page=${page}&size=${size}&sort=created_at,desc`);
-  
-          // 检查响应格式并设置数据
-          if (response.data && response.data.data) {
-            console.log("查询：" + JSON.stringify(response.data.data));
-            setOrderData(response.data.data.content || []);
-            setTotalPages(response.data.data.totalPages || 0);
-            setTotalElements(response.data.data.totalElements || 0);
-          } else {
-            console.error("响应数据格式错误:", response.data);
-            setOrderData([]);
-            setTotalPages(0);
-            setTotalElements(0);
-          }
-          setError(null);
-        } catch (error) {
-          console.error("获取订单数据失败:", error);
-          setError("获取订单数据失败，请稍后重试");
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchOrders();
-    }
+    fetchOrders();
   }, [isLoggedIn, userInfo, status, page, size]);
 
   const handleFavorite = (orderId) => {
@@ -174,22 +189,21 @@ const OrderList = () => {
     }
   };
 
-  // 将 selectedStatus 转换为对应的数字状态
-  const getStatusNumber = (statusText) => {
-    return Object.keys(statusMap).find(key => statusMap[key] === statusText);
+  // 修改过滤逻辑
+  const filteredOrders = useMemo(() => {
+    if (selectedStatus === "全部") {
+      return orderData;
+    }
+    return orderData.filter((order) => {
+      // 使用 statusMap 将数字状态转换为文字进行比较
+      return statusMap[order.status] === selectedStatus;
+    });
+  }, [orderData, selectedStatus]);
+
+  // 修改状态显示逻辑
+  const getOrderStatus = (status) => {
+    return statusMap[status] || "未知状态";
   };
-
-  const filteredOrders =
-    selectedStatus === "全部"
-      ? orderData
-      : orderData.filter((order) => {
-          const statusNumber = getStatusNumber(selectedStatus);
-          // 检查 order.status 是否为 null 或 undefined
-          return order.status != null && order.status.toString() === statusNumber;
-        });
-
-  // 检查筛选后的订单数量
-  console.log("filteredOrders 数量:", filteredOrders.length);
 
   /* if (loading) {
     return <div>加载中...</div>;
@@ -300,15 +314,15 @@ const OrderList = () => {
                       <span className="text-xs">{order.shopName}</span>
                     </div>
                     <span className={`text-xs ${
-                      order.status === "待付款" ? "text-red-500" : 
-                      order.status === "已完成" ? "text-green-500" : "text-primary"
+                      order.status === 1 ? "text-red-500" : 
+                      order.status === 4 ? "text-green-500" : "text-primary"
                     }`}>
-                      {order.statusText}
+                      {getOrderStatus(order.status)}
                     </span>
                   </div>
                   
                   {/* 订单内容 */}
-                  <Link to={`/order/${order.id}`}>
+                  <Link to={`/order/${order.orderNumber}`}>
                     {order.items.map((item) => (
                       <div key={item.id} className="flex items-center gap-2 pb-2 border-b border-gray-100">
                         <img
@@ -341,7 +355,7 @@ const OrderList = () => {
                   </div>
                   
                   {/* 倒计时 - 仅待付款订单显示 */}
-                  {order.status === "待付款" && (
+                  {order.status === 1 && (
                     <div className="flex items-center mt-1">
                       <div className="text-[10px] text-red-500">
                         <i className="ri-time-line mr-1"></i>
