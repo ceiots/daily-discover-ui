@@ -8,7 +8,7 @@ const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
   const navigate = useNavigate();
   const { isLoggedIn, userInfo } = useAuth();
-  
+
   // 状态定义
   const [orderData, setOrderData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,7 +17,7 @@ const OrderList = () => {
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  
+
   // 状态映射表 - 修改为更清晰的数字映射
   const statusMap = {
     0: "全部",
@@ -25,28 +25,28 @@ const OrderList = () => {
     2: "待发货",
     3: "待收货",
     4: "已完成",
-    5: "已取消"
+    5: "已取消",
   };
-  
+
   // 反向映射表，用于从文字状态获取状态码
   const reverseStatusMap = {
-    "全部": "0",
-    "待付款": "1",
-    "待发货": "2",
-    "待收货": "3",
-    "已完成": "4",
-    "已取消": "5"
+    全部: "0",
+    待付款: "1",
+    待发货: "2",
+    待收货: "3",
+    已完成: "4",
+    已取消: "5",
   };
-  
+
   // 根据 URL 参数设置初始状态
   const [selectedStatus, setSelectedStatus] = useState(
     status ? statusMap[status] || "全部" : "全部"
   );
-  
+
   // 将获取订单的逻辑定义为函数
   const fetchOrders = async (statusParam = status) => {
     if (!isLoggedIn || !userInfo?.id) return;
-    
+
     try {
       setLoading(true);
       // 确保 status 是整数类型
@@ -57,7 +57,7 @@ const OrderList = () => {
       );
 
       console.log("查询响应:", response.data);
-      
+
       // 检查响应格式并设置数据
       if (response.data && response.data.data) {
         setOrderData(response.data.data.content || []);
@@ -76,7 +76,7 @@ const OrderList = () => {
       setLoading(false);
     }
   };
-  
+
   // 修改状态切换处理函数
   const handleStatusChange = (statusText) => {
     setSelectedStatus(statusText);
@@ -84,12 +84,12 @@ const OrderList = () => {
     const statusCode = reverseStatusMap[statusText];
     console.log("statusCode:", statusCode); // 打印状态码以确认
     navigate(`/order-list/${statusCode}`, { replace: true });
-    
+
     // 重置页码并获取新数据
     setPage(0);
     fetchOrders(statusCode);
   };
-  
+
   // 当 URL 参数变化时更新选中状态
   useEffect(() => {
     if (status && statusMap[status]) {
@@ -98,7 +98,7 @@ const OrderList = () => {
       setSelectedStatus("全部");
     }
   }, [status]);
-  
+
   // 获取订单数据
   useEffect(() => {
     fetchOrders();
@@ -132,12 +132,10 @@ const OrderList = () => {
       case "待付款": // 待付款
         return (
           <>
-            <button 
-              className="px-3 py-1.5 text-xs text-gray-600 bg-gray-50 rounded-full mr-2"
-            >
+            <button className="px-3 py-1.5 text-xs text-gray-600 bg-gray-50 rounded-full mr-2">
               取消订单
             </button>
-            <button 
+            <button
               onClick={() => handlePayment(order.id)}
               className="px-3 py-1.5 text-xs text-white bg-primary rounded-full"
             >
@@ -147,23 +145,17 @@ const OrderList = () => {
         );
       case "待发货": // 待发货
         return (
-          <button 
-            className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full"
-          >
+          <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
             提醒发货
           </button>
         );
       case "待收货": // 待收货
         return (
           <>
-            <button 
-              className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-full mr-2"
-            >
+            <button className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-full mr-2">
               查看物流
             </button>
-            <button 
-              className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full"
-            >
+            <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
               确认收货
             </button>
           </>
@@ -171,15 +163,13 @@ const OrderList = () => {
       case "已完成": // 已完成
         return (
           <>
-            <button 
+            <button
               onClick={() => handleRebuy(order.id)}
               className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-full mr-2"
             >
               再次购买
             </button>
-            <button 
-              className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full"
-            >
+            <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
               评价订单
             </button>
           </>
@@ -209,7 +199,7 @@ const OrderList = () => {
     return <div>加载中...</div>;
   } */
 
-/*   if (error) {
+  /*   if (error) {
     return <div>{error}</div>;
   } */
 
@@ -218,7 +208,10 @@ const OrderList = () => {
       {/* 导航栏 */}
       <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
         <div className="h-11 flex items-center px-4">
-          <button onClick={handleBack} className="w-8 h-8 flex items-center justify-center">
+          <button
+            onClick={handleBack}
+            className="w-8 h-8 flex items-center justify-center"
+          >
             <FaArrowLeft className="text-gray-800 text-sm" />
           </button>
           <span className="text-sm font-medium ml-2">全部订单</span>
@@ -229,7 +222,9 @@ const OrderList = () => {
         <div className="flex justify-between px-4">
           <button
             className={`${
-              selectedStatus === "全部" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "全部"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("全部");
@@ -240,7 +235,9 @@ const OrderList = () => {
           </button>
           <button
             className={`${
-              selectedStatus === "待付款" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待付款"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待付款");
@@ -250,7 +247,9 @@ const OrderList = () => {
           </button>
           <button
             className={`${
-              selectedStatus === "待发货" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待发货"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待发货");
@@ -260,7 +259,9 @@ const OrderList = () => {
           </button>
           <button
             className={`${
-              selectedStatus === "待收货" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "待收货"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("待收货");
@@ -270,7 +271,9 @@ const OrderList = () => {
           </button>
           <button
             className={`${
-              selectedStatus === "已完成" ? "text-primary border-primary border-b-2" : "text-gray-500"
+              selectedStatus === "已完成"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
             } py-2 px-2 text-xs`}
             onClick={() => {
               handleStatusChange("已完成");
@@ -293,8 +296,8 @@ const OrderList = () => {
               />
             </div>
             <p className="text-gray-500 text-xs">暂无相关订单</p>
-            <button 
-              onClick={() => navigate('/')}
+            <button
+              onClick={() => navigate("/")}
               className="mt-3 bg-primary text-white px-4 py-1.5 rounded-full text-xs"
             >
               去逛逛
@@ -313,47 +316,67 @@ const OrderList = () => {
                       <i className="ri-store-2-line mr-1 text-gray-600 text-xs"></i>
                       <span className="text-xs">{order.shopName}</span>
                     </div>
-                    <span className={`text-xs ${
-                      order.status === 1 ? "text-red-500" : 
-                      order.status === 4 ? "text-green-500" : "text-primary"
-                    }`}>
+                    <span
+                      className={`text-xs ${
+                        order.status === 1
+                          ? "text-red-500"
+                          : order.status === 4
+                          ? "text-green-500"
+                          : "text-primary"
+                      }`}
+                    >
                       {getOrderStatus(order.status)}
                     </span>
                   </div>
-                  
+
                   {/* 订单内容 */}
                   <Link to={`/order/${order.orderNumber}`}>
                     {order.items.map((item) => (
-                      <div key={item.id} className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-2 pb-2 border-b border-gray-100"
+                      >
                         <img
                           src={item.imageUrl}
                           className="w-16 h-16 object-cover rounded"
                           alt={item.name}
                         />
                         <div className="flex-1">
-                          <h3 className="text-xs mb-1 line-clamp-2">{item.name}</h3>
+                          <h3 className="text-xs mb-1 line-clamp-2">
+                            {item.name}
+                          </h3>
                           <p className="text-[10px] text-gray-500 mb-1">
                             {item.specs}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-primary">¥{item?.price ? item.price.toFixed(2) : '0.00'}</span>
-                            <span className="text-[10px] text-gray-500">x{item.quantity}</span>
+                            <span className="text-xs text-primary">
+                              ¥{item?.price ? item.price.toFixed(2) : "0.00"}
+                            </span>
+                            <span className="text-[10px] text-gray-500">
+                              x{item.quantity}
+                            </span>
                           </div>
                         </div>
                       </div>
                     ))}
                   </Link>
-                  
+
                   {/* 订单底部信息 */}
                   <div className="flex items-center justify-between mt-2">
                     <div className="text-[10px] text-gray-500">
                       {order.date}
                     </div>
                     <div className="text-[10px]">
-                      共{order.items.length}件商品 合计: <span className="text-primary">¥{order?.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}</span>
+                      共{order.items.length}件商品 合计:{" "}
+                      <span className="text-primary">
+                        ¥
+                        {order?.totalAmount
+                          ? order.totalAmount.toFixed(2)
+                          : "0.00"}
+                      </span>
                     </div>
                   </div>
-                  
+
                   {/* 倒计时 - 仅待付款订单显示 */}
                   {order.status === 1 && (
                     <div className="flex items-center mt-1">
@@ -363,7 +386,7 @@ const OrderList = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   {/* 订单操作按钮 */}
                   <div className="flex justify-end mt-2">
                     {getOrderActions(order)}
@@ -373,24 +396,32 @@ const OrderList = () => {
             ))}
           </div>
         )}
-        
+
         {/* 分页控件 */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center mt-4 pb-4">
-            <button 
+            <button
               onClick={() => setPage(Math.max(0, page - 1))}
               disabled={page === 0}
-              className={`px-3 py-1 text-xs rounded-l-md ${page === 0 ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white'}`}
+              className={`px-3 py-1 text-xs rounded-l-md ${
+                page === 0
+                  ? "bg-gray-200 text-gray-500"
+                  : "bg-primary text-white"
+              }`}
             >
               上一页
             </button>
             <span className="px-3 py-1 text-xs bg-gray-100">
               {page + 1} / {totalPages}
             </span>
-            <button 
+            <button
               onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
               disabled={page >= totalPages - 1}
-              className={`px-3 py-1 text-xs rounded-r-md ${page >= totalPages - 1 ? 'bg-gray-200 text-gray-500' : 'bg-primary text-white'}`}
+              className={`px-3 py-1 text-xs rounded-r-md ${
+                page >= totalPages - 1
+                  ? "bg-gray-200 text-gray-500"
+                  : "bg-primary text-white"
+              }`}
             >
               下一页
             </button>

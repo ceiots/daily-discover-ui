@@ -68,7 +68,7 @@ const Payment = () => {
                 orderNo,
                 itemIds: selectedItems.map(item => item.id),
                 totalAmount: calculateTotal(),
-                payType: paymentMethod === "支付宝" ? '1' : '2',
+                payType: paymentMethod === "支付宝" ? 1 : 2,
                 address: {
                     name: address.name,
                     phone: address.phone,

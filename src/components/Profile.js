@@ -76,27 +76,9 @@ const Profile = () => {
           navigate("/login");
           return;
         }
-       /*  // 在请求中传递 userId 和 activeTab
-        const response = await instance.get(
-          `/order/user?status=${activeTab}&userId=${userId}`
-        );
-        console.log("订单查response:", JSON.stringify(response));
-        setOrders(response.data); */
+      
       } catch (error) {
-        /* if (error.response && error.response.status === 401) {
-          // 尝试刷新用户信息并重试请求
-          try {
-            await refreshUserInfo();
-            const newResponse = await instance.get(
-              `/order/user?status=${activeTab}&userId=${userId}`
-            );
-            setOrders(newResponse.data);
-          } catch (newError) {
-            setError("重试获取订单失败");
-          }
-        } else {
           setError("获取订单失败");
-        } */
       } finally {
         setLoading(false);
       }
