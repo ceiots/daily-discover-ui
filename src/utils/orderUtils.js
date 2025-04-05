@@ -1,3 +1,22 @@
+import { useState, useEffect } from 'react';
+
+export const useCountdown = (initialSeconds) => {
+  const [remainingSeconds, setRemainingSeconds] = useState(initialSeconds);
+
+  useEffect(() => {
+    if (remainingSeconds > 0) {
+      const timer = setInterval(() => {
+        setRemainingSeconds(prevSeconds => prevSeconds - 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [remainingSeconds]);
+
+  return remainingSeconds;
+};
+
+
 // 格式化规格信息
 export const formatSpecifications = (specs) => {
     if (!specs) return "默认规格";

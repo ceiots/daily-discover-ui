@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -8,10 +8,14 @@ import {
   FaFileAlt,
   FaClock,
   FaCreditCard,
-  FaFileInvoice
+  FaFileInvoice,
+  FaShoppingCart,
+  FaCommentAlt,
+  FaTrashAlt,
+  FaTruck,
+  FaCheck,
 } from "react-icons/fa";
 import instance from "../utils/axios";
-import { formatSpecifications, initCountdown } from "../utils/orderUtils";
 
 const OrderDetail = () => {
   // 使用 useParams 钩子获取 URL 参数
@@ -20,10 +24,10 @@ const OrderDetail = () => {
   const [orderDetail, setOrderDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLogistics, setShowLogistics] = useState(false);
-  const [countdown, setCountdown] = useState("");
-
-  // Move the fetchOrderDetail function outside of useEffect
-  const fetchOrderDetail = async (orderNumber) => {
+  const [remainingTime, setRemainingTime] = useState(0);
+  
+  // 获取订单详情
+  const fetchOrderDetail = useCallback(async () => {
     try {
       const response = await instance.get(`/order/${orderNumber}`);
       console.log("Fetching order detail for response:", response.data);
@@ -31,22 +35,57 @@ const OrderDetail = () => {
         setOrderDetail(response.data);
         setLoading(false);
         
-        // If it's a pending payment status, initialize the countdown
-        if (response.data.status === 1) {
-          initCountdown(response.data.countdown || "30 minutes");
+        // 如果是待付款状态，初始化倒计时
+        if (response.data.status === "pending" || response.data.status === 1) {
+          // 解析倒计时字符串，例如 "30分钟"
+          let minutes = 30;
+          if (response.data.countdown) {
+            const match = response.data.countdown.match(/(\d+)/);
+            if (match && match[1]) {
+              minutes = parseInt(match[1], 10);
+            }
+          }
+          
+          // 设置倒计时秒数
+          setRemainingTime(minutes * 60);
         }
       } else {
-        console.error("Failed to get order details");
+        console.error("获取订单详情失败");
       }
     } catch (error) {
-      console.error("Request error:", error);
+      console.error("请求出错:", error);
     }
-  };
-
-  useEffect(() => {
-    // Call the fetchOrderDetail function and pass the orderNumber parameter
-    fetchOrderDetail(orderNumber);
   }, [orderNumber]);
+
+  // 初始化数据
+  useEffect(() => {
+    fetchOrderDetail();
+  }, [fetchOrderDetail]);
+
+  // 倒计时效果
+  useEffect(() => {
+    // 只有在待付款状态且剩余时间大于0时才启动倒计时
+    if (
+      remainingTime > 0 && 
+      orderDetail && 
+      (orderDetail.status === "pending" || orderDetail.status === 1)
+    ) {
+      const timer = setInterval(() => {
+        setRemainingTime((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            // 倒计时结束，可以刷新订单状态
+            fetchOrderDetail();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+      
+      // 组件卸载时清除定时器
+      return () => clearInterval(timer);
+    }
+  }, [remainingTime, orderDetail, fetchOrderDetail]);
 
   const handleBack = () => {
     navigate(-1);
@@ -54,6 +93,8 @@ const OrderDetail = () => {
 
   // 复制订单号
   const copyOrderNumber = () => {
+    if (!orderDetail || !orderDetail.orderNumber) return;
+    
     navigator.clipboard
       .writeText(orderDetail.orderNumber)
       .then(() => {
@@ -64,108 +105,177 @@ const OrderDetail = () => {
       });
   };
 
+  // 格式化时间
+  const formatTime = (seconds) => {
+    if (!seconds || seconds <= 0) return "0分00秒";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}分${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}秒`;
+  };
+
+  // 格式化规格信息
+  const formatSpecifications = (specs) => {
+    if (!specs) return "默认规格";
+    
+    try {
+      // 如果是字符串，尝试解析成对象
+      const specsObj = typeof specs === 'string' ? JSON.parse(specs) : specs;
+      
+      // 如果是数组格式
+      if (Array.isArray(specsObj)) {
+        return specsObj.map(spec => {
+          if (spec.name && spec.values) {
+            // 如果 values 是数组，将其连接起来
+            const values = Array.isArray(spec.values) ? spec.values.join('/') : spec.values;
+            return `${spec.name}: ${values}`;
+          }
+          return '';
+        }).filter(Boolean).join(' | ');
+      } 
+      // 如果是对象格式
+      else if (specsObj.name && specsObj.values) {
+        const values = Array.isArray(specsObj.values) ? specsObj.values.join('/') : specsObj.values;
+        return `${specsObj.name}: ${values}`;
+      }
+      // 如果是简单的键值对格式
+      else {
+        return Object.entries(specsObj)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(' | ');
+      }
+    } catch (error) {
+      console.error("规格格式化错误:", error);
+      // 如果解析失败，直接返回原始字符串，但去掉多余的符号
+      if (typeof specs === 'string') {
+        return specs
+          .replace(/[{}""]/g, '')  // 移除括号和引号
+          .replace(/name:/g, '')       // 移除 name: 标签
+          .replace(/values:/g, '')     // 移除 values: 标签
+          .replace(/,/g, ' | ');       // 将逗号替换为分隔符
+      }
+      return String(specs);
+    }
+  };
+
   // 根据订单状态获取对应的操作按钮
   const getOrderActions = (order) => {
+    if (!order) return null;
+    
+    // 不要在这里使用 hooks！
+    const renderPendingActions = () => (
+      <div className="flex gap-3">
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          取消订单
+        </button>
+        <button className="flex-1 py-2.5 text-xs bg-primary text-white rounded-full">
+          立即支付
+        </button>
+      </div>
+    );
+    
+    const renderProcessingActions = () => (
+      <div className="flex gap-3">
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          申请退款
+        </button>
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          联系客服
+        </button>
+      </div>
+    );
+    
+    const renderShippedActions = () => (
+      <div className="flex gap-3">
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          查看物流
+        </button>
+        <button className="flex-1 py-2.5 text-xs bg-primary text-white rounded-full">
+          确认收货
+        </button>
+      </div>
+    );
+    
+    const renderCompletedActions = () => (
+      <div className="flex gap-3">
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          申请售后
+        </button>
+        <button className="flex-1 py-2.5 text-xs bg-primary text-white rounded-full">
+          评价商品
+        </button>
+      </div>
+    );
+    
+    const renderCanceledActions = () => (
+      <div className="flex gap-3">
+        <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
+          删除订单
+        </button>
+        <button className="flex-1 py-2.5 text-xs bg-primary text-white rounded-full">
+          再次购买
+        </button>
+      </div>
+    );
+    
     switch (order.status) {
       case "pending":
       case 1:
-        return (
-          <div className="flex gap-3">
-            <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
-              取消订单
-            </button>
-            <button className="flex-1 py-2.5 text-xs text-white bg-primary rounded-full">
-              立即付款
-            </button>
-          </div>
-        );
+        return renderPendingActions();
       case "processing":
       case 2:
-        return (
-          <button className="w-full py-2.5 text-xs text-primary border border-primary rounded-full">
-            提醒发货
-          </button>
-        );
+        return renderProcessingActions();
       case "shipped":
       case 3:
-        return (
-          <div className="flex gap-3">
-            <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
-              查看物流
-            </button>
-            <button className="flex-1 py-2.5 text-xs text-primary border border-primary rounded-full">
-              确认收货
-            </button>
-          </div>
-        );
+        return renderShippedActions();
       case "completed":
       case 4:
-        return (
-          <div className="flex gap-3">
-            <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
-              再次购买
-            </button>
-            <button className="flex-1 py-2.5 text-xs text-primary border border-primary rounded-full">
-              评价订单
-            </button>
-          </div>
-        );
+        return renderCompletedActions();
       case "canceled":
       case 5:
-        return (
-          <button className="w-full py-2.5 text-xs border border-gray-300 rounded-full">
-            删除订单
-          </button>
-        );
+        return renderCanceledActions();
       default:
         return null;
     }
   };
 
-  // 获取状态卡片的背景颜色
+  // 根据订单状态获取状态卡片的背景颜色
   const getStatusCardBgColor = (status) => {
     switch (status) {
       case "pending":
       case 1:
-        return "bg-primary";
+        return "bg-indigo-500";
       case "processing":
       case 2:
         return "bg-blue-500";
       case "shipped":
       case 3:
-        return "bg-indigo-500";
+        return "bg-green-500";
       case "completed":
       case 4:
-        return "bg-green-500";
+        return "bg-teal-500";
       case "canceled":
       case 5:
         return "bg-gray-500";
       default:
-        return "bg-primary";
+        return "bg-indigo-500";
     }
   };
 
-  // 显示加载状态
   if (loading) {
     return (
-      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">加载中...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
-  // 如果没有找到订单
   if (!orderDetail) {
     return (
-      <div className="bg-gray-50 min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <div className="text-center">
-          <div className="text-4xl mb-4">😕</div>
-          <h2 className="text-lg font-medium mb-2">未找到订单</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            抱歉，未能找到ID为 {orderNumber} 的订单信息
+          <h2 className="text-xl font-medium mb-2">订单不存在</h2>
+          <p className="text-gray-500 mb-6">
+            抱歉，未找到该订单信息，请检查订单号是否正确
           </p>
           <button
             onClick={() => navigate("/order-list")}
@@ -207,7 +317,7 @@ const OrderDetail = () => {
             </span>
             {(orderDetail.status === "pending" || orderDetail.status === 1) && (
               <span className="text-xs">
-                支付剩余时间：{countdown}
+                支付剩余时间：{formatTime(remainingTime)}
               </span>
             )}
           </div>
@@ -241,7 +351,7 @@ const OrderDetail = () => {
                 </div>
 
                 {/* 物流时间线 */}
-                {showLogistics && (
+                {showLogistics && orderDetail.logistics.timeline && (
                   <div className="mt-3 border-t border-white border-opacity-20 pt-3">
                     <p className="mb-2 font-medium">物流跟踪</p>
                     <div className="space-y-3">
@@ -269,29 +379,40 @@ const OrderDetail = () => {
         </div>
 
         {/* 收货地址 */}
-        <div className="bg-white p-4 rounded-lg">
-          <div className="flex">
-            <FaMapMarkerAlt className="text-primary mt-1 flex-shrink-0" />
-            <div className="flex-1 ml-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  {orderDetail?.address?.name}
-                </span>
-                <span className="text-gray-600 text-xs">
-                  {orderDetail?.address?.phone}
-                </span>
+        {orderDetail.address && (
+          <div className="bg-white rounded-lg p-4">
+            <div className="flex items-start">
+              <FaMapMarkerAlt className="text-primary text-sm mt-0.5 mr-3" />
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <span className="font-medium text-sm">
+                      {orderDetail.address.name}
+                    </span>
+                    <span className="ml-2 text-xs text-gray-500">
+                      {orderDetail.address.phone}
+                    </span>
+                  </div>
+                  {orderDetail.address.isDefault && (
+                    <span className="text-[10px] text-primary border border-primary rounded-full px-1">
+                      默认
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                  {orderDetail.address.province} {orderDetail.address.city}{" "}
+                  {orderDetail.address.district} {orderDetail.address.detail}
+                  {orderDetail?.address?.address}
+                </p>
               </div>
-              <p className="mt-1 text-xs text-gray-600">
-                {orderDetail?.address?.address}
-              </p>
             </div>
           </div>
-        </div>
+        )}
 
         {/* 商品信息 */}
         <div className="bg-white rounded-lg p-4">
-          {orderDetail && orderDetail.items && orderDetail.items.map((item) => (
-            <div key={item.id} className="pb-3">
+          {orderDetail.items && orderDetail.items.map((item, index) => (
+            <div key={item.id || index} className="pb-3">
               {/* 店铺信息 - 移到最上方 */}
               <div className="flex items-center mb-3">
                 {item.shopAvatarUrl ? (
@@ -430,22 +551,6 @@ const OrderDetail = () => {
       <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100">
         {getOrderActions(orderDetail)}
       </div>
-
-      {/* 底部导航栏 */}
-      {/* <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2">
-        <div className="flex flex-col items-center">
-          <FaShoppingCart className="text-gray-400 text-lg" />
-          <span className="text-xs mt-1 text-gray-500">购物车</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <FaCommentAlt className="text-gray-400 text-lg" />
-          <span className="text-xs mt-1 text-gray-500">消息</span>
-        </div>
-        <div className="flex flex-col items-center">
-          <FaStore className="text-primary text-lg" />
-          <span className="text-xs mt-1 text-primary">订单</span>
-        </div>
-      </div> */}
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaStore } from "react-icons/fa";
 import instance from "../utils/axios";
 import { useAuth } from "../App";
-import { formatSpecifications, initCountdown } from "../utils/orderUtils";
+import { useCountdown,formatSpecifications, initCountdown } from "../utils/orderUtils";
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
@@ -127,58 +127,25 @@ const OrderList = () => {
     navigate(-1);
   };
 
-  // 根据订单状态获取对应的操作按钮
-  const getOrderActions = (order) => {
-    switch (order.status) {
-      case "待付款": // 待付款
-        return (
-          <>
-            <button className="px-3 py-1.5 text-xs text-gray-600 bg-gray-50 rounded-full mr-2">
-              取消订单
-            </button>
-            <button
-              onClick={() => handlePayment(order.id)}
-              className="px-3 py-1.5 text-xs text-white bg-primary rounded-full"
-            >
-              立即付款
-            </button>
-          </>
-        );
-      case "待发货": // 待发货
-        return (
-          <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
-            提醒发货
-          </button>
-        );
-      case "待收货": // 待收货
-        return (
-          <>
-            <button className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-full mr-2">
-              查看物流
-            </button>
-            <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
-              确认收货
-            </button>
-          </>
-        );
-      case "已完成": // 已完成
-        return (
-          <>
-            <button
-              onClick={() => handleRebuy(order.id)}
-              className="px-3 py-1.5 text-xs text-gray-600 border border-gray-300 rounded-full mr-2"
-            >
-              再次购买
-            </button>
-            <button className="px-3 py-1.5 text-xs text-primary border border-primary rounded-full">
-              评价订单
-            </button>
-          </>
-        );
-      default:
-        return null;
-    }
+  // 定义一个映射来存储每个待付款订单的倒计时
+  // Create a new component to manage the countdown for each order
+  const OrderCountdown = ({ initialCountdown }) => {
+    const remainingTime = useCountdown(initialCountdown);
+    return remainingTime;
   };
+
+  const countdownMap = useMemo(() => {
+    const map = new Map();
+    orderData.forEach((order) => {
+      if (order.status === 1) {
+        const initialCountdown = order.countdown || 30 * 60; // 30 minutes in seconds
+        // Use the OrderCountdown component to manage the countdown
+        const remainingTime = <OrderCountdown initialCountdown={initialCountdown} />;
+        map.set(order.id, remainingTime);
+      }
+    });
+    return map;
+  }, [orderData]);
 
   // 修改过滤逻辑
   const filteredOrders = useMemo(() => {
@@ -398,10 +365,6 @@ const OrderList = () => {
                     </div>
                   )}
 
-                  {/* 订单操作按钮 */}
-                  <div className="flex justify-end mt-2">
-                    {getOrderActions(order)}
-                  </div>
                 </div>
               </div>
             ))}
@@ -441,6 +404,12 @@ const OrderList = () => {
       </main>
     </div>
   );
+};
+
+const formatTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
 export default OrderList;
