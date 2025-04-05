@@ -3,8 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaStore } from "react-icons/fa";
 import instance from "../utils/axios";
 import { useAuth } from "../App";
-import { useCountdown, formatSpecifications, initCountdown } from "../utils/orderUtils";
-import PropTypes from 'prop-types';
+import { formatSpecifications } from "../utils/orderUtils";
 import OrderCountdown from './OrderCountdown';
 
 const OrderList = () => {

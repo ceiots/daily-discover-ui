@@ -8,15 +8,10 @@ import {
   FaFileAlt,
   FaClock,
   FaCreditCard,
-  FaFileInvoice,
-  FaShoppingCart,
-  FaCommentAlt,
-  FaTrashAlt,
-  FaTruck,
-  FaCheck,
+  FaFileInvoice
 } from "react-icons/fa";
 import instance from "../utils/axios";
-import { useCountdown } from '../utils/orderUtils';
+import { formatSpecifications } from "../utils/orderUtils";
 // 新增：导入 OrderCountdown 组件
 import OrderCountdown from './OrderCountdown';
 
@@ -38,20 +33,6 @@ const OrderDetail = () => {
         setOrderDetail(response.data);
         setLoading(false);
         
-        // 如果是待付款状态，初始化倒计时
-        if (response.data.status === "pending" || response.data.status === 1) {
-          // 解析倒计时字符串，例如 "30分钟"
-          let minutes = 30;
-          if (response.data.countdown) {
-            const match = response.data.countdown.match(/(\d+)/);
-            if (match && match[1]) {
-              minutes = parseInt(match[1], 10);
-            }
-          }
-          
-          // 设置倒计时秒数
-          setRemainingTime(minutes * 60);
-        }
       } else {
         console.error("获取订单详情失败");
       }
@@ -65,41 +46,16 @@ const OrderDetail = () => {
     fetchOrderDetail();
   }, [fetchOrderDetail]);
 
-  // 倒计时效果
-  useEffect(() => {
-    // 只有在待付款状态且剩余时间大于0时才启动倒计时
-    if (
-      remainingTime > 0 && 
-      orderDetail && 
-      (orderDetail.status === "pending" || orderDetail.status === 1)
-    ) {
-      const timer = setInterval(() => {
-        setRemainingTime((prevTime) => {
-          if (prevTime <= 1) {
-            clearInterval(timer);
-            // 倒计时结束，可以刷新订单状态
-            fetchOrderDetail();
-            return 0;
-          }
-          return prevTime - 1;
-        });
-      }, 1000);
-      
-      // 组件卸载时清除定时器
-      return () => clearInterval(timer);
-    }
-  }, [remainingTime, orderDetail, fetchOrderDetail]);
-
   const handleBack = () => {
     navigate(-1);
   };
 
   // 复制订单号
   const copyOrderNumber = () => {
-    if (!orderDetail || !orderDetail.orderNumber) return;
+    if (!orderDetail || !orderDetail.order.orderNumber) return;
     
     navigator.clipboard
-      .writeText(orderDetail.orderNumber)
+      .writeText(orderDetail.order.orderNumber)
       .then(() => {
         alert("订单号已复制到剪贴板");
       })
@@ -108,62 +64,11 @@ const OrderDetail = () => {
       });
   };
 
-  // 格式化时间
-  const formatTime = (seconds) => {
-    if (!seconds || seconds <= 0) return "0分00秒";
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}分${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}秒`;
-  };
-
-  // 格式化规格信息
-  const formatSpecifications = (specs) => {
-    if (!specs) return "默认规格";
-    
-    try {
-      // 如果是字符串，尝试解析成对象
-      const specsObj = typeof specs === 'string' ? JSON.parse(specs) : specs;
-      
-      // 如果是数组格式
-      if (Array.isArray(specsObj)) {
-        return specsObj.map(spec => {
-          if (spec.name && spec.values) {
-            // 如果 values 是数组，将其连接起来
-            const values = Array.isArray(spec.values) ? spec.values.join('/') : spec.values;
-            return `${spec.name}: ${values}`;
-          }
-          return '';
-        }).filter(Boolean).join(' | ');
-      } 
-      // 如果是对象格式
-      else if (specsObj.name && specsObj.values) {
-        const values = Array.isArray(specsObj.values) ? specsObj.values.join('/') : specsObj.values;
-        return `${specsObj.name}: ${values}`;
-      }
-      // 如果是简单的键值对格式
-      else {
-        return Object.entries(specsObj)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join(' | ');
-      }
-    } catch (error) {
-      console.error("规格格式化错误:", error);
-      // 如果解析失败，直接返回原始字符串，但去掉多余的符号
-      if (typeof specs === 'string') {
-        return specs
-          .replace(/[{}""]/g, '')  // 移除括号和引号
-          .replace(/name:/g, '')       // 移除 name: 标签
-          .replace(/values:/g, '')     // 移除 values: 标签
-          .replace(/,/g, ' | ');       // 将逗号替换为分隔符
-      }
-      return String(specs);
-    }
-  };
-
   // 根据订单状态获取对应的操作按钮
   const getOrderActions = (order) => {
+ 
     if (!order) return null;
-    
+  
     // 不要在这里使用 hooks！
     const renderPendingActions = () => (
       <div className="flex gap-3">
@@ -223,6 +128,7 @@ const OrderDetail = () => {
     switch (order.status) {
       case "pending":
       case 1:
+        console.log("Rendering pending actions");
         return renderPendingActions();
       case "processing":
       case 2:
@@ -316,9 +222,9 @@ const OrderDetail = () => {
         >
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">
-              {orderDetail.statusText || orderDetail.statusStr}
+              {orderDetail.order.statusText || orderDetail.order.statusStr}
             </span>
-            {(orderDetail.status === "pending" || orderDetail.status === 1) && (
+            {(orderDetail.order.status === "pending" || orderDetail.order.status === 1) && (
               <span className="text-xs">
                 支付剩余时间：<OrderCountdown initialCountdown={remainingTime} />
               </span>
@@ -326,8 +232,8 @@ const OrderDetail = () => {
           </div>
 
           {/* 物流信息 - 仅在待收货和已完成状态显示 */}
-          {(orderDetail.status === "shipped" || orderDetail.status === 3 ||
-            orderDetail.status === "completed" || orderDetail.status === 4) &&
+          {(orderDetail.order.status === "shipped" || orderDetail.order.status === 3 ||
+            orderDetail.order.status === "completed" || orderDetail.order.status === 4) &&
             orderDetail.logistics && (
               <div
                 className="mt-3 text-xs"
@@ -414,7 +320,7 @@ const OrderDetail = () => {
 
         {/* 商品信息 */}
         <div className="bg-white rounded-lg p-4">
-          {orderDetail.items && orderDetail.items.map((item, index) => (
+          {orderDetail.order.items && orderDetail.order.items.map((item, index) => (
             <div key={item.id || index} className="pb-3">
               {/* 店铺信息 - 移到最上方 */}
               <div className="flex items-center mb-3">
@@ -464,7 +370,7 @@ const OrderDetail = () => {
               <span className="text-gray-600">订单编号</span>
             </div>
             <div className="flex items-center">
-              <span>{orderDetail.orderNumber}</span>
+              <span>{orderDetail.order.orderNumber}</span>
               <button
                 onClick={copyOrderNumber}
                 className="ml-2 text-primary text-[10px] border border-primary rounded-full px-1.5 py-0.5"
@@ -479,33 +385,33 @@ const OrderDetail = () => {
               <span className="text-gray-600">创建时间</span>
             </div>
             <span>
-              {orderDetail.date}
+              {orderDetail.order.date}
             </span>
           </div>
 
           {/* 支付方式 - 仅在已支付的订单中显示 */}
-          {orderDetail.status !== "pending" && orderDetail.status !== 1 &&
-            orderDetail.status !== "canceled" && orderDetail.status !== 5 && (
+          {orderDetail.order.status !== "pending" && orderDetail.order.status !== 1 &&
+            orderDetail.order.status !== "canceled" && orderDetail.order.status !== 5 && (
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center">
                   <FaCreditCard className="text-gray-500 mr-2" />
                   <span className="text-gray-600">支付方式</span>
                 </div>
-                <span>{orderDetail.paymentMethodText || "在线支付"}</span>
+                <span>{orderDetail.order.paymentMethodText || "在线支付"}</span>
               </div>
             )}
 
           {/* 发票信息 - 仅在已支付的订单中显示 */}
-          {orderDetail.status !== "pending" && orderDetail.status !== 1 &&
-            orderDetail.status !== "canceled" && orderDetail.status !== 5 &&
-            orderDetail.invoice && (
+          {orderDetail.order.status !== "pending" && orderDetail.order.status !== 1 &&
+            orderDetail.order.status !== "canceled" && orderDetail.order.status !== 5 &&
+            orderDetail.order.invoice && (
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center">
                   <FaFileInvoice className="text-gray-500 mr-2" />
                   <span className="text-gray-600">发票信息</span>
                 </div>
                 <div className="flex items-center text-primary">
-                  <span>{orderDetail.invoice.type}</span>
+                  <span>{orderDetail.order.invoice.type}</span>
                   <FaChevronRight className="ml-1 text-xs" />
                 </div>
               </div>
@@ -516,21 +422,21 @@ const OrderDetail = () => {
         <div className="bg-white rounded-lg p-4">
           <div className="flex justify-between text-xs mb-3">
             <span className="text-gray-600">商品总价</span>
-            <span>¥{(orderDetail.paymentAmount || 0).toFixed(2)}</span>
+            <span>¥{(orderDetail.order.paymentAmount || 0).toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-xs mb-3">
             <span className="text-gray-600">运费</span>
             <span>
-              {orderDetail.shipping > 0
-                ? `¥${orderDetail.shipping.toFixed(2)}`
+              {orderDetail.order.shipping > 0
+                ? `¥${orderDetail.order.shipping.toFixed(2)}`
                 : "免运费"}
             </span>
           </div>
-          {orderDetail.discount > 0 && (
+          {orderDetail.order.discount > 0 && (
             <div className="flex justify-between text-xs mb-3">
               <span className="text-gray-600">优惠</span>
               <span className="text-red-500">
-                -¥{orderDetail.discount.toFixed(2)}
+                -¥{orderDetail.order.discount.toFixed(2)}
               </span>
             </div>
           )}
@@ -540,9 +446,9 @@ const OrderDetail = () => {
               <span className="text-lg text-primary font-medium">
                 ¥
                 {(
-                  (orderDetail.paymentAmount || 0) +
-                  (orderDetail.shipping || 0) -
-                  (orderDetail.discount || 0)
+                  (orderDetail.order.paymentAmount || 0) +
+                  (orderDetail.order.shipping || 0) -
+                  (orderDetail.order.discount || 0)
                 ).toFixed(2)}
               </span>
             </div>
@@ -552,7 +458,7 @@ const OrderDetail = () => {
 
       {/* 底部操作按钮 - 不同状态显示不同按钮 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100">
-        {getOrderActions(orderDetail)}
+        {getOrderActions(orderDetail.order)}
       </div>
     </div>
   );
