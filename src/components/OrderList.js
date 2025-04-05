@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaSearch } from "react-icons/fa";
+import { FaArrowLeft, FaStore } from "react-icons/fa";
 import instance from "../utils/axios";
 import { useAuth } from "../App";
+import { formatSpecifications, initCountdown } from "../utils/orderUtils";
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
@@ -311,55 +312,65 @@ const OrderList = () => {
                 className="bg-white rounded-lg overflow-hidden shadow-sm"
               >
                 <div className="p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center">
-                      <i className="ri-store-2-line mr-1 text-gray-600 text-xs"></i>
-                      <span className="text-xs">{order.shopName}</span>
-                    </div>
-                    <span
-                      className={`text-xs ${
-                        order.status === 1
-                          ? "text-red-500"
-                          : order.status === 4
-                          ? "text-green-500"
-                          : "text-primary"
-                      }`}
-                    >
-                      {getOrderStatus(order.status)}
-                    </span>
-                  </div>
-
-                  {/* 订单内容 */}
-                  <Link to={`/order/${order.orderNumber}`}>
-                    {order.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center gap-2 pb-2 border-b border-gray-100"
-                      >
-                        <img
-                          src={item.imageUrl}
-                          className="w-16 h-16 object-cover rounded"
-                          alt={item.name}
-                        />
-                        <div className="flex-1">
-                          <h3 className="text-xs mb-1 line-clamp-2">
-                            {item.name}
-                          </h3>
-                          <p className="text-[10px] text-gray-500 mb-1">
-                            {item.specs}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-primary">
-                              ¥{item?.price ? item.price.toFixed(2) : "0.00"}
-                            </span>
-                            <span className="text-[10px] text-gray-500">
-                              x{item.quantity}
-                            </span>
-                          </div>
+                  {/* 遍历每个商品，显示其对应的店铺信息 */}
+                  {order.items.map((item, index) => (
+                    <div key={index}>
+                      {index > 0 && <hr className="my-2 border-gray-200" />}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center">
+                          {item.shopAvatarUrl ? (
+                            <img
+                              src={item.shopAvatarUrl}
+                              className="w-4 h-4 rounded-full mr-1"
+                              alt={item.shopName}
+                            />
+                          ) : (
+                            <FaStore className="text-gray-600 text-xs mr-1" />
+                          )}
+                          <span className="text-xs">
+                            {item.shopName || "未知店铺"}
+                          </span>
+                        </div>
+                        <div
+                          className={`text-xs ${
+                            order.status === 1
+                              ? "text-red-500"
+                              : order.status === 4
+                              ? "text-green-500"
+                              : "text-primary"
+                          }`}
+                        >
+                          {getOrderStatus(order.status)}
                         </div>
                       </div>
-                    ))}
-                  </Link>
+                      {/* 订单内容 */}
+                      <Link to={`/order/${order.orderNumber}`}>
+                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                          <img
+                            src={item.imageUrl}
+                            className="w-16 h-16 object-cover rounded"
+                            alt={item.name}
+                          />
+                          <div className="flex-1">
+                            <h3 className="text-xs mb-1 line-clamp-2">
+                              {item.name}
+                            </h3>
+                            <p className="text-[10px] text-gray-500 mb-1">
+                              {formatSpecifications(item.specs)}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-primary">
+                                ¥{item?.price ? item.price.toFixed(2) : "0.00"}
+                              </span>
+                              <span className="text-[10px] text-gray-500">
+                                x{item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
 
                   {/* 订单底部信息 */}
                   <div className="flex items-center justify-between mt-2">
