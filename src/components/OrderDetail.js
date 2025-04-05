@@ -16,6 +16,9 @@ import {
   FaCheck,
 } from "react-icons/fa";
 import instance from "../utils/axios";
+import { useCountdown } from '../utils/orderUtils';
+// 新增：导入 OrderCountdown 组件
+import OrderCountdown from './OrderCountdown';
 
 const OrderDetail = () => {
   // 使用 useParams 钩子获取 URL 参数
@@ -317,7 +320,7 @@ const OrderDetail = () => {
             </span>
             {(orderDetail.status === "pending" || orderDetail.status === 1) && (
               <span className="text-xs">
-                支付剩余时间：{formatTime(remainingTime)}
+                支付剩余时间：<OrderCountdown initialCountdown={remainingTime} />
               </span>
             )}
           </div>

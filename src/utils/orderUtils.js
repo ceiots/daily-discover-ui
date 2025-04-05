@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
 
-export const useCountdown = (initialSeconds) => {
-  const [remainingSeconds, setRemainingSeconds] = useState(initialSeconds);
+export const useCountdown = (initialCountdown) => {
+  const [remainingTime, setRemainingTime] = useState(initialCountdown);
 
   useEffect(() => {
-    if (remainingSeconds > 0) {
+    if (remainingTime > 0) {
       const timer = setInterval(() => {
-        setRemainingSeconds(prevSeconds => prevSeconds - 1);
+        setRemainingTime((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prevTime - 1;
+        });
       }, 1000);
 
       return () => clearInterval(timer);
     }
-  }, [remainingSeconds]);
+  }, [remainingTime]);
 
-  return remainingSeconds;
+  return remainingTime;
 };
 
 

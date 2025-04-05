@@ -3,7 +3,9 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaStore } from "react-icons/fa";
 import instance from "../utils/axios";
 import { useAuth } from "../App";
-import { useCountdown,formatSpecifications, initCountdown } from "../utils/orderUtils";
+import { useCountdown, formatSpecifications, initCountdown } from "../utils/orderUtils";
+import PropTypes from 'prop-types';
+import OrderCountdown from './OrderCountdown';
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
@@ -126,26 +128,6 @@ const OrderList = () => {
   const handleBack = () => {
     navigate(-1);
   };
-
-  // 定义一个映射来存储每个待付款订单的倒计时
-  // Create a new component to manage the countdown for each order
-  const OrderCountdown = ({ initialCountdown }) => {
-    const remainingTime = useCountdown(initialCountdown);
-    return remainingTime;
-  };
-
-  const countdownMap = useMemo(() => {
-    const map = new Map();
-    orderData.forEach((order) => {
-      if (order.status === 1) {
-        const initialCountdown = order.countdown || 30 * 60; // 30 minutes in seconds
-        // Use the OrderCountdown component to manage the countdown
-        const remainingTime = <OrderCountdown initialCountdown={initialCountdown} />;
-        map.set(order.id, remainingTime);
-      }
-    });
-    return map;
-  }, [orderData]);
 
   // 修改过滤逻辑
   const filteredOrders = useMemo(() => {
@@ -323,7 +305,7 @@ const OrderList = () => {
                               {item.name}
                             </h3>
                             <p className="text-[10px] text-gray-500 mb-1">
-                              {formatSpecifications(item.specs)}
+                              {formatSpecifications(item.specifications)}
                             </p>
                             <div className="flex items-center justify-between">
                               <span className="text-xs text-primary">
@@ -360,7 +342,7 @@ const OrderList = () => {
                     <div className="flex items-center mt-1">
                       <div className="text-[10px] text-red-500">
                         <i className="ri-time-line mr-1"></i>
-                        <span>支付剩余时间：{order.countdown}</span>
+                        <span>支付剩余时间：<OrderCountdown initialCountdown={order.countdown || 30 * 60} /></span>
                       </div>
                     </div>
                   )}
