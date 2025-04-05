@@ -1,23 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
-const OrderCountdown = ({ initialCountdown }) => {
-  const [remainingTime, setRemainingTime] = useState(() => {
+const OrderCountdown = ({ initialCountdown, remainingTime }) => {
+  const [currentTime, setCurrentTime] = useState(() => {
+    if (remainingTime) {
+      return remainingTime;
+    }
     const countdown = parseInt(initialCountdown, 10);
-    return isNaN(countdown) ? 1800 : countdown;  // 默认30分钟(1800秒)
+    return isNaN(countdown) ? 1800 : countdown; // 默认30分钟(1800秒)
   });
 
+  const timerRef = useRef(null);
+
   useEffect(() => {
-    // 移除多余的转换和设置逻辑
-    if (remainingTime <= 0) return;
+    if (remainingTime) {
+      setCurrentTime(remainingTime);
+    }
+  }, [remainingTime]);
 
-    console.log("倒计时开始，初始值:", remainingTime);
+  useEffect(() => {
+    if (currentTime <= 0) return;
 
-    const timer = setInterval(() => {
-      setRemainingTime(prev => {
+    console.log("倒计时开始，初始值:", currentTime);
+
+    timerRef.current = setInterval(() => {
+      setCurrentTime(prev => {
         const newValue = prev - 1;
         if (newValue <= 0) {
-          clearInterval(timer);
+          clearInterval(timerRef.current);
           console.log("倒计时结束");
           return 0;
         }
@@ -27,9 +37,9 @@ const OrderCountdown = ({ initialCountdown }) => {
 
     return () => {
       console.log("清除倒计时定时器");
-      clearInterval(timer);
+      clearInterval(timerRef.current);
     };
-  }, [remainingTime]);
+  }, [currentTime]);
 
   const formatTime = (seconds) => {
     if (!seconds || seconds <= 0) return "0分00秒";
@@ -38,11 +48,12 @@ const OrderCountdown = ({ initialCountdown }) => {
     return `${minutes}分${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}秒`;
   };
 
-  return <span>{formatTime(remainingTime)}</span>;
+  return <span>{formatTime(currentTime)}</span>;
 };
 
 OrderCountdown.propTypes = {
   initialCountdown: PropTypes.number.isRequired,
+  remainingTime: PropTypes.number,
 };
 
 export default OrderCountdown;

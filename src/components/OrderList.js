@@ -19,6 +19,50 @@ const OrderList = () => {
   const [size, setSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [remainingTimes, setRemainingTimes] = useState({});
+
+  // 将获取订单的逻辑定义为函数
+  const fetchOrders = async (statusParam = status) => {
+    if (!isLoggedIn || !userInfo?.id) return;
+
+    try {
+      setLoading(true);
+      // 确保 status 是整数类型
+      const statusValue = parseInt(statusParam) || 0;
+      // 添加分页参数
+      const response = await instance.get(
+        `/order/user/${userInfo.id}?status=${statusValue}&page=${page}&size=${size}&sort=created_at,desc`
+      );
+
+      console.log("查询响应:", response.data);
+
+      // 检查响应格式并设置数据
+      if (response.data && response.data.data) {
+        const newOrderData = response.data.data.content || [];
+        const newRemainingTimes = {};
+        newOrderData.forEach(order => {
+          if (order.status === 1) {
+            newRemainingTimes[order.id] = order.countdown || 30 * 60;
+          }
+        });
+        setOrderData(newOrderData);
+        setTotalPages(response.data.data.totalPages || 0);
+        setTotalElements(response.data.data.totalElements || 0);
+        setRemainingTimes(newRemainingTimes);
+      } else {
+        setOrderData([]);
+        setTotalPages(0);
+        setTotalElements(0);
+        setRemainingTimes({});
+      }
+      setError(null);
+    } catch (error) {
+      console.error("获取订单数据失败:", error);
+      setError("获取订单数据失败，请稍后重试");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 状态映射表 - 修改为更清晰的数字映射
   const statusMap = {
@@ -44,40 +88,6 @@ const OrderList = () => {
   const [selectedStatus, setSelectedStatus] = useState(
     status ? statusMap[status] || "全部" : "全部"
   );
-
-  // 将获取订单的逻辑定义为函数
-  const fetchOrders = async (statusParam = status) => {
-    if (!isLoggedIn || !userInfo?.id) return;
-
-    try {
-      setLoading(true);
-      // 确保 status 是整数类型
-      const statusValue = parseInt(statusParam) || 0;
-      // 添加分页参数
-      const response = await instance.get(
-        `/order/user/${userInfo.id}?status=${statusValue}&page=${page}&size=${size}&sort=created_at,desc`
-      );
-
-      console.log("查询响应:", response.data);
-
-      // 检查响应格式并设置数据
-      if (response.data && response.data.data) {
-        setOrderData(response.data.data.content || []);
-        setTotalPages(response.data.data.totalPages || 0);
-        setTotalElements(response.data.data.totalElements || 0);
-      } else {
-        setOrderData([]);
-        setTotalPages(0);
-        setTotalElements(0);
-      }
-      setError(null);
-    } catch (error) {
-      console.error("获取订单数据失败:", error);
-      setError("获取订单数据失败，请稍后重试");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // 修改状态切换处理函数
   const handleStatusChange = (statusText) => {
@@ -341,11 +351,11 @@ const OrderList = () => {
                     <div className="flex items-center mt-1">
                       <div className="text-[10px] text-red-500">
                         <i className="ri-time-line mr-1"></i>
-                        <span>支付剩余时间：<OrderCountdown initialCountdown={order.countdown || 30 * 60} /></span>
+                        <span>支付剩余时间：<OrderCountdown initialCountdown={order.countdown || 30 * 60} remainingTime={remainingTimes[order.id]} />
+                        </span>
                       </div>
                     </div>
                   )}
-
                 </div>
               </div>
             ))}

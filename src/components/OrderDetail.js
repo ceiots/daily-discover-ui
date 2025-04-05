@@ -23,7 +23,7 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [showLogistics, setShowLogistics] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
-  
+
   // 获取订单详情
   const fetchOrderDetail = useCallback(async () => {
     try {
@@ -32,7 +32,8 @@ const OrderDetail = () => {
       if (response.data) {
         setOrderDetail(response.data);
         setLoading(false);
-        
+        const countdown = response.data.order.countdown || 30 * 60;
+        setRemainingTime(countdown);
       } else {
         console.error("获取订单详情失败");
       }
@@ -226,7 +227,7 @@ const OrderDetail = () => {
             </span>
             {(orderDetail.order.status === "pending" || orderDetail.order.status === 1) && (
               <span className="text-xs">
-                支付剩余时间：<OrderCountdown initialCountdown={remainingTime} />
+                支付剩余时间：<OrderCountdown initialCountdown={orderDetail.order.countdown || 30 * 60} remainingTime={remainingTime} />
               </span>
             )}
           </div>
@@ -309,9 +310,7 @@ const OrderDetail = () => {
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  {orderDetail.address.province} {orderDetail.address.city}{" "}
-                  {orderDetail.address.district} {orderDetail.address.detail}
-                  {orderDetail?.address?.address}
+                  {orderDetail.address.province} {orderDetail.address.city} {orderDetail.address.district} {orderDetail.address.address}
                 </p>
               </div>
             </div>
