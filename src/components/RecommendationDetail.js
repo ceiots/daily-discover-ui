@@ -5,7 +5,7 @@ import instance from "../utils/axios";
 import { useAuth } from "../App"; // 添加上下文导入
 
 const RecommendationDetail = () => {
-  const { isLoggedIn } = useAuth(); // 获取登录状态
+  const { userInfo } = useAuth(); // 获取登录状态
   const { id } = useParams(); // Get the recommendation ID from the URL
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,13 +16,12 @@ const RecommendationDetail = () => {
   //const [selectedVariant, setSelectedVariant] = useState(""); // State for selected variant
   const navigate = useNavigate(); // Create navigate object
   // 初始化选择状态
-   const [selectedSpecs, setSelectedSpecs] = useState({});
-   // 初始化转换后的规格数组
-   const [transformedSpecs, setTransformedSpecs] = useState([]);
- 
+  const [selectedSpecs, setSelectedSpecs] = useState({});
+  // 初始化转换后的规格数组
+  const [transformedSpecs, setTransformedSpecs] = useState([]);
 
   // 处理选择变化
-   const handleSpecChange = (specName, value) => {
+  const handleSpecChange = (specName, value) => {
     // 更新选择状态
     const updatedSpecs = {
       ...selectedSpecs,
@@ -31,7 +30,7 @@ const RecommendationDetail = () => {
     setSelectedSpecs(updatedSpecs);
 
     // 转换为所需格式
-    const transformed = recommendation.specifications.map(spec => ({
+    const transformed = recommendation.specifications.map((spec) => ({
       ...spec,
       values: [updatedSpecs[spec.name]].filter(Boolean), // 只保留选中的值
     }));
@@ -43,22 +42,12 @@ const RecommendationDetail = () => {
     console.log("Transformed Specs:", transformed);
   };
 
-  // 生成“已选”文字
-  const getSelectedText = () => {
-    return Object.entries(selectedSpecs)
-      .map(([specName, value]) => `${specName}: ${value}`)
-      .join(' + ');
-  };
-
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
-        const response = await instance.get(
-          `/recommendations/${id}`
-        );
-        
+        const response = await instance.get(`/recommendations/${id}`);
+
         setRecommendation(response.data);
-        
       } catch (error) {
         setError(
           "Error fetching recommendation details. Please try again later."
@@ -86,72 +75,100 @@ const RecommendationDetail = () => {
   };
 
   // Function to conf// Function to confirm adding to cart
+  // 抽取共用逻辑到新函数
+  const prepareOrderData = (userInfo, id, recommendation, quantity, transformedSpecs) => {
+      // 检查是否所有规格都已选择
+      const isAllSpecsSelected = () => {
+          return recommendation.specifications.every(
+              (spec) =>
+                  Object.prototype.hasOwnProperty.call(selectedSpecs, spec.name) &&
+                  selectedSpecs[spec.name]
+          );
+      };
+  
+      if (!isAllSpecsSelected()) {
+          return null;
+      }
+  
+      if (userInfo === null || userInfo === undefined || !userInfo.id) {
+          return null;
+      }
+  
+      // 确保 transformedSpecs 格式符合后端要求
+      const formattedSpecifications = transformedSpecs.map((spec) => ({
+          name: spec.name,
+          values: spec.values,
+      }));
+  
+      const orderData = {
+          userId: userInfo.id, // 动态获取用户ID
+          productId: id,
+          productName: recommendation.title,
+          productImage: recommendation.imageUrl,
+          // 确保 specifications 是有效的数组
+          specifications: Array.isArray(formattedSpecifications) ? formattedSpecifications : [],
+          price: recommendation.price,
+          quantity: quantity,
+          shopName: recommendation.shopName,
+          shopAvatarUrl: recommendation.shopAvatarUrl,
+      };
+  
+      return orderData;
+  };
+  
+  // 修改 confirmAddToCart 函数
   const confirmAddToCart = async () => {
-
-    // 添加登录状态校验
-    if (!isLoggedIn?.status) {
-      navigate('/login');
-      return;
-    }
-
-
-   // 检查是否所有规格都已选择
-  const isAllSpecsSelected = () => {
-    return recommendation.specifications.every(
-      (spec) => Object.prototype.hasOwnProperty.call(selectedSpecs, spec.name) && selectedSpecs[spec.name]
-    );
+      const orderData = prepareOrderData(userInfo, id, recommendation, quantity, transformedSpecs);
+      if (orderData) {
+          try {
+              await instance.post("/cart/add", orderData);
+          } catch (error) {
+              console.error("Error adding item to cart:", error);
+          }
+      }
+      setIsModalOpen(false); // Close the modal
   };
-
-  if (!isAllSpecsSelected()) {
-    //alert("请选择所有规格"); // Alert if not all variants are selected
-    return;
-  }
-
-    const cartItem = {
-      userId: isLoggedIn.userInfo.id, // 动态获取用户ID
-      productId: id,
-      productName: recommendation.title,
-      productImage: recommendation.imageUrl,
-      specifications: transformedSpecs,
-      price: recommendation.price,
-      quantity: quantity,
-      shopName: recommendation.shopName,
-      shopAvatarUrl: recommendation.shopAvatarUrl
-    };
-    console.log(' dsaf:'+JSON.stringify(cartItem.shopAvatarUrl));
-
-    try {
-      await instance.post(
-        "/cart/add",
-        cartItem
-      );
-      //navigate('/cart'); // Navigate to Cart.js
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-    }
-    setIsModalOpen(false); // Close the modal
-  };
-
-  // Function to navigate to Order Confirmation
-  const handleBuyNow = () => {
-    navigate("/payment"); // Navigate to payment.js
+  
+  // 修改 handleBuyNow 函数
+  const handleBuyNow = async () => {
+      const orderData = prepareOrderData(userInfo, id, recommendation, quantity, transformedSpecs);
+      if (orderData) {
+          // 这里直接跳转到支付页面，不调用加入购物车接口
+          navigate("/payment"); 
+      }
   };
 
   // Function to render product details
   const renderProductDetails = (details) => {
     return details.map((item, index) => {
-      if (item.type === 'image') {
-        return <img key={index} src={item.content} alt="Product Detail" className="w-full h-auto mb-4" />;
-      } else if (item.type === 'text') {
-        return <div key={index} className="text-sm text-gray-800 leading-relaxed mb-4 font-light">{item.content}</div>;
+      if (item.type === "image") {
+        return (
+          <img
+            key={index}
+            src={item.content}
+            alt="Product Detail"
+            className="w-full h-auto mb-4"
+          />
+        );
+      } else if (item.type === "text") {
+        return (
+          <div
+            key={index}
+            className="text-sm text-gray-800 leading-relaxed mb-4 font-light"
+          >
+            {item.content}
+          </div>
+        );
       } else if (item.title && item.content) {
         return (
           <div key={index} className="mb-4">
             <h4 className="text-base font-semibold mb-2">{item.title}</h4>
-            <p className="text-sm text-gray-700 leading-relaxed font-light">{item.content}</p>
+            <p className="text-sm text-gray-700 leading-relaxed font-light">
+              {item.content}
+            </p>
           </div>
         );
-      } 
+      }
       return null;
     });
   };
@@ -163,11 +180,7 @@ const RecommendationDetail = () => {
         <h4 className="text-base font-semibold mb-2">{spec.name}</h4>
         <div className="flex flex-wrap gap-2">
           {spec.values.map((value, idx) => (
-            <button
-              key={idx}
-            >
-              {value}
-            </button>
+            <button key={idx}>{value}</button>
           ))}
         </div>
       </div>
@@ -195,29 +208,33 @@ const RecommendationDetail = () => {
             />
           </div>
 
-        <div className="bg-white px-4 py-4 mt-2">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h1 className="text-lg font-medium leading-tight">
-              {recommendation.title}
-            </h1>
-            <div className="flex items-center mt-2">
-              <span className="text-2xl font-semibold text-primary">¥ {recommendation.price}</span>
-              <span className="text-gray-400 text-sm ml-2">已售 {recommendation.soldCount}</span>
+          <div className="bg-white px-4 py-4 mt-2">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h1 className="text-lg font-medium leading-tight">
+                  {recommendation.title}
+                </h1>
+                <div className="flex items-center mt-2">
+                  <span className="text-2xl font-semibold text-primary">
+                    ¥ {recommendation.price}
+                  </span>
+                  <span className="text-gray-400 text-sm ml-2">
+                    已售 {recommendation.soldCount}
+                  </span>
+                </div>
+              </div>
+              <button className="w-8 h-8 flex items-center justify-center ml-2">
+                <i className="ri-heart-line text-xl text-gray-400"></i>
+              </button>
+            </div>
+            <div className="flex items-center mt-3 text-sm text-gray-500">
+              <span className="mr-4">快递：免运费</span>
             </div>
           </div>
-          <button className="w-8 h-8 flex items-center justify-center ml-2">
-            <i className="ri-heart-line text-xl text-gray-400"></i>
-          </button>
-        </div>
-        <div className="flex items-center mt-3 text-sm text-gray-500">
-          <span className="mr-4">快递：免运费</span>
-        </div>
-      </div>
 
-      <div className="my-0 w-full h-2 bg-gray-100"></div>
-    
-      {/* <div className="bg-white mt-2 px-4 py-4">
+          <div className="my-0 w-full h-2 bg-gray-100"></div>
+
+          {/* <div className="bg-white mt-2 px-4 py-4">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-medium">规格选择</h2>
           <span className="text-sm text-gray-500">已选：{getSelectedText() || '请选择'}</span>
@@ -278,7 +295,8 @@ const RecommendationDetail = () => {
                   <h3 className="text-lg font-medium tracking-wide mb-3">
                     产品详情
                   </h3>
-                  {renderProductDetails(recommendation.productDetails)} {/* Render product details */}
+                  {renderProductDetails(recommendation.productDetails)}{" "}
+                  {/* Render product details */}
                   {/* <div
                     className="text-sm text-gray-700 leading-relaxed mb-4 font-light"
                     dangerouslySetInnerHTML={{
@@ -287,11 +305,9 @@ const RecommendationDetail = () => {
                   /> */}
                 </>
               )}
- 
+
               {activeTab === "purchaseNotice" && (
-                <>
-                  {renderProductDetails(recommendation.purchaseNotices)}
-                </>
+                <>{renderProductDetails(recommendation.purchaseNotices)}</>
               )}
             </div>
           </div>
@@ -350,57 +366,22 @@ const RecommendationDetail = () => {
               className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center"
             >
               <div className="bg-white w-full max-w-md rounded-t-xl p-4">
-
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-semibold">选择规格</h3>
-                  <button 
-                    className="text-gray-500 hover:text-gray-700 text-2xl leading-none" 
+                  <button
+                    className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
                     onClick={() => setIsModalOpen(false)}
                   >
                     ×
                   </button>
                 </div>
-                
-                {/* <div className="mb-4">
-                  <p className="mb-2">套装类型</p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      className={`px-3 py-1 border rounded-full text-sm ${
-                        selectedVariant === "初学者套装"
-                          ? "bg-primary text-white"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedVariant("初学者套装")}
-                    >
-                      初学者套装
-                    </button>
-                    <button
-                      className={`px-3 py-1 border rounded-full text-sm ${
-                        selectedVariant === "进阶套装"
-                          ? "bg-primary text-white"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedVariant("进阶套装")}
-                    >
-                      进阶套装
-                    </button>
-                    <button
-                      className={`px-3 py-1 border rounded-full text-sm ${
-                        selectedVariant === "高级套装"
-                          ? "bg-primary text-white"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedVariant("高级套装")}
-                    >
-                      高级套装
-                    </button>
-                  </div>
-                </div> */}
 
                 <div>
                   {recommendation.specifications.map((spec, index) => (
                     <div key={index} className="mb-4">
-                      <div className="text-sm text-gray-600 mb-2">{spec.name}</div>
+                      <div className="text-sm text-gray-600 mb-2">
+                        {spec.name}
+                      </div>
                       <div className="flex flex-wrap gap-3 specs-item">
                         {spec.values.map((value, idx) => (
                           <React.Fragment key={idx}>
@@ -409,13 +390,17 @@ const RecommendationDetail = () => {
                               name={spec.name}
                               id={`${spec.name}-${idx}`}
                               className="hidden"
-                              onChange={() => handleSpecChange(spec.name, value)}
+                              onChange={() =>
+                                handleSpecChange(spec.name, value)
+                              }
                               checked={selectedSpecs[spec.name] === value}
                             />
                             <label
                               htmlFor={`${spec.name}-${idx}`}
                               className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${
-                                selectedSpecs[spec.name] === value ? 'bg-primary text-white' : ''
+                                selectedSpecs[spec.name] === value
+                                  ? "bg-primary text-white"
+                                  : ""
                               }`}
                             >
                               {value}
@@ -464,13 +449,11 @@ const RecommendationDetail = () => {
           {/* <button className="flex items-center justify-center w-10 h-10 mr-2">
             <i className="fas fa-comments text-gray-600 text-xl"></i>
           </button> */}
-          <button
-            className="w-12 h-12 flex flex-col items-center justify-center text-gray-500"
-          >
+          <button className="w-12 h-12 flex flex-col items-center justify-center text-gray-500">
             <i className="ri-customer-service-2-line text-xl"></i>
             <span className="text-xs mt-0.5">客服</span>
           </button>
-          
+
           <button
             className="flex-1 bg-secondary text-primary py-2 rounded-full mr-2 !rounded-button"
             onClick={handleAddToCart}
