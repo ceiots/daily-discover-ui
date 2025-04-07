@@ -33,7 +33,7 @@ const Profile = () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem("userId");
-        
+
         if (!userId) {
           navigate("/login");
           return;
@@ -76,9 +76,8 @@ const Profile = () => {
           navigate("/login");
           return;
         }
-      
       } catch (error) {
-          setError("获取订单失败");
+        setError("获取订单失败");
       } finally {
         setLoading(false);
       }
@@ -86,6 +85,44 @@ const Profile = () => {
     fetchOrders();
   }, [activeTab, refreshUserInfo]);
 
+  const handleAvatarUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("userId", userInfo.id);
+
+    try {
+      const response = await instance.post("/user/upload-avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (response.data.avatar) {
+        setProfileInfo((prev) => ({ ...prev, avatar: response.data.avatar }));
+        refreshUserInfo(); // 刷新全局用户信息
+      }
+    } catch (error) {
+      console.error("头像上传失败:", error);
+    }
+  };
+
+  // 添加退出登录处理函数
+  const handleLogout = async () => {
+    try {
+      await instance.post("/user/logout");
+      // 清除本地存储
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      // 重置用户状态
+      refreshUserInfo();
+      // 跳转到登录页
+      navigate("/login");
+    } catch (error) {
+      console.error("退出登录失败:", error);
+    }
+  };
 
   // 在页面加载时检查
   useEffect(() => {
@@ -102,7 +139,7 @@ const Profile = () => {
       {/* 用户信息卡片 */}
       <div className="bg-primary rounded-lg p-4 text-white">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white">
+          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative">
             <img
               src={
                 profileInfo?.avatar ||
@@ -110,6 +147,12 @@ const Profile = () => {
               }
               className="w-full h-full object-cover"
               alt="用户头像"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              onChange={handleAvatarUpload}
             />
           </div>
           <div className="flex-1">
@@ -120,7 +163,10 @@ const Profile = () => {
               会员等级：{profileInfo?.memberLevel || "加载中..."}
             </div>
           </div>
-          <div className="w-8 h-8 flex items-center justify-center">
+          <div 
+            className="w-8 h-8 flex items-center justify-center"
+            onClick={() => navigate('/settings')} // 添加点击事件
+          >
             <i className="ri-settings-3-line text-xl"></i>
           </div>
         </div>
@@ -138,7 +184,7 @@ const Profile = () => {
           </div> */}
         </div>
         {loading && <div>加载中...</div>}
-       {/*  {error && <div>{error}</div>} */}
+        {/*  {error && <div>{error}</div>} */}
         <div className="grid grid-cols-5 text-center">
           {ORDER_TABS.map((tab) => (
             <div
@@ -148,7 +194,7 @@ const Profile = () => {
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <div 
+              <div
                 className="w-10 h-10 flex items-center justify-center relative"
                 onClick={(e) => {
                   e.stopPropagation(); // 防止触发父元素的 onClick
@@ -172,7 +218,7 @@ const Profile = () => {
                   <i className="ri-check-line text-xl text-gray-700"></i>
                 )}
               </div>
-              <span 
+              <span
                 className="text-xs"
                 onClick={(e) => {
                   e.stopPropagation(); // 防止触发父元素的 onClick
@@ -260,6 +306,7 @@ const Profile = () => {
             </div>
             <span className="text-xs">意见反馈</span>
           </div>
+          
         </div>
       </div>
     </div>

@@ -36,6 +36,7 @@ const Discover = () => {
 
   // 合并后的统一数据请求逻辑
   useEffect(() => {
+    console.log("Fetching data for isLoggedIn:", isLoggedIn);
     
     const fetchInitialData = async () => {
       try {
@@ -87,24 +88,6 @@ const Discover = () => {
     navigate(`/event/${eventId}`, { state: { event, currentDate } }); // 传递事件数据和当前日期
   };
 
-  const handleCategoryClick = async (categoryId) => {
-    console.log("Clicked category ID:", categoryId);
-    try {
-      // 根据分类 ID 获取推荐内容
-      const response = await instance.get(
-        `/recommendations?categoryId=${categoryId}`
-      );
-      setRecommendations(response.data); // 更新推荐内容
-    } catch (error) {
-      console.error("Error fetching recommendations:", error);
-    }
-    // 不需要导航到分类页面，保持在当前页面
-  };
-
-  const handleRecommendationClick = (recommendationId) => {
-    console.log("Clicked recommendation ID:", recommendationId);
-    navigate(`/recommendation/${recommendationId}`);
-  };
 
   const handleRefreshRecommendations = async () => {
     try {
@@ -124,11 +107,6 @@ const Discover = () => {
     setSearchTerm(value);
   };
 
-  const filteredRecommendations = recommendations.filter(
-    (recommendation) =>
-      recommendation.title.includes(searchTerm) ||
-      recommendation.shopName.includes(searchTerm)
-  );
 
   return (
     <div className="discover-container bg-gray-50 ">

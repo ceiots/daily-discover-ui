@@ -22,6 +22,7 @@ import EventDetail from "./components/EventDetail"; // 事件详情页面
 import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
+import Settings from './components/Settings';
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -186,6 +187,7 @@ const App = () => {
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
           <Route path="/search-results" element={<SearchResultsPage />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </Router>
     </AuthProvider>
