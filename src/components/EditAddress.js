@@ -14,7 +14,8 @@ const EditAddress = () => {
       name: "",
       phone: "",
       address: "",
-      isDefault: false,
+      // 修改这里，将 isDefault 默认设置为 true
+      isDefault: true, 
       province: "",
       city: "",
       district: "",
@@ -55,14 +56,12 @@ const EditAddress = () => {
     }
   };
 
-  // 后续区县处理类似...
-
   // 验证表单
   const validateForm = () => {
     const newErrors = {};
     if (!address.name.trim()) newErrors.name = "请输入收货人姓名";
     if (!address.phone.trim()) newErrors.phone = "请输入联系电话";
-    if (!/^1[3 - 9]\d{9}$/.test(address.phone)) newErrors.phone = "请输入正确的手机号码";
+    if (!/^1[3-9]\d{9}$/.test(address.phone)) newErrors.phone = "请输入正确的手机号码";
     if (!address.address.trim()) newErrors.address = "请输入详细地址";
     if (!address.province) newErrors.region = "请选择所在地区";
 
@@ -110,6 +109,9 @@ const EditAddress = () => {
     if (showRegionPicker) {
       setShowRegionPicker(false);
     } else {
+      if (location.state && location.state.onBack) {
+        location.state.onBack();
+      }
       navigate(-1);
     }
   };
@@ -171,124 +173,128 @@ const EditAddress = () => {
   };
 
   return (
-    <div className="bg-gray-50 min - h - screen text - sm">
-      <div className="max - w - [375px] mx - auto bg - white min - h - screen relative">
-        {/* 顶部导航栏 */}
-        <nav className="fixed top - 0 left - 0 right - 0 bg - [#7366ff] text - white p - 3 flex items - center justify - between z - 20 shadow - sm">
-          <button className="text - lg px - 2" onClick={handleBack}>
-            <i className="fas fa - arrow - left"></i>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-[375px] mx-auto bg-white min-h-screen relative">
+        {/* 顶部导航栏 - 采用图片中的紫色风格 */}
+        <nav className="fixed top-0 left-0 right-0 bg-[#7467f0] text-white p-3 flex items-center justify-between z-20 shadow-sm w-full max-w-[375px] mx-auto">
+          <button className="text-xl px-2" onClick={handleBack}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
           </button>
-          <h1 className="text - base font - medium tracking - wide">
+          <h1 className="text-base font-medium tracking-wide text-center flex-1">
             {showRegionPicker ? "选择地区" : (address.id ? "编辑地址" : "新增地址")}
           </h1>
-          <div className="w - 8"></div> {/* 占位元素，保持导航栏对称 */}
+          <div className="w-5"></div>
         </nav>
 
         {/* 主内容区 */}
         {!showRegionPicker ? (
-          <main className="pt - 14 pb - 20 px - 4">
-            <div className="bg - white rounded - lg">
-              <div className="mb - 3">
-                <label className="block text - xs text - gray - 500 mb - 1">收货人</label>
+          <main className="pt-14 pb-20 px-4">
+            <div className="bg-white rounded-lg mt-3">
+              <div className="mb-3">
+                <label className="block text-xs text-gray-500 mb-1">收货人</label>
                 <input
                   type="text"
                   placeholder="请输入姓名"
                   value={address.name}
                   onChange={(e) => setAddress({ ...address, name: e.target.value })}
-                  className={`border ${errors.name ? 'border - red - 500' : 'border - gray - 300'} p - 2.5 rounded - lg w - full text - sm`}
+                  className={`border ${errors.name ? 'border-red-500' : 'border-gray-300'} p-2.5 rounded-lg w-full text-sm`}
                 />
-                {errors.name && <span className="text - red - 500 text - xs mt - 1">{errors.name}</span>}
+                {errors.name && <span className="text-red-500 text-xs mt-1">{errors.name}</span>}
               </div>
 
-              <div className="mb - 3">
-                <label className="block text - xs text - gray - 500 mb - 1">手机号码</label>
+              <div className="mb-3">
+                <label className="block text-xs text-gray-500 mb-1">手机号码</label>
                 <input
                   type="tel"
                   placeholder="请输入手机号码"
                   value={address.phone}
                   onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                  className={`border ${errors.phone ? 'border - red - 500' : 'border - gray - 300'} p - 2.5 rounded - lg w - full text - sm`}
+                  className={`border ${errors.phone ? 'border-red-500' : 'border-gray-300'} p-2.5 rounded-lg w-full text-sm`}
                 />
-                {errors.phone && <span className="text - red - 500 text - xs mt - 1">{errors.phone}</span>}
+                {errors.phone && <span className="text-red-500 text-xs mt-1">{errors.phone}</span>}
               </div>
 
-              <div className="mb - 3">
-                <label className="block text - xs text - gray - 500 mb - 1">所在地区</label>
+              <div className="mb-3">
+                <label className="block text-xs text-gray-500 mb-1">所在地区</label>
                 <div
-                  className={`flex items - center border ${errors.region ? 'border - red - 500' : 'border - gray - 300'} p - 2.5 rounded - lg`}
+                  className={`flex items-center border ${errors.region ? 'border-red-500' : 'border-gray-300'} p-2.5 rounded-lg`}
                   onClick={openRegionPicker}
                 >
                   <input
                     type="text"
                     placeholder="选择省/市/区"
                     value={`${address.province || ''} ${address.city || ''} ${address.district || ''}`.trim()}
-                    className="flex - 1 outline - none text - sm"
+                    className="flex-1 outline-none text-sm"
                     readOnly
                   />
-                  <i className="fas fa - chevron - right text - gray - 400 text - xs"></i>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-                {errors.region && <span className="text - red - 500 text - xs mt - 1">{errors.region}</span>}
+                {errors.region && <span className="text-red-500 text-xs mt-1">{errors.region}</span>}
               </div>
 
-              <div className="mb - 4">
-                <label className="block text - xs text - gray - 500 mb - 1">详细地址</label>
+              <div className="mb-4">
+                <label className="block text-xs text-gray-500 mb-1">详细地址</label>
                 <textarea
                   placeholder="请输入详细地址，如街道、门牌号等"
                   value={address.address}
                   onChange={(e) => setAddress({ ...address, address: e.target.value })}
-                  className={`border ${errors.address ? 'border - red - 500' : 'border - gray - 300'} p - 2.5 rounded - lg w - full h - 20 text - sm`}
+                  className={`border ${errors.address ? 'border-red-500' : 'border-gray-300'} p-2.5 rounded-lg w-full h-16 text-sm`}
                 />
-                {errors.address && <span className="text - red - 500 text - xs mt - 1">{errors.address}</span>}
+                {errors.address && <span className="text-red-500 text-xs mt-1">{errors.address}</span>}
               </div>
 
-              <div className="mt - 5 flex items - center justify - between">
-                <span className="text - xs text - gray - 600">设为默认收货地址</span>
-                <label className="relative inline - flex items - center cursor - pointer">
+              <div className="mt-3 py-2 flex items-center justify-between">
+                <span className="text-xs text-gray-600">设为默认收货地址</span>
+                <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={address.isDefault}
                     onChange={toggleDefaultAddress}
-                    className="sr - only peer"
+                    className="sr-only peer"
                   />
-                  <div className={`w - 10 h - 5 rounded - full peer ${address.isDefault ? 'bg - [#7366ff]' : 'bg - gray - 200'} peer - checked:after:translate - x - full after:content - [''] after:absolute after:top - [2px] after:left - [2px] after:bg - white after:border - gray - 300 after:border after:rounded - full after:h - 4 after:w - 4 after:transition - all`}></div>
+                  <div className={`w-10 h-5 rounded-full peer ${address.isDefault ? 'bg-[#7467f0]' : 'bg-gray-200'} peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all`}></div>
                 </label>
               </div>
             </div>
           </main>
         ) : (
           /* 省市区选择器 */
-          <main className="pt - 14 pb - 20 px - 0">
-            <div className="bg - white h - screen">
+          <main className="pt-14 pb-20 px-0">
+            <div className="bg-white h-screen">
               {/* 选项卡 */}
-              <div className="flex border - b text - xs">
+              <div className="flex border-b text-xs">
                 <button
-                  className={`flex - 1 py - 3 text - center font - medium ${activeTab === 'province' ? 'text - [#7366ff] border - b - 2 border - [#7366ff]' : 'text - gray - 500'}`}
+                  className={`flex-1 py-3 text-center font-medium ${activeTab === 'province' ? 'text-[#7467f0] border-b-2 border-[#7467f0]' : 'text-gray-500'}`}
                   onClick={() => setActiveTab('province')}
                 >
-                  {selectedProvince ? selectedProvince.name : '请选择'}
+                  {selectedProvince ? selectedProvince.name : '请选择省份'}
                 </button>
                 <button
-                  className={`flex - 1 py - 3 text - center font - medium ${activeTab === 'city' ? 'text - [#7366ff] border - b - 2 border - [#7366ff]' : 'text - gray - 500'} ${!selectedProvince ? 'opacity - 50' : ''}`}
+                  className={`flex-1 py-3 text-center font-medium ${activeTab === 'city' ? 'text-[#7467f0] border-b-2 border-[#7467f0]' : 'text-gray-500'} ${!selectedProvince ? 'opacity-50' : ''}`}
                   onClick={() => selectedProvince && setActiveTab('city')}
                   disabled={!selectedProvince}
                 >
-                  {selectedCity ? selectedCity.name : '请选择'}
+                  {selectedCity ? selectedCity.name : '请选择城市'}
                 </button>
                 <button
-                  className={`flex - 1 py - 3 text - center font - medium ${activeTab === 'district' ? 'text - [#7366ff] border - b - 2 border - [#7366ff]' : 'text - gray - 500'} ${!selectedCity ? 'opacity - 50' : ''}`}
+                  className={`flex-1 py-3 text-center font-medium ${activeTab === 'district' ? 'text-[#7467f0] border-b-2 border-[#7467f0]' : 'text-gray-500'} ${!selectedCity ? 'opacity-50' : ''}`}
                   onClick={() => selectedCity && setActiveTab('district')}
                   disabled={!selectedCity}
                 >
-                  {address.district || '请选择'}
+                  {address.district || '请选择区县'}
                 </button>
               </div>
 
               {/* 列表区域 */}
-              <div className="overflow - y - auto h - [calc(100vh - 120px)]">
+              <div className="overflow-y-auto h-[calc(100vh-120px)]">
                 {activeTab === 'province' && provinces.map(province => (
                   <div
                     key={province.code}
-                    className={`px - 4 py - 3 border - b border - gray - 100 ${selectedProvince?.code === province.code ? 'text - [#7366ff]' : ''}`}
+                    className={`px-4 py-3 border-b border-gray-100 ${selectedProvince?.code === province.code ? 'text-[#7467f0] font-medium' : ''}`}
                     onClick={() => selectProvince(province)}
                   >
                     {province.name}
@@ -298,7 +304,7 @@ const EditAddress = () => {
                 {activeTab === 'city' && cities.map(city => (
                   <div
                     key={city.code}
-                    className={`px - 4 py - 3 border - b border - gray - 100 ${selectedCity?.code === city.code ? 'text - [#7366ff]' : ''}`}
+                    className={`px-4 py-3 border-b border-gray-100 ${selectedCity?.code === city.code ? 'text-[#7467f0] font-medium' : ''}`}
                     onClick={() => selectCity(city)}
                   >
                     {city.name}
@@ -308,7 +314,7 @@ const EditAddress = () => {
                 {activeTab === 'district' && districts.map(district => (
                   <div
                     key={district.code}
-                    className={`px - 4 py - 3 border - b border - gray - 100 ${address.district === district.name ? 'text - [#7366ff]' : ''}`}
+                    className={`px-4 py-3 border-b border-gray-100 ${address.district === district.name ? 'text-[#7467f0] font-medium' : ''}`}
                     onClick={() => selectDistrict(district)}
                   >
                     {district.name}
@@ -319,7 +325,17 @@ const EditAddress = () => {
           </main>
         )}
 
-        {/* 底部保存按钮 */}
+        {/* 底部保存按钮 - 采用圆角紫色风格 */}
+        {!showRegionPicker && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10 shadow-md max-w-[375px] mx-auto">
+            <button
+              onClick={handleSubmit}
+              className="w-full py-3 bg-[#7467f0] text-white rounded-full text-sm font-medium"
+            >
+              保存地址
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

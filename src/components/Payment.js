@@ -5,7 +5,10 @@ import instance from "../utils/axios";
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { selectedItems, shopInfo } = location.state || { selectedItems: [], shopInfo: {} };
+    const { selectedItems} = location.state || { selectedItems: []};
+
+    // 打印 selectedItems 进行调试
+    console.log('selectedItems:', selectedItems);
 
     const [address, setAddress] = useState({
         name: "",
@@ -32,12 +35,26 @@ const Payment = () => {
                     console.error('未获取到用户 ID');
                     return;
                 }
-                // 修改为调用获取默认地址的接口
                 const response = await instance.get(`/orderAddr/getDefaultByUserId?userId=${userId}`);
                 console.log('获取到的地址信息:', response.data);
-                setAddress(response.data.data); // 假设返回的数据结构为 { code: 200, message: "成功", data: { ... } }
+                setAddress(response.data.data); 
             } catch (error) {
                 console.error('Error fetching address:', error);
+            }
+        };
+
+        const handleEditAddress = () => {
+            const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : null;
+            if (userId) {
+                navigate('/edit-address', { 
+                    state: { 
+                        userId, 
+                        currentAddress: address,
+                        onBack: fetchAddress 
+                    } 
+                });
+            } else {
+                console.error('未获取到用户 ID，无法编辑地址');
             }
         };
 
@@ -183,7 +200,7 @@ const Payment = () => {
                         </div>
                     </div>
                     {selectedItems.map((item) => (
-                        <div key={item.id} className="bg-white rounded-lg p-3 border border-gray-100">
+                        <div key={item.productId} className="bg-white rounded-lg p-3 border border-gray-100">
                             <div className="flex items-center mt-2 pb-2">
                                 <img
                                     src={item.shopAvatarUrl}

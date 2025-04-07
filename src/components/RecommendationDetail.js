@@ -176,8 +176,8 @@ const RecommendationDetail = () => {
     console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
     if (orderPayload) {
       if (isBuyNow) {
-        // 立即购买，直接跳转到支付页面
-        navigateToPayment();
+        // 立即购买，直接跳转到支付页面并传递 orderPayload
+        navigate("/payment", { state: { selectedItems: [orderPayload] } });
       } else {
         // 加入购物车，调用加入购物车接口
         try {
