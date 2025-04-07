@@ -15,6 +15,7 @@ import OrderDetail from './components/OrderDetail';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
 import './App.css';
+import EditAddress from './components/EditAddress';
 import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import EventDetail from "./components/EventDetail"; // 事件详情页面
@@ -179,6 +180,7 @@ const App = () => {
               </Suspense>
             } 
           />
+          <Route path="/editAddress" element={<EditAddress />} />
           <Route path="/order/:orderNumber" element={<OrderDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
