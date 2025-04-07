@@ -180,7 +180,7 @@ const App = () => {
               </Suspense>
             } 
           />
-          <Route path="/editAddress" element={<EditAddress />} />
+          <Route path="/edit-address" element={<EditAddress />} />
           <Route path="/order/:orderNumber" element={<OrderDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
