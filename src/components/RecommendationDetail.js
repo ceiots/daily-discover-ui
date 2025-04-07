@@ -5,6 +5,7 @@ import instance from "../utils/axios";
 import { useAuth } from "../App"; // 添加上下文导入
 
 const RecommendationDetail = () => {
+  
   const { userInfo } = useAuth(); // 获取登录状态
   const { id } = useParams(); // Get the recommendation ID from the URL
   const [recommendation, setRecommendation] = useState(null);
@@ -19,6 +20,9 @@ const RecommendationDetail = () => {
   const [selectedSpecs, setSelectedSpecs] = useState({});
   // 初始化转换后的规格数组
   const [transformedSpecs, setTransformedSpecs] = useState([]);
+  
+  // 新增状态来记录是否是立即购买
+  const [isBuyNow, setIsBuyNow] = useState(false);
 
   // 处理选择变化
   const handleSpecChange = (specName, value) => {
@@ -69,75 +73,137 @@ const RecommendationDetail = () => {
     navigate(-1); // Go back to the previous page
   };
 
-  // Function to open the modal
-  const handleAddToCart = async () => {
-    setIsModalOpen(true);
-  };
-
   // Function to conf// Function to confirm adding to cart
   // 抽取共用逻辑到新函数
-  const prepareOrderData = (userInfo, id, recommendation, quantity, transformedSpecs) => {
-      // 检查是否所有规格都已选择
-      const isAllSpecsSelected = () => {
-          return recommendation.specifications.every(
-              (spec) =>
-                  Object.prototype.hasOwnProperty.call(selectedSpecs, spec.name) &&
-                  selectedSpecs[spec.name]
-          );
-      };
-  
-      if (!isAllSpecsSelected()) {
-          return null;
+  const prepareOrderPayload = (
+    userInfo,
+    productId,
+    productInfo,
+    selectedQuantity,
+    selectedSpecs
+  ) => {
+    // 打印 productInfo.specifications 以确认其结构
+    console.log("productInfo.specifications:", productInfo.specifications);
+    
+    // 检查是否所有规格都已选择
+    const areAllSpecsSelected = () => {
+      // 如果没有规格，或者规格数组为空，直接返回true
+      if (!productInfo.specifications || productInfo.specifications.length === 0) {
+        return true;
       }
-  
-      if (userInfo === null || userInfo === undefined || !userInfo.id) {
-          return null;
-      }
-  
-      // 确保 transformedSpecs 格式符合后端要求
-      const formattedSpecifications = transformedSpecs.map((spec) => ({
-          name: spec.name,
-          values: spec.values,
-      }));
-  
-      const orderData = {
-          userId: userInfo.id, // 动态获取用户ID
-          productId: id,
-          productName: recommendation.title,
-          productImage: recommendation.imageUrl,
-          // 确保 specifications 是有效的数组
-          specifications: Array.isArray(formattedSpecifications) ? formattedSpecifications : [],
-          price: recommendation.price,
-          quantity: quantity,
-          shopName: recommendation.shopName,
-          shopAvatarUrl: recommendation.shopAvatarUrl,
-      };
-  
-      return orderData;
-  };
-  
-  // 修改 confirmAddToCart 函数
-  const confirmAddToCart = async () => {
-      const orderData = prepareOrderData(userInfo, id, recommendation, quantity, transformedSpecs);
-      if (orderData) {
-          try {
-              await instance.post("/cart/add", orderData);
-          } catch (error) {
-              console.error("Error adding item to cart:", error);
-          }
-      }
-      setIsModalOpen(false); // Close the modal
-  };
-  
-  // 修改 handleBuyNow 函数
-  const handleBuyNow = async () => {
-      const orderData = prepareOrderData(userInfo, id, recommendation, quantity, transformedSpecs);
-      if (orderData) {
-          // 这里直接跳转到支付页面，不调用加入购物车接口
-          navigate("/payment"); 
-      }
+      
+      const allSpecs = productInfo.specifications.map(spec => spec.name);
+      console.log("All possible specs:", allSpecs);
+      console.log("Selected specs:", selectedSpecs);
+      
+      // 修复逻辑：确保所有规格都有对应的选择值
+      return allSpecs.every(specName => {
+        // 遍历 selectedSpecs 数组，查找匹配的规格名
+        const selectedValueObj = selectedSpecs.find(spec => spec.name === specName);
+        const selectedValue = selectedValueObj ? selectedValueObj.values[0] : undefined;
+        console.log(`Checking spec ${specName}:`, selectedValue);
+        // 判断不为undefined、null、空字符串或空白字符串
+        return selectedValue !== undefined && 
+               selectedValue !== null && 
+               selectedValue.toString().trim() !== '';
+      });
+    };
+    
+    console.log("areAllSpecsSelected:", areAllSpecsSelected());
+    
+    // 检查用户是否已登录
+    const isUserLoggedIn = () => userInfo && userInfo.id;
+    
+    // 如果规格未全部选择或用户未登录，返回 null
+    if (!areAllSpecsSelected() || !isUserLoggedIn()) {
+      return null;
+    }
+    
+    // 继续执行后续逻辑
+    console.log("All specs are selected and user is logged in. Proceeding...");
+    console.log("productInfo.userInfo:", userInfo); // 打印 
+    if (userInfo === null || userInfo === undefined || !userInfo.id) {
+      return null;
+    }
+
+    // 确保 transformedSpecs 格式符合后端要求
+    const formattedSpecifications = selectedSpecs.map((spec) => ({
+      name: spec.name,
+      values: spec.values,
+    }));
+
+    const orderPayload = {
+      userId: userInfo.id, // 动态获取用户ID
+      productId: productId,
+      productName: productInfo.title,
+      productImage: productInfo.imageUrl,
+      // 确保 specifications 是有效的数组
+      specifications: Array.isArray(formattedSpecifications)
+        ? formattedSpecifications
+        : [],
+      price: productInfo.price,
+      quantity: selectedQuantity,
+      shopName: productInfo.shopName,
+      shopAvatarUrl: productInfo.shopAvatarUrl,
+    };
+
+    return orderPayload;
   };
 
+  // 封装错误处理逻辑
+  const handleOrderError = (error, action) => {
+    console.error(`Error ${action}:`, error);
+    // 可以在这里添加更详细的错误提示，如弹出模态框
+  };
+
+  // 封装导航逻辑
+  const navigateToPayment = () => {
+    navigate("/payment");
+    // 可以在这里添加成功提示，如弹出模态框
+  };
+
+  // 修改为通用的处理函数
+  const handleAddOrBuy = async (isBuyNow) => {
+    
+    const orderPayload = prepareOrderPayload(
+      userInfo,
+      id,
+      recommendation,
+      quantity,
+      transformedSpecs
+    );
+    console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
+    console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
+    if (orderPayload) {
+      if (isBuyNow) {
+        // 立即购买，直接跳转到支付页面
+        navigateToPayment();
+      } else {
+        // 加入购物车，调用加入购物车接口
+        try {
+          await instance.post("/cart/add", orderPayload);
+          // 可以在这里添加加入购物车成功的提示，如弹出模态框
+        } catch (error) {
+          handleOrderError(error, "adding item to cart");
+        }
+      }
+    }
+    setIsModalOpen(false); // Close the modal
+  };
+
+  // 修改 handleAddToCart 为 handleAddToCart
+  const handleAddToCart = () => {
+    setIsModalOpen(true);
+    setIsBuyNow(false); // 标记为加入购物车
+  };
+  
+  // 添加 handleBuyNow 函数
+  const handleBuyNow = () => {
+    setIsModalOpen(true);
+    setIsBuyNow(true); // 标记为立即购买
+    // 这里不需要再调用 handleAddOrBuy，因为在点击确定时再处理
+  };
+  
   // Function to render product details
   const renderProductDetails = (details) => {
     return details.map((item, index) => {
@@ -171,20 +237,6 @@ const RecommendationDetail = () => {
       }
       return null;
     });
-  };
-
-  // Function to render specifications
-  const renderSpecifications = () => {
-    return recommendation.specifications.map((spec, index) => (
-      <div key={index} className="mb-4">
-        <h4 className="text-base font-semibold mb-2">{spec.name}</h4>
-        <div className="flex flex-wrap gap-2">
-          {spec.values.map((value, idx) => (
-            <button key={idx}>{value}</button>
-          ))}
-        </div>
-      </div>
-    ));
   };
 
   return (
@@ -233,18 +285,6 @@ const RecommendationDetail = () => {
           </div>
 
           <div className="my-0 w-full h-2 bg-gray-100"></div>
-
-          {/* <div className="bg-white mt-2 px-4 py-4">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-medium">规格选择</h2>
-          <span className="text-sm text-gray-500">已选：{getSelectedText() || '请选择'}</span>
-        </div>
-    
-        
-      </div> 
-
-      <div className="my-0 w-full h-2 bg-gray-100"></div>*/}
-
           <div className="p-4 bg-white mt-2 flex items-center justify-between">
             <div className="flex items-center">
               <img
@@ -437,7 +477,7 @@ const RecommendationDetail = () => {
                 </div>
                 <button
                   className="w-full py-2 bg-primary text-white rounded-button"
-                  onClick={confirmAddToCart}
+                  onClick={() => handleAddOrBuy(isBuyNow)} // 传递标志位
                 >
                   确定
                 </button>
