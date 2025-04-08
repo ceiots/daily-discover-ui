@@ -36,7 +36,7 @@ const Payment = () => {
                     return;
                 }
                 const response = await instance.get(`/orderAddr/getDefaultByUserId?userId=${userId}`);
-                console.log('获取到的地址信息:', response.data);
+                console.log(userId +' 获取到的地址信息:', response.data);
                 setAddress(response.data.data); 
             } catch (error) {
                 console.error('Error fetching address:', error);
@@ -111,12 +111,19 @@ const Payment = () => {
                     address: {
                         name: address.name,
                         phone: address.phone,
+                        province: address.province,
+                        city: address.city,
+                        district: address.district,
                         address: address.address
                     },
                     items: selectedItems.map(item => ({
                         id: item.id,
                         productId: item.productId,
                         quantity: item.quantity,
+                        shopAvatarUrl: item.shopAvatarUrl,
+                        shopName: item.shopName,
+                        productImage: item.productImage,
+                        productName: item.productName,
                         price: item.price,
                         specifications: item.specifications
                     })) // 新增，传递商品数量、价格及规格信息

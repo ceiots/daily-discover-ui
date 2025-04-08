@@ -18,7 +18,8 @@ const OrderConfirmation = () => {
         const orderNo = location.state?.orderNo;
         console.log('orderNo:', orderNo); // 打印订单号以确认是否正确获取到订单号
         if (orderNo) {
-            navigate('/order/${orderNo}'); // 传入订单号
+            // 修改为模板字符串
+            navigate(`/order/${orderNo}`); // 传入订单号
         } else {
             console.error('未获取到订单号');
         }
@@ -61,7 +62,7 @@ const OrderConfirmation = () => {
                 }
                 const response = await instance.get(`/order/${orderNo}`);
                 console.log('获取订单详情成功:', response.data);
-                setOrder(response.data);
+                setOrder(response.data.order);
                 setError(null);
             } catch (error) {
                 console.error('获取订单详情失败:', error);
