@@ -14,6 +14,7 @@ const Cart = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedShops, setSelectedShops] = useState({});
   const [showDropdown, setShowDropdown] = useState(false);
+  const [quantities, setQuantities] = useState({}); // 添加数量状态
 
   useEffect(() => {
     // 检查用户是否登录
@@ -31,7 +32,16 @@ const Cart = () => {
         }
         
         const response = await instance.get(`/cart/${userId}`);
-        setCartItems(response.data);
+        const items = response.data;
+        setCartItems(items);
+        
+        // 初始化数量状态
+        const initialQuantities = {};
+        items.forEach(item => {
+          initialQuantities[item.id] = item.quantity || 1;
+        });
+        setQuantities(initialQuantities);
+        
         setLoading(false);
       } catch (error) {
         console.error("获取购物车数据失败:", error);
@@ -123,6 +133,10 @@ const Cart = () => {
           item.id === itemId ? { ...item, quantity: newQuantity } : item
         )
       );
+      setQuantities(prev => ({
+        ...prev,
+        [itemId]: newQuantity
+      }));
     } catch (error) {
       console.error("Error updating quantity:", error);
     }
@@ -248,16 +262,26 @@ const Cart = () => {
                     <div className="flex items-center gap-4 mr-12">
                       <button
                         className="w-5 h-5 flex items-center justify-center border border-gray-300"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, (quantities[item.id] || 1) - 1)}
                       >
-                        <i className="fas fa-minus text-[10px] text-gray-300"></i>
+                        -
                       </button>
-                      <span className="text-gray-400 text-xs">{item.quantity}</span>
+                      <input
+                        type="number"
+                        value={quantities[item.id] || 1}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          if (!isNaN(value) && value > 0) {
+                            updateQuantity(item.id, value);
+                          }
+                        }}
+                        className="w-8 h-5 text-center border border-gray-300"
+                      />
                       <button
                         className="w-5 h-5 flex items-center justify-center border border-gray-300"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, (quantities[item.id] || 1) + 1)}
                       >
-                        <i className="fas fa-plus text-[10px] text-gray-300"></i>
+                        +
                       </button>
                     </div>
                   </div>
@@ -266,7 +290,7 @@ const Cart = () => {
             </div>
           ))
         ) : (
-          <p className="text-center mt-10">购物车为空</p>
+          <div className="text-center py-8 text-gray-500">购物车是空的</div>
         )}
       </main>
       <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 h-[60px] flex items-center justify-between px-4">
