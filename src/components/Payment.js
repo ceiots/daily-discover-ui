@@ -130,11 +130,14 @@ const Payment = () => {
                 });
 
                 const createOrderResult = createOrderResponse.data;
-                console.log('订单创建结果:', createOrderResult);
                 if (createOrderResult.code === 200) {
                     navigate('/order-confirmation', {
                         state: {
-                            orderNo
+                            orderNo,
+                            // 传递更多数据
+                            paymentAmount: createOrderResult.data.paymentAmount,
+                            paymentMethod: createOrderResult.data.paymentMethod,
+                            paymentTime: createOrderResult.data.paymentTime
                         }
                     });
                 } else {

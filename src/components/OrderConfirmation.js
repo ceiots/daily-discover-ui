@@ -6,8 +6,13 @@ import { LeftOutlined, CheckOutlined } from '@ant-design/icons'; // 假设使用
 const OrderConfirmation = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [order, setOrder] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { 
+        orderNo, 
+        paymentAmount, 
+        paymentMethod, 
+        paymentTime
+    } = location.state || {};
+
     const [error, setError] = useState(null);
 
     const handleBack = () => {
@@ -50,44 +55,6 @@ const OrderConfirmation = () => {
         });
     };
 
-    // 修改请求路径和参数名称
-    useEffect(() => {
-        const fetchOrder = async () => {
-            try {
-                setLoading(true);
-                const orderNo = location.state?.orderNo;
-                console.log('orderNo:', orderNo);
-                if (!orderNo) {
-                    throw new Error('无效的订单 ID');
-                }
-                const response = await instance.get(`/order/${orderNo}`);
-                console.log('获取订单详情成功:', response.data);
-                setOrder(response.data.order);
-                setError(null);
-            } catch (error) {
-                console.error('获取订单详情失败:', error);
-                setError(error.message || '获取订单详情失败，请稍后重试。');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (location.state?.orderNo) {
-            fetchOrder();
-        } else {
-            setError('未接收到有效的订单ID，请返回重试。');
-            setLoading(false);
-        }
-    }, [location]);
-
-    if (loading) {
-        return (
-            <div className="relative min-h-screen bg-gray-50 flex justify-center items-center">
-                <p>加载中...</p>
-            </div>
-        );
-    }
-
     if (error) {
         return (
             <div className="relative min-h-screen bg-gray-50 flex justify-center items-center">
@@ -115,45 +82,37 @@ const OrderConfirmation = () => {
                         <CheckOutlined className="text-white text-2xl" />
                     </div>
                     <h2 className="text-base font-medium mb-2">支付成功</h2>
-                    {order && (
+                    {paymentAmount && (
                         <div className="text-[#7B66FF] text-2xl font-semibold">
-                            ¥{order.paymentAmount?.toFixed(2) || '0.00'}
+                            ¥{paymentAmount.toFixed(2) || '0.00'}
                         </div>
                     )}
                 </div>
                 {/* 订单信息 */}
-                {order && (
+                {orderNo && (
                     <div className="bg-white rounded-lg p-4 space-y-4">
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">订单编号</span>
-                            <span className="text-gray-700 text-sm">{order.orderNumber || '暂无数据'}</span>
+                            <span className="text-gray-700 text-sm">{orderNo || '暂无数据'}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">支付时间</span>
-                            <span className="text-gray-700 text-sm">{formatDateTime(order.paymentTime)}</span>
+                            <span className="text-gray-700 text-sm">{formatDateTime(paymentTime)}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-500 text-sm">支付方式</span>
                             <div className="flex items-center">
-                                {paymentMethodMap[order.paymentMethod] === '支付宝' && (
+                                {paymentMethodMap[paymentMethod] === '支付宝' && (
                                     <i className="fab fa-alipay text-[#1677FF] mr-1"></i>
                                 )}
-                                {paymentMethodMap[order.paymentMethod] === '微信支付' && (
+                                {paymentMethodMap[paymentMethod] === '微信支付' && (
                                     <i className="fab fa-weixin text-[#07C160] mr-1"></i>
                                 )}
                                 <span className="text-gray-700 text-sm">
-                                    {paymentMethodMap[order.paymentMethod] || '未知支付方式'}
+                                    {paymentMethodMap[paymentMethod] || '未知支付方式'}
                                 </span>
                             </div>
                         </div>
-                        {/* <div className="flex justify-between items-center">
-                            <span className="text-gray-500 text-sm">商品列表</span>
-                            <span className="text-gray-700 text-sm">
-                                {order.items && order.items.length > 0 
-                                    ? order.items.map(item => item.productName || '未命名商品').join(', ')
-                                    : '暂无商品信息'}
-                            </span>
-                        </div> */}
                     </div>
                 )}
             </div>
