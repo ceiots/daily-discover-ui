@@ -122,8 +122,8 @@ const Payment = () => {
                         quantity: item.quantity,
                         shopAvatarUrl: item.shopAvatarUrl,
                         shopName: item.shopName,
-                        productImage: item.productImage,
-                        productName: item.productName,
+                        imageUrl: item.productImage,
+                        name: item.productName,
                         price: item.price,
                         specifications: item.specifications
                     })) // 新增，传递商品数量、价格及规格信息
