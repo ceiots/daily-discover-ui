@@ -44,8 +44,7 @@ const PaymentPassword = () => {
             const response = await instance.post("/payment/process", {
                 orderNo,
                 paymentMethod,
-                paymentAmount,
-                paymentPassword: newPassword,
+                paymentPassword: newPassword
             });
             const result = response.data;
             if (result.code === 200) {
