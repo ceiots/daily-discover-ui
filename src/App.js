@@ -23,7 +23,7 @@ import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
 import Settings from './components/Settings';
-
+import PaymentPassword from './components/PaymentPassword';
 // 创建认证上下文
 const AuthContext = createContext();
 
@@ -188,6 +188,7 @@ const App = () => {
           <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/payment-password" element={<PaymentPassword />} />
         </Routes>
       </Router>
     </AuthProvider>

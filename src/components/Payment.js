@@ -5,7 +5,7 @@ import instance from "../utils/axios";
 const Payment = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { selectedItems} = location.state || { selectedItems: []};
+    const { selectedItems } = location.state || { selectedItems: [] };
 
     // 打印 selectedItems 进行调试
     console.log('selectedItems:', selectedItems);
@@ -20,14 +20,17 @@ const Payment = () => {
     const [clientIp, setClientIp] = useState("");
 
     useEffect(() => {
-        // Fetch client IP address from an external API
-        // Note: This is a placeholder. In a real application, you would use an actual API.
-        fetch('https://ipapi.co/json/')
-          .then(response => response.json())
-          .then(data => setClientIp(data.ip))
-          .catch(error => console.error('Error fetching client IP:', error));
+        const fetchClientIp = async () => {
+            try {
+                const response = await fetch('https://ipapi.co/json/');
+                const data = await response.json();
+                setClientIp(data.ip);
+            } catch (error) {
+                console.error('Error fetching client IP:', error);
+            }
+        };
+        fetchClientIp();
 
-        // Fetch address information from the backend
         const fetchAddress = async () => {
             try {
                 const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : null;
@@ -36,8 +39,8 @@ const Payment = () => {
                     return;
                 }
                 const response = await instance.get(`/orderAddr/getDefaultByUserId?userId=${userId}`);
-                console.log(userId +' 获取到的地址信息:', response.data);
-                setAddress(response.data.data); 
+                console.log(userId + ' 获取到的地址信息:', response.data);
+                setAddress(response.data.data);
             } catch (error) {
                 console.error('Error fetching address:', error);
             }
@@ -68,7 +71,12 @@ const Payment = () => {
     const handleEditAddress = () => {
         const userId = localStorage.getItem('userId') ? parseInt(localStorage.getItem('userId')) : null;
         if (userId) {
-            navigate('/edit-address', { state: { userId, currentAddress: address } });
+            navigate('/edit-address', {
+                state: {
+                    userId,
+                    currentAddress: address
+                }
+            });
         } else {
             console.error('未获取到用户 ID，无法编辑地址');
         }
@@ -131,10 +139,10 @@ const Payment = () => {
 
                 const createOrderResult = createOrderResponse.data;
                 if (createOrderResult.code === 200) {
-                    navigate('/order-confirmation', {
+                    // 跳转到输入密码页面
+                    navigate('/payment-password', {
                         state: {
                             orderNo,
-                            // 传递更多数据
                             paymentAmount: createOrderResult.data.paymentAmount,
                             paymentMethod: createOrderResult.data.paymentMethod,
                             paymentTime: createOrderResult.data.paymentTime
@@ -147,14 +155,7 @@ const Payment = () => {
                 alert('支付失败: ' + result.message);
             }
         } catch (error) {
-            if (error.response) {
-                console.error('支付请求失败，服务器响应状态码:', error.response.status);
-                console.error('服务器响应数据:', error.response.data);
-            } else if (error.request) {
-                console.error('支付请求失败，没有收到服务器响应');
-            } else {
-                console.error('支付请求失败，设置请求时出错:', error.message);
-            }
+            console.error('支付请求失败:', error);
             alert('支付请求失败，请稍后重试');
         }
     };
