@@ -110,13 +110,15 @@ const RecommendationDetail = () => {
     };
     
     console.log("areAllSpecsSelected:", areAllSpecsSelected());
-    
+
     // 检查用户是否已登录
     const isUserLoggedIn = () => userInfo && userInfo.id;
+
+    console.log(userInfo + " isUserLoggedIn:", isUserLoggedIn()); // 打印规格数组
     
     // 如果规格未全部选择或用户未登录，返回 null
     if (!areAllSpecsSelected() || !isUserLoggedIn()) {
-      return null;
+      return navigate("/login");
     }
     
     // 继续执行后续逻辑
