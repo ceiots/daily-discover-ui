@@ -12,6 +12,7 @@ import OrderConfirmation from './components/OrderConfirmation';
 import { lazy, Suspense } from 'react';
 const OrderList = lazy(() => import('./components/OrderList'));
 import OrderDetail from './components/OrderDetail';
+import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
 import './App.css';
@@ -183,6 +184,7 @@ const App = () => {
           />
           <Route path="/edit-address" element={<EditAddress />} />
           <Route path="/order/:orderNumber" element={<OrderDetail />} />
+          <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
