@@ -6,6 +6,7 @@
 .pnp.js
 /android
 
+/.cursor
 # testing
 /coverage
 

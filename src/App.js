@@ -25,6 +25,9 @@ import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
 import Settings from './components/Settings';
 import PaymentPassword from './components/PaymentPassword';
+import CreationPage from './components/CreationPage'; // 创作中心页面
+import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
+import EcommerceCreationPage from './components/EcommerceCreationPage'; // 电商创建页面
 // 创建认证上下文
 const AuthContext = createContext();
 
@@ -46,9 +49,9 @@ const AuthProvider = ({ children }) => {
         // 从本地存储中获取 token 和 userId
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
-        
+
         console.log("初始化检查 - token:", !!token, "userId:", userId);
-        
+
         // 检查 token 和 userId 是否存在
         if (token && userId) {
           // 确保 userId 是有效值
@@ -90,7 +93,7 @@ const AuthProvider = ({ children }) => {
         setUserLoading(false);
       }
     };
-  
+
     // 调用检查认证状态的函数
     checkAuth();
   }, []);
@@ -105,13 +108,13 @@ const AuthProvider = ({ children }) => {
         // 更新用户信息...
       }
     };
-    
+
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ 
+    <AuthContext.Provider value={{
       isLoggedIn,
       userInfo,
       userLoading, // 暴露加载状态
@@ -150,7 +153,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return <div>加载中...</div>;
   }
- console.log("ProtectedRoute isLoggedIn:", isLoggedIn); 
+ console.log("ProtectedRoute isLoggedIn:", isLoggedIn);
   if (!isLoggedIn) {
     return <Navigate to="/login" />;
   }
@@ -174,23 +177,26 @@ const App = () => {
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
-          <Route 
-            path="/order-list/:status" 
+          <Route
+            path="/order-list/:status"
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <OrderList />
               </Suspense>
-            } 
+            }
           />
           <Route path="/edit-address" element={<EditAddress />} />
           <Route path="/order/:orderNumber" element={<OrderDetail />} />
           <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
-          <Route path="/recommendation/:id" element={<RecommendationDetail/>} /> 
+          <Route path="/recommendation/:id" element={<RecommendationDetail/>} />
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/payment-password" element={<PaymentPassword />} />
+          <Route path="/creation" element={<CreationPage />} />
+          <Route path="/content-creation" element={<ContentCreationPage />} />
+          <Route path="/ecommerce-creation" element={<EcommerceCreationPage />} />
         </Routes>
       </Router>
     </AuthProvider>

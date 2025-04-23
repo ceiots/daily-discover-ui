@@ -1,8 +1,9 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
 import "./EventDetail.css";
 
-const Events = () => {
+const EventDetail = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { event, currentDate } = location.state || {}; // 获取传递的事件数据和当前日期
@@ -40,8 +41,18 @@ const Events = () => {
             {event ? (
               <div>
                 <h2 className="text-lg font-bold mb-4">{event.title}</h2>
-                <p className="text-small mb-2">{event.description}</p>
-                <img src={event.imageUrl} alt={event.title} />
+                {/* 使用dangerouslySetInnerHTML安全地渲染HTML内容 */}
+                <div
+                  className="event-content mb-4"
+                  dangerouslySetInnerHTML={{ 
+                    __html: DOMPurify.sanitize(event.description) 
+                  }}
+                />
+                <img 
+                  src={event.imageUrl} 
+                  alt={event.title}
+                  className="w-full h-auto rounded-lg mt-4" 
+                />
               </div>
             ) : (
               <p className="text-red-500">未找到事件信息</p>
@@ -53,4 +64,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default EventDetail;

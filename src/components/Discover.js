@@ -47,8 +47,10 @@ const Discover = () => {
         ]);
 
         setEvents(eventsRes.data);
+        console.log("Events:", eventsRes.data);
         setCategories(categoriesRes.data);
         const recData = recommendationsRes.data;
+        
         setRecommendations(recData);
         setOriginalRecommendations(recData);
       } catch (error) {
@@ -200,7 +202,7 @@ const Discover = () => {
                       </span>
                       <h3 className="text-sm font-medium my-2">{event.title}</h3>
                       <p className="text-xs text-gray-500 line-clamp-2">
-                        {event.description}
+                        {event.plainDescription}
                       </p>
                     </div>
                   </div>

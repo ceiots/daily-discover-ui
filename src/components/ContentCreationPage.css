@@ -1,0 +1,16 @@
+.content-creation-container {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.editor-container textarea {
+  resize: none;
+}
+
+.preview-container {
+  min-height: 300px;
+}

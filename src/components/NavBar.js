@@ -16,7 +16,10 @@ const NavBar = () => {
           </>
         )}
         </NavLink>
-        <NavLink className="flex relative">
+        <NavLink
+          to="/creation"
+          className="flex relative"
+        >
           <button className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white shadow-lg !rounded-button">
             <i className="fas fa-plus text-xl"></i>
           </button>
