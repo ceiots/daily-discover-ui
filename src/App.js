@@ -194,9 +194,9 @@ const App = () => {
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/payment-password" element={<PaymentPassword />} />
-          <Route path="/creation" element={<CreationPage />} />
-          <Route path="/content-creation" element={<ContentCreationPage />} />
-          <Route path="/ecommerce-creation" element={<EcommerceCreationPage />} />
+          <Route path="/creation" element={<ProtectedRoute><CreationPage /></ProtectedRoute>} />
+          <Route path="/content-creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
+          <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

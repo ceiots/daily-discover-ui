@@ -70,7 +70,7 @@ const CreationPage = () => {
           </div>
 
           {/* 电商创建卡片 */}
-          <div 
+          {/* <div 
             className="creation-card bg-white rounded-lg p-4 shadow-sm border border-gray-100"
             onClick={handleEcommerceCreation}
           >
@@ -98,7 +98,7 @@ const CreationPage = () => {
                 <span className="text-xs text-gray-500">优惠</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* 最近创作 */}
