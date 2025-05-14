@@ -35,59 +35,82 @@ const ContentCreationPage = () => {
       // 显示上传中状态
       setIsSubmitting(true);
       
-      for (const file of files) {
-        // 创建FormData对象用于文件上传
-        const fileData = new FormData();
-        fileData.append('file', file);
+      try {
+        // 获取token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('未登录，请先登录');
+          navigate('/login');
+          return;
+        }
         
-        try {
-          // 获取token
-          const token = localStorage.getItem('token');
-          if (!token) {
-            alert('未登录，请先登录');
-            navigate('/login');
-            return;
-          }
+        // 分批上传图片，避免请求体过大
+        const BATCH_SIZE = 1; // 每次只上传1张图片
+        
+        // 分批处理图片上传
+        for (let i = 0; i < files.length; i += BATCH_SIZE) {
+          const batch = files.slice(i, i + BATCH_SIZE);
+          const formData = new FormData();
           
-          // 发送上传请求
-          const response = await instance.post('/content/upload', fileData, {
+          // 添加当前批次的图片到formData
+          batch.forEach(file => {
+            formData.append('file', file);
+          });
+          
+          // 发送当前批次的上传请求
+          const response = await instance.post('/content/upload', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer ${token}`
             }
           });
           
-          if (response.data && response.data.data && response.data.data.url) {
-            newImages.push({
-              id: Date.now() + Math.random(),
-              url: response.data.data.url,
-              remoteUrl: response.data.data.url
-            });
+          if (response.data && response.data.code === 200) {
+            // 处理成功上传的图片
+            if (response.data.data.urls && response.data.data.urls.length > 0) {
+              // 将所有成功上传的图片URL添加到图片列表
+              response.data.data.urls.forEach(url => {
+                newImages.push({
+                  id: Date.now() + Math.random(),
+                  url: url,
+                  remoteUrl: url
+                });
+              });
+            } else if (response.data.data.url) {
+              // 兼容旧版API，处理单个URL
+              newImages.push({
+                id: Date.now() + Math.random(),
+                url: response.data.data.url,
+                remoteUrl: response.data.data.url
+              });
+            }
+          } else {
+            console.error(`批次 ${i + 1} 上传失败:`, response.data.message);
           }
-        } catch (error) {
-          console.error('图片上传失败:', error);
-          
-          // 显示错误消息
-          const errorMsg = error.response?.data?.message || '上传失败，请稍后重试';
-          alert(`图片上传失败: ${errorMsg}`);
-          
-          // 仍然允许本地预览
-          newImages.push({
-            id: Date.now() + Math.random(),
-            url: URL.createObjectURL(file),
-            file
+        }
+        
+        if (newImages.length === 0) {
+          throw new Error('所有图片上传失败');
+        } else if (newImages.length < files.length) {
+          alert(`部分图片上传成功，${files.length - newImages.length}张图片上传失败`);
+        }
+      } catch (error) {
+        console.error('图片上传失败:', error);
+        
+        // 显示错误消息
+        const errorMsg = error.response?.data?.message || error.message || '上传失败，请稍后重试';
+        alert(`图片上传失败: ${errorMsg}`);
+      } finally {
+        // 取消上传中状态
+        setIsSubmitting(false);
+        
+        // 只有成功上传的图片才会添加到列表中
+        if (newImages.length > 0) {
+          setFormData({
+            ...formData,
+            images: [...formData.images, ...newImages]
           });
         }
-      }
-      
-      // 取消上传中状态
-      setIsSubmitting(false);
-      
-      if (newImages.length > 0) {
-        setFormData({
-          ...formData,
-          images: [...formData.images, ...newImages]
-        });
       }
     }
   };
