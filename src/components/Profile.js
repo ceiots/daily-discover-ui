@@ -232,6 +232,61 @@ const Profile = () => {
         </div>
       </div>
 
+      {/* 我的创作 */}
+      <div className="bg-white rounded-lg p-4 mt-3">
+        <div className="text-base font-medium mb-3">我的创作</div>
+        
+        {/* 创作统计 */}
+        {/* <div className="grid grid-cols-3 gap-2 mb-3 bg-gray-50 rounded-lg p-3">
+          <div className="text-center">
+            <div className="text-lg font-medium text-primary">12</div>
+            <div className="text-xs text-gray-500">内容数量</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-medium text-primary">256</div>
+            <div className="text-xs text-gray-500">总浏览量</div>
+          </div>
+          <div className="text-center">
+            <div className="text-lg font-medium text-primary">32</div>
+            <div className="text-xs text-gray-500">互动数</div>
+          </div>
+        </div> */}
+        
+        <div className="grid grid-cols-2 gap-3">
+          {/* 图文创作查询入口 */}
+          <div 
+            className="creation-item border border-gray-100 rounded-lg p-3 cursor-pointer shadow-sm"
+            onClick={() => navigate('/my-content')}
+          >
+            <div className="flex items-center">
+              <div className="w-10 h-10 flex items-center justify-center bg-blue-50 rounded-lg mr-3">
+                <i className="ri-image-line text-xl text-blue-500"></i>
+              </div>
+              <div>
+                <div className="text-sm font-medium">图文创作</div>
+                <div className="text-xs text-gray-500 mt-1">查看我的图文内容</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* 电商创作查询入口 */}
+          <div 
+            className="creation-item border border-gray-100 rounded-lg p-3 cursor-pointer shadow-sm"
+            onClick={() => navigate('/my-shop')}
+          >
+            <div className="flex items-center">
+              <div className="w-10 h-10 flex items-center justify-center bg-orange-50 rounded-lg mr-3">
+                <i className="ri-store-line text-xl text-orange-500"></i>
+              </div>
+              <div>
+                <div className="text-sm font-medium">电商创作</div>
+                <div className="text-xs text-gray-500 mt-1">查看我的商品内容</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 我的服务 */}
       <div className="bg-white rounded-lg p-4">
         <div className="text-base font-medium mb-3">我的服务</div>

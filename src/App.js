@@ -28,6 +28,8 @@ import PaymentPassword from './components/PaymentPassword';
 import CreationPage from './components/CreationPage'; // 创作中心页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
 import EcommerceCreationPage from './components/EcommerceCreationPage'; // 电商创建页面
+import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
+import MyShopPage from './components/MyShopPage'; // 我的电商内容页面
 // 创建认证上下文
 const AuthContext = createContext();
 
@@ -197,6 +199,8 @@ const App = () => {
           <Route path="/creation" element={<ProtectedRoute><CreationPage /></ProtectedRoute>} />
           <Route path="/content-creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
           <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
+          <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
+          <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
