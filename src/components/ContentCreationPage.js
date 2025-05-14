@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ContentCreationPage.css';
+import instance from "../utils/axios";
 
 const ContentCreationPage = () => {
   const navigate = useNavigate();
@@ -9,8 +10,14 @@ const ContentCreationPage = () => {
     content: '',
     images: []
   });
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [errors, setErrors] = useState({});
   const [activeTab, setActiveTab] = useState('editor'); // editor or preview
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 预设标签列表
+  const preset_tags = ['旅行', '美食', '生活', '时尚', '运动', '科技', '教育', '健康', '音乐', '宠物'];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,21 +27,68 @@ const ContentCreationPage = () => {
     });
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      // 在实际应用中，这里应该上传图片到服务器并获取URL
-      // 这里仅做本地预览示例
-      const newImages = files.map(file => ({
-        id: Date.now() + Math.random(),
-        url: URL.createObjectURL(file),
-        file
-      }));
+      const newImages = [];
       
-      setFormData({
-        ...formData,
-        images: [...formData.images, ...newImages]
-      });
+      // 显示上传中状态
+      setIsSubmitting(true);
+      
+      for (const file of files) {
+        // 创建FormData对象用于文件上传
+        const fileData = new FormData();
+        fileData.append('file', file);
+        
+        try {
+          // 获取token
+          const token = localStorage.getItem('token');
+          if (!token) {
+            alert('未登录，请先登录');
+            navigate('/login');
+            return;
+          }
+          
+          // 发送上传请求
+          const response = await instance.post('/content/upload', fileData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.data && response.data.data && response.data.data.url) {
+            newImages.push({
+              id: Date.now() + Math.random(),
+              url: response.data.data.url,
+              remoteUrl: response.data.data.url
+            });
+          }
+        } catch (error) {
+          console.error('图片上传失败:', error);
+          
+          // 显示错误消息
+          const errorMsg = error.response?.data?.message || '上传失败，请稍后重试';
+          alert(`图片上传失败: ${errorMsg}`);
+          
+          // 仍然允许本地预览
+          newImages.push({
+            id: Date.now() + Math.random(),
+            url: URL.createObjectURL(file),
+            file
+          });
+        }
+      }
+      
+      // 取消上传中状态
+      setIsSubmitting(false);
+      
+      if (newImages.length > 0) {
+        setFormData({
+          ...formData,
+          images: [...formData.images, ...newImages]
+        });
+      }
     }
   };
 
@@ -43,6 +97,22 @@ const ContentCreationPage = () => {
       ...formData,
       images: formData.images.filter(image => image.id !== id)
     });
+  };
+
+  const toggleTag = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const addNewTag = () => {
+    const tag = prompt('请输入新标签名称');
+    if (tag && tag.trim() && !preset_tags.includes(tag) && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+      setSelectedTags([...selectedTags, tag]);
+    }
   };
 
   const validateForm = () => {
@@ -57,19 +127,91 @@ const ContentCreationPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // 在实际应用中，这里应该提交表单数据到服务器
-      console.log('提交的数据:', formData);
-      alert('内容创建成功！');
-      navigate('/');
+  const handleSubmit = async () => {
+    if (validateForm() && !isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        // 获取token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('未登录，请先登录');
+          navigate('/login');
+          return;
+        }
+        
+        // 构建请求数据
+        const contentDto = {
+          title: formData.title,
+          content: formData.content,
+          images: formData.images.map(img => img.remoteUrl || img.url),
+          tags: selectedTags,
+          status: 1 // 已发布状态
+        };
+        
+        // 发送请求
+        const response = await instance.post('/content/save', contentDto, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.data && response.data.code === 200) {
+          alert('内容发布成功！');
+          navigate('/');
+        } else {
+          alert(`发布失败: ${response.data.message || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('发布内容失败:', error);
+        alert(`发布失败: ${error.response?.data?.message || error.message || '未知错误'}`);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
-  const handleDraft = () => {
-    // 保存草稿逻辑
-    console.log('保存草稿:', formData);
-    alert('草稿已保存！');
+  const handleDraft = async () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      try {
+        // 获取token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('未登录，请先登录');
+          navigate('/login');
+          return;
+        }
+        
+        // 构建请求数据
+        const contentDto = {
+          title: formData.title || '无标题草稿',
+          content: formData.content,
+          images: formData.images.map(img => img.remoteUrl || img.url),
+          tags: selectedTags,
+          status: 0 // 草稿状态
+        };
+        
+        // 发送请求
+        const response = await instance.post('/content/draft', contentDto, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.data && response.data.code === 200) {
+          alert('草稿保存成功！');
+        } else {
+          alert(`保存失败: ${response.data.message || '未知错误'}`);
+        }
+      } catch (error) {
+        console.error('保存草稿失败:', error);
+        alert(`保存失败: ${error.response?.data?.message || error.message || '未知错误'}`);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   return (
@@ -78,7 +220,7 @@ const ContentCreationPage = () => {
       <div className="fixed top-0 left-0 right-0 bg-primary text-white z-10 max-w-[375px] mx-auto">
         <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => navigate('/creation')} 
+            onClick={() => navigate('/')} 
             className="w-8 h-8 flex items-center justify-center"
           >
             <i className="fas fa-arrow-left"></i>
@@ -144,20 +286,31 @@ const ContentCreationPage = () => {
                     <button 
                       className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                       onClick={() => removeImage(image.id)}
+                      disabled={isSubmitting}
                     >
                       <i className="fas fa-times text-xs"></i>
                     </button>
                   </div>
                 ))}
-                <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50">
-                  <i className="fas fa-plus text-gray-400 mb-1"></i>
-                  <span className="text-xs text-gray-500">添加图片</span>
+                <label className={`w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer ${isSubmitting ? 'opacity-50' : 'bg-gray-50'}`}>
+                  {isSubmitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                      <span className="text-xs text-gray-500">上传中...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-plus text-gray-400 mb-1"></i>
+                      <span className="text-xs text-gray-500">添加图片</span>
+                    </>
+                  )}
                   <input 
                     type="file" 
                     accept="image/*" 
                     multiple 
                     className="hidden" 
                     onChange={handleImageUpload}
+                    disabled={formData.images.length >= 9 || isSubmitting}
                   />
                 </label>
               </div>
@@ -168,19 +321,28 @@ const ContentCreationPage = () => {
             <div className="mb-6">
               <p className="text-sm font-medium mb-2">添加标签</p>
               <div className="flex flex-wrap gap-2">
-                <button className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
-                  旅行
-                </button>
-                <button className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
-                  美食
-                </button>
-                <button className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
-                  生活
-                </button>
-                <button className="px-3 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
-                  时尚
-                </button>
-                <button className="px-3 py-1 bg-primary/10 rounded-full text-xs text-primary">
+                {preset_tags.map(tag => (
+                  <button 
+                    key={tag}
+                    className={`px-3 py-1 rounded-full text-xs ${selectedTags.includes(tag) ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
+                    onClick={() => toggleTag(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                {tags.map(tag => (
+                  <button 
+                    key={tag}
+                    className={`px-3 py-1 rounded-full text-xs ${selectedTags.includes(tag) ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}
+                    onClick={() => toggleTag(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
+                <button 
+                  className="px-3 py-1 bg-primary/10 rounded-full text-xs text-primary"
+                  onClick={addNewTag}
+                >
                   <i className="fas fa-plus text-xs mr-1"></i>
                   添加
                 </button>
@@ -215,6 +377,16 @@ const ContentCreationPage = () => {
             ) : (
               <div className="text-sm text-gray-300">请输入正文内容...</div>
             )}
+
+            {selectedTags.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {selectedTags.map(tag => (
+                  <span key={tag} className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -224,15 +396,17 @@ const ContentCreationPage = () => {
         <div className="flex gap-3">
           <button 
             onClick={handleDraft}
-            className="flex-1 py-2.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700"
+            disabled={isSubmitting}
+            className="flex-1 py-2.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700 disabled:opacity-50"
           >
-            保存草稿
+            {isSubmitting ? '保存中...' : '保存草稿'}
           </button>
           <button 
             onClick={handleSubmit}
-            className="flex-1 py-2.5 bg-primary rounded-full text-sm font-medium text-white"
+            disabled={isSubmitting}
+            className="flex-1 py-2.5 bg-primary rounded-full text-sm font-medium text-white disabled:opacity-50"
           >
-            发布
+            {isSubmitting ? '发布中...' : '发布'}
           </button>
         </div>
       </div>

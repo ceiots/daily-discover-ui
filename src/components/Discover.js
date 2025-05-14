@@ -47,9 +47,10 @@ const Discover = () => {
         ]);
 
         setEvents(eventsRes.data);
-        console.log("Events:", eventsRes.data);
+       
         setCategories(categoriesRes.data);
         const recData = recommendationsRes.data;
+        console.log("recData:", recData);
         
         setRecommendations(recData);
         setOriginalRecommendations(recData);

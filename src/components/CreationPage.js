@@ -19,7 +19,7 @@ const CreationPage = () => {
       <div className="fixed top-0 left-0 right-0 bg-primary text-white z-10 max-w-[375px] mx-auto">
         <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate('/')} 
             className="w-8 h-8 flex items-center justify-center"
           >
             <i className="fas fa-arrow-left"></i>
@@ -70,7 +70,7 @@ const CreationPage = () => {
           </div>
 
           {/* 电商创建卡片 */}
-          {/* <div 
+          { <div 
             className="creation-card bg-white rounded-lg p-4 shadow-sm border border-gray-100"
             onClick={handleEcommerceCreation}
           >
@@ -98,7 +98,7 @@ const CreationPage = () => {
                 <span className="text-xs text-gray-500">优惠</span>
               </div>
             </div>
-          </div> */}
+          </div> }
         </div>
 
         {/* 最近创作 */}
