@@ -1,0 +1,18 @@
+.shop-creation-page {
+    max-width: 375px;
+    margin: 0 auto;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+  }
+  
+  .shop-creation-page .logo-upload:hover {
+    border-color: #7e57c2;
+  }
+  
+  .shop-creation-page .logo-upload-text {
+    transition: opacity 0.3s;
+  }
+  
+  .shop-creation-page .logo-upload:hover .logo-upload-text {
+    opacity: 1;
+  }

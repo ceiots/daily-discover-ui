@@ -27,6 +27,9 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [orders, setOrders] = useState([]);
   const [profileInfo, setProfileInfo] = useState(null);
+  // 添加店铺状态
+  const [hasShop, setHasShop] = useState(false);
+  const [shopId, setShopId] = useState(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -58,6 +61,39 @@ const Profile = () => {
       fetchUserProfile();
     }
   }, [navigate, refreshUserInfo, isLoggedIn, userInfo]);
+
+  // 添加检查用户是否有店铺的逻辑
+  useEffect(() => {
+    const checkUserShop = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          return;
+        }
+        
+        const response = await instance.get('/shops/user', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.data && response.data.code === 200 && response.data.data) {
+          setHasShop(true);
+          setShopId(response.data.data.id);
+        } else {
+          setHasShop(false);
+        }
+      } catch (error) {
+        console.error('检查用户店铺失败：', error);
+        setHasShop(false);
+      }
+    };
+    
+    if (isLoggedIn) {
+      checkUserShop();
+    }
+  }, [isLoggedIn]);
 
   const ORDER_TABS = [
     { id: 0, name: "全部" },
@@ -134,6 +170,65 @@ const Profile = () => {
     ); */
   }, []);
 
+  // 功能菜单配置
+  const FEATURE_MENUS = [
+    {
+      title: "我的服务",
+      items: [
+        { 
+          icon: "ri-store-2-line", 
+          text: "我的店铺", 
+          onClick: () => hasShop ? navigate('/my-shop') : navigate('/create-shop') 
+        },
+        { 
+          icon: "ri-shopping-bag-line", 
+          text: "我的订单", 
+          onClick: () => navigate('/order-list/all') 
+        },
+        { 
+          icon: "ri-map-pin-line", 
+          text: "收货地址", 
+          onClick: () => navigate('/edit-address') 
+        },
+      ]
+    },
+    {
+      title: "创作中心",
+      items: [
+        { 
+          icon: "ri-pencil-line", 
+          text: "去创作", 
+          onClick: () => navigate('/creation') 
+        },
+        { 
+          icon: "ri-file-list-line", 
+          text: "我的内容", 
+          onClick: () => navigate('/my-content') 
+        }
+      ]
+    },
+    {
+      title: "设置",
+      items: [
+        { 
+          icon: "ri-settings-3-line", 
+          text: "账户设置", 
+          onClick: () => navigate('/settings') 
+        },
+        { 
+          icon: "ri-lock-password-line", 
+          text: "支付密码", 
+          onClick: () => navigate('/payment-password') 
+        },
+        { 
+          icon: "ri-logout-box-r-line", 
+          text: "退出登录", 
+          onClick: handleLogout 
+        }
+      ]
+    }
+  ];
+
   return (
     <div className="w-full min-h-screen mx-auto bg-gray-50 pb-[60px]">
       {/* 用户信息卡片 */}
@@ -173,197 +268,131 @@ const Profile = () => {
       </div>
 
       {/* 订单管理 */}
-      <div className="bg-white rounded-lg p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-base font-medium">我的订单</div>
-          {/* <div
-            className="text-xs text-gray-500 flex items-center cursor-pointer"
-            onClick={() => navigate("/order-list")} // 添加点击事件处理函数
-          >
-            查看全部订单 <i className="ri-arrow-right-s-line ml-1"></i>
-          </div> */}
-        </div>
-        {loading && <div>加载中...</div>}
-        {/*  {error && <div>{error}</div>} */}
-        <div className="grid grid-cols-5 text-center">
-          {ORDER_TABS.map((tab) => (
+      {false && (
+        <div className="bg-white rounded-lg p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-base font-medium">我的订单</div>
             <div
-              key={tab.id}
-              className={`order-item flex flex-col items-center space-y-1 cursor-pointer ${
-                activeTab === tab.id ? "text-primary" : ""
-              }`}
-              onClick={() => setActiveTab(tab.id)}
+              className="text-xs text-gray-500 flex items-center cursor-pointer"
+              onClick={() => navigate("/order-list")} // 添加点击事件处理函数
             >
+              查看全部订单 <i className="ri-arrow-right-s-line ml-1"></i>
+            </div> 
+          </div>
+          {loading && <div>加载中...</div>}
+           {error && <div>{error}</div>} 
+          <div className="grid grid-cols-5 text-center">
+            {ORDER_TABS.map((tab) => (
               <div
-                className="w-10 h-10 flex items-center justify-center relative"
-                onClick={(e) => {
-                  e.stopPropagation(); // 防止触发父元素的 onClick
-                  navigate(`/order-list/${tab.id}`);
-                }}
+                key={tab.id}
+                className={`order-item flex flex-col items-center space-y-1 cursor-pointer ${
+                  activeTab === tab.id ? "text-primary" : ""
+                }`}
+                onClick={() => setActiveTab(tab.id)}
               >
-                {/* 根据不同状态显示不同图标 */}
-                {tab.id === 0 && (
-                  <i className="ri-list-unordered text-xl text-gray-700"></i>
-                )}
-                {tab.id === 1 && (
-                  <i className="ri-wallet-3-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 2 && (
-                  <i className="ri-truck-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 3 && (
-                  <i className="ri-inbox-archive-line text-xl text-gray-700"></i>
-                )}
-                {tab.id === 4 && (
-                  <i className="ri-check-line text-xl text-gray-700"></i>
-                )}
+                <div
+                  className="w-10 h-10 flex items-center justify-center relative"
+                  onClick={(e) => {
+                    e.stopPropagation(); // 防止触发父元素的 onClick
+                    navigate(`/order-list/${tab.id === 0 ? 'all' : tab.id}`);
+                  }}
+                >
+                  {/* 图标 */}
+                  {tab.id === 0 && (
+                    <i className="ri-file-list-line text-xl"></i>
+                  )}
+                  {tab.id === 1 && (
+                    <i className="ri-bank-card-line text-xl"></i>
+                  )}
+                  {tab.id === 2 && (
+                    <i className="ri-gift-line text-xl"></i>
+                  )}
+                  {tab.id === 3 && (
+                    <i className="ri-truck-line text-xl"></i>
+                  )}
+                  {tab.id === 4 && (
+                    <i className="ri-checkbox-circle-line text-xl"></i>
+                  )}
+                  {/* 数量提示 */}
+                   {tab.count > 0 && (
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
+                      {tab.count}
+                    </div>
+                  )} 
+                </div>
+                <div className="text-xs">{tab.name}</div>
               </div>
-              <span
-                className="text-xs"
-                onClick={(e) => {
-                  e.stopPropagation(); // 防止触发父元素的 onClick
-                  navigate(`/order-list/${tab.id}`);
-                }}
-              >
-                {tab.name}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 我的创作 */}
+      {/* 店铺信息卡片 */}
       <div className="bg-white rounded-lg p-4 mt-3">
-        <div className="text-base font-medium mb-3">我的创作</div>
-        
-        {/* 创作统计 */}
-        {/* <div className="grid grid-cols-3 gap-2 mb-3 bg-gray-50 rounded-lg p-3">
-          <div className="text-center">
-            <div className="text-lg font-medium text-primary">12</div>
-            <div className="text-xs text-gray-500">内容数量</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-medium text-primary">256</div>
-            <div className="text-xs text-gray-500">总浏览量</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-medium text-primary">32</div>
-            <div className="text-xs text-gray-500">互动数</div>
-          </div>
-        </div> */}
-        
-        <div className="grid grid-cols-2 gap-3">
-          {/* 图文创作查询入口 */}
-          <div 
-            className="creation-item border border-gray-100 rounded-lg p-3 cursor-pointer shadow-sm"
-            onClick={() => navigate('/my-content')}
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-base font-medium">我的店铺</div>
+          <div
+            className="text-xs text-gray-500 flex items-center cursor-pointer"
+            onClick={() => hasShop ? navigate(`/shop/${shopId}`) : navigate('/create-shop')}
           >
-            <div className="flex items-center">
-              <div className="w-10 h-10 flex items-center justify-center bg-blue-50 rounded-lg mr-3">
-                <i className="ri-image-line text-xl text-blue-500"></i>
-              </div>
-              <div>
-                <div className="text-sm font-medium">图文创作</div>
-                <div className="text-xs text-gray-500 mt-1">查看我的图文内容</div>
-              </div>
-            </div>
+            {hasShop ? '查看店铺' : '创建店铺'} <i className="ri-arrow-right-s-line ml-1"></i>
           </div>
-          
-          {/* 电商创作查询入口 */}
+        </div>
+        
+        {hasShop ? (
           <div 
-            className="creation-item border border-gray-100 rounded-lg p-3 cursor-pointer shadow-sm"
+            className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
             onClick={() => navigate('/my-shop')}
           >
-            <div className="flex items-center">
-              <div className="w-10 h-10 flex items-center justify-center bg-orange-50 rounded-lg mr-3">
-                <i className="ri-store-line text-xl text-orange-500"></i>
-              </div>
-              <div>
-                <div className="text-sm font-medium">电商创作</div>
-                <div className="text-xs text-gray-500 mt-1">查看我的商品内容</div>
-              </div>
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+              <i className="ri-store-2-line text-primary text-xl"></i>
             </div>
+            <div>
+              <div className="text-sm font-medium">管理我的商品</div>
+              <div className="text-xs text-gray-500 mt-1">发布商品、处理订单、查看销售数据</div>
+            </div>
+            <i className="ri-arrow-right-s-line ml-auto text-gray-400"></i>
           </div>
-        </div>
+        ) : (
+          <div 
+            className="flex flex-col items-center justify-center py-5 bg-gray-50 rounded-lg cursor-pointer"
+            onClick={() => navigate('/create-shop')}
+          >
+            <i className="ri-store-2-line text-primary text-3xl mb-2"></i>
+            <div className="text-sm text-gray-600 mb-2">您还没有创建店铺</div>
+            <button 
+              className="px-4 py-1.5 bg-primary text-white text-xs rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/create-shop');
+              }}
+            >
+              立即创建
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* 我的服务 */}
-      <div className="bg-white rounded-lg p-4">
-        <div className="text-base font-medium mb-3">我的服务</div>
-        <div className="grid grid-cols-4 gap-y-4">
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/cd9080a28513d62910830645c40aab58.jpg"
-                className="w-full h-full object-cover"
-                alt="地址管理"
-              />
-            </div>
-            <span className="text-xs">地址管理</span>
+      {/* 功能菜单 */}
+      {FEATURE_MENUS.map((menu, index) => (
+        <div key={index} className="bg-white rounded-lg p-4 mt-3">
+          <div className="text-base font-medium mb-3">{menu.title}</div>
+          <div className="grid grid-cols-3 gap-3">
+            {menu.items.map((item, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center py-3 cursor-pointer"
+                onClick={item.onClick}
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                  <i className={`${item.icon} text-primary text-xl`}></i>
+                </div>
+                <div className="text-xs">{item.text}</div>
+              </div>
+            ))}
           </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/dbc44988f5c99f32a1c1ee7412fbba35.jpg"
-                className="w-full h-full object-cover"
-                alt="我的收藏"
-              />
-            </div>
-            <span className="text-xs">我的收藏</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/9eff0e45f6ff14d4aaa12b3be82f20fd.jpg"
-                className="w-full h-full object-cover"
-                alt="优惠券"
-              />
-            </div>
-            <span className="text-xs">优惠券</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/0a123b33fc2c67bb522bcbafe353e1ea.jpg"
-                className="w-full h-full object-cover"
-                alt="购物车"
-              />
-            </div>
-            <span className="text-xs">购物车</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/53037345ad836010cf384a85fadbac6a.jpg"
-                className="w-full h-full object-cover"
-                alt="积分商城"
-              />
-            </div>
-            <span className="text-xs">积分商城</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/7a113086b48c5e0133282226db445fd4.jpg"
-                className="w-full h-full object-cover"
-                alt="联系客服"
-              />
-            </div>
-            <span className="text-xs">联系客服</span>
-          </div>
-          <div className="service-item flex flex-col items-center space-y-1 cursor-pointer">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img
-                src="https://public.readdy.ai/ai/img_res/d7fc2f18b0e07eaad3561dbbe1244a7c.jpg"
-                className="w-full h-full object-cover"
-                alt="意见反馈"
-              />
-            </div>
-            <span className="text-xs">意见反馈</span>
-          </div>
-          
         </div>
-      </div>
+      ))}
     </div>
   );
 };

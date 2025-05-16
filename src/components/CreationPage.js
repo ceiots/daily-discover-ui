@@ -93,23 +93,23 @@ const CreationPage = () => {
                 <i className="fas fa-store text-gray-400 mb-1"></i>
                 <span className="text-xs text-gray-500">店铺</span>
               </div>
-              <div className="bg-gray-50 rounded p-2 flex flex-col items-center">
+              {/* <div className="bg-gray-50 rounded p-2 flex flex-col items-center">
                 <i className="fas fa-tags text-gray-400 mb-1"></i>
                 <span className="text-xs text-gray-500">优惠</span>
-              </div>
+              </div> */}
             </div>
           </div> }
         </div>
 
         {/* 最近创作 */}
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <h2 className="text-lg font-medium mb-3">最近创作</h2>
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
             <div className="flex items-center justify-center h-20 text-gray-400">
               <p className="text-sm">暂无最近创作内容</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
