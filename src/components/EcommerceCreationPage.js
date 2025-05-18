@@ -456,7 +456,7 @@ const EcommerceCreationPage = () => {
       <div className="fixed top-0 left-0 right-0 bg-primary text-white z-10 max-w-[375px] mx-auto">
         <div className="flex items-center justify-between px-4 py-3">
           <button 
-            onClick={() => navigate('/creation')} 
+            onClick={() => navigate(-1)} 
             className="w-8 h-8 flex items-center justify-center"
           >
             <i className="fas fa-arrow-left"></i>

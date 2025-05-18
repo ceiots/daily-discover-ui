@@ -119,9 +119,9 @@ const MyShopPage = () => {
           >
             <i className="fas fa-arrow-left"></i>
           </button>
-          <h1 className="text-lg font-medium">我的商品</h1>
+          <h1 className="text-lg font-medium">商品管理</h1>
           <button 
-            onClick={() => navigate('/create-product')} 
+            onClick={() => navigate('/ecommerce-creation')} 
             className="w-8 h-8 flex items-center justify-center"
           >
             <i className="fas fa-plus"></i>
@@ -131,6 +131,23 @@ const MyShopPage = () => {
 
       {/* 商品列表 */}
       <div className="product-list pt-16 px-4">
+        {/* 管理选项 */}
+        <div className="bg-white rounded-lg mb-4 overflow-hidden">
+          <div className="flex border-b">
+            <div 
+              className="flex-1 py-3 text-center text-sm font-medium text-primary border-b-2 border-primary"
+            >
+              全部商品
+            </div>
+            <div 
+              className="flex-1 py-3 text-center text-sm text-gray-500"
+              onClick={() => navigate('/category-manage')}
+            >
+              分类管理
+            </div>
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <i className="fas fa-spinner fa-spin text-primary mr-2"></i>
@@ -143,10 +160,10 @@ const MyShopPage = () => {
             暂无商品
             <div className="mt-2">
               <button 
-                onClick={() => navigate('/create-product')} 
+                onClick={() => navigate('/ecommerce-creation')} 
                 className="px-4 py-2 bg-primary text-white rounded-full text-sm"
               >
-                去创建
+                发布商品
               </button>
             </div>
           </div>

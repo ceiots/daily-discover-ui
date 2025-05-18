@@ -177,7 +177,7 @@ const ShopDetailPage = () => {
               {/* 编辑按钮（仅店铺所有者可见） */}
               {isOwner && (
                 <button 
-                  onClick={() => navigate(`/shop/edit/${shop.id}`)} 
+                  onClick={() => navigate(`/shop-edit/${shop.id}`)} 
                   className="w-full mt-4 py-2 bg-primary text-white rounded-lg"
                 >
                   编辑店铺信息

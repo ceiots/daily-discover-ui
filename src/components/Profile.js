@@ -176,11 +176,6 @@ const Profile = () => {
       title: "我的服务",
       items: [
         { 
-          icon: "ri-store-2-line", 
-          text: "我的店铺", 
-          onClick: () => hasShop ? navigate('/my-shop') : navigate('/create-shop') 
-        },
-        { 
           icon: "ri-shopping-bag-line", 
           text: "我的订单", 
           onClick: () => navigate('/order-list/all') 
@@ -190,19 +185,29 @@ const Profile = () => {
           text: "收货地址", 
           onClick: () => navigate('/edit-address') 
         },
+        { 
+          icon: "ri-user-3-line", 
+          text: "个人信息", 
+          onClick: () => navigate('/settings/profile') 
+        },
       ]
     },
     {
-      title: "创作中心",
+      title: "创作与经营",
       items: [
         { 
           icon: "ri-pencil-line", 
-          text: "去创作", 
-          onClick: () => navigate('/creation') 
+          text: "内容创作", 
+          onClick: () => navigate('/content-creation') 
+        },
+        { 
+          icon: "ri-shopping-cart-2-line", 
+          text: "商品发布", 
+          onClick: () => navigate('/ecommerce-creation') 
         },
         { 
           icon: "ri-file-list-line", 
-          text: "我的内容", 
+          text: "内容管理", 
           onClick: () => navigate('/my-content') 
         }
       ]
@@ -327,51 +332,7 @@ const Profile = () => {
         </div>
       )}
 
-      {/* 店铺信息卡片 */}
-      <div className="bg-white rounded-lg p-4 mt-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-base font-medium">我的店铺</div>
-          <div
-            className="text-xs text-gray-500 flex items-center cursor-pointer"
-            onClick={() => hasShop ? navigate(`/shop/${shopId}`) : navigate('/create-shop')}
-          >
-            {hasShop ? '查看店铺' : '创建店铺'} <i className="ri-arrow-right-s-line ml-1"></i>
-          </div>
-        </div>
-        
-        {hasShop ? (
-          <div 
-            className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
-            onClick={() => navigate('/my-shop')}
-          >
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-              <i className="ri-store-2-line text-primary text-xl"></i>
-            </div>
-            <div>
-              <div className="text-sm font-medium">管理我的商品</div>
-              <div className="text-xs text-gray-500 mt-1">发布商品、处理订单、查看销售数据</div>
-            </div>
-            <i className="ri-arrow-right-s-line ml-auto text-gray-400"></i>
-          </div>
-        ) : (
-          <div 
-            className="flex flex-col items-center justify-center py-5 bg-gray-50 rounded-lg cursor-pointer"
-            onClick={() => navigate('/create-shop')}
-          >
-            <i className="ri-store-2-line text-primary text-3xl mb-2"></i>
-            <div className="text-sm text-gray-600 mb-2">您还没有创建店铺</div>
-            <button 
-              className="px-4 py-1.5 bg-primary text-white text-xs rounded-full"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate('/create-shop');
-              }}
-            >
-              立即创建
-            </button>
-          </div>
-        )}
-      </div>
+      
 
       {/* 功能菜单 */}
       {FEATURE_MENUS.map((menu, index) => (
@@ -393,6 +354,60 @@ const Profile = () => {
           </div>
         </div>
       ))}
+
+      {/* 店铺信息卡片 */}
+      <div className="bg-white rounded-lg p-4 mt-3">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-base font-medium">我的店铺</div>
+          <div
+            className="text-xs text-gray-500 flex items-center cursor-pointer"
+            onClick={() => hasShop ? navigate(`/shop/${shopId}`) : navigate('/create-shop')}
+          >
+            {hasShop ? '查看店铺主页' : '创建店铺'} <i className="ri-arrow-right-s-line ml-1"></i>
+          </div>
+        </div>
+        
+        {hasShop ? (
+          <div className="grid grid-cols-2 gap-3">
+            <div 
+              className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
+              onClick={() => navigate(`/shop-edit/${shopId}`)}
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-store-2-line text-primary text-xl"></i>
+              </div>
+              <div className="text-xs mt-1">店铺设置</div>
+            </div>
+            
+            <div 
+              className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
+              onClick={() => navigate('/my-shop')}
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-shopping-basket-2-line text-primary text-xl"></i>
+              </div>
+              <div className="text-xs mt-1">商品管理</div>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="flex flex-col items-center justify-center py-5 bg-gray-50 rounded-lg cursor-pointer"
+            onClick={() => navigate('/create-shop')}
+          >
+            <i className="ri-store-2-line text-primary text-3xl mb-2"></i>
+            <div className="text-sm text-gray-600 mb-2">您还没有创建店铺</div>
+            <button 
+              className="px-4 py-1.5 bg-primary text-white text-xs rounded-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/create-shop');
+              }}
+            >
+              立即创建
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
