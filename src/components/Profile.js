@@ -274,50 +274,50 @@ const Profile = () => {
 
       {/* 订单管理 */}
       {false && (
-        <div className="bg-white rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-base font-medium">我的订单</div>
+      <div className="bg-white rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-base font-medium">我的订单</div>
             <div
-              className="text-xs text-gray-500 flex items-center cursor-pointer"
-              onClick={() => navigate("/order-list")} // 添加点击事件处理函数
-            >
-              查看全部订单 <i className="ri-arrow-right-s-line ml-1"></i>
+            className="text-xs text-gray-500 flex items-center cursor-pointer"
+            onClick={() => navigate("/order-list")} // 添加点击事件处理函数
+          >
+            查看全部订单 <i className="ri-arrow-right-s-line ml-1"></i>
             </div> 
-          </div>
-          {loading && <div>加载中...</div>}
+        </div>
+        {loading && <div>加载中...</div>}
            {error && <div>{error}</div>} 
-          <div className="grid grid-cols-5 text-center">
-            {ORDER_TABS.map((tab) => (
+        <div className="grid grid-cols-5 text-center">
+          {ORDER_TABS.map((tab) => (
+            <div
+              key={tab.id}
+              className={`order-item flex flex-col items-center space-y-1 cursor-pointer ${
+                activeTab === tab.id ? "text-primary" : ""
+              }`}
+              onClick={() => setActiveTab(tab.id)}
+            >
               <div
-                key={tab.id}
-                className={`order-item flex flex-col items-center space-y-1 cursor-pointer ${
-                  activeTab === tab.id ? "text-primary" : ""
-                }`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <div
-                  className="w-10 h-10 flex items-center justify-center relative"
-                  onClick={(e) => {
-                    e.stopPropagation(); // 防止触发父元素的 onClick
+                className="w-10 h-10 flex items-center justify-center relative"
+                onClick={(e) => {
+                  e.stopPropagation(); // 防止触发父元素的 onClick
                     navigate(`/order-list/${tab.id === 0 ? 'all' : tab.id}`);
-                  }}
-                >
+                }}
+              >
                   {/* 图标 */}
-                  {tab.id === 0 && (
+                {tab.id === 0 && (
                     <i className="ri-file-list-line text-xl"></i>
-                  )}
-                  {tab.id === 1 && (
+                )}
+                {tab.id === 1 && (
                     <i className="ri-bank-card-line text-xl"></i>
-                  )}
-                  {tab.id === 2 && (
+                )}
+                {tab.id === 2 && (
                     <i className="ri-gift-line text-xl"></i>
-                  )}
-                  {tab.id === 3 && (
+                )}
+                {tab.id === 3 && (
                     <i className="ri-truck-line text-xl"></i>
-                  )}
-                  {tab.id === 4 && (
+                )}
+                {tab.id === 4 && (
                     <i className="ri-checkbox-circle-line text-xl"></i>
-                  )}
+                )}
                   {/* 数量提示 */}
                    {tab.count > 0 && (
                     <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
@@ -349,10 +349,10 @@ const Profile = () => {
                   <i className={`${item.icon} text-primary text-xl`}></i>
                 </div>
                 <div className="text-xs">{item.text}</div>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
       ))}
 
       {/* 店铺信息卡片 */}
@@ -365,24 +365,24 @@ const Profile = () => {
           >
             {hasShop ? '查看店铺主页' : '创建店铺'} <i className="ri-arrow-right-s-line ml-1"></i>
           </div>
-        </div>
+          </div>
         
         {hasShop ? (
-          <div className="grid grid-cols-2 gap-3">
-            <div 
+        <div className="grid grid-cols-2 gap-3">
+          <div 
               className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
               onClick={() => navigate(`/shop-edit/${shopId}`)}
-            >
+          >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
                 <i className="ri-store-2-line text-primary text-xl"></i>
               </div>
               <div className="text-xs mt-1">店铺设置</div>
-            </div>
-            
-            <div 
+          </div>
+          
+          <div 
               className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
-              onClick={() => navigate('/my-shop')}
-            >
+            onClick={() => navigate('/my-shop')}
+          >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
                 <i className="ri-shopping-basket-2-line text-primary text-xl"></i>
               </div>

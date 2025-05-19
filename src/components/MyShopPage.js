@@ -31,7 +31,7 @@ const MyShopPage = () => {
           return;
         }
         
-        const response = await instance.get('/recommendations/user', {
+        const response = await instance.get('/product/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

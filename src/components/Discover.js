@@ -43,7 +43,7 @@ const Discover = () => {
         const [eventsRes, categoriesRes, recommendationsRes] = await Promise.all([
           instance.get(`/events/date?date=${currentDate}`),
           instance.get('/categories'),
-          instance.get('/recommendations')
+          instance.get('/product')
         ]);
 
         setEvents(eventsRes.data);
@@ -94,7 +94,7 @@ const Discover = () => {
 
   const handleRefreshRecommendations = async () => {
     try {
-      const response = await instance.get(`/recommendations/random`); // 假设后端有这个接口
+      const response = await instance.get(`/product/random`); // 假设后端有这个接口
       setRecommendations(response.data); // 更新推荐内容
     } catch (error) {
       console.error("Error fetching random recommendations:", error);

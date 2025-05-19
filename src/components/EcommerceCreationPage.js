@@ -81,17 +81,75 @@ const EcommerceCreationPage = () => {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
-      // 在实际应用中，这里应该上传图片到服务器并获取URL
-      // 这里仅做本地预览示例
-      const newImages = files.map(file => ({
-        id: Date.now() + Math.random(),
-        url: URL.createObjectURL(file),
-        file
-      }));
+      // 检查文件大小
+      const maxSizeInMB = 5; // 5MB限制
+      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
       
-      setFormData({
-        ...formData,
-        images: [...formData.images, ...newImages]
+      // 过滤出过大的文件
+      const oversizedFiles = files.filter(file => file.size > maxSizeInBytes);
+      
+      if (oversizedFiles.length > 0) {
+        alert(`以下文件超过${maxSizeInMB}MB大小限制，请压缩后再上传：\n${oversizedFiles.map(f => f.name).join('\n')}`);
+        return;
+      }
+      
+      // 显示上传中状态
+      setLoading(true);
+      
+      // 创建FormData对象用于文件上传
+      const formData = new FormData();
+      files.forEach(file => {
+        formData.append('file', file);
+      });
+      
+      // 调用上传接口
+      instance({
+        method: 'post',
+        url: '/product/upload',
+        data: formData,
+        headers: {
+          'Content-Type': undefined // 让浏览器自动设置正确的Content-Type和boundary
+        }
+      })
+      .then(response => {
+        if (response.data && response.data.code === 200) {
+          const responseData = response.data.data;
+          // 检查后端返回的数据结构
+          let imageUrls = [];
+          
+          if (responseData.urls && Array.isArray(responseData.urls)) {
+            // 如果返回了urls数组，使用它
+            imageUrls = responseData.urls;
+          } else if (responseData.url) {
+            // 如果只返回了单个url，转换为数组
+            imageUrls = [responseData.url];
+          } else {
+            // 如果数据结构不符合预期，提示错误
+            console.error('图片上传响应格式不正确:', responseData);
+            alert('图片上传响应格式不正确，请稍后重试');
+            return;
+          }
+          
+          // 将返回的URL添加到表单状态中
+          const newImages = imageUrls.map((url, index) => ({
+            id: Date.now() + index,
+            url: url,
+          }));
+          
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            images: [...prevFormData.images, ...newImages]
+          }));
+        } else {
+          alert('图片上传失败：' + (response.data.message || '未知错误'));
+        }
+      })
+      .catch(error => {
+        console.error('上传图片时发生错误：', error);
+        alert('图片上传失败，请稍后重试');
+      })
+      .finally(() => {
+        setLoading(false);
       });
     }
   };
@@ -312,19 +370,23 @@ const EcommerceCreationPage = () => {
           price: parseFloat(formData.price),
           originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
           categoryId: formData.categoryId,
+          parentCategoryId: formData.parentCategoryId,
+          grandCategoryId: formData.grandCategoryId,
           tagIds: formData.tagIds,
-          images: formData.images.map(img => img.url), // 假设后端接受图片URL数组
+          images: formData.images.map(img => img.url),
           details: formData.details,
           specifications: formData.specifications,
           purchaseNotices: formData.purchaseNotices
         };
         
-        const response = await instance.post('/products', productData, {
+        console.log('提交商品数据:', productData);
+        
+        const response = await instance.post('/product/create', productData, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (response.data && response.data.code === 200) {
-          alert('商品创建成功！');
+          alert('商品创建成功，等待审核！');
           navigate('/');
         } else {
           alert('商品创建失败：' + (response.data.message || '未知错误'));
@@ -353,7 +415,7 @@ const EcommerceCreationPage = () => {
         const response = await instance.get('/categories?level=1', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
+        console.log('一级分类：',response.data);
         if (response.data && response.data.code === 200) {
           setCategories(response.data.data || []);
         }
@@ -575,7 +637,7 @@ const EcommerceCreationPage = () => {
 
                 {/* 商品分类 */}
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {/* <label className="block text-sm font-medium text-gray-700 mb-1">
                     商品分类
                     <Link 
                       to="/category-manage" 
@@ -583,7 +645,7 @@ const EcommerceCreationPage = () => {
                     >
                       管理分类
                     </Link>
-                  </label>
+                  </label> */}
                   <div className="space-y-2">
                     {/* 一级分类 */}
                     <select
@@ -669,15 +731,20 @@ const EcommerceCreationPage = () => {
                         </button>
                       </div>
                     ))}
-                    <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50">
-                      <i className="fas fa-plus text-gray-400 mb-1"></i>
-                      <span className="text-xs text-gray-500">添加图片</span>
+                    <label className={`w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      {loading ? (
+                        <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                      ) : (
+                        <i className="fas fa-plus text-gray-400 mb-1"></i>
+                      )}
+                      <span className="text-xs text-gray-500">{loading ? '上传中...' : '添加图片'}</span>
                       <input 
                         type="file" 
                         accept="image/*" 
                         multiple 
                         className="hidden" 
                         onChange={handleImageUpload}
+                        disabled={loading}
                       />
                     </label>
                   </div>
@@ -745,18 +812,70 @@ const EcommerceCreationPage = () => {
                                 </button>
                               </div>
                             ) : (
-                              <label className="block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white">
-                                <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
-                                <span className="text-xs text-gray-500">上传详情图片</span>
+                              <label className={`block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                {loading ? (
+                                  <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                                ) : (
+                                  <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
+                                )}
+                                <span className="text-xs text-gray-500">{loading ? '上传中...' : '上传详情图片'}</span>
                                 <input 
                                   type="file" 
                                   accept="image/*" 
-                                  className="hidden" 
+                                  className="hidden"
+                                  disabled={loading}
                                   onChange={(e) => {
                                     if (e.target.files && e.target.files[0]) {
                                       const file = e.target.files[0];
-                                      const url = URL.createObjectURL(file);
-                                      updateDetail(detail.id, url);
+                                      
+                                      // 显示上传中状态
+                                      setLoading(true);
+                                      
+                                      // 创建FormData对象用于文件上传
+                                      const formData = new FormData();
+                                      formData.append('file', file);
+                                      
+                                      // 调用上传接口
+                                      instance({
+                                        method: 'post',
+                                        url: '/product/upload',
+                                        data: formData,
+                                        headers: {
+                                          'Content-Type': undefined // 让浏览器自动设置正确的Content-Type和boundary
+                                        }
+                                      })
+                                      .then(response => {
+                                        if (response.data && response.data.code === 200) {
+                                          const responseData = response.data.data;
+                                          // 检查后端返回的数据结构
+                                          let imageUrl;
+                                          
+                                          if (responseData.url) {
+                                            // 如果返回了单个url
+                                            imageUrl = responseData.url;
+                                          } else if (responseData.urls && Array.isArray(responseData.urls) && responseData.urls.length > 0) {
+                                            // 如果返回了urls数组，使用第一个
+                                            imageUrl = responseData.urls[0];
+                                          } else {
+                                            // 如果数据结构不符合预期，提示错误
+                                            console.error('图片上传响应格式不正确:', responseData);
+                                            alert('图片上传响应格式不正确，请稍后重试');
+                                            return;
+                                          }
+                                          
+                                          // 更新详情
+                                          updateDetail(detail.id, imageUrl);
+                                        } else {
+                                          alert('图片上传失败：' + (response.data.message || '未知错误'));
+                                        }
+                                      })
+                                      .catch(error => {
+                                        console.error('上传详情图片时发生错误：', error);
+                                        alert('图片上传失败，请稍后重试');
+                                      })
+                                      .finally(() => {
+                                        setLoading(false);
+                                      });
                                     }
                                   }}
                                 />

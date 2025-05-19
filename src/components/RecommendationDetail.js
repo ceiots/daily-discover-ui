@@ -49,7 +49,7 @@ const RecommendationDetail = () => {
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
-        const response = await instance.get(`/recommendations/${id}`);
+        const response = await instance.get(`/product/${id}`);
 
         setRecommendation(response.data);
       } catch (error) {

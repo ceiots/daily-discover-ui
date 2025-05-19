@@ -58,7 +58,7 @@ const ShopDetailPage = () => {
   useEffect(() => {
     const fetchShopProducts = async () => {
       try {
-        const response = await instance.get(`/recommendations/shop/${shopId}`);
+        const response = await instance.get(`/product/shop/${shopId}`);
         
         if (response.data && response.data.code === 200) {
           setProducts(response.data.data || []);
@@ -175,14 +175,14 @@ const ShopDetailPage = () => {
               </div>
 
               {/* 编辑按钮（仅店铺所有者可见） */}
-              {isOwner && (
+              {/* {isOwner && (
                 <button 
                   onClick={() => navigate(`/shop-edit/${shop.id}`)} 
                   className="w-full mt-4 py-2 bg-primary text-white rounded-lg"
                 >
                   编辑店铺信息
                 </button>
-              )}
+              )} */}
             </div>
 
             {/* 商品列表 */}
