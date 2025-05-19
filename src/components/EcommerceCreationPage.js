@@ -9,6 +9,7 @@ const EcommerceCreationPage = () => {
     title: '',
     price: '',
     originalPrice: '',
+    stock: 0,
     categoryId: '',
     parentCategoryId: '',
     grandCategoryId: '',
@@ -82,7 +83,7 @@ const EcommerceCreationPage = () => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
       // 检查文件大小
-      const maxSizeInMB = 5; // 5MB限制
+      const maxSizeInMB = 10; // 10MB限制
       const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
       
       // 过滤出过大的文件
@@ -198,7 +199,7 @@ const EcommerceCreationPage = () => {
     const newSpec = {
       id: Date.now(),
       name: '',
-      options: ['']
+      values: ['']
     };
     setFormData({
       ...formData,
@@ -221,7 +222,7 @@ const EcommerceCreationPage = () => {
     setFormData({
       ...formData,
       specifications: formData.specifications.map(spec => 
-        spec.id === specId ? { ...spec, options: [...spec.options, ''] } : spec
+        spec.id === specId ? { ...spec, values: [...spec.values, ''] } : spec
       )
     });
   };
@@ -233,7 +234,7 @@ const EcommerceCreationPage = () => {
       specifications: formData.specifications.map(spec => 
         spec.id === specId ? { 
           ...spec, 
-          options: spec.options.map((opt, i) => i === index ? value : opt) 
+          values: spec.values.map((opt, i) => i === index ? value : opt) 
         } : spec
       )
     });
@@ -246,7 +247,7 @@ const EcommerceCreationPage = () => {
       specifications: formData.specifications.map(spec => 
         spec.id === specId ? { 
           ...spec, 
-          options: spec.options.filter((_, i) => i !== index) 
+          values: spec.values.filter((_, i) => i !== index) 
         } : spec
       )
     });
@@ -364,19 +365,38 @@ const EcommerceCreationPage = () => {
         setLoading(true);
         const token = localStorage.getItem('token');
         
+        // 准备商品详情数据，过滤无效内容
+        const cleanDetails = formData.details.filter(detail => {
+          if (detail.type === 'text') {
+            return detail.content && detail.content.trim() !== '';
+          } else {
+            return detail.content != null;
+          }
+        }).map((detail, index) => ({
+          ...detail,
+          sort: index // 重新计算排序
+        }));
+        
+        // 准备规格数据，保证格式正确
+        const cleanSpecifications = formData.specifications.map(spec => ({
+          name: spec.name,
+          values: spec.values.filter(val => val.trim() !== '') // 移除空值
+        })).filter(spec => spec.name.trim() !== '' && spec.values.length > 0); // 移除没有名称或选项的规格
+
         // 准备提交数据，转换为后端接受的格式
         const productData = {
           title: formData.title,
           price: parseFloat(formData.price),
           originalPrice: formData.originalPrice ? parseFloat(formData.originalPrice) : null,
+          stock: parseInt(formData.stock) || 0, // 确保stock是整数
           categoryId: formData.categoryId,
           parentCategoryId: formData.parentCategoryId,
           grandCategoryId: formData.grandCategoryId,
           tagIds: formData.tagIds,
           images: formData.images.map(img => img.url),
-          details: formData.details,
-          specifications: formData.specifications,
-          purchaseNotices: formData.purchaseNotices
+          details: cleanDetails,
+          specifications: cleanSpecifications,
+          purchaseNotices: formData.purchaseNotices.filter(notice => notice.title.trim() !== '' || notice.content.trim() !== '')
         };
         
         console.log('提交商品数据:', productData);
@@ -635,6 +655,24 @@ const EcommerceCreationPage = () => {
                   </div>
                 </div>
 
+                {/* 商品库存 */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">商品库存</label>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <input
+                        type="number"
+                        name="stock"
+                        placeholder="请输入库存数量"
+                        value={formData.stock}
+                        onChange={handleInputChange}
+                        min="0"
+                        className="w-full p-3 border border-gray-200 rounded-lg text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 {/* 商品分类 */}
                 <div className="mb-4">
                   {/* <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -748,7 +786,8 @@ const EcommerceCreationPage = () => {
                       />
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500">建议上传尺寸800x800像素以上的图片</p>
+                  <p className="text-xs text-gray-500">建议上传尺寸800x800像素以上、大小不超过10MB的图片</p>
+                  <p className="text-xs text-gray-500">如果图片过大，请使用图片压缩工具处理后再上传</p>
                   {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
                 </div>
               </div>
@@ -827,6 +866,15 @@ const EcommerceCreationPage = () => {
                                   onChange={(e) => {
                                     if (e.target.files && e.target.files[0]) {
                                       const file = e.target.files[0];
+                                      
+                                      // 检查文件大小
+                                      const maxSizeInMB = 10; // 10MB限制
+                                      const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+                                      
+                                      if (file.size > maxSizeInBytes) {
+                                        alert(`图片 ${file.name} 超过${maxSizeInMB}MB大小限制，请压缩后再上传`);
+                                        return;
+                                      }
                                       
                                       // 显示上传中状态
                                       setLoading(true);
@@ -929,7 +977,7 @@ const EcommerceCreationPage = () => {
                         </div>
                         
                         <div className="space-y-2 mt-2">
-                          {spec.options.map((option, optIndex) => (
+                          {spec.values.map((option, optIndex) => (
                             <div key={optIndex} className="flex items-center">
                               <input
                                 type="text"
@@ -938,7 +986,7 @@ const EcommerceCreationPage = () => {
                                 onChange={(e) => updateSpecOption(spec.id, optIndex, e.target.value)}
                                 className="flex-1 p-2 border border-gray-200 rounded text-sm"
                               />
-                              {spec.options.length > 1 && (
+                              {spec.values.length > 1 && (
                                 <button 
                                   className="ml-2 text-gray-400 hover:text-red-500"
                                   onClick={() => removeSpecOption(spec.id, optIndex)}
