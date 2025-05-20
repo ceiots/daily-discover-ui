@@ -72,6 +72,8 @@ const OrderList = () => {
     3: "待收货",
     4: "已完成",
     5: "已取消",
+    6: "退款中",
+    7: "已退款"
   };
 
   // 反向映射表，用于从文字状态获取状态码
@@ -82,6 +84,8 @@ const OrderList = () => {
     待收货: "3",
     已完成: "4",
     已取消: "5",
+    退款中: "6",
+    已退款: "7"
   };
 
   // 根据 URL 参数设置初始状态
@@ -133,6 +137,23 @@ const OrderList = () => {
     console.log(`再次购买: ${orderId}`);
     // 这里可以添加再次购买的逻辑
   };
+  
+  const handleRefund = (order) => {
+    console.log(`申请退款: ${order.id}`);
+    navigate(`/refund/apply/${order.id}`, { state: { orderData: order } });
+  };
+  
+  const handleCancel = (orderId) => {
+    console.log(`取消订单: ${orderId}`);
+    // 这里添加取消订单的逻辑
+    // 可以调用取消订单的接口
+  };
+  
+  const handleConfirmReceipt = (orderId) => {
+    console.log(`确认收货: ${orderId}`);
+    // 这里添加确认收货的逻辑
+    // 可以调用确认收货的接口
+  };
 
   const handleBack = () => {
     navigate(-1);
@@ -152,6 +173,84 @@ const OrderList = () => {
   // 修改状态显示逻辑
   const getOrderStatus = (status) => {
     return statusMap[status] || "未知状态";
+  };
+
+  // 渲染订单操作按钮
+  const renderOrderActions = (order) => {
+    const { status, id } = order;
+    
+    switch(status) {
+      case 1: // 待付款
+        return (
+          <div className="flex justify-end mt-2 space-x-2">
+            <button 
+              className="px-3 py-1 text-xs border border-gray-300 rounded-full"
+              onClick={() => handleCancel(id)}
+            >
+              取消订单
+            </button>
+            <button 
+              className="px-3 py-1 text-xs bg-primary text-white rounded-full"
+              onClick={() => handlePayment(id)}
+            >
+              立即支付
+            </button>
+          </div>
+        );
+      case 2: // 待发货
+        return (
+          <div className="flex justify-end mt-2 space-x-2">
+            <button 
+              className="px-3 py-1 text-xs border border-gray-300 rounded-full"
+              onClick={() => handleRefund(order)}
+            >
+              申请退款
+            </button>
+          </div>
+        );
+      case 3: // 待收货
+        return (
+          <div className="flex justify-end mt-2 space-x-2">
+            <button 
+              className="px-3 py-1 text-xs border border-gray-300 rounded-full"
+              onClick={() => handleRefund(order)}
+            >
+              申请退款
+            </button>
+            <button 
+              className="px-3 py-1 text-xs bg-primary text-white rounded-full"
+              onClick={() => handleConfirmReceipt(id)}
+            >
+              确认收货
+            </button>
+          </div>
+        );
+      case 4: // 已完成
+        return (
+          <div className="flex justify-end mt-2 space-x-2">
+            <button 
+              className="px-3 py-1 text-xs border border-gray-300 rounded-full"
+              onClick={() => handleRebuy(id)}
+            >
+              再次购买
+            </button>
+            <button 
+              className="px-3 py-1 text-xs border border-primary text-primary rounded-full"
+              onClick={() => navigate(`/review/${id}`)}
+            >
+              评价
+            </button>
+            <button 
+              className="px-3 py-1 text-xs border border-gray-300 rounded-full"
+              onClick={() => handleRefund(order)}
+            >
+              申请退款
+            </button>
+          </div>
+        );
+      default:
+        return null;
+    }
   };
 
   /* if (loading) {
@@ -295,6 +394,10 @@ const OrderList = () => {
                               ? "text-red-500"
                               : order.status === 4
                               ? "text-green-500"
+                              : order.status === 6
+                              ? "text-orange-500"
+                              : order.status === 7
+                              ? "text-blue-500"
                               : "text-primary"
                           }`}
                         >
@@ -356,6 +459,9 @@ const OrderList = () => {
                       </div>
                     </div>
                   )}
+                  
+                  {/* 订单操作按钮 */}
+                  {renderOrderActions(order)}
                 </div>
               </div>
             ))}

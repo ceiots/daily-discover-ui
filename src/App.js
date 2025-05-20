@@ -15,6 +15,8 @@ import OrderDetail from './components/OrderDetail';
 import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
+import RefundForm from "./components/RefundForm"; // 导入退款表单组件
+import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
 import EditAddress from './components/EditAddress';
 import RegisterPage from './components/RegisterPage';
@@ -210,6 +212,8 @@ const App = () => {
           <Route path="/edit-shop/:id" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
           <Route path="/shop/:shopId" element={<ShopDetailPage />} />
           <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
+          <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
+          <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
