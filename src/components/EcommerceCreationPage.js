@@ -382,7 +382,7 @@ const EcommerceCreationPage = () => {
           name: spec.name,
           values: spec.values.filter(val => val.trim() !== '') // 移除空值
         })).filter(spec => spec.name.trim() !== '' && spec.values.length > 0); // 移除没有名称或选项的规格
-
+        
         // 准备提交数据，转换为后端接受的格式
         const productData = {
           title: formData.title,
@@ -773,7 +773,7 @@ const EcommerceCreationPage = () => {
                       {loading ? (
                         <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
                       ) : (
-                        <i className="fas fa-plus text-gray-400 mb-1"></i>
+                      <i className="fas fa-plus text-gray-400 mb-1"></i>
                       )}
                       <span className="text-xs text-gray-500">{loading ? '上传中...' : '添加图片'}</span>
                       <input 
@@ -855,13 +855,13 @@ const EcommerceCreationPage = () => {
                                 {loading ? (
                                   <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
                                 ) : (
-                                  <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
+                                <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
                                 )}
                                 <span className="text-xs text-gray-500">{loading ? '上传中...' : '上传详情图片'}</span>
                                 <input 
                                   type="file" 
                                   accept="image/*" 
-                                  className="hidden"
+                                  className="hidden" 
                                   disabled={loading}
                                   onChange={(e) => {
                                     if (e.target.files && e.target.files[0]) {

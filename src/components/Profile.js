@@ -381,7 +381,7 @@ const Profile = () => {
           
           <div 
               className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
-            onClick={() => navigate('/my-shop')}
+            onClick={() => navigate('/product-manage')}
           >
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
                 <i className="ri-shopping-basket-2-line text-primary text-xl"></i>

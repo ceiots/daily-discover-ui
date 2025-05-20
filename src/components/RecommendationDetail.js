@@ -34,10 +34,10 @@ const RecommendationDetail = () => {
     setSelectedSpecs(updatedSpecs);
 
     // 转换为所需格式
-    const transformed = recommendation.specifications.map((spec) => ({
+    const transformed = recommendation?.specifications?.map((spec) => ({
       ...spec,
       values: [updatedSpecs[spec.name]].filter(Boolean), // 只保留选中的值
-    }));
+    })) || [];
 
     // 更新转换后的规格数组
     setTransformedSpecs(transformed);
@@ -49,24 +49,52 @@ const RecommendationDetail = () => {
   useEffect(() => {
     const fetchRecommendation = async () => {
       try {
+        setLoading(true);
         const response = await instance.get(`/product/${id}`);
-
-        setRecommendation(response.data);
+        
+        if (response.data) {
+          setRecommendation(response.data);
+        } else {
+          setError("未找到商品信息");
+        }
       } catch (error) {
-        setError(
-          "Error fetching recommendation details. Please try again later."
-        );
         console.error("Error fetching recommendation:", error);
+        setError(
+          "获取商品详情失败，请稍后重试。"
+        );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecommendation();
+    if (id) {
+      fetchRecommendation();
+    } else {
+      setError("无效的商品ID");
+      setLoading(false);
+    }
   }, [id]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (loading) return <div className="flex justify-center items-center min-h-screen"><p>正在加载商品信息...</p></div>;
+  if (error) return <div className="flex flex-col justify-center items-center min-h-screen">
+    <p className="text-red-500 mb-4">{error}</p>
+    <button 
+      className="px-4 py-2 bg-primary text-white rounded-lg"
+      onClick={() => navigate(-1)}
+    >
+      返回上一页
+    </button>
+  </div>;
+  
+  if (!recommendation) return <div className="flex flex-col justify-center items-center min-h-screen">
+    <p className="text-red-500 mb-4">未找到商品信息</p>
+    <button 
+      className="px-4 py-2 bg-primary text-white rounded-lg"
+      onClick={() => navigate(-1)}
+    >
+      返回上一页
+    </button>
+  </div>;
 
   // Function to handle back navigation
   const handleBack = () => {
@@ -98,14 +126,10 @@ const RecommendationDetail = () => {
       
       // 修复逻辑：确保所有规格都有对应的选择值
       return allSpecs.every(specName => {
-        // 遍历 selectedSpecs 数组，查找匹配的规格名
-        const selectedValueObj = selectedSpecs.find(spec => spec.name === specName);
-        const selectedValue = selectedValueObj ? selectedValueObj.values[0] : undefined;
-        console.log(`Checking spec ${specName}:`, selectedValue);
-        // 判断不为undefined、null、空字符串或空白字符串
-        return selectedValue !== undefined && 
-               selectedValue !== null && 
-               selectedValue.toString().trim() !== '';
+        // 判断 selectedSpecs 是否有该规格的值
+        return selectedSpecs[specName] !== undefined && 
+               selectedSpecs[specName] !== null && 
+               selectedSpecs[specName].toString().trim() !== '';
       });
     };
     
@@ -114,24 +138,26 @@ const RecommendationDetail = () => {
     // 检查用户是否已登录
     const isUserLoggedIn = () => userInfo && userInfo.id;
 
-    console.log(userInfo + " isUserLoggedIn:", isUserLoggedIn()); // 打印规格数组
+    console.log("isUserLoggedIn:", isUserLoggedIn()); // 打印规格数组
     
     // 如果规格未全部选择或用户未登录，返回 null
-    if (!areAllSpecsSelected() || !isUserLoggedIn()) {
-      return navigate("/login");
+    if (!areAllSpecsSelected()) {
+      alert("请选择所有规格");
+      return null;
+    }
+    
+    if (!isUserLoggedIn()) {
+      navigate("/login");
+      return null;
     }
     
     // 继续执行后续逻辑
     console.log("All specs are selected and user is logged in. Proceeding...");
-    console.log("productInfo.userInfo:", userInfo); // 打印 
-    if (userInfo === null || userInfo === undefined || !userInfo.id) {
-      return null;
-    }
-
-    // 确保 transformedSpecs 格式符合后端要求
-    const formattedSpecifications = selectedSpecs.map((spec) => ({
-      name: spec.name,
-      values: spec.values,
+    
+    // 将选择的规格转换为后端需要的格式
+    const formattedSpecifications = Object.keys(selectedSpecs).map(specName => ({
+      name: specName,
+      values: [selectedSpecs[specName]],
     }));
 
     const orderPayload = {
@@ -140,13 +166,11 @@ const RecommendationDetail = () => {
       productName: productInfo.title,
       productImage: productInfo.imageUrl,
       // 确保 specifications 是有效的数组
-      specifications: Array.isArray(formattedSpecifications)
-        ? formattedSpecifications
-        : [],
+      specifications: formattedSpecifications,
       price: productInfo.price,
       quantity: selectedQuantity,
-      shopName: productInfo.shopName,
-      shopAvatarUrl: productInfo.shopAvatarUrl,
+      shopName: productInfo.shopName || '',
+      shopAvatarUrl: productInfo.shopAvatarUrl || '',
     };
 
     return orderPayload;
@@ -155,42 +179,47 @@ const RecommendationDetail = () => {
   // 封装错误处理逻辑
   const handleOrderError = (error, action) => {
     console.error(`Error ${action}:`, error);
-    // 可以在这里添加更详细的错误提示，如弹出模态框
+    alert(`操作失败: ${error.message || '请稍后重试'}`);
   };
 
   // 封装导航逻辑
   const navigateToPayment = () => {
     navigate("/payment");
-    // 可以在这里添加成功提示，如弹出模态框
   };
 
   // 修改为通用的处理函数
   const handleAddOrBuy = async (isBuyNow) => {
-    
-    const orderPayload = prepareOrderPayload(
-      userInfo,
-      id,
-      recommendation,
-      quantity,
-      transformedSpecs
-    );
-    console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
-    console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
-    if (orderPayload) {
-      if (isBuyNow) {
-        // 立即购买，直接跳转到支付页面并传递 orderPayload
-        navigate("/payment", { state: { selectedItems: [orderPayload] } });
-      } else {
-        // 加入购物车，调用加入购物车接口
-        try {
-          await instance.post("/cart/add", orderPayload);
-          // 可以在这里添加加入购物车成功的提示，如弹出模态框
-        } catch (error) {
-          handleOrderError(error, "adding item to cart");
+    try {
+      const orderPayload = prepareOrderPayload(
+        userInfo,
+        id,
+        recommendation,
+        quantity,
+        selectedSpecs
+      );
+      
+      console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
+      console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
+      
+      if (orderPayload) {
+        if (isBuyNow) {
+          // 立即购买，直接跳转到支付页面并传递 orderPayload
+          navigate("/payment", { state: { selectedItems: [orderPayload] } });
+        } else {
+          // 加入购物车，调用加入购物车接口
+          const response = await instance.post("/cart/add", orderPayload);
+          if (response.data && response.data.code === 200) {
+            alert("已成功加入购物车");
+          } else {
+            alert(response.data?.message || "加入购物车失败");
+          }
         }
       }
+    } catch (error) {
+      handleOrderError(error, isBuyNow ? "购买商品" : "加入购物车");
+    } finally {
+      setIsModalOpen(false); // 无论成功失败都关闭模态框
     }
-    setIsModalOpen(false); // Close the modal
   };
 
   // 修改 handleAddToCart 为 handleAddToCart
@@ -208,6 +237,10 @@ const RecommendationDetail = () => {
   
   // Function to render product details
   const renderProductDetails = (details) => {
+    if (!details || !Array.isArray(details) || details.length === 0) {
+      return <p>暂无详细信息</p>;
+    }
+    
     return details.map((item, index) => {
       if (item.type === "image") {
         return (
@@ -243,7 +276,7 @@ const RecommendationDetail = () => {
 
   return (
     <div className="bg-gray-100">
-      <div className="max-w-[375px] mx-auto bg-white min-h-screen relative">
+      <div className="max-w-[375px] mx-auto bg-white min-h-screen relative pb-16">
         <nav className="fixed top-0 left-0 right-0 bg-primary text-white p-4 flex items-center justify-between z-10">
           <button className="text-xl" onClick={handleBack}>
             <i className="fas fa-arrow-left"></i>
@@ -290,17 +323,17 @@ const RecommendationDetail = () => {
           <div className="p-4 bg-white mt-2 flex items-center justify-between">
             <div className="flex items-center">
               <img
-                src={recommendation.shopAvatarUrl} // Use fetched data
+                src={recommendation.shopAvatarUrl || "https://via.placeholder.com/100"} // 添加默认图片
                 alt="店铺logo"
                 className="w-10 h-10 rounded-full mr-3"
               />
               <div>
                 <h3 className="font-medium tracking-wide">
-                  {recommendation.shopName}
+                  {recommendation.shopName || "未知店铺"}
                 </h3>{" "}
                 {/* Use fetched data */}
                 <p className="text-xs text-gray-500 font-light">
-                  {recommendation.storeDescription}
+                  {recommendation.storeDescription || "暂无店铺描述"}
                 </p>
               </div>
             </div>
@@ -372,24 +405,24 @@ const RecommendationDetail = () => {
                   >
                     <div className="flex items-center">
                       <img
-                        src={comment.userAvatarUrl} // Use fetched data
+                        src={comment.userAvatarUrl || "https://via.placeholder.com/100"} // 添加默认头像
                         alt="用户头像"
                         className="w-10 h-10 rounded-full mr-3"
                       />
                       <div>
-                        <p className="font-medium">{comment.userName}</p>
+                        <p className="font-medium">{comment.userName || "匿名用户"}</p>
                         <p className="text-sm text-gray-700 leading-relaxed mb-2 font-light">
-                          {comment.content} {/* Display comment content */}
+                          {comment.content || "暂无评论内容"} {/* Display comment content */}
                         </p>
                         <div className="flex items-center mt-1">
                           <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-full">
                             <i className="fas fa-star text-yellow-400 text-xs mr-1"></i>
                             <span className="text-xs font-medium text-yellow-700">
-                              {comment.rating} {/* Display rating */}
+                              {comment.rating || "5.0"} {/* Display rating */}
                             </span>
                           </div>
                           <span className="text-xs text-gray-500 ml-2">
-                            {comment.date} {/* Display date */}
+                            {comment.date || "未知日期"} {/* Display date */}
                           </span>
                         </div>
                       </div>
@@ -405,7 +438,7 @@ const RecommendationDetail = () => {
           {isModalOpen && (
             <div
               id="specificationModal"
-              className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center"
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
             >
               <div className="bg-white w-full max-w-md rounded-t-xl p-4">
                 <div className="flex justify-between items-center mb-6">
@@ -419,39 +452,43 @@ const RecommendationDetail = () => {
                 </div>
 
                 <div>
-                  {recommendation.specifications.map((spec, index) => (
-                    <div key={index} className="mb-4">
-                      <div className="text-sm text-gray-600 mb-2">
-                        {spec.name}
+                  {recommendation.specifications && recommendation.specifications.length > 0 ? (
+                    recommendation.specifications.map((spec, index) => (
+                      <div key={index} className="mb-4">
+                        <div className="text-sm text-gray-600 mb-2">
+                          {spec.name}
+                        </div>
+                        <div className="flex flex-wrap gap-3 specs-item">
+                          {spec.values.map((value, idx) => (
+                            <React.Fragment key={idx}>
+                              <input
+                                type="radio"
+                                name={spec.name}
+                                id={`${spec.name}-${idx}`}
+                                className="hidden"
+                                onChange={() =>
+                                  handleSpecChange(spec.name, value)
+                                }
+                                checked={selectedSpecs[spec.name] === value}
+                              />
+                              <label
+                                htmlFor={`${spec.name}-${idx}`}
+                                className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${
+                                  selectedSpecs[spec.name] === value
+                                    ? "bg-primary text-white"
+                                    : ""
+                                }`}
+                              >
+                                {value}
+                              </label>
+                            </React.Fragment>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-3 specs-item">
-                        {spec.values.map((value, idx) => (
-                          <React.Fragment key={idx}>
-                            <input
-                              type="radio"
-                              name={spec.name}
-                              id={`${spec.name}-${idx}`}
-                              className="hidden"
-                              onChange={() =>
-                                handleSpecChange(spec.name, value)
-                              }
-                              checked={selectedSpecs[spec.name] === value}
-                            />
-                            <label
-                              htmlFor={`${spec.name}-${idx}`}
-                              className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${
-                                selectedSpecs[spec.name] === value
-                                  ? "bg-primary text-white"
-                                  : ""
-                              }`}
-                            >
-                              {value}
-                            </label>
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 py-2">该商品无规格选择</p>
+                  )}
                 </div>
 
                 <div className="mb-4">

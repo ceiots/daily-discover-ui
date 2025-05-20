@@ -300,19 +300,19 @@ const Discover = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {recommendations.map((product) => (
                   <Link to={`/product/${product.id}`} key={product.id}>
-                    <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+                    <div className="bg-white rounded-lg overflow-hidden shadow-sm mb-6">
                       <img
                         src={product.imageUrl}
                         alt={product.title}
                         className="w-full h-36 object-cover"
                       />
-                      <div className="p-2">
-                        <h4 className="text-sm line-clamp-2 h-10">{product.title}</h4>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-primary text-sm">¥{product.price}</span>
+                      <div className="p-3">
+                        <h4 className="text-sm line-clamp-2">{product.title}</h4>
+                        <div className="flex items-center justify-between">
+                          <span className="text-primary font-medium">¥{product.price}</span>
                           <span className="text-xs text-gray-500">已售{product.soldCount}</span>
                         </div>
                       </div>
@@ -323,7 +323,7 @@ const Discover = () => {
               
               {/* 加载更多按钮 */}
               {page < totalPages - 1 && (
-                <div className="flex justify-center mt-6 mb-6">
+                <div className="flex justify-center mt-8 mb-24">
                   <button 
                     onClick={handleLoadMore} 
                     className="bg-primary text-white px-5 py-2 rounded-full text-sm flex items-center"
