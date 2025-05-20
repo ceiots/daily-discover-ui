@@ -33,6 +33,10 @@ const Discover = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [originalRecommendations, setOriginalRecommendations] = useState([]);
   const [cartItemCount, setCartItemCount] = useState(0); // 购物车数量状态
+  const [page, setPage] = useState(0); // 商品分页页码
+  const [size, setSize] = useState(10); // 每页商品数量
+  const [totalPages, setTotalPages] = useState(0); // 总页数
+  const [loadMoreLoading, setLoadMoreLoading] = useState(false); // 加载更多状态
 
   // 合并后的统一数据请求逻辑
   useEffect(() => {
@@ -40,25 +44,46 @@ const Discover = () => {
     
     const fetchInitialData = async () => {
       try {
+        // 使用分页参数获取商品数据
         const [eventsRes, categoriesRes, recommendationsRes] = await Promise.all([
           instance.get(`/events/date?date=${currentDate}`),
           instance.get('/categories'),
-          instance.get('/product')
+          instance.get(`/product?page=${page}&size=${size}`)
         ]);
 
         setEvents(eventsRes.data);
-       
         setCategories(categoriesRes.data);
-        const recData = recommendationsRes.data;
-        console.log("recData:", recData);
         
-        setRecommendations(recData);
-        setOriginalRecommendations(recData);
+        // 处理带分页的商品数据
+        if (recommendationsRes.data && recommendationsRes.data.code === 200) {
+          const recData = recommendationsRes.data.data || {};
+          console.log("recData:", recData);
+          
+          const newContent = recData.content || [];
+          
+          // 如果是第一页，直接设置数据
+          if (page === 0) {
+            setRecommendations(newContent);
+            setOriginalRecommendations(newContent);
+          } else {
+            // 如果不是第一页，追加数据
+            setRecommendations(prev => [...prev, ...newContent]);
+            setOriginalRecommendations(prev => [...prev, ...newContent]);
+          }
+          
+          setTotalPages(recData.totalPages || 0);
+        } else {
+          if (page === 0) {
+            setRecommendations([]);
+            setOriginalRecommendations([]);
+          }
+        }
       } catch (error) {
         setError("数据加载失败，请稍后重试");
         console.error("Data loading error:", error);
       } finally {
         setLoading(false);
+        setLoadMoreLoading(false);
       }
     };
 
@@ -83,7 +108,7 @@ const Discover = () => {
     } else {
       setCartItemCount(0);
     }
-  }, [currentDate, isLoggedIn]); // 添加isLoggedIn作为依赖项
+  }, [currentDate, isLoggedIn, page, size]); // 添加page和size作为依赖项
 
   // 点击事件处理函数
   const handleEventClick = (eventId) => {
@@ -94,8 +119,16 @@ const Discover = () => {
 
   const handleRefreshRecommendations = async () => {
     try {
-      const response = await instance.get(`/product/random`); // 假设后端有这个接口
-      setRecommendations(response.data); // 更新推荐内容
+      // 先重置页码
+      setPage(0);
+      // 使用random API获取随机商品
+      const response = await instance.get(`/product/random`);
+      if (response.data && response.data.length > 0) {
+        setRecommendations(response.data); // 更新推荐内容
+        setOriginalRecommendations(response.data);
+      } else {
+        console.log("没有获取到随机商品");
+      }
     } catch (error) {
       console.error("Error fetching random recommendations:", error);
     }
@@ -110,7 +143,14 @@ const Discover = () => {
     setSearchTerm(value);
   };
 
-
+  // 加载更多商品
+  const handleLoadMore = () => {
+    if (page < totalPages - 1 && !loadMoreLoading) {
+      setLoadMoreLoading(true);
+      setPage(prevPage => prevPage + 1);
+    }
+  };
+  
   return (
     <div className="discover-container bg-gray-50 ">
       <nav className="nav-bar fixed top-0 w-full px-4 py-3 z-50">
@@ -246,54 +286,62 @@ const Discover = () => {
               换一换 <i className="fas fa-sync-alt ml-1"></i>
             </button>
           </div>
-        
-        <div className="masonry pb-16">
-          {originalRecommendations.length > 0 ? (
-            originalRecommendations.map((recommendation) => (
-              <div
-                key={recommendation.id}
-                /* onClick={() => handleRecommendationClick(recommendation.id)} */
+          
+          {/* 今日推荐列表 */}
+          {(recommendations?.length === 0) ? (
+            <div className="bg-white rounded-lg p-5 text-center">
+              <p className="text-gray-500">没有推荐内容</p>
+              {/* <button
+                onClick={handleRefreshRecommendations}
+                className="mt-3 bg-primary text-white px-4 py-1.5 rounded-full text-xs"
               >
-                <Link to={`/recommendation/${recommendation.id}`}>
-                  <div className="masonry-item">
+                刷新推荐
+              </button> */}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                {recommendations.map((product) => (
+                  <Link to={`/product/${product.id}`} key={product.id}>
                     <div className="bg-white rounded-lg overflow-hidden shadow-sm">
                       <img
-                        src={recommendation.imageUrl}
-                        alt={recommendation.title}
-                        className="w-full h-48 object-cover"
+                        src={product.imageUrl}
+                        alt={product.title}
+                        className="w-full h-36 object-cover"
                       />
-                      <div className="p-3">
-                        <div className="flex items-center mb-2">
-                          <img
-                            src={recommendation.shopAvatarUrl}
-                            alt="店铺头像"
-                            className="w-6 h-6 rounded-full"
-                          />
-                          <span className="text-xs ml-2">
-                            {recommendation.shopName}
-                          </span>
-                        </div>
-                        <h3 className="text-sm font-medium mb-1">
-                          {recommendation.title}
-                        </h3>
-                        <div className="flex items-center justify-between">
-                          <div className="text-primary text-sm font-medium">
-                            ¥ {recommendation.price}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            已售 {recommendation.soldCount}{" "}
-                          </div>
+                      <div className="p-2">
+                        <h4 className="text-sm line-clamp-2 h-10">{product.title}</h4>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-primary text-sm">¥{product.price}</span>
+                          <span className="text-xs text-gray-500">已售{product.soldCount}</span>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                ))}
               </div>
-            ))
-          ) : (
-            <p className="text-gray-500">没有推荐内容</p>
+              
+              {/* 加载更多按钮 */}
+              {page < totalPages - 1 && (
+                <div className="flex justify-center mt-6 mb-6">
+                  <button 
+                    onClick={handleLoadMore} 
+                    className="bg-primary text-white px-5 py-2 rounded-full text-sm flex items-center"
+                    disabled={loadMoreLoading}
+                  >
+                    {loadMoreLoading ? (
+                      <>
+                        <span className="mr-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        加载中...
+                      </>
+                    ) : (
+                      '加载更多'
+                    )}
+                  </button>
+                </div>
+              )}
+            </>
           )}
-        </div>
 
         
       </div>

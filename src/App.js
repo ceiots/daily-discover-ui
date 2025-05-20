@@ -32,6 +32,7 @@ import ContentCreationPage from './components/ContentCreationPage'; // 图文创
 import EcommerceCreationPage from './components/EcommerceCreationPage'; // 电商创建页面
 import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
 import MyShopPage from './components/MyShopPage'; // 我的店铺内容页面
+import ProductManagePage from './components/ProductManagePage'; // 商品管理页面
 import CategoryManagePage from './components/CategoryManagePage'; // 商品分类管理页面
 import ShopCreationPage from './components/ShopCreationPage'; // 店铺创建页
 import ShopDetailPage from './components/ShopDetailPage'; // 店铺详情页面
@@ -198,7 +199,7 @@ const App = () => {
           <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
-          <Route path="/recommendation/:id" element={<RecommendationDetail/>} />
+          <Route path="/product/:id" element={<RecommendationDetail/>} />
           <Route path="/search-results" element={<SearchResultsPage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/payment-password" element={<PaymentPassword />} />
@@ -207,7 +208,8 @@ const App = () => {
           <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
           <Route path="/category-manage" element={<ProtectedRoute><CategoryManagePage /></ProtectedRoute>} />
           <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
-          <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />          
+          <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
+          <Route path="/product-manage" element={<ProtectedRoute><ProductManagePage /></ProtectedRoute>} />
           <Route path="/create-shop" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
           <Route path="/edit-shop/:id" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
           <Route path="/shop/:shopId" element={<ShopDetailPage />} />

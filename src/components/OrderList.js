@@ -340,6 +340,32 @@ const OrderList = () => {
             已完成
           </button>
         </div>
+        <div className="flex px-4 border-t border-gray-100">
+          <button
+            className={`${
+              selectedStatus === "退款中"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
+            } py-2 px-2 text-xs mr-4`}
+            onClick={() => {
+              handleStatusChange("退款中");
+            }}
+          >
+            退款中
+          </button>
+          <button
+            className={`${
+              selectedStatus === "已退款"
+                ? "text-primary border-primary border-b-2"
+                : "text-gray-500"
+            } py-2 px-2 text-xs`}
+            onClick={() => {
+              handleStatusChange("已退款");
+            }}
+          >
+            已退款
+          </button>
+        </div>
       </nav>
 
       {/* 订单列表 */}
