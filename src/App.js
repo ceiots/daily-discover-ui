@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import instance from './utils/axios';
 import Discover from './components/Discover';
@@ -50,6 +50,7 @@ const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [userLoading, setUserLoading] = useState(true); // 新增加载状态
+  const isInitialMountRef = useRef(true); // 添加一个引用来跟踪初始挂载
 
   // 初始化时加载用户信息
   useEffect(() => {
@@ -59,7 +60,11 @@ const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
 
-        console.log("初始化检查 - token:", !!token, "userId:", userId);
+        // 使用 ref 确保只在第一次渲染时输出日志
+        if (isInitialMountRef.current) {
+          console.log("初始化检查 - token:", !!token, "userId:", userId);
+          isInitialMountRef.current = false;
+        }
 
         // 检查 token 和 userId 是否存在
         if (token && userId) {
