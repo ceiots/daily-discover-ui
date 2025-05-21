@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import NavBar from './NavBar'; // 引入底部导航栏组件
 import FixImages from './FixImages'; // 引入图片修复组件
 import { useNavigate } from "react-router-dom";
+import EnhancedAiChat from './ai/EnhancedAiChat'; // 引入增强型AI聊天组件
 
 // 默认内联占位图片，直接使用内联定义，不依赖任何外部资源
 const DEFAULT_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhIj7lm77niYflt7LliqDovb08L3RleHQ+PC9zdmc+';
@@ -28,7 +29,8 @@ const IMAGE_MAP = {
 };
 
 // 获取图片函数，只使用本地变量，完全消除闪烁
-const getImage = (id) => {
+// 修改为导出函数，以便其他组件使用
+export const getImage = (id) => {
   // 如果ID是完整URL，且不包含ai-public.mastergo.com，则返回该URL
   if (typeof id === 'string' && id.startsWith('http') && !id.includes('ai-public.mastergo.com')) {
     return id;
@@ -71,10 +73,45 @@ const DailyAiApp = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [similarUsers, setSimilarUsers] = useState([]);
-  const [showUserPopup, setShowUserPopup] = useState(false); // 新增：控制用户信息弹窗
+  const [showUserPopup, setShowUserPopup] = useState(false);
+  const [articles, setArticles] = useState([]);
+  const [showArticleModal, setShowArticleModal] = useState(false);
+  const [showArticlePreview, setShowArticlePreview] = useState(false);
+  const [articleTopic, setArticleTopic] = useState('');
+  const [articleCategory, setArticleCategory] = useState('');
+  const [articleLength, setArticleLength] = useState('medium');
+  const [articlePrompt, setArticlePrompt] = useState('');
+  const [isGeneratingArticle, setIsGeneratingArticle] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
   const mainRef = useRef(null);
   const speechRecognition = useRef(null);
 
+  // 新增：处理文章请求的函数
+  const handleArticleRequest = (prompt) => {
+    console.log('请求创建文章:', prompt);
+    
+    // 从提示中提取主题
+    const topic = prompt.replace(/帮我写篇关于|写一篇关于|生成一篇|创建一篇文章关于|的文章/gi, '').trim();
+    
+    // 设置主题并打开模态框
+    setArticleTopic(topic);
+    setShowArticleModal(true);
+  };
+  
+  // 新增：生成随机封面图
+  const generateCoverImage = (articleTopic) => {
+    // 尝试从主题生成相关图片，实际项目中可能是调用AI生成或从库中选择
+    const defaultCovers = [
+      DEFAULT_PRODUCT1,
+      DEFAULT_PRODUCT2,
+      DEFAULT_PRODUCT3, 
+      DEFAULT_PRODUCT4,
+      DEFAULT_THEME
+    ];
+    
+    return defaultCovers[Math.floor(Math.random() * defaultCovers.length)];
+  };
+  
   // 格式化日期显示
   const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth()+1}月${currentDate.getDate()}日`;
 
@@ -116,7 +153,8 @@ const DailyAiApp = () => {
     fetchPersonalizedFeatures();
     fetchInteractiveGames();
     fetchSimilarUsers();
-    fetchTrendingProducts(); // 获取热门商品数据
+    fetchTrendingProducts();
+    fetchArticles(); // 新增：获取文章列表
 
     // 监测系统暗色模式
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
@@ -784,6 +822,192 @@ const DailyAiApp = () => {
     return DEFAULT_THEME;
   };
 
+  // 获取文章列表
+  const fetchArticles = async () => {
+    try {
+      if (!isLoggedIn) return;
+      
+      const response = await instance.get('/ai/articles');
+      if (response.data && response.data.code === 200) {
+        setArticles(response.data.data || []);
+      } else {
+        // 使用示例数据
+        setArticles([
+          {
+            id: 1,
+            title: '智能家居入门指南：打造舒适便捷的生活空间',
+            summary: '本文介绍如何通过智能设备打造现代化家居环境，提升生活品质。',
+            content: '<p>随着科技的发展，智能家居已经逐渐走进千家万户。本文将详细介绍智能家居的基本概念、核心设备以及如何根据不同需求搭建适合自己的智能家居系统。</p><h3>智能家居的核心设备</h3><p>智能音箱、智能灯具、智能开关和智能窗帘是入门智能家居的首选设备。这些设备不仅安装简单，而且可以通过语音控制，极大地提升了生活便利性。</p><h3>系统互通与场景设置</h3><p>选择支持主流协议的设备，确保不同品牌产品之间可以互相通信。通过场景设置，可以实现一键控制多个设备，例如"回家模式"可以同时打开灯光、空调和窗帘。</p><h3>智能家居的发展趋势</h3><p>未来智能家居将更加注重AI学习用户习惯，自动调整家居环境，提供更加个性化的服务体验。</p>',
+            createdAt: '2023-10-15',
+            category: '家居',
+            coverImage: DEFAULT_PRODUCT3,
+            images: [DEFAULT_PRODUCT3, DEFAULT_PRODUCT4],
+            status: '已完成'
+          },
+          {
+            id: 2,
+            title: '2023年最值得购买的无线耳机评测',
+            summary: '详细对比市面上热门无线耳机的音质、续航和舒适度，助您做出最佳选择。',
+            content: '<p>无线耳机已经成为现代生活的必备品，本文将从音质、降噪效果、续航能力和佩戴舒适度等方面对市面主流无线耳机进行全面评测。</p><h3>音质表现</h3><p>Sony WF-1000XM4在音质方面表现出色，低频饱满有力，中频清晰，高频明亮但不刺耳。AirPods Pro则在空间感和平衡性方面有优势。</p><h3>降噪效果</h3><p>Bose QuietComfort Earbuds II的降噪能力领先，尤其在嘈杂环境中表现突出。索尼和苹果的产品紧随其后。</p><h3>续航与舒适度</h3><p>三星Galaxy Buds Pro 2在续航方面表现最佳，单次充电可使用10小时。而Beats Fit Pro在佩戴舒适度和运动稳定性方面更具优势。</p>',
+            createdAt: '2023-11-02',
+            category: '评测',
+            coverImage: DEFAULT_PRODUCT2,
+            images: [DEFAULT_PRODUCT1, DEFAULT_PRODUCT2],
+            status: '已完成'
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('获取文章列表失败:', error);
+      // 使用示例数据
+      setArticles([
+        {
+          id: 1,
+          title: '智能家居入门指南：打造舒适便捷的生活空间',
+          summary: '本文介绍如何通过智能设备打造现代化家居环境，提升生活品质。',
+          content: '<p>随着科技的发展，智能家居已经逐渐走进千家万户。本文将详细介绍智能家居的基本概念、核心设备以及如何根据不同需求搭建适合自己的智能家居系统。</p><h3>智能家居的核心设备</h3><p>智能音箱、智能灯具、智能开关和智能窗帘是入门智能家居的首选设备。这些设备不仅安装简单，而且可以通过语音控制，极大地提升了生活便利性。</p><h3>系统互通与场景设置</h3><p>选择支持主流协议的设备，确保不同品牌产品之间可以互相通信。通过场景设置，可以实现一键控制多个设备，例如"回家模式"可以同时打开灯光、空调和窗帘。</p><h3>智能家居的发展趋势</h3><p>未来智能家居将更加注重AI学习用户习惯，自动调整家居环境，提供更加个性化的服务体验。</p>',
+          createdAt: '2023-10-15',
+          category: '家居',
+          coverImage: DEFAULT_PRODUCT3,
+          images: [DEFAULT_PRODUCT3, DEFAULT_PRODUCT4],
+          status: '已完成'
+        },
+        {
+          id: 2,
+          title: '2023年最值得购买的无线耳机评测',
+          summary: '详细对比市面上热门无线耳机的音质、续航和舒适度，助您做出最佳选择。',
+          content: '<p>无线耳机已经成为现代生活的必备品，本文将从音质、降噪效果、续航能力和佩戴舒适度等方面对市面主流无线耳机进行全面评测。</p><h3>音质表现</h3><p>Sony WF-1000XM4在音质方面表现出色，低频饱满有力，中频清晰，高频明亮但不刺耳。AirPods Pro则在空间感和平衡性方面有优势。</p><h3>降噪效果</h3><p>Bose QuietComfort Earbuds II的降噪能力领先，尤其在嘈杂环境中表现突出。索尼和苹果的产品紧随其后。</p><h3>续航与舒适度</h3><p>三星Galaxy Buds Pro 2在续航方面表现最佳，单次充电可使用10小时。而Beats Fit Pro在佩戴舒适度和运动稳定性方面更具优势。</p>',
+          createdAt: '2023-11-02',
+          category: '评测',
+          coverImage: DEFAULT_PRODUCT2,
+          images: [DEFAULT_PRODUCT1, DEFAULT_PRODUCT2],
+          status: '已完成'
+        }
+      ]);
+    }
+  };
+
+  // 处理生成文章
+  const handleGenerateArticle = async () => {
+    if (!articleTopic.trim()) return;
+    
+    setIsGeneratingArticle(true);
+    try {
+      // 构建请求参数
+      const requestData = {
+        topic: articleTopic,
+        category: articleCategory,
+        length: articleLength,
+        additionalPrompt: articlePrompt
+      };
+      
+      const response = await instance.post('/ai/generate-article', requestData);
+      
+      if (response.data && response.data.code === 200) {
+        const generatedArticle = response.data.data;
+        
+        // 添加到文章列表
+        setArticles(prev => [generatedArticle, ...prev]);
+        
+        // 重置表单并关闭模态框
+        resetArticleForm();
+        setShowArticleModal(false);
+        
+        // 显示成功提示
+        alert('文章生成成功！');
+      } else {
+        // 模拟生成的文章
+        const coverImage = generateCoverImage(articleTopic);
+        const randomImages = articleCategory === '评测' ? 
+          [DEFAULT_PRODUCT1, DEFAULT_PRODUCT2] : 
+          (Math.random() > 0.5 ? [generateCoverImage(articleTopic)] : []);
+        
+        const mockArticle = {
+          id: Date.now(),
+          title: articleCategory ? `${articleCategory}：${articleTopic}` : articleTopic,
+          summary: `关于${articleTopic}的详细解析和最新信息整理。`,
+          content: `<h2>${articleTopic}</h2><p>这是一篇关于${articleTopic}的AI生成文章。文章内容将根据您的要求进行生成。</p><h3>主要内容</h3><p>在这部分将详细介绍${articleTopic}的核心内容和要点。</p><h3>深入分析</h3><p>这部分将对${articleTopic}进行深入的分析和讨论，提供专业的见解和建议。</p><h3>总结</h3><p>最后，我们将对${articleTopic}进行总结，并展望未来的发展趋势。</p>`,
+          createdAt: new Date().toISOString().split('T')[0],
+          category: articleCategory || '未分类',
+          coverImage: coverImage,
+          images: randomImages,
+          status: '已完成'
+        };
+        
+        // 添加到文章列表
+        setArticles(prev => [mockArticle, ...prev]);
+        
+        // 重置表单并关闭模态框
+        resetArticleForm();
+        setShowArticleModal(false);
+        
+        // 显示成功提示
+        alert('文章生成成功！');
+      }
+    } catch (error) {
+      console.error('生成文章失败:', error);
+      alert('生成文章失败，请稍后再试');
+    } finally {
+      setIsGeneratingArticle(false);
+    }
+  };
+
+  // 重置文章表单
+  const resetArticleForm = () => {
+    setArticleTopic('');
+    setArticleCategory('');
+    setArticleLength('medium');
+    setArticlePrompt('');
+  };
+
+  // 处理查看文章
+  const handleViewArticle = (article) => {
+    setSelectedArticle(article);
+    setShowArticlePreview(true);
+  };
+
+  // 处理编辑文章
+  const handleEditArticle = (article) => {
+    // 实际项目中应该导航到编辑页面或打开编辑模态框
+    alert(`编辑文章: ${article.title}`);
+  };
+
+  // 处理删除文章
+  const handleDeleteArticle = async (articleId) => {
+    if (!window.confirm('确定要删除这篇文章吗？')) return;
+    
+    try {
+      const response = await instance.delete(`/ai/articles/${articleId}`);
+      
+      if (response.data && response.data.code === 200) {
+        // 从列表中移除
+        setArticles(prev => prev.filter(article => article.id !== articleId));
+        alert('文章已删除');
+      } else {
+        // 模拟删除
+        setArticles(prev => prev.filter(article => article.id !== articleId));
+        alert('文章已删除');
+      }
+    } catch (error) {
+      console.error('删除文章失败:', error);
+      // 模拟删除
+      setArticles(prev => prev.filter(article => article.id !== articleId));
+      alert('文章已删除');
+    }
+  };
+
+  // 处理分享文章
+  const handleShareArticle = (article) => {
+    // 实际项目中应该实现分享功能
+    alert(`分享文章: ${article.title}`);
+  };
+
+  // 处理导出文章
+  const handleExportArticle = (article) => {
+    // 实际项目中应该实现导出功能（如PDF、Word等）
+    alert(`导出文章: ${article.title}`);
+  };
+
   return (
     <div className="daily-ai-wrapper">
       {/* 添加图片修复组件 */}
@@ -846,79 +1070,8 @@ const DailyAiApp = () => {
       </header>
 
         <main ref={mainRef} className="flex-grow p-4 overflow-y-auto overflow-x-visible pb-24" style={{width: '100%', maxWidth: '100%'}}> {/* 确保可垂直滚动但水平方向内容完全可见 */}
-        {/* AI助手区域 */}
-        <section className="ai-chat-container p-4 text-white">
-          <div className="flex items-start">
-              <div className="ai-avatar mr-3">
-                <img
-                  src={getImage('avatar')}
-                  alt="AI助手"
-                  onError={handleImageError}
-                />
-              </div>
-            <div className="flex-grow">
-              <h2 className="text-base font-semibold mb-2">AI智能助手</h2>
-              <div className="ai-message-bubble">
-                <p className="text-sm">{aiResponse}</p>
-                  <button
-                    onClick={() => speakText(aiResponse)}
-                    className="mt-2 text-xs opacity-70 hover:opacity-100"
-                    aria-label="播放语音"
-                  >
-                    <i className="fas fa-volume-up mr-1"></i>播放语音
-                  </button>
-              </div>
-
-              <div className="quick-question-container">
-                  <span className="quick-question-tag mr-2" onClick={() => handleQuickQuestion("今日有什么好物推荐？")}>
-                    今日有什么好物推荐？
-                  </span>
-                  <span className="quick-question-tag" onClick={() => handleQuickQuestion("这周最热门的智能产品是什么？")}>
-                    这周最热门的智能产品是什么？
-                  </span>
-              </div>
-
-              <div className="chat-input-container">
-                  <button
-                    className={`voice-button ${isVoiceActive ? 'animate-pulse bg-red-400' : ''}`}
-                    onClick={toggleVoiceInput}
-                    aria-label="语音输入"
-                  >
-                    <i className="fas fa-microphone"></i>
-                  </button>
-                  <button
-                    className="image-button"
-                    onClick={handleImageInput}
-                    aria-label="图片输入"
-                  >
-                    <i className="fas fa-camera"></i>
-                  </button>
-                <input
-                  type="text"
-                  className="chat-input"
-                    placeholder={isVoiceActive ? "请说话..." : "输入您的问题..."}
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAIRequest()}
-                />
-                <button
-                  className="send-button"
-                  onClick={handleAIRequest}
-                  disabled={isLoading}>
-                  {isLoading ? (
-                      <div className="brand-loader">
-                        <span className="dot"></span>
-                        <span className="dot"></span>
-                        <span className="dot"></span>
-                      </div>
-                  ) : (
-                    <i className="fas fa-paper-plane"></i>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* 使用增强型AI聊天组件替换原来的AI助手区域 */}
+        <EnhancedAiChat onRequestArticle={handleArticleRequest} />
 
 
         {/* 导航选项卡 */}
@@ -948,88 +1101,8 @@ const DailyAiApp = () => {
         {/* 智能推荐选项卡内容 */}
         {activeTab === 'recommendations' && (
           <section className="fade-in">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-semibold text-primary">每日AI智能推荐</h2>
-              <div className="flex items-center">
-                <button onClick={handleRefreshRecommendations} className="mr-2 theme-refresh-button">
-                  <i className="fas fa-sync-alt"></i>
-                </button>
-                <Link to="/discover" className="text-primary text-sm">
-                  更多 <i className="fas fa-chevron-right"></i>
-                </Link>
-              </div>
-            </div>
-
-            {loadingRecommendations ? (
-              <div className="flex justify-center items-center py-10">
-                  <div className="brand-loader">
-                    <span className="dot bg-primary"></span>
-                    <span className="dot bg-primary"></span>
-                    <span className="dot bg-primary"></span>
-                  </div>
-              </div>
-            ) : (
-              <>
-                                    <div className="grid grid-cols-2 gap-3 mb-4" style={{minWidth: 0}}>
-                  {recommendations.slice(0, 4).map((product, index) => (
-                    <div key={product.id || index} className="recommendation-card" style={{width: '100%'}}>
-                      <div style={{position: 'relative', width: '100%', paddingTop: '100%'}}>
-                        <img
-                          src={getImage(product.imageUrl)}
-                          alt={product.title}
-                          className="product-image"
-                          onError={handleImageError}
-                          loading="lazy"
-                          style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover'}}
-                        />
-                      </div>
-                      <div className="product-info" style={{width: '100%', boxSizing: 'border-box'}}>
-                        <h3 className="product-title" style={{width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{product.title}</h3>
-                        <p className="product-description" style={{width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{product.description || '智能推荐'}</p>
-                        <div className="flex justify-between items-center" style={{width: '100%'}}>
-                          <p className="product-price">¥{product.price?.toFixed(2)}</p>
-                          <div className="flex">
-                            <button
-                              onClick={() => generateShareCard(product)}
-                              className="mr-1 text-gray-500 text-sm hover:text-primary"
-                              aria-label="分享"
-                            >
-                              <i className="fas fa-share-alt"></i>
-                            </button>
-                            <Link 
-                              to={`/product/${product.id}`}
-                              className="view-details-button"
-                            >
-                              查看详情
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {recommendationReasons.length > 0 && (
-                  <div className="recommendation-reasons">
-                    <h3 className="reasons-title">
-                      <i className="fas fa-lightbulb text-yellow-500 mr-2"></i>
-                      AI智能推荐理由
-                    </h3>
-                    <ul className="space-y-2">
-                      {recommendationReasons.slice(0, 3).map((reason, index) => (
-                        <li key={index} className="reason-item">
-                          <span className="reason-bullet">•</span>
-                          <p className="reason-text">{reason}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                  {/* 渲染相似用户推荐 */}
-                  {renderSimilarUserRecommendations()}
-              </>
-            )}
+            
+             {/* {renderSimilarUserRecommendations()} */}
           </section>
         )}
 
@@ -1070,30 +1143,6 @@ const DailyAiApp = () => {
                 </div>
               ))}
             </div>
-
-            {/* 排行榜区域 */}
-            <h2 className="section-title mt-6">游戏排行榜</h2>
-            <div className="profile-card">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-medium">用户</span>
-                <span className="text-sm font-medium">得分</span>
-              </div>
-              {[
-                { name: "用户A", score: 98 },
-                { name: "用户B", score: 87 },
-                { name: "用户C", score: 75 }
-              ].map((user, index) => (
-                <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <div className="flex items-center">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center mr-2 text-xs ${index === 0 ? 'bg-yellow-400' : index === 1 ? 'bg-gray-300' : index === 2 ? 'bg-amber-600' : 'bg-gray-200'} text-white`}>
-                      {index + 1}
-                    </span>
-                    <span className="text-sm">{user.name}</span>
-                  </div>
-                  <span className="text-sm font-medium">{user.score}</span>
-                </div>
-              ))}
-            </div>
           </section>
         )}
 
@@ -1103,6 +1152,252 @@ const DailyAiApp = () => {
               {renderTrendingProducts()}
           </section>
         )}
+
+        <section className="fade-in">
+          {/* AI生成文章部分 */}
+          <div className="ai-article-section">
+            {/* <div className="section-header">
+              <h2 className="text-base font-semibold text-primary">AI文章助手</h2>
+              <button 
+                className="create-article-btn"
+                onClick={() => setShowArticleModal(true)}
+              >
+                <i className="fas fa-pen-fancy mr-1"></i>
+                创建新文章
+              </button>
+            </div> */}
+            
+            {/* 文章列表 */}
+            <div className="ai-article-list">
+              {articles.length > 0 ? (
+                articles.map((article, index) => (
+                  <div key={index} className="article-card" onClick={() => handleViewArticle(article)}>
+                    <div className="article-card-content">
+                      {article.coverImage && (
+                        <div className="article-image-container">
+                          <img 
+                            src={article.coverImage} 
+                            alt={article.title}
+                            className="article-cover-image"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = DEFAULT_IMAGE;
+                            }}
+                          />
+                        </div>
+                      )}
+                      <h3 className="article-title">{article.title}</h3>
+                      <p className="article-summary">{article.summary}</p>
+                      <div className="article-meta">
+                        <span className="article-date">
+                          <i className="far fa-calendar-alt mr-1"></i>
+                          {article.createdAt}
+                        </span>
+                        <span className="article-category">
+                          <i className="far fa-folder mr-1"></i>
+                          {article.category}
+                        </span>
+                        <span className="article-status">
+                          <i className="far fa-check-circle mr-1"></i>
+                          {article.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-articles">
+                  <div className="empty-icon">
+                    <i className="fas fa-file-alt"></i>
+                  </div>
+                  <p className="empty-text">暂无生成的文章</p>
+                  <p className="empty-subtext">点击&quot;创建新文章&quot;按钮开始创作</p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {/* 文章创建模态框 */}
+          {showArticleModal && (
+            <div className="modal-overlay">
+              <div className="article-modal">
+                <div className="modal-header">
+                  <h3>创建AI文章</h3>
+                  <button 
+                    className="close-modal-btn"
+                    onClick={() => setShowArticleModal(false)}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="form-group">
+                    <label htmlFor="articleTopic">文章主题</label>
+                    <input 
+                      type="text" 
+                      id="articleTopic" 
+                      value={articleTopic}
+                      onChange={(e) => setArticleTopic(e.target.value)}
+                      placeholder="例如：智能家居使用指南" 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="articleCategory">文章分类</label>
+                    <select 
+                      id="articleCategory"
+                      value={articleCategory}
+                      onChange={(e) => setArticleCategory(e.target.value)}
+                    >
+                      <option value="">选择分类</option>
+                      <option value="科技">科技</option>
+                      <option value="数码">数码</option>
+                      <option value="家居">家居</option>
+                      <option value="评测">评测</option>
+                      <option value="教程">教程</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="articleLength">文章长度</label>
+                    <select 
+                      id="articleLength"
+                      value={articleLength}
+                      onChange={(e) => setArticleLength(e.target.value)}
+                    >
+                      <option value="short">短文（500字左右）</option>
+                      <option value="medium">中等（1000字左右）</option>
+                      <option value="long">长文（2000字左右）</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="articlePrompt">更多要求（可选）</label>
+                    <textarea 
+                      id="articlePrompt" 
+                      value={articlePrompt}
+                      onChange={(e) => setArticlePrompt(e.target.value)}
+                      placeholder="添加更多具体要求，如文风、重点内容等" 
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => setShowArticleModal(false)}
+                  >
+                    取消
+                  </button>
+                  <button 
+                    className="generate-btn"
+                    onClick={handleGenerateArticle}
+                    disabled={isGeneratingArticle || !articleTopic.trim()}
+                  >
+                    {isGeneratingArticle ? (
+                      <>
+                        <span className="loading-dots"></span>
+                        生成中...
+                      </>
+                    ) : '生成文章'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* 文章预览模态框 */}
+          {showArticlePreview && selectedArticle && (
+            <div className="modal-overlay">
+              <div className="article-preview-modal">
+                <div className="modal-header">
+                  <h3>{selectedArticle.title}</h3>
+                  <button 
+                    className="close-modal-btn"
+                    onClick={() => setShowArticlePreview(false)}
+                  >
+                    <i className="fas fa-times"></i>
+                  </button>
+                </div>
+                <div className="article-preview-content">
+                  <div className="article-meta-info">
+                    <span>
+                      <i className="far fa-calendar-alt mr-1"></i>
+                      {selectedArticle.createdAt}
+                    </span>
+                    <span>
+                      <i className="far fa-folder mr-1"></i>
+                      {selectedArticle.category}
+                    </span>
+                    <span>
+                      <i className="fas fa-pen-fancy mr-1"></i>
+                      AI生成
+                    </span>
+                  </div>
+                  {selectedArticle.images && selectedArticle.images.length > 0 && (
+                    <div className="article-preview-images">
+                      <div className={`grid ${selectedArticle.images.length === 1 ? '' : 'grid-cols-2'} gap-3 mb-4`}>
+                        {selectedArticle.images.map((image, index) => (
+                          <img 
+                            key={index} 
+                            src={image} 
+                            alt={`图片 ${index + 1}`}
+                            className={`w-full rounded-lg ${selectedArticle.images.length === 1 ? 'max-h-[300px] object-contain' : 'h-32 object-cover'}`}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = DEFAULT_IMAGE;
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {selectedArticle.coverImage && !selectedArticle.images && (
+                    <div className="article-preview-cover mb-4">
+                      <img 
+                        src={selectedArticle.coverImage} 
+                        alt={selectedArticle.title}
+                        className="w-full max-h-[300px] object-contain rounded-lg"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = DEFAULT_IMAGE;
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div 
+                    className="article-content"
+                    dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
+                  />
+                </div>
+                <div className="modal-footer">
+                  <button 
+                    className="share-btn"
+                    onClick={() => handleShareArticle(selectedArticle)}
+                  >
+                    <i className="fas fa-share-alt mr-1"></i>
+                    分享
+                  </button>
+                  <button 
+                    className="export-btn"
+                    onClick={() => handleExportArticle(selectedArticle)}
+                  >
+                    <i className="fas fa-download mr-1"></i>
+                    导出
+                  </button>
+                  <button 
+                    className="edit-btn"
+                    onClick={() => {
+                      setShowArticlePreview(false);
+                      handleEditArticle(selectedArticle);
+                    }}
+                  >
+                    <i className="fas fa-edit mr-1"></i>
+                    编辑
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
       </main>
       </div>
 

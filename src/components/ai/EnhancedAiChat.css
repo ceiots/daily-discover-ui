@@ -1,0 +1,607 @@
+/* EnhancedAiChat.css - 现代化AI聊天界面样式 */
+
+.enhanced-ai-chat {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.enhanced-ai-chat:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* 聊天头部 */
+.chat-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.ai-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 14px;
+  background-color: #fff;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-avatar:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.ai-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.ai-avatar:hover img {
+  transform: scale(1.1);
+}
+
+.chat-title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.chat-title h2::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+.chat-title p {
+  margin: 8px 0 0;
+  font-size: 12px;
+  opacity: 0.8;
+  font-weight: 300;
+}
+
+/* 聊天容器 */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 380px;
+  position: relative;
+}
+
+/* 消息容器 */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 400px;
+  scroll-behavior: smooth;
+  background-color: #f8f9fe;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.03) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.03) 0%, transparent 20%);
+}
+
+.messages-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+  background-color: rgba(79, 70, 229, 0.2);
+  border-radius: 6px;
+}
+
+/* 消息样式 */
+.message {
+  display: flex;
+  align-items: flex-start;
+  max-width: 95%;
+  animation: fadeIn 0.4s ease-in-out;
+  position: relative;
+}
+
+.message.ai {
+  align-self: flex-start;
+}
+
+.message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.message-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid #fff;
+  transition: transform 0.3s ease;
+}
+
+.message-avatar:hover {
+  transform: scale(1.1);
+}
+
+.message.ai .message-avatar {
+  margin-right: 12px;
+}
+
+.message.user .message-avatar {
+  margin-left: 12px;
+}
+
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-content {
+  background-color: #f2f2f7;
+  border-radius: 18px;
+  padding: 12px 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+  max-width: calc(100% - 60px);
+  word-break: break-word;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
+}
+
+.message-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.message.user .message-content {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message.ai .message-content {
+  background-color: white;
+  color: #333;
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.message.ai .message-content::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-left: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transform: rotate(45deg) translateY(6px);
+  z-index: -1;
+}
+
+.message.user .message-content::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  transform: rotate(45deg) translateY(6px);
+  z-index: -1;
+}
+
+.message.image-message .message-content {
+  background-color: rgba(79, 70, 229, 0.05);
+  border: 1px dashed rgba(79, 70, 229, 0.3);
+}
+
+/* 加载指示器 */
+.typing-indicator {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 20px;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  margin: 0 2px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0% {
+    transform: translateY(0px);
+    background-color: #bbb;
+  }
+  28% {
+    transform: translateY(-6px);
+    background-color: #999;
+  }
+  44% {
+    transform: translateY(0px);
+    background-color: #bbb;
+  }
+}
+
+/* 快捷问题 */
+.quick-questions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  padding: 14px 20px;
+  background-color: #f8f9fe;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.quick-questions::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.quick-questions::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to right, transparent, #f8f9fe);
+  pointer-events: none;
+}
+
+.quick-question-btn {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+  color: #4f46e5;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.quick-question-btn:hover {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.quick-question-btn:active {
+  transform: translateY(0);
+}
+
+/* 输入容器 */
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  position: relative;
+}
+
+.input-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, rgba(79, 70, 229, 0.2), rgba(147, 51, 234, 0.2));
+}
+
+.chat-input {
+  flex: 1;
+  height: 44px;
+  max-height: 120px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 22px;
+  padding: 12px 18px;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+  transition: all 0.25s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-family: inherit;
+}
+
+.chat-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.input-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f7;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.input-button:hover {
+  background-color: #eaeaec;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.input-button:active {
+  transform: translateY(0);
+}
+
+.send-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: white;
+}
+
+.send-button:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+}
+
+.send-button:disabled {
+  background: linear-gradient(135deg, #c7c7c7 0%, #d1d1d1 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.voice-button.active {
+  background-color: #ff4b4b;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.image-button {
+  color: #666;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(255, 75, 75, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 75, 75, 0);
+  }
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+  .enhanced-ai-chat {
+    background-color: #1c1c1e;
+  }
+  
+  .messages-container {
+    background-color: #2c2c2e;
+    background-image: 
+      radial-gradient(circle at 10% 20%, rgba(79, 70, 229, 0.05) 0%, transparent 20%),
+      radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.05) 0%, transparent 20%);
+  }
+  
+  .message-content {
+    background-color: #3a3a3c;
+    color: #f0f0f0;
+  }
+  
+  .message.ai .message-content {
+    background-color: #3a3a3c;
+    color: #f0f0f0;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .message.ai .message-content::before {
+    background-color: #3a3a3c;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .quick-questions {
+    background-color: #2c2c2e;
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .quick-questions::after {
+    background: linear-gradient(to right, transparent, #2c2c2e);
+  }
+  
+  .quick-question-btn {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.15) 0%, rgba(147, 51, 234, 0.15) 100%);
+    color: #a5a1ff;
+    border-color: rgba(79, 70, 229, 0.3);
+  }
+  
+  .quick-question-btn:hover {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.25) 0%, rgba(147, 51, 234, 0.25) 100%);
+  }
+  
+  .input-container {
+    background-color: #1c1c1e;
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .input-container::before {
+    background: linear-gradient(to right, rgba(79, 70, 229, 0.3), rgba(147, 51, 234, 0.3));
+  }
+  
+  .chat-input {
+    background-color: #3a3a3c;
+    color: #f0f0f0;
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .chat-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .input-button {
+    background-color: #3a3a3c;
+    color: #e0e0e0;
+  }
+  
+  .input-button:hover {
+    background-color: #48484a;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .enhanced-ai-chat {
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .chat-header {
+    padding: 12px;
+  }
+  
+  .ai-avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+  }
+  
+  .messages-container {
+    padding: 16px;
+    max-height: 320px;
+  }
+  
+  .message {
+    max-width: 95%;
+  }
+  
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .message.ai .message-avatar {
+    margin-right: 8px;
+  }
+  
+  .message.user .message-avatar {
+    margin-left: 8px;
+  }
+  
+  .message-content {
+    padding: 10px 14px;
+    font-size: 14px;
+    max-width: calc(100% - 48px);
+  }
+  
+  .quick-questions {
+    padding: 12px;
+  }
+  
+  .quick-question-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .input-container {
+    padding: 12px;
+  }
+  
+  .chat-input {
+    height: 40px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .input-button {
+    width: 40px;
+    height: 40px;
+  }
+}
