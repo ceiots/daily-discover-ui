@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../utils/axios";
 import "./ForgotPasswordPage.css"; // 引入样式文件
+import NavBar from "./NavBar"; // 引入NavBar组件
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -230,22 +231,9 @@ const ForgotPasswordPage = () => {
           </div>
         </div>
       </div>
-      {/* 底部导航栏 */}
-      <div className="fixed bottom-0 w-full max-w-[375px] h-12 bg-white border-t flex justify-around items-center">
-        <a href="#" className="flex flex-col items-center text-primary">
-          <i className="ri-compass-line text-sm"></i>
-          <span className="nav-text mt-0.5">发现</span>
-        </a>
-        <a href="#" className="flex flex-col items-center text-gray-400">
-          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center -mt-3">
-            <i className="ri-add-line text-lg text-white"></i>
-          </div>
-        </a>
-        <a href="#" className="flex flex-col items-center text-gray-400">
-          <i className="ri-calendar-line text-sm"></i>
-          <span className="nav-text mt-0.5">日历</span>
-        </a>
-      </div>
+      {/* 使用统一的NavBar组件 */}
+      <NavBar />
+      
       <div
         id="toast"
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white px-2.5 py-1 rounded-md text-xs hidden"

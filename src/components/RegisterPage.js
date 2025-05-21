@@ -1,8 +1,8 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../utils/axios";
 import "./RegisterPage.css"; // 引入样式文件
+import NavBar from "./NavBar"; // 引入NavBar组件
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -221,25 +221,8 @@ const RegisterPage = () => {
         </div>
       </div>
 
-      <div className="bottom-nav fixed bottom-0 w-full max-w-[375px] bg-white border-t flex items-center justify-around">
-        <a href="#" className="flex flex-col items-center space-y-0.5">
-          <div className="bottom-nav-icon flex items-center justify-center">
-            <i className="ri-compass-3-line text-gray-400 text-sm"></i>
-          </div>
-          <span className="nav-text text-gray-400">发现</span>
-        </a>
-        <a href="#" className="flex flex-col items-center -mt-3">
-          <div className="bottom-nav-add rounded-full bg-primary flex items-center justify-center shadow-lg">
-            <i className="ri-add-line text-lg text-white"></i>
-          </div>
-        </a>
-        <a href="#" className="flex flex-col items-center space-y-0.5">
-          <div className="bottom-nav-icon flex items-center justify-center">
-            <i className="ri-calendar-line text-gray-400 text-sm"></i>
-          </div>
-          <span className="nav-text text-gray-400">日历</span>
-        </a>
-      </div>
+      {/* 使用统一的NavBar组件 */}
+      <NavBar />
 
       <div
         id="toast"

@@ -5,6 +5,7 @@ import { Input } from 'antd';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import './LoginPage.css'; // 创建一个新的 CSS 文件来存放样式
 import instance from '../utils/axios';
+import NavBar from './NavBar'; // 引入NavBar组件
 
 const LoginPage = () => {
   const { refreshUserInfo } = useAuth(); // 替换 setIsLoggedIn, setUserInfo
@@ -186,22 +187,8 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 h-13 bottom-nav flex items-center justify-around px-6 bg-white/90">
-          <a href="#" className="flex flex-col items-center text-primary">
-            <i className="ri-compass-3-line text-xl" />
-            <span className="text-xs mt-1">发现</span>
-          </a>
-          <a
-            href="#"
-            className="flex items-center justify-center w-14 h-14 bg-primary rounded-full -mt-6"
-          >
-            <i className="ri-add-line text-2xl text-white" />
-          </a>
-          <a href="#" className="flex flex-col items-center text-gray-400">
-            <i className="ri-calendar-line text-xl" />
-            <span className="text-xs mt-1">日历</span>
-          </a>
-        </div>
+        {/* 使用统一的NavBar组件 */}
+        <NavBar />
       </div>
     </div>
   );

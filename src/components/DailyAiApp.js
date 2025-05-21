@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './DailyAiApp.css';
 import instance from '../utils/axios';
 import { useAuth } from '../App';
 import { Link } from 'react-router-dom';
@@ -157,26 +158,26 @@ const DailyAiApp = () => {
   };
 
   return (
-                <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col">
-                <header className="bg-primary text-white p-3">
-                    <div className="flex justify-between items-center">
-                    <div>
+    <div className="max-w-md mx-auto bg-white min-h-screen flex flex-col">
+      <header className="bg-primary text-white p-3">
+        <div className="flex justify-between items-center">
+          <div>
             <h1 className="text-lg font-semibold">每日发现 AI</h1>
             <p className="text-xs">{formattedDate} {weekday}</p>
-                    </div>
-                    <div className="flex items-center">
+          </div>
+          <div className="flex items-center">
             <i className="fas fa-user-circle text-xl mr-2"></i>
             <span className="text-sm">{isLoggedIn && userInfo ? userInfo.nickname || '用户' : '未登录'}</span>
-                    </div>
-                    </div>
-                </header>
+          </div>
+        </div>
+      </header>
 
       <main className="flex-grow p-4 overflow-auto">
         {/* AI助手区域 */}
-                        <section className="mb-6 bg-gradient-to-r from-primary to-indigo-500 rounded-lg p-4 text-white">
-                        <div className="flex items-start">
+        <section className="mb-6 bg-gradient-to-r from-primary to-indigo-500 rounded-lg p-4 text-white">
+          <div className="flex items-start">
             <img src="https://ai-public.mastergo.com/ai/img_res/a5bb22994e55aad0f1dd10d5e239240a.jpg" alt="AI助手" className="w-12 h-12 rounded-full mr-3"/>
-                        <div className="flex-grow">
+            <div className="flex-grow">
               <h2 className="text-base font-semibold mb-2">智能助手</h2>
               <div className="bg-white bg-opacity-20 p-3 rounded-lg mb-3">
                 <p className="text-sm">{aiResponse}</p>
@@ -197,8 +198,8 @@ const DailyAiApp = () => {
                   onClick={() => handleQuickQuestion('有哪些提高生活品质的好物？')}>
                     提升生活
                 </button>
-                        </div>
-                        <div className="flex items-center">
+              </div>
+              <div className="flex items-center">
                 <input 
                   type="text" 
                   placeholder="输入您的问题..." 
@@ -212,11 +213,11 @@ const DailyAiApp = () => {
                   onClick={handleAIRequest}
                   disabled={isLoading}>
                   {isLoading ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-paper-plane"></i>}
-                        </button>
-                        </div>
-                        </div>
-                        </div>
-                        </section>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* 每日主题区域 */}
         <section className="mb-6 bg-gradient-to-r from-yellow-50 to-yellow-100 rounded-lg p-4 border-l-4 border-yellow-400">
@@ -227,7 +228,7 @@ const DailyAiApp = () => {
             </button>
           </div>
           <p className="text-sm text-yellow-700 mb-2">{dailyTheme.description}</p>
-                        </section>
+        </section>
 
         {/* 每日发现区域 */}
         <section className="mb-6">
@@ -269,9 +270,9 @@ const DailyAiApp = () => {
                             查看详情
                           </Link>
                         </div>
-                        </div>
-                        </div>
-                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ))}
               </div>
 
@@ -281,19 +282,19 @@ const DailyAiApp = () => {
                     <i className="fas fa-lightbulb text-yellow-500 mr-2"></i>
                     AI智能推荐理由
                   </h3>
-                        <ul className="space-y-2">
+                  <ul className="space-y-2">
                     {recommendationReasons.slice(0, 3).map((reason, index) => (
                       <li key={index} className="flex items-start">
                         <span className="text-primary mr-2">•</span>
                         <p className="text-xs text-gray-600">{reason}</p>
-                        </li>
+                      </li>
                     ))}
-                        </ul>
+                  </ul>
                 </div>
               )}
             </>
           )}
-                        </section>
+        </section>
 
         {/* 个性化体验区域 */}
         <section className="mb-6">
@@ -318,10 +319,10 @@ const DailyAiApp = () => {
               <i className="fas fa-fire text-red-500 mb-2"></i>
               <h3 className="text-sm font-medium mb-1">热门榜单</h3>
               <p className="text-xs text-gray-600">了解最热门的商品</p>
-                        </div>
-                        </div>
-                    </section>
-                </main>
+            </div>
+          </div>
+        </section>
+      </main>
 
       {/* 简单的底部导航 */}
       <footer className="bg-white border-t border-gray-200 py-2">
@@ -344,7 +345,7 @@ const DailyAiApp = () => {
           </Link>
         </div>
       </footer>
-          </div>
+    </div>
   );
 };
 

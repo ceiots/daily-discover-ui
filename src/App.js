@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import instance from './utils/axios';
-import Calendar from './components/Calendar';
 import Discover from './components/Discover';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
@@ -37,6 +36,7 @@ import CategoryManagePage from './components/CategoryManagePage'; // 商品分�
 import ShopCreationPage from './components/ShopCreationPage'; // 店铺创建页
 import ShopDetailPage from './components/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
+import DailyAiApp from './components/DailyAiApp'; 
 // 创建认证上下文
 const AuthContext = createContext();
 
@@ -171,16 +171,25 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const App = () => {
+  // 确定当前路径是否需要显示导航栏
+  const shouldShowNavBar = () => {
+    // 获取当前路径
+    const currentPath = window.location.pathname;
+    // 这些路径已经在自己的页面中引入了NavBar，不需要全局显示
+    const pathsWithoutNavBar = ['/login', '/register', '/forgot-password'];
+    return !pathsWithoutNavBar.includes(currentPath);
+  };
+
   return (
     <AuthProvider>
       <Router>
         <CommonHelmet />
-        <NavBar />
+        {shouldShowNavBar() && <NavBar />}
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+          <Route path="/daily-ai" element={<ProtectedRoute><DailyAiApp /></ProtectedRoute>} />
           <Route path="/" element={<Discover />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/cart" element={<Cart />} />
