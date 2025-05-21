@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './DailyAiApp.css';
 import instance from '../utils/axios';
 import { useAuth } from '../App';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NavBar from './NavBar'; // 引入底部导航栏组件
 import FixImages from './FixImages'; // 引入图片修复组件
-import { useNavigate } from "react-router-dom";
 import EnhancedAiChat from './ai/EnhancedAiChat'; // 引入增强型AI聊天组件
 
 // 默认内联占位图片，直接使用内联定义，不依赖任何外部资源
-const DEFAULT_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjYWFhIj7lm77niYflt7LliqDovb08L3RleHQ+PC9zdmc+';
+const DEFAULT_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAMAAABrrFhUAAAAElBMVEXy8vL///8AAADu7u7m5ub5+fk5uGF3AAAADUlEQVR42u3BAQ0AAADCoPdPbQ8HFAAAAAAAAAAAAAAA8G4qWAABjyVw+QAAAABJRU5ErkJggg==';
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjgwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9IjE4MCIgcj0iNjAiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
 const DEFAULT_THEME = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5MzMzZWEiLz48L2xpbmVhckdyYWRpZW50PjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSJ1cmwoI2cpIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iIGZpbGw9IiNmZmYiPuaZuuiDveeUn+a0uzwvdGV4dD48L3N2Zz4=';
 const DEFAULT_PRODUCT1 = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjhmZiIvPjxyZWN0IHg9IjUwIiB5PSI1MCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9IiM3NjZkZTgiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjIwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iI2ZmZiI+aVBob25lPC90ZXh0Pjwvc3ZnPg==';
@@ -489,40 +488,26 @@ const DailyAiApp = () => {
     }
   };
 
-  // 设置默认互动游戏 - 更新游戏数据，增加难度字段
+  // 设置默认的互动游戏
   const setDefaultInteractiveGames = () => {
     setInteractiveGames([
       {
-        id: "productQuiz",
-        title: "商品知识问答",
-        description: "测试您对商品的了解程度",
-        icon: "question-circle",
-        playerCount: 1243,
-        difficulty: 2 // 新增：难度等级，1-3
+        id: 'productQuiz',
+        title: '商品知识问答',
+        description: '测试您对商品类型、功能和特性的了解程度，提高您的产品认知度',
+        icon: 'shopping-bag',
+        difficulty: 2,
+        playerCount: 1268,
+        imageUrl: getImage('productQuiz')
       },
       {
-        id: "styleGuess",
-        title: "风格猜猜猜",
-        description: "猜测不同商品的风格",
-        icon: "palette",
-        playerCount: 987,
-        difficulty: 1 // 新增：难度等级，1-3
-      },
-      {
-        id: "priceGuess",
-        title: "价格竞猜",
-        description: "猜测商品的实际价格",
-        icon: "money-bill",
-        playerCount: 1576,
-        difficulty: 3 // 新增：难度等级，1-3
-      },
-      {
-        id: "brandQuiz",
-        title: "品牌知识竞赛",
-        description: "测试您对品牌的了解",
-        icon: "trademark",
-        playerCount: 1123,
-        difficulty: 2 // 新增：难度等级，1-3
+        id: 'brandQuiz',
+        title: '品牌知识竞赛',
+        description: '挑战您对知名品牌的认识，了解品牌故事和发展历程',
+        icon: 'crown',
+        difficulty: 3,
+        playerCount: 876,
+        imageUrl: getImage('brandQuiz')
       }
     ]);
   };
@@ -1111,37 +1096,122 @@ const DailyAiApp = () => {
         {/* 互动游戏选项卡内容 - 使用新的渲染函数 */}
         {activeTab === 'games' && (
           <section className="games-section fade-in">
-            <h2 className="section-title">趣味AI游戏</h2>
-            <div className="games-container">
-              {interactiveGames.map((game) => (
-                <div key={game.id} className="game-card">
-                  <div className="game-image">
-                    <i className={`fas fa-${game.icon} game-icon`}></i>
-                  </div>
-                  <div className="game-content">
-                    <h3 className="game-title">{game.title}</h3>
-                    <p className="game-description">{game.description}</p>
-                    <div className="game-footer">
-                      <div className="game-difficulty">
-                        {[1, 2, 3].map((level) => (
-                          <span
-                            key={level}
-                            className={`difficulty-dot ${level <= (game.difficulty || 1) ? 'active' : ''}`}
-                            title={`难度等级: ${game.difficulty || 1}/3`}
-                          ></span>
-                        ))}
-                      </div>
-                      <span className="game-players">
-                        <i className="fas fa-user-friends mr-1"></i>
-                        {game.playerCount}
-                      </span>
+            <div className="featured-games">
+              <h2 className="section-title">趣味知识问答</h2>
+              <div className="games-cards-container">
+                {interactiveGames.filter(game => game.id === "productQuiz" || game.id === "brandQuiz").map((game) => (
+                  <div 
+                    key={game.id} 
+                    className="featured-game-card"
+                    onClick={() => navigate(`/game/${game.id}`)}
+                  >
+                    <div className="game-card-icon-container" style={{
+                      background: game.id === "productQuiz" ? 
+                        "linear-gradient(135deg, #6366f1, #4f46e5)" : 
+                        "linear-gradient(135deg, #ec4899, #db2777)"
+                    }}>
+                      <i className={`fas fa-${game.icon}`}></i>
                     </div>
-                    <button className="play-button">
-                      开始游戏
-                    </button>
+                    <div className="game-card-content">
+                      <h3 className="game-card-title">{game.title}</h3>
+                      <p className="game-card-description">{game.description}</p>
+                      <div className="game-card-meta">
+                        <div className="game-card-difficulty">
+                          {[1, 2, 3].map((level) => (
+                            <span
+                              key={level}
+                              className={`difficulty-dot ${level <= (game.difficulty || 1) ? 'active' : ''}`}
+                            ></span>
+                          ))}
+                          <span className="difficulty-text">
+                            {game.difficulty === 1 ? '简单' : game.difficulty === 2 ? '中等' : '困难'}
+                          </span>
+                        </div>
+                        <div className="game-card-players">
+                          <i className="fas fa-user-friends"></i>
+                          <span>{game.playerCount || 0}人参与</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="game-card-button">
+                      开始挑战
+                      <i className="fas fa-chevron-right"></i>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+           
+            <div className="daily-challenge-section">
+              <div className="daily-challenge-header">
+                <h2 className="daily-challenge-title">
+                  <i className="fas fa-calendar-day daily-icon"></i>
+                  每日知识挑战
+                </h2>
+                <span className="daily-challenge-date">{formattedDate}</span>
+              </div>
+              
+              <div 
+                className="daily-challenge-card"
+                onClick={() => navigate('/game/daily-quiz')}
+              >
+                <div className="daily-challenge-content">
+                  <div className="daily-challenge-badge">
+                    <span>每日精选</span>
+                  </div>
+                  <h3 className="daily-challenge-name">AI购物助手知识竞赛</h3>
+                  <p className="daily-challenge-desc">
+                    测试您对智能购物、AI推荐和消费趋势的了解程度，回答问题赢取积分！
+                  </p>
+                  
+                  <div className="daily-challenge-stats">
+                    <div className="challenge-stat">
+                      <i className="fas fa-question-circle"></i>
+                      <span>10题</span>
+                    </div>
+                    <div className="challenge-stat">
+                      <i className="fas fa-clock"></i>
+                      <span>5分钟</span>
+                    </div>
+                    <div className="challenge-stat">
+                      <i className="fas fa-medal"></i>
+                      <span>100积分</span>
+                    </div>
                   </div>
                 </div>
-              ))}
+                
+                <div className="daily-challenge-image">
+                  <div className="image-container">
+                    <img src={getImage('theme1')} alt="每日挑战" />
+                    <div className="image-overlay">
+                      <div className="pulse-circle"></div>
+                      <i className="fas fa-trophy challenge-trophy"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <button className="daily-challenge-button">
+                  立即挑战
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+              </div>
+              
+              <div className="daily-rewards-info">
+                <div className="reward-item">
+                  <i className="fas fa-gift reward-icon"></i>
+                  <div className="reward-details">
+                    <h4>完成挑战奖励</h4>
+                    <p>获得100积分和每日专属徽章</p>
+                  </div>
+                </div>
+                <div className="reward-item">
+                  <i className="fas fa-crown reward-icon"></i>
+                  <div className="reward-details">
+                    <h4>排行榜奖励</h4>
+                    <p>每周前10名获得额外优惠券</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         )}
@@ -1153,6 +1223,8 @@ const DailyAiApp = () => {
           </section>
         )}
 
+        {/* AI生成文章部分 - 只在推荐TAB中显示 */}
+        {activeTab === 'recommendations' && (
         <section className="fade-in">
           {/* AI生成文章部分 */}
           <div className="ai-article-section">
@@ -1216,188 +1288,189 @@ const DailyAiApp = () => {
               )}
             </div>
           </div>
-          
-          {/* 文章创建模态框 */}
-          {showArticleModal && (
-            <div className="modal-overlay">
-              <div className="article-modal">
-                <div className="modal-header">
-                  <h3>创建AI文章</h3>
-                  <button 
-                    className="close-modal-btn"
-                    onClick={() => setShowArticleModal(false)}
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-                <div className="modal-body">
-                  <div className="form-group">
-                    <label htmlFor="articleTopic">文章主题</label>
-                    <input 
-                      type="text" 
-                      id="articleTopic" 
-                      value={articleTopic}
-                      onChange={(e) => setArticleTopic(e.target.value)}
-                      placeholder="例如：智能家居使用指南" 
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="articleCategory">文章分类</label>
-                    <select 
-                      id="articleCategory"
-                      value={articleCategory}
-                      onChange={(e) => setArticleCategory(e.target.value)}
-                    >
-                      <option value="">选择分类</option>
-                      <option value="科技">科技</option>
-                      <option value="数码">数码</option>
-                      <option value="家居">家居</option>
-                      <option value="评测">评测</option>
-                      <option value="教程">教程</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="articleLength">文章长度</label>
-                    <select 
-                      id="articleLength"
-                      value={articleLength}
-                      onChange={(e) => setArticleLength(e.target.value)}
-                    >
-                      <option value="short">短文（500字左右）</option>
-                      <option value="medium">中等（1000字左右）</option>
-                      <option value="long">长文（2000字左右）</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="articlePrompt">更多要求（可选）</label>
-                    <textarea 
-                      id="articlePrompt" 
-                      value={articlePrompt}
-                      onChange={(e) => setArticlePrompt(e.target.value)}
-                      placeholder="添加更多具体要求，如文风、重点内容等" 
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button 
-                    className="cancel-btn"
-                    onClick={() => setShowArticleModal(false)}
-                  >
-                    取消
-                  </button>
-                  <button 
-                    className="generate-btn"
-                    onClick={handleGenerateArticle}
-                    disabled={isGeneratingArticle || !articleTopic.trim()}
-                  >
-                    {isGeneratingArticle ? (
-                      <>
-                        <span className="loading-dots"></span>
-                        生成中...
-                      </>
-                    ) : '生成文章'}
-                  </button>
-                </div>
+        </section>
+        )}
+
+        {/* 文章创建模态框 */}
+        {showArticleModal && (
+          <div className="modal-overlay">
+            <div className="article-modal">
+              <div className="modal-header">
+                <h3>创建AI文章</h3>
+                <button 
+                  className="close-modal-btn"
+                  onClick={() => setShowArticleModal(false)}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
               </div>
-            </div>
-          )}
-          
-          {/* 文章预览模态框 */}
-          {showArticlePreview && selectedArticle && (
-            <div className="modal-overlay">
-              <div className="article-preview-modal">
-                <div className="modal-header">
-                  <h3>{selectedArticle.title}</h3>
-                  <button 
-                    className="close-modal-btn"
-                    onClick={() => setShowArticlePreview(false)}
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-                <div className="article-preview-content">
-                  <div className="article-meta-info">
-                    <span>
-                      <i className="far fa-calendar-alt mr-1"></i>
-                      {selectedArticle.createdAt}
-                    </span>
-                    <span>
-                      <i className="far fa-folder mr-1"></i>
-                      {selectedArticle.category}
-                    </span>
-                    <span>
-                      <i className="fas fa-pen-fancy mr-1"></i>
-                      AI生成
-                    </span>
-                  </div>
-                  {selectedArticle.images && selectedArticle.images.length > 0 && (
-                    <div className="article-preview-images">
-                      <div className={`grid ${selectedArticle.images.length === 1 ? '' : 'grid-cols-2'} gap-3 mb-4`}>
-                        {selectedArticle.images.map((image, index) => (
-                          <img 
-                            key={index} 
-                            src={image} 
-                            alt={`图片 ${index + 1}`}
-                            className={`w-full rounded-lg ${selectedArticle.images.length === 1 ? 'max-h-[300px] object-contain' : 'h-32 object-cover'}`}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = DEFAULT_IMAGE;
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {selectedArticle.coverImage && !selectedArticle.images && (
-                    <div className="article-preview-cover mb-4">
-                      <img 
-                        src={selectedArticle.coverImage} 
-                        alt={selectedArticle.title}
-                        className="w-full max-h-[300px] object-contain rounded-lg"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = DEFAULT_IMAGE;
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div 
-                    className="article-content"
-                    dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
+              <div className="modal-body">
+                <div className="form-group">
+                  <label htmlFor="articleTopic">文章主题</label>
+                  <input 
+                    type="text" 
+                    id="articleTopic" 
+                    value={articleTopic}
+                    onChange={(e) => setArticleTopic(e.target.value)}
+                    placeholder="例如：智能家居使用指南" 
                   />
                 </div>
-                <div className="modal-footer">
-                  <button 
-                    className="share-btn"
-                    onClick={() => handleShareArticle(selectedArticle)}
+                <div className="form-group">
+                  <label htmlFor="articleCategory">文章分类</label>
+                  <select 
+                    id="articleCategory"
+                    value={articleCategory}
+                    onChange={(e) => setArticleCategory(e.target.value)}
                   >
-                    <i className="fas fa-share-alt mr-1"></i>
-                    分享
-                  </button>
-                  <button 
-                    className="export-btn"
-                    onClick={() => handleExportArticle(selectedArticle)}
+                    <option value="">选择分类</option>
+                    <option value="科技">科技</option>
+                    <option value="数码">数码</option>
+                    <option value="家居">家居</option>
+                    <option value="评测">评测</option>
+                    <option value="教程">教程</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="articleLength">文章长度</label>
+                  <select 
+                    id="articleLength"
+                    value={articleLength}
+                    onChange={(e) => setArticleLength(e.target.value)}
                   >
-                    <i className="fas fa-download mr-1"></i>
-                    导出
-                  </button>
-                  <button 
-                    className="edit-btn"
-                    onClick={() => {
-                      setShowArticlePreview(false);
-                      handleEditArticle(selectedArticle);
-                    }}
-                  >
-                    <i className="fas fa-edit mr-1"></i>
-                    编辑
-                  </button>
+                    <option value="short">短文（500字左右）</option>
+                    <option value="medium">中等（1000字左右）</option>
+                    <option value="long">长文（2000字左右）</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="articlePrompt">更多要求（可选）</label>
+                  <textarea 
+                    id="articlePrompt" 
+                    value={articlePrompt}
+                    onChange={(e) => setArticlePrompt(e.target.value)}
+                    placeholder="添加更多具体要求，如文风、重点内容等" 
+                    rows="3"
+                  ></textarea>
                 </div>
               </div>
+              <div className="modal-footer">
+                <button 
+                  className="cancel-btn"
+                  onClick={() => setShowArticleModal(false)}
+                >
+                  取消
+                </button>
+                <button 
+                  className="generate-btn"
+                  onClick={handleGenerateArticle}
+                  disabled={isGeneratingArticle || !articleTopic.trim()}
+                >
+                  {isGeneratingArticle ? (
+                    <>
+                      <span className="loading-dots"></span>
+                      生成中...
+                    </>
+                  ) : '生成文章'}
+                </button>
+              </div>
             </div>
-          )}
-        </section>
+          </div>
+        )}
+        
+        {/* 文章预览模态框 */}
+        {showArticlePreview && selectedArticle && (
+          <div className="modal-overlay">
+            <div className="article-preview-modal">
+              <div className="modal-header">
+                <h3>{selectedArticle.title}</h3>
+                <button 
+                  className="close-modal-btn"
+                  onClick={() => setShowArticlePreview(false)}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+              <div className="article-preview-content">
+                <div className="article-meta-info">
+                  <span>
+                    <i className="far fa-calendar-alt mr-1"></i>
+                    {selectedArticle.createdAt}
+                  </span>
+                  <span>
+                    <i className="far fa-folder mr-1"></i>
+                    {selectedArticle.category}
+                  </span>
+                  <span>
+                    <i className="fas fa-pen-fancy mr-1"></i>
+                    AI生成
+                  </span>
+                </div>
+                {selectedArticle.images && selectedArticle.images.length > 0 && (
+                  <div className="article-preview-images">
+                    <div className={`grid ${selectedArticle.images.length === 1 ? '' : 'grid-cols-2'} gap-3 mb-4`}>
+                      {selectedArticle.images.map((image, index) => (
+                        <img 
+                          key={index} 
+                          src={image} 
+                          alt={`图片 ${index + 1}`}
+                          className={`w-full rounded-lg ${selectedArticle.images.length === 1 ? 'max-h-[300px] object-contain' : 'h-32 object-cover'}`}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = DEFAULT_IMAGE;
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {selectedArticle.coverImage && !selectedArticle.images && (
+                  <div className="article-preview-cover mb-4">
+                    <img 
+                      src={selectedArticle.coverImage} 
+                      alt={selectedArticle.title}
+                      className="w-full max-h-[300px] object-contain rounded-lg"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = DEFAULT_IMAGE;
+                      }}
+                    />
+                  </div>
+                )}
+                <div 
+                  className="article-content"
+                  dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
+                />
+              </div>
+              <div className="modal-footer">
+                <button 
+                  className="share-btn"
+                  onClick={() => handleShareArticle(selectedArticle)}
+                >
+                  <i className="fas fa-share-alt mr-1"></i>
+                  分享
+                </button>
+                <button 
+                  className="export-btn"
+                  onClick={() => handleExportArticle(selectedArticle)}
+                >
+                  <i className="fas fa-download mr-1"></i>
+                  导出
+                </button>
+                <button 
+                  className="edit-btn"
+                  onClick={() => {
+                    setShowArticlePreview(false);
+                    handleEditArticle(selectedArticle);
+                  }}
+                >
+                  <i className="fas fa-edit mr-1"></i>
+                  编辑
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       </div>
 

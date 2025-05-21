@@ -37,6 +37,8 @@ import ShopCreationPage from './components/ShopCreationPage'; // 店铺创建页
 import ShopDetailPage from './components/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
 import DailyAiApp from './components/DailyAiApp'; 
+import QuizGame from './components/games/QuizGame';
+
 // 创建认证上下文
 const AuthContext = createContext();
 
@@ -230,6 +232,7 @@ const App = () => {
           <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
           <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
           <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
+          <Route path="/game/:gameId" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

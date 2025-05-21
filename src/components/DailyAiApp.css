@@ -2254,4 +2254,606 @@ img {
   line-height: 1.6;
 }
 
+/* 每日知识挑战样式 */
+.game-promotion {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.game-promotion-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 16px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.game-promotion-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 18px;
+  background: linear-gradient(to bottom, #4f46e5, #9333ea);
+  border-radius: 2px;
+}
+
+.daily-quiz-card {
+  background: linear-gradient(135deg, #f9f9ff, #fff);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(79, 70, 229, 0.1);
+  position: relative;
+}
+
+.daily-quiz-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.15);
+}
+
+.daily-quiz-header {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  color: white;
+}
+
+.daily-quiz-icon {
+  font-size: 28px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.daily-quiz-info {
+  flex: 1;
+}
+
+.daily-quiz-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.daily-quiz-info h4 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.daily-quiz-content {
+  padding: 20px;
+}
+
+.daily-quiz-content p {
+  color: #4b5563;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.daily-quiz-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.daily-quiz-stat {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.daily-quiz-stat i {
+  color: #4f46e5;
+  margin-right: 8px;
+}
+
+.daily-quiz-button {
+  background: linear-gradient(135deg, #4f46e5, #9333ea);
+  color: white;
+  border: none;
+  padding: 12px 0;
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.daily-quiz-button:hover {
+  background: linear-gradient(135deg, #4338ca, #7e22ce);
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .daily-quiz-card {
+    background: linear-gradient(135deg, #2a2a3c, #1a1a2e);
+    border-color: rgba(99, 102, 241, 0.2);
+  }
+  
+  .daily-quiz-content p {
+    color: #e0e0e0;
+  }
+  
+  .daily-quiz-stat {
+    color: #d1d5db;
+  }
+}
+
+/* 重新设计的游戏卡片 */
+.featured-games {
+  margin-bottom: 32px;
+}
+
+.games-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.featured-game-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  height: 100%;
+}
+
+.featured-game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.game-card-icon-container {
+  padding: 24px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.game-card-icon-container i {
+  font-size: 42px;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.featured-game-card:hover .game-card-icon-container i {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.game-card-content {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+.game-card-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.game-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.game-card-difficulty {
+  display: flex;
+  align-items: center;
+}
+
+.difficulty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+  margin-right: 4px;
+}
+
+.difficulty-dot.active {
+  background-color: #4f46e5;
+}
+
+.difficulty-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 6px;
+}
+
+.game-card-players {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.game-card-players i {
+  margin-right: 4px;
+  color: #4f46e5;
+}
+
+.game-card-button {
+  background: linear-gradient(to right, #4f46e5, #6366f1);
+  color: white;
+  padding: 14px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.3s ease;
+}
+
+.game-card-button i {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.featured-game-card:hover .game-card-button i {
+  transform: translateX(3px);
+}
+
+.featured-game-card:hover .game-card-button {
+  background: linear-gradient(to right, #4338ca, #4f46e5);
+}
+
+/* 每日挑战部分 */
+.daily-challenge-section {
+  margin-bottom: 70px;
+}
+
+.daily-challenge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.daily-challenge-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.daily-icon {
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.daily-challenge-date {
+  font-size: 14px;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.daily-challenge-card {
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.daily-challenge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.daily-challenge-content {
+  padding: 24px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.daily-challenge-badge {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.daily-challenge-badge span {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.daily-challenge-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.daily-challenge-desc {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.daily-challenge-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.challenge-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.challenge-stat i {
+  color: #8b5cf6;
+}
+
+.daily-challenge-image {
+  grid-column: 2;
+  grid-row: 1;
+  width: 180px;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.daily-challenge-card:hover .image-container img {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, rgba(113, 113, 122, 0), rgba(79, 70, 229, 0.3));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pulse-circle {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+}
+
+.challenge-trophy {
+  font-size: 36px;
+  color: #f8fafc;
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.3));
+  z-index: 2;
+}
+
+.daily-challenge-button {
+  grid-column: 1 / 3;
+  grid-row: 2;
+  background: linear-gradient(to right, #7c3aed, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.daily-challenge-button i {
+  transition: transform 0.3s ease;
+}
+
+.daily-challenge-card:hover .daily-challenge-button {
+  background: linear-gradient(to right, #6d28d9, #7c3aed);
+}
+
+.daily-challenge-card:hover .daily-challenge-button i {
+  transform: translateX(5px);
+}
+
+.daily-rewards-info {
+  background-color: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reward-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.reward-details h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.reward-details p {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* 媒体查询适配小屏幕 */
+@media (max-width: 768px) {
+  .daily-challenge-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+  
+  .daily-challenge-image {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    height: 150px;
+  }
+  
+  .daily-challenge-content {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .daily-challenge-button {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .daily-rewards-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .featured-game-card,
+  .daily-challenge-card {
+    background-color: #1e1e2d;
+  }
+  
+  .game-card-title,
+  .daily-challenge-name {
+    color: #f9fafb;
+  }
+  
+  .game-card-description,
+  .daily-challenge-desc {
+    color: #d1d5db;
+  }
+  
+  .difficulty-text,
+  .game-card-players {
+    color: #9ca3af;
+  }
+  
+  .daily-challenge-title {
+    color: #f3f4f6;
+  }
+  
+  .daily-challenge-date {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+  
+  .daily-rewards-info {
+    background-color: #111827;
+  }
+  
+  .reward-details h4 {
+    color: #f3f4f6;
+  }
+  
+  .reward-details p {
+    color: #9ca3af;
+  }
+  
+  .challenge-stat {
+    color: #d1d5db;
+  }
+}
+
 
