@@ -44,14 +44,14 @@ const ArticleCard = ({ article, onClick }) => {
         
         <div className="article-meta">
           <div className="article-date">
-            <i className="far fa-calendar-alt"></i>
-            <span>{formatDate(date)}</span>
+            <i className="far fa-calendar-alt" style={{fontSize: "10px", marginRight: "3px"}}></i>
+            <span style={{fontSize: "10px"}}>{formatDate(date)}</span>
           </div>
           
           {tags && tags.length > 0 && (
             <div className="article-tags">
               {tags.slice(0, 2).map((tag, index) => (
-                <span key={index} className="article-tag">
+                <span key={index} className="article-tag" style={{fontSize: "10px", padding: "1px 4px"}}>
                   {tag}
                 </span>
               ))}
@@ -60,8 +60,8 @@ const ArticleCard = ({ article, onClick }) => {
         </div>
         
         <div className="article-read-more">
-          <span>阅读全文</span>
-          <i className="fas fa-arrow-right"></i>
+          <span style={{fontSize: "10px"}}>阅读全文</span>
+          <i className="fas fa-arrow-right" style={{fontSize: "9px", marginLeft: "3px"}}></i>
         </div>
       </div>
     </div>

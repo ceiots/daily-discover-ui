@@ -292,9 +292,9 @@
 .quick-questions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px;
-  padding: 0 4px;
-  margin-bottom: 10px;
+  gap: 4px;
+  padding: 0 2px;
+  margin-bottom: 8px;
 }
 
 /* 减小现有快捷提问按钮的大小和间距 */
@@ -303,16 +303,21 @@
   background-color: #f3f4f6;
   color: #4b5563;
   border: 1px solid #e5e7eb;
-  padding: 6px 10px;
-  border-radius: 16px;
-  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 30px;
+  min-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
 }
 
 .quick-question:hover, .quick-question:active {

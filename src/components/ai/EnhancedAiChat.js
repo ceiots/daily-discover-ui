@@ -21,12 +21,12 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   const speechRecognition = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
 
-  // 快捷提问选项 - 更直观引导的问题
+  // 快捷提问选项 - 更直观引导的问题，缩短字数
   const quickQuestions = [
-    "今日有什么值得买的好物？",
-    "智能产品热门推荐",
-    "查看个性化购物清单",
-    "游戏和互动活动"
+    "今日值得买好物",
+    "智能产品推荐",
+    "个性化购物清单",
+    "互动游戏活动"
   ];
 
   // 自动滚动到最新消息
