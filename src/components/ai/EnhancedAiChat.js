@@ -11,7 +11,7 @@ const AI_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI
 const EnhancedAiChat = ({ onRequestArticle }) => {
   const { isLoggedIn, userInfo } = useAuth();
   const [messages, setMessages] = useState([
-    { type: 'ai', text: '您好！我是您的AI助手，可以为您推荐商品、回答问题或创建内容。有什么可以帮您的？' }
+    { type: 'ai', text: '您好！我是今日发现AI助手。请告诉我您想了解什么，我可以帮您找到商品、回答问题或创建个性化内容。' }
   ]);
   const [userInput, setUserInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,19 +19,29 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const speechRecognition = useRef(null);
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
-  // 快捷提问选项
+  // 快捷提问选项 - 更直观引导的问题
   const quickQuestions = [
-    "推荐今日好物",
-    "热门数码产品",
-    "如何选择智能家居",
-    "帮我写篇产品文章"
+    "今日有什么值得买的好物？",
+    "智能产品热门推荐",
+    "查看个性化购物清单",
+    "游戏和互动活动"
   ];
 
   // 自动滚动到最新消息
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // 聚焦输入框
+  useEffect(() => {
+    if (inputRef.current) {
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 500);
+    }
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -94,11 +104,13 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
     // 清空输入框并设置加载状态
     setUserInput('');
     setIsLoading(true);
+    // 发送后隐藏快捷提问
+    setShowSuggestions(false);
 
     try {
       // 检查是否登录
       if (!isLoggedIn) {
-        setMessages(prev => [...prev, { type: 'ai', text: '请先登录后再使用AI助手功能' }]);
+        setMessages(prev => [...prev, { type: 'ai', text: '请先登录后再使用AI助手功能，登录后可以获得个性化推荐和更多专属内容。' }]);
         setIsLoading(false);
         return;
       }
@@ -106,24 +118,36 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       // 检查是否请求创建文章
       if (userInput.includes('写篇') || userInput.includes('创建文章') || userInput.includes('生成文章')) {
         onRequestArticle && onRequestArticle(userInput);
-        setMessages(prev => [...prev, { type: 'ai', text: '好的，我可以帮您创建一篇文章。请稍等...' }]);
+        setMessages(prev => [...prev, { type: 'ai', text: '好的，我可以帮您创建一篇文章。请在弹出的表单中补充详细信息，我会根据您的需求生成高质量的内容。' }]);
         setIsLoading(false);
         return;
       }
 
-      // 发送请求到后端
-      const response = await instance.post('/ai/chat', { prompt: userInput });
-      if (response.data && response.data.data) {
-        const aiText = response.data.data;
-        setMessages(prev => [...prev, { type: 'ai', text: aiText }]);
+      // 模拟AI响应 - 在实际项目中替换为真实API调用
+      let aiResponse = "";
+      
+      if (userInput.includes('推荐') || userInput.includes('好物')) {
+        aiResponse = "根据最新数据，我为您推荐几款好评产品：\n\n1. 索尼WH-1000XM5无线降噪耳机 - 音质和降噪效果出色\n2. 小米空气净化器Pro - 高效过滤PM2.5\n3. Dyson V12 Detect Slim - 轻量化设计，清洁效果好\n\n要了解更多详情，您可以点击下方的\"智能推荐\"查看完整列表。";
+      } else if (userInput.includes('游戏') || userInput.includes('互动')) {
+        aiResponse = "我们有多款互动游戏可以体验：\n\n1. 「每日挑战」- 答对题目可获得积分\n2. 「知识问答」- 测试您的商品知识\n3. 「幸运抽奖」- 有机会获得折扣券\n\n您可以点击\"互动游戏\"开始体验，玩游戏还能获得积分哦！";
       } else {
-        setMessages(prev => [...prev, { type: 'ai', text: '抱歉，我无法处理您的请求，请稍后再试' }]);
+        // 模拟通用回复
+        aiResponse = "感谢您的提问。作为每日发现AI助手，我可以帮您：\n\n• 查找和推荐适合您的商品\n• 解答商品相关问题\n• 生成个性化内容\n• 提供购物建议\n\n您可以尝试询问特定产品推荐，或点击下方功能入口探索更多服务。";
       }
+      
+      // 延迟一点时间模拟网络请求
+      setTimeout(() => {
+        setMessages(prev => [...prev, { type: 'ai', text: aiResponse }]);
+        setIsLoading(false);
+        // 回复后重新显示快捷提问
+        setTimeout(() => setShowSuggestions(true), 1000);
+      }, 1200);
+      
     } catch (error) {
       console.error('AI请求失败:', error);
       setMessages(prev => [...prev, { type: 'ai', text: '连接AI服务出错，请稍后再试' }]);
-    } finally {
       setIsLoading(false);
+      setTimeout(() => setShowSuggestions(true), 1000);
     }
   };
 
@@ -154,14 +178,17 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
         // 实际项目中这里应该上传图片到服务器并获取URL
         const userMessage = { type: 'user', text: '上传了一张图片', isImage: true };
         setMessages([...messages, userMessage]);
+        setShowSuggestions(false);
         
         // 模拟AI响应
         setTimeout(() => {
           setMessages(prev => [...prev, { 
             type: 'ai', 
-            text: '我看到您上传了一张图片。这似乎是一张商品图片，需要我为您分析或推荐类似商品吗？' 
+            text: '我看到您上传了一张图片。这似乎是一个商品的照片，我可以帮您：\n\n1. 查找类似的商品\n2. 分析商品特性\n3. 提供购买建议\n\n请告诉我您需要什么帮助？' 
           }]);
-        }, 1000);
+          setIsLoading(false);
+          setTimeout(() => setShowSuggestions(true), 1000);
+        }, 1500);
       }
     };
     input.click();
@@ -173,21 +200,21 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   };
 
   return (
-    <div className="ai-chat-card" style={{ marginBottom: '10px', padding: '10px' }}>
-      <div className="ai-chat-header" style={{ padding: '10px 12px' }}>
+    <div className="ai-chat-card">
+      <div className="ai-chat-header">
         <div className="ai-info">
           <div className="ai-avatar">
-            <img src={getImage('avatar')} alt="AI助手" onError={handleImageError} />
+            <img src={AI_AVATAR} alt="AI助手" onError={handleImageError} />
           </div>
           <div>
-            <h3 className="ai-name">智能助手</h3>
-            <p className="ai-description">随时为您提供帮助</p>
+            <h3 className="ai-name">每日发现</h3>
+            <p className="ai-description">智能AI助手</p>
           </div>
         </div>
       </div>
       
-      <div className="ai-chat-body" style={{ maxHeight: '220px', padding: '10px' }}>
-        <div className="chat-messages" ref={messagesEndRef} style={{ padding: '5px 0' }}>
+      <div className="ai-chat-body">
+        <div className="chat-messages">
           {messages.map((message, index) => (
             <div 
               key={index} 
@@ -200,7 +227,16 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
               )}
               {message.type === 'user' && (
                 <div className="user-message">
-                  <div className="message-content">{message.text}</div>
+                  <div className="message-content">
+                    {message.isImage ? (
+                      <div className="uploaded-image-placeholder">
+                        <i className="fas fa-image"></i>
+                        <span>已上传图片</span>
+                      </div>
+                    ) : (
+                      message.text
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -212,44 +248,38 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
               <div className="typing-dot"></div>
             </div>
           )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
       
-      <div className="ai-chat-footer" style={{ padding: '8px 10px' }}>
-        <div className="quick-questions" style={{ marginBottom: '8px' }}>
-          <button 
-            className="quick-question"
-            onClick={() => handleQuickQuestion("推荐今日热门商品")}
-          >
-            今日热门
-          </button>
-          <button 
-            className="quick-question"
-            onClick={() => handleQuickQuestion("推荐性价比最高的商品")}
-          >
-            性价比推荐
-          </button>
-          <button 
-            className="quick-question"
-            onClick={() => handleQuickQuestion("帮我写篇商品评测文章")}
-          >
-            生成文章
-          </button>
-        </div>
+      <div className="ai-chat-footer">
+        {showSuggestions && (
+          <div className="quick-questions">
+            {quickQuestions.map((question, index) => (
+              <div 
+                key={index} 
+                className="quick-question"
+                onClick={() => handleQuickQuestion(question)}
+              >
+                {question}
+              </div>
+            ))}
+          </div>
+        )}
         
         <div className="chat-input-container">
           <input
+            ref={inputRef}
             type="text"
             className="chat-input"
-            placeholder="输入您的问题..."
+            placeholder="输入问题或需求..."
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
           />
-          <button
-            className="voice-input-btn"
+          <button 
+            className={`voice-input-btn ${isVoiceActive ? 'active' : ''}`}
             onClick={toggleVoiceInput}
-            style={{ backgroundColor: isVoiceActive ? '#7269ef' : '' }}
           >
             <i className={`fas ${isVoiceActive ? 'fa-stop' : 'fa-microphone'}`}></i>
           </button>
@@ -257,9 +287,9 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
             <i className="fas fa-image"></i>
           </button>
           <button 
-            className="send-btn" 
+            className="send-btn"
             onClick={sendMessage}
-            disabled={isLoading || !userInput.trim()}
+            disabled={!userInput.trim()}
           >
             <i className="fas fa-paper-plane"></i>
           </button>
@@ -270,7 +300,7 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
 };
 
 EnhancedAiChat.propTypes = {
-  onRequestArticle: PropTypes.func.isRequired
+  onRequestArticle: PropTypes.func
 };
 
 export default EnhancedAiChat; 
