@@ -39,6 +39,7 @@ import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
 import DailyAiApp from './components/DailyAiApp'; 
 import QuizGame from './components/games/QuizGame';
 import H5GamePage from './components/games/H5GamePage'; // 引入H5游戏页面
+import AiExplore from './components/AiExplore'; // 引入AI探索空间页面
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -198,6 +199,7 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/daily-ai" element={<ProtectedRoute><DailyAiApp /></ProtectedRoute>} />
+          <Route path="/ai-explore" element={<ProtectedRoute><AiExplore /></ProtectedRoute>} />
           <Route path="/" element={<Discover />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/cart" element={<Cart />} />

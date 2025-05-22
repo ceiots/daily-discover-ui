@@ -56,6 +56,37 @@ const DailyAiApp = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(true);
+  const [dailyTheme, setDailyTheme] = useState('科技改变生活');
+  const [recommendedTopics, setRecommendedTopics] = useState([
+    {
+      id: 1,
+      title: 'AI与未来工作',
+      icon: 'brain',
+      views: 1342,
+      hotLevel: 3,
+      tag: '热门话题',
+      route: '/ai-explore'
+    },
+    {
+      id: 2,
+      title: '智能家居新趋势',
+      icon: 'lightbulb',
+      views: 986,
+      hotLevel: 2,
+      tag: '为您推荐',
+      route: '/recommendations'
+    },
+    {
+      id: 3,
+      title: '数字化娱乐体验',
+      icon: 'gamepad',
+      views: 658,
+      hotLevel: 1,
+      tag: '近期热点',
+      route: '/games'
+    }
+  ]);
+  const [lastUpdateTime, setLastUpdateTime] = useState(new Date());
 
   const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
   const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
@@ -64,11 +95,17 @@ const DailyAiApp = () => {
   useEffect(() => {
     fetchTrendingProducts();
     fetchArticles();
+    fetchRecommendedTopics();
 
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkMode(prefersDarkMode.matches);
     const darkModeHandler = (e) => setIsDarkMode(e.matches);
     prefersDarkMode.addEventListener('change', darkModeHandler);
+
+    const topicsRefreshInterval = setInterval(() => {
+      fetchRecommendedTopics();
+      setLastUpdateTime(new Date());
+    }, 10 * 60 * 1000);
 
     const hasVisited = localStorage.getItem('hasVisitedAiApp');
     if (!hasVisited) {
@@ -96,6 +133,7 @@ const DailyAiApp = () => {
       if (mainElement) {
         mainElement.removeEventListener('scroll', handleScroll);
       }
+      clearInterval(topicsRefreshInterval);
     };
   }, [isLoggedIn]);
 
@@ -293,6 +331,36 @@ const DailyAiApp = () => {
     alert(`导出文章: ${article.title}`);
   };
 
+  const fetchRecommendedTopics = async () => {
+    try {
+      if (isLoggedIn) {
+        const response = await instance.get('/recommend/topics');
+        if (response.data && response.data.code === 200) {
+          setRecommendedTopics(response.data.data.topics);
+          setDailyTheme(response.data.data.theme || '科技改变生活');
+        }
+      } else {
+        const newTopics = [...recommendedTopics];
+        newTopics.forEach(topic => {
+          topic.views = Math.max(100, topic.views + Math.floor(Math.random() * 50 - 10));
+          topic.hotLevel = Math.min(3, Math.max(1, topic.hotLevel + Math.floor(Math.random() * 2 - 1)));
+        });
+        setRecommendedTopics(newTopics.sort((a, b) => b.hotLevel - a.hotLevel));
+        
+        const themeOptions = ['科技改变生活', '智能时代探索', '数字创新前沿', 'AI赋能未来'];
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (24 * 60 * 60 * 1000));
+        setDailyTheme(themeOptions[dayOfYear % themeOptions.length]);
+      }
+      setLastUpdateTime(new Date());
+    } catch (error) {
+      console.error('获取推荐主题失败:', error);
+    }
+  };
+
+  const refreshRecommendations = () => {
+    fetchRecommendedTopics();
+  };
+
   return (
     <div className="daily-ai-wrapper">
       <div className={`ai-app-container ${isDarkMode ? 'dark' : ''}`}>
@@ -306,11 +374,63 @@ const DailyAiApp = () => {
       
         <EnhancedAiChat onRequestArticle={handleArticleRequest} />
           <section className="feature-entry-cards">
-            <h2 className="feature-section-title">
-              <span className="pulse-dot"></span>
-              AI智能为您精选
-            </h2>
+            <div className="daily-theme-header">
+              <div className="theme-label">今日主题</div>
+              <h2 className="feature-section-title">
+                <span className="pulse-dot"></span>
+                {dailyTheme}
+              </h2>
+                              <p className="theme-update-time" onClick={refreshRecommendations}>
+                  <i className="fas fa-sync-alt"></i> 
+                  实时更新 · {lastUpdateTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}
+                </p>
+            </div>
+            
+            <div className="recommendation-topics">
+              {/* 动态生成推荐主题项 */}
+              {recommendedTopics.map(topic => (
+                <div key={topic.id} className="topic-item" onClick={() => navigate(topic.route)}>
+                  <div className="topic-icon">
+                    <i className={`fas fa-${topic.icon}`}></i>
+                  </div>
+                  <div className="topic-content">
+                    <div className="topic-title">{topic.title}</div>
+                    <div className="topic-stats">
+                      <span className="topic-views"><i className="fas fa-eye"></i> {topic.views}人关注</span>
+                      <span className="topic-hot-level">
+                        {[...Array(topic.hotLevel)].map((_, i) => (
+                          <i key={i} className="fas fa-fire"></i>
+                        ))}
+                      </span>
+                    </div>
+                    <div className="topic-tag">{topic.tag}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
             <div className="entry-cards-container">
+              <div 
+                className="entry-card" 
+                onClick={() => navigate('/ai-explore')}
+                role="button"
+                aria-label="AI探索"
+              >
+                <div className="entry-card-icon" style={{
+                  background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                  boxShadow: "0 4px 8px rgba(139, 92, 246, 0.15)"
+                }}>
+                  <i className="fas fa-brain"></i>
+                </div>
+                <div className="entry-card-content">
+                  <h3 className="entry-card-title">AI探索</h3>
+                  <p className="entry-card-desc">了解AI洞察和趋势</p>
+                </div>
+                <div className="entry-card-arrow">
+                  <i className="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            
               <div 
                 className="entry-card" 
                 onClick={() => navigate('/recommendations')}
