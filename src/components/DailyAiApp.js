@@ -375,38 +375,52 @@ const DailyAiApp = () => {
         <EnhancedAiChat onRequestArticle={handleArticleRequest} />
           <section className="feature-entry-cards">
             <div className="daily-theme-header">
-              <div className="theme-label">今日主题</div>
+              <div className="theme-label">今日AI发现</div>
               <h2 className="feature-section-title">
                 <span className="pulse-dot"></span>
-                {dailyTheme}
+                <span className="theme-highlight">{dailyTheme}</span>
               </h2>
-                              <p className="theme-update-time" onClick={refreshRecommendations}>
-                  <i className="fas fa-sync-alt"></i> 
-                  实时更新 · {lastUpdateTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}
-                </p>
+              <p className="theme-description">每日为您发掘AI前沿资讯，解锁数字世界的无限可能</p>
+              <p className="theme-update-time" onClick={refreshRecommendations}>
+                <i className="fas fa-sync-alt"></i> 
+                实时更新 · {lastUpdateTime.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}
+              </p>
             </div>
             
             <div className="recommendation-topics">
-              {/* 动态生成推荐主题项 */}
-              {recommendedTopics.map(topic => (
-                <div key={topic.id} className="topic-item" onClick={() => navigate(topic.route)}>
-                  <div className="topic-icon">
-                    <i className={`fas fa-${topic.icon}`}></i>
-                  </div>
-                  <div className="topic-content">
-                    <div className="topic-title">{topic.title}</div>
-                    <div className="topic-stats">
-                      <span className="topic-views"><i className="fas fa-eye"></i> {topic.views}人关注</span>
-                      <span className="topic-hot-level">
-                        {[...Array(topic.hotLevel)].map((_, i) => (
-                          <i key={i} className="fas fa-fire"></i>
-                        ))}
-                      </span>
+              <div className="topics-header">
+                <h3 className="topics-title">热门AI论点</h3>
+                <div className="topics-subtitle">探索三大核心观点，启发思考</div>
+              </div>
+              
+              {/* 三点论风格设计 */}
+              <div className="topics-points-container">
+                {recommendedTopics.map((topic, index) => (
+                  <div key={topic.id} className="topic-point-item" onClick={() => navigate(topic.route)}>
+                    <div className="point-number">{index + 1}</div>
+                    <div className="point-content">
+                      <div className="point-title">
+                        <div className="point-icon">
+                          <i className={`fas fa-${topic.icon}`}></i>
+                        </div>
+                        <h4>{topic.title}</h4>
+                      </div>
+                      <div className="point-stats">
+                        <span className="point-views"><i className="fas fa-eye"></i> {topic.views}人关注</span>
+                        <span className="point-hot-level">
+                          {[...Array(topic.hotLevel)].map((_, i) => (
+                            <i key={i} className="fas fa-fire"></i>
+                          ))}
+                        </span>
+                        <span className="point-tag">{topic.tag}</span>
+                      </div>
                     </div>
-                    <div className="topic-tag">{topic.tag}</div>
+                    <div className="point-arrow">
+                      <i className="fas fa-chevron-right"></i>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
             
             <div className="entry-cards-container">
@@ -474,164 +488,6 @@ const DailyAiApp = () => {
               </div>
             </div>
           </section>
-
-          <section className="trending-entry-section">
-            <div 
-              className="trending-entry-card" 
-              onClick={() => navigate('/trending')}
-              role="button"
-              aria-label="热门榜单"
-            >
-              <div className="trending-entry-icon" style={{
-                background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                boxShadow: "0 3px 6px rgba(245, 158, 11, 0.2)"
-              }}>
-                <i className="fas fa-crown"></i>
-              </div>
-              <div className="trending-entry-content">
-                <h3 className="entry-card-title">热门榜单</h3>
-                <p className="entry-card-desc">发现流行趋势</p>
-              </div>
-              <div className="entry-card-arrow">
-                <i className="fas fa-chevron-right"></i>
-              </div>
-            </div>
-          </section>
-
-          <section className="fade-in">
-            <div className="ai-article-section">
-              <div className="section-header" style={{ 
-                display: "flex", 
-                alignItems: "center", 
-                marginBottom: "12px"
-              }}>
-                <div style={{ 
-                  width: "3px", 
-                  height: "16px", 
-                  background: "linear-gradient(135deg, #6366f1, #4f46e5)", 
-                  marginRight: "8px", 
-                  borderRadius: "2px" 
-                }}></div>
-                <h2 style={{ 
-                  fontSize: "13px", 
-                  fontWeight: "600", 
-                  color: "#333"
-                }}>精选文章</h2>
-                <div style={{ flex: 1 }}></div>
-                <button 
-                  onClick={() => navigate('/articles')}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    color: "#4f46e5",
-                    display: "flex",
-                    alignItems: "center",
-                    fontSize: "11px",
-                    cursor: "pointer"
-                  }}
-                >
-                  查看全部
-                  <i className="fas fa-chevron-right" style={{ marginLeft: "4px", fontSize: "10px" }}></i>
-                </button>
-              </div>
-              <ArticleSection 
-                onRequestArticle={handleArticleRequest} 
-                onArticleClick={(article) => {
-                  setSelectedArticle(article);
-                  setShowArticlePreview(true);
-                }}
-              />
-            </div>
-          </section>
-        
-        {/* 文章预览模态框 */}
-        {showArticlePreview && selectedArticle && (
-          <div className="modal-overlay">
-            <div className="article-preview-modal">
-              <div className="modal-header">
-                <h3>{selectedArticle.title}</h3>
-                <button 
-                  className="close-modal-btn"
-                  onClick={() => setShowArticlePreview(false)}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              </div>
-              <div className="article-preview-content">
-                <div className="article-meta-info">
-                  <span>
-                    <i className="far fa-calendar-alt mr-1"></i>
-                    {selectedArticle.createdAt}
-                  </span>
-                  <span>
-                    <i className="far fa-folder mr-1"></i>
-                    {selectedArticle.category}
-                  </span>
-                  <span>
-                    <i className="fas fa-pen-fancy mr-1"></i>
-                    AI生成
-                  </span>
-                </div>
-                {selectedArticle.images && selectedArticle.images.length > 0 && (
-                  <div className="article-preview-images">
-                    <div className={`grid ${selectedArticle.images.length === 1 ? '' : 'grid-cols-2'} gap-3 mb-4`}>
-                      {selectedArticle.images.map((image, index) => (
-                        <img 
-                          key={index} 
-                            src={getImage(image)}
-                          alt={`图片 ${index + 1}`}
-                          className={`w-full rounded-lg ${selectedArticle.images.length === 1 ? 'max-h-[300px] object-contain' : 'h-32 object-cover'}`}
-                            onError={handleImageError}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {selectedArticle.coverImage && !selectedArticle.images && (
-                  <div className="article-preview-cover mb-4">
-                    <img 
-                        src={getImage(selectedArticle.coverImage)}
-                      alt={selectedArticle.title}
-                      className="w-full max-h-[300px] object-contain rounded-lg"
-                        onError={handleImageError}
-                    />
-                  </div>
-                )}
-                <div 
-                  className="article-content"
-                  dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
-                />
-              </div>
-              <div className="modal-footer">
-                <button 
-                  className="share-btn"
-                  onClick={() => handleShareArticle(selectedArticle)}
-                >
-                  <i className="fas fa-share-alt mr-1"></i>
-                  分享
-                </button>
-                <button 
-                  className="export-btn"
-                  onClick={() => handleExportArticle(selectedArticle)}
-                >
-                  <i className="fas fa-download mr-1"></i>
-                  导出
-                </button>
-                <button 
-                  className="edit-btn"
-                  onClick={() => {
-                    setShowArticlePreview(false);
-                    handleEditArticle(selectedArticle);
-                  }}
-                >
-                  <i className="fas fa-edit mr-1"></i>
-                  编辑
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
       <NavBar />
     </div>
