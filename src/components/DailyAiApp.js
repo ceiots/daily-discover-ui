@@ -1020,9 +1020,8 @@ const DailyAiApp = () => {
         {/* 使用增强型AI聊天组件替换原来的AI助手区域 */}
         <EnhancedAiChat onRequestArticle={handleArticleRequest} />
 
-
-        {/* 导航选项卡 */}
-        <section className="mb-4">
+        {/* 导航选项卡 - 减小与上方AI聊天组件的间距 */}
+        <section className="mb-2">
             <div className="flex border-b border-gray-200 overflow-x-auto"> {/* 添加水平滚动以防止溢出 */}
             <button
               className={`flex-1 py-2 text-sm font-medium ${activeTab === 'recommendations' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}

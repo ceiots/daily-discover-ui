@@ -59,8 +59,8 @@
 }
 
 .scrollable-content {
-  margin-top: calc(120px + env(safe-area-inset-top));
-  height: calc(100vh - 120px - env(safe-area-inset-top));
+  margin-top: calc(100px + env(safe-area-inset-top));
+  height: calc(100vh - 100px - env(safe-area-inset-top));
   overflow-y: auto;
   overflow-x: hidden;
 }

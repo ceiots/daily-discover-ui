@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import './EnhancedAiChat.css';
 import instance from '../../utils/axios';
 import { useAuth } from '../../App';
+import { getImage } from '../DailyAiApp';
 
 // AI头像默认数据URL - 使用紫色渐变的AI图标
 const AI_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0ZjQ2ZTUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5MzMzZWEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjEwMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMTM1LDkwIEMxMzUsNzAgMTIwLDU1IDEwMCw1NSBDODAsNTUgNjUsNzAgNjUsOTAgQzY1LDEwMCA3MCwxMDkgNzgsMTE0IEw3OCwxMzAgQzc4LDEzNSA4MiwxNDAgOTAsMTQwIEwxMTAsMTQwIEMxMTgsMTQwIDEyMiwxMzUgMTIyLDEzMCBMMTIyLDExNCBDMTMwLDEwOSAxMzUsMTAwIDEzNSw5MCBaIE05MCwxMjAgTDExMCwxMjAgTDExMCwxMzAgTDkwLDEzMCBaIE03OSwxMTEgQzc0LDEwNyA3MCwxMDAgNzAsOTAgQzcwLDcyIDg0LDYwIDEwMCw2MCBDMTE2LDYwIDEzMCw3MiAxMzAsOTAgQzEzMCwxMDAgMTI2LDEwNyAxMjEsMTExIEwxMjEsOTUgQzEyMSw4NCAxMTIsNzUgMTAwLDc1IEM4OCw3NSA3OSw4NCA3OSw5NSBaIE05Nyw3NSBDOTcsNzcgOTgsNzggMTAwLDc4IEMxMDIsNzggMTAzLDc3IDEwMyw3NSBDMTAzLDczIDEwMiw3MiAxMDAsNzIgQzk4LDcyIDk3LDczIDk3LDc1IFogTTEwNSw5NiBDMTA1LDk4IDEwNyw5OSAxMDksOTkgQzExMSw5OSAxMTMsOTggMTEzLDk2IEMxMTMsOTQgMTExLDkzIDEwOSw5MyBDMTA3LDkzIDEwNSw5NCAxMDUsOTYgWiBNODcsOTYgQzg3LDk4IDg5LDk5IDkxLDk5IEM5Myw5OSA5NSw5OCA5NSw5NiBDOTUsOTQgOTMsOTMgOTEsOTMgQzg5LDkzIDg3LDk0IDg3LDk2IFoiLz48L3N2Zz4=';
@@ -166,96 +167,99 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
     input.click();
   };
 
+  const handleImageError = (e) => {
+    e.target.onerror = null;
+    e.target.src = getImage('avatar');
+  };
+
   return (
-    <div className="enhanced-ai-chat">
-      <div className="chat-header">
-        <div className="ai-avatar">
-          <img src={AI_AVATAR} alt="AI助手" />
-        </div>
-        <div className="chat-title">
-          <h2>智能AI助手</h2>
-          <p>实时智能推荐，解答各类问题</p>
+    <div className="ai-chat-card" style={{ marginBottom: '10px', padding: '10px' }}>
+      <div className="ai-chat-header" style={{ padding: '10px 12px' }}>
+        <div className="ai-info">
+          <div className="ai-avatar">
+            <img src={getImage('avatar')} alt="AI助手" onError={handleImageError} />
+          </div>
+          <div>
+            <h3 className="ai-name">智能助手</h3>
+            <p className="ai-description">随时为您提供帮助</p>
+          </div>
         </div>
       </div>
-
-      <div className="chat-container">
-        <div className="messages-container">
+      
+      <div className="ai-chat-body" style={{ maxHeight: '220px', padding: '10px' }}>
+        <div className="chat-messages" ref={messagesEndRef} style={{ padding: '5px 0' }}>
           {messages.map((message, index) => (
             <div 
               key={index} 
-              className={`message ${message.type} ${message.isImage ? 'image-message' : ''}`}
+              className={`chat-message ${message.type} ${message.isImage ? 'image-message' : ''}`}
             >
               {message.type === 'ai' && (
-                <div className="message-avatar">
-                  <img src={AI_AVATAR} alt="AI头像" />
+                <div className="assistant-message">
+                  <div className="message-content">{message.text}</div>
                 </div>
               )}
-              <div className="message-content">
-                {message.text}
-              </div>
               {message.type === 'user' && (
-                <div className="message-avatar">
-                  <img 
-                    src={userInfo?.avatar || "https://public.readdy.ai/ai/img_res/5e00a7e7e46d41bd53e4f60d9a7ae8be.jpg"} 
-                    alt="用户头像" 
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "https://public.readdy.ai/ai/img_res/5e00a7e7e46d41bd53e4f60d9a7ae8be.jpg";
-                    }}
-                  />
+                <div className="user-message">
+                  <div className="message-content">{message.text}</div>
                 </div>
               )}
             </div>
           ))}
           {isLoading && (
-            <div className="message ai loading">
-              <div className="message-avatar">
-                <img src={AI_AVATAR} alt="AI头像" />
-              </div>
-              <div className="message-content">
-                <div className="typing-indicator">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-              </div>
+            <div className="loading-indicator">
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
+              <div className="typing-dot"></div>
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
-
-        {/* <div className="quick-questions">
-          {quickQuestions.map((question, index) => (
-            <button 
-              key={index} 
-              className="quick-question-btn" 
-              onClick={() => handleQuickQuestion(question)}
-            >
-              {question}
-            </button>
-          ))}
-        </div> */}
-
-        <div className="input-container">
+      </div>
+      
+      <div className="ai-chat-footer" style={{ padding: '8px 10px' }}>
+        <div className="quick-questions" style={{ marginBottom: '8px' }}>
           <button 
-            className="input-button image-button" 
-            onClick={handleImageUpload}
-            title="上传图片"
+            className="quick-question"
+            onClick={() => handleQuickQuestion("推荐今日热门商品")}
           >
-            <i className="fas fa-image"></i>
+            今日热门
           </button>
-          <textarea
-            ref={inputRef}
+          <button 
+            className="quick-question"
+            onClick={() => handleQuickQuestion("推荐性价比最高的商品")}
+          >
+            性价比推荐
+          </button>
+          <button 
+            className="quick-question"
+            onClick={() => handleQuickQuestion("帮我写篇商品评测文章")}
+          >
+            生成文章
+          </button>
+        </div>
+        
+        <div className="chat-input-container">
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="输入您的问题..."
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="输入您的问题或请求..."
-            className="chat-input"
           />
+          <button
+            className="voice-input-btn"
+            onClick={toggleVoiceInput}
+            style={{ backgroundColor: isVoiceActive ? '#7269ef' : '' }}
+          >
+            <i className={`fas ${isVoiceActive ? 'fa-stop' : 'fa-microphone'}`}></i>
+          </button>
+          <button className="image-input-btn" onClick={handleImageUpload}>
+            <i className="fas fa-image"></i>
+          </button>
           <button 
-            className="input-button send-button" 
+            className="send-btn" 
             onClick={sendMessage}
-            disabled={!userInput.trim() && !isVoiceActive}
+            disabled={isLoading || !userInput.trim()}
           >
             <i className="fas fa-paper-plane"></i>
           </button>

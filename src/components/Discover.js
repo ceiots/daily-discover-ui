@@ -213,9 +213,9 @@ const Discover = () => {
           <i onClick={handleSearch} className="fas fa-qrcode text-gray-400 ml-2"></i>
         </div>
       </nav>
-      <div className="scrollable-content mt-28 px-4">
+      <div className="scrollable-content mt-12 px-3">
         {events.length > 0 && (
-          <div className="bg-white rounded-lg p-4 mb-6">
+          <div className="bg-white rounded-lg p-4 mb-4">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-lg font-medium">历史的今天</h2>
               <span className="text-sm text-gray-500">{currentDate}</span>
@@ -274,7 +274,7 @@ const Discover = () => {
           ))}
         </div> */}
 
-          <div className="flex items-center justify-between mb-3 mt-5">
+          <div className="flex items-center justify-between mb-2 mt-2">
             <div className="flex items-center gap-2">
               <i className="fas fa-crown text-primary"></i>
               <h3 className="text-base font-medium">今日推荐</h3>
@@ -300,7 +300,7 @@ const Discover = () => {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-3 mb-0.1">
                 {recommendations.map((product) => (
                   <Link to={`/product/${product.id}`} key={product.id}>
                     <div className="bg-white rounded-lg overflow-hidden shadow-sm mb-6">
@@ -323,7 +323,7 @@ const Discover = () => {
               
               {/* 加载更多按钮 */}
               {page < totalPages - 1 && (
-                <div className="flex justify-center mt-8 mb-24">
+                <div className="flex justify-center mt-4 mb-20">
                   <button 
                     onClick={handleLoadMore} 
                     className="bg-primary text-white px-5 py-2 rounded-full text-sm flex items-center"
