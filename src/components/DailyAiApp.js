@@ -119,28 +119,6 @@ const DailyAiApp = () => {
     }
   };
 
-  const renderFirstVisitGuide = () => {
-    if (!isFirstVisit) return null;
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl p-6 max-w-md">
-          <h2 className="text-lg font-bold text-primary mb-4">欢迎使用 AI 发现</h2>
-          <p className="text-gray-700 mb-4">这是您第一次使用AI发现功能，这里有一些使用提示：</p>
-          <ul className="list-disc pl-5 mb-4 text-gray-600 space-y-2">
-            <li>您可以向AI助手提问关于商品、购物建议等问题</li>
-            <li>探索个性化推荐，发现更适合您的商品</li>
-            <li>参与互动游戏，赢取积分和优惠券</li>
-          </ul>
-          <button
-            onClick={() => setIsFirstVisit(false)}
-            className="w-full bg-primary text-white font-medium py-2 rounded-lg"
-          >
-            开始探索
-          </button>
-        </div>
-      </div>
-    );
-  };
 
   const fetchTrendingProducts = async () => {
     try {
@@ -163,41 +141,6 @@ const DailyAiApp = () => {
       { id: 303, title: '无线耳机', imageUrl: 'product3', price: 899.00, salesCount: 4562 },
       { id: 304, title: '超薄笔记本电脑', imageUrl: 'product4', price: 6399.00, salesCount: 2876 }
     ]);
-  };
-
-  const renderTrendingProducts = () => {
-    if (trendingProducts.length === 0) return null;
-    return (
-      <section className="fade-in">
-        <h2 className="section-title mb-4">热门商品排行</h2>
-        <div className="trending-products">
-          {trendingProducts.map((product, index) => (
-            <div key={product.id} className="trending-product-item">
-              <div className="trending-rank">{index + 1}</div>
-              <div className="trending-product-image-container">
-                <img
-                  src={getImage(product.imageUrl)}
-                  alt={product.title || product.name}
-                  className="trending-product-image"
-                  onError={handleImageError}
-                  loading="lazy"
-                />
-              </div>
-              <div className="trending-product-info">
-                <h3 className="trending-product-title">{product.title || product.name}</h3>
-                <div className="trending-product-meta">
-                  <span className="trending-product-price">¥{product.price}</span>
-                  <span className="trending-product-sales">销量: {product.sales || product.salesCount || '热销'}</span>
-                </div>
-                <Link to={`/product/${product.id}`} className="trending-view-details-button">
-                  查看详情
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
   };
 
   const handleArticleRequest = (prompt) => {
@@ -368,7 +311,12 @@ const DailyAiApp = () => {
               AI智能为您精选
             </h2>
             <div className="entry-cards-container">
-              <div className="entry-card" onClick={() => navigate('/recommendations')}>
+              <div 
+                className="entry-card" 
+                onClick={() => navigate('/recommendations')}
+                role="button"
+                aria-label="智能推荐"
+              >
                 <div className="entry-card-icon" style={{
                   background: "linear-gradient(135deg, #6366f1, #4f46e5)",
                   boxShadow: "0 8px 16px rgba(99, 102, 241, 0.15)"
@@ -384,7 +332,12 @@ const DailyAiApp = () => {
                 </div>
               </div>
 
-              <div className="entry-card" onClick={() => navigate('/games')}>
+              <div 
+                className="entry-card" 
+                onClick={() => navigate('/games')}
+                role="button"
+                aria-label="互动游戏"
+              >
                 <div className="entry-card-icon" style={{
                   background: "linear-gradient(135deg, #ec4899, #db2777)",
                   boxShadow: "0 8px 16px rgba(236, 72, 153, 0.15)"
@@ -403,21 +356,27 @@ const DailyAiApp = () => {
           </section>
 
           <section className="trending-entry-section">
-            <div className="trending-entry-card" onClick={() => navigate('/trending')} style={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-              overflow: "hidden",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease"
-            }}>
+            <div 
+              className="trending-entry-card" 
+              onClick={() => navigate('/trending')}
+              role="button"
+              aria-label="热门榜单"
+              style={{
+                borderRadius: "16px",
+                boxShadow: "0 8px 20px rgba(0, 0, 0, 0.08)",
+                overflow: "hidden",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease"
+              }}
+            >
               <div className="trending-entry-icon" style={{
                 background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)"
+                boxShadow: "0 8px 16px rgba(245, 158, 11, 0.2)"
               }}>
                 <i className="fas fa-crown"></i>
               </div>
               <div className="trending-entry-content">
-                <h3 style={{ fontSize: "16px", fontWeight: "600" }}>热门榜单</h3>
-                <p style={{ fontSize: "14px", color: "#666" }}>发现流行趋势与人气好物</p>
+                <h3 style={{ fontSize: "18px", fontWeight: "600" }}>热门榜单</h3>
+                <p style={{ fontSize: "16px", color: "#666" }}>发现流行趋势与人气好物</p>
               </div>
               <div className="trending-entry-indicator">
                 <i className="fas fa-arrow-right"></i>
@@ -430,21 +389,36 @@ const DailyAiApp = () => {
               <div className="section-header" style={{ 
                 display: "flex", 
                 alignItems: "center", 
-                marginBottom: "16px", 
-                padding: "0 16px" 
+                marginBottom: "20px"
               }}>
                 <div style={{ 
                   width: "4px", 
-                  height: "18px", 
+                  height: "20px", 
                   background: "linear-gradient(135deg, #6366f1, #4f46e5)", 
-                  marginRight: "8px", 
+                  marginRight: "10px", 
                   borderRadius: "2px" 
                 }}></div>
                 <h2 style={{ 
-                  fontSize: "20px", 
+                  fontSize: "22px", 
                   fontWeight: "600", 
                   color: "#333"
                 }}>精选文章</h2>
+                <div style={{ flex: 1 }}></div>
+                <button 
+                  onClick={() => navigate('/articles')}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#4f46e5",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "15px",
+                    cursor: "pointer"
+                  }}
+                >
+                  查看全部
+                  <i className="fas fa-chevron-right" style={{ marginLeft: "4px", fontSize: "12px" }}></i>
+                </button>
               </div>
               <ArticleSection 
                 onRequestArticle={handleArticleRequest} 

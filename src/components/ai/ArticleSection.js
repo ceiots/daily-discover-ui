@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ArticleList from './ArticleList';
 import ArticleDetail from './ArticleDetail';
-import ArticleCard from './ArticleCard';
 import { getRandomTemplate } from './articleTemplates';
 
-// 示例文章数据
+// 示例文章数据 - 添加默认封面图片
 const sampleArticles = [
   {
     id: '1',
@@ -15,7 +14,7 @@ const sampleArticles = [
     category: '家居',
     views: 128,
     tags: ['智能家居', '科技生活'],
-    coverImage: '/images/smart-home.jpg'
+    coverImage: 'product3'
   },
   {
     id: '2',
@@ -25,13 +24,22 @@ const sampleArticles = [
     category: '数码',
     views: 253,
     tags: ['智能手表', '购物指南'],
-    coverImage: '/images/smartwatch.jpg'
+    coverImage: 'product2'
+  },
+  {
+    id: '3',
+    title: '2023年最值得购买的无线耳机评测',
+    summary: '详细对比市面上热门无线耳机的音质、续航和舒适度，助您做出最佳选择。',
+    date: '2023-11-02',
+    category: '评测',
+    views: 321,
+    tags: ['无线耳机', '数码产品', '购物指南'],
+    coverImage: 'product1'
   }
 ];
 
 const ArticleSection = ({ onRequestArticle, onArticleClick }) => {
   const [articles, setArticles] = useState(sampleArticles);
-  const [currentView, setCurrentView] = useState('list'); // 'list', 'detail', 'create'
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,32 +48,9 @@ const ArticleSection = ({ onRequestArticle, onArticleClick }) => {
     // 实际项目中这里会从API获取文章列表
   }, []);
 
-  // 创建新文章
-  const handleCreateArticle = () => {
-    setIsLoading(true);
-    
-    // 模拟API请求延迟
-    setTimeout(() => {
-      // 使用模板生成一篇新文章
-      const newTemplate = getRandomTemplate();
-      
-      const newArticle = {
-        id: `article-${Date.now()}`,
-        ...newTemplate,
-        views: 0
-      };
-      
-      setArticles([newArticle, ...articles]);
-      setSelectedArticle(newArticle);
-      setCurrentView('detail');
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  // 查看文章详情
+  // 处理文章点击
   const handleViewArticle = (article) => {
     setSelectedArticle(article);
-    setCurrentView('detail');
     
     // 如果提供了外部点击处理函数，则调用它
     if (onArticleClick) {
@@ -73,82 +58,27 @@ const ArticleSection = ({ onRequestArticle, onArticleClick }) => {
     }
   };
 
-  // 编辑文章
-  const handleEditArticle = (article) => {
-    // 在实际项目中，这里会打开文章编辑表单
-    console.log('编辑文章:', article.id);
-  };
-
-  // 删除文章
-  const handleDeleteArticle = (articleId) => {
-    if (window.confirm('确定要删除这篇文章吗？')) {
-      setArticles(articles.filter(article => article.id !== articleId));
-      if (selectedArticle && selectedArticle.id === articleId) {
-        setCurrentView('list');
-        setSelectedArticle(null);
-      }
-    }
-  };
-
-  // 分享文章
-  const handleShareArticle = (article) => {
-    // 实际项目中，这里会打开分享对话框
-    console.log('分享文章:', article.id);
-    alert(`文章《${article.title}》已分享到您的朋友圈`);
-  };
-
-  // 导出文章
-  const handleExportArticle = (article) => {
-    // 实际项目中，这里会提供下载或打印功能
-    console.log('导出文章:', article.id);
-    alert(`文章《${article.title}》已导出到您的设备`);
-  };
-
-  // 返回文章列表
-  const handleBackToList = () => {
-    setCurrentView('list');
-    setSelectedArticle(null);
-  };
-
   // 渲染内容
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div style={{ 
-          padding: '50px 20px', 
-          textAlign: 'center'
-        }}>
+        <div className="article-loading">
           <div className="loading-spinner"></div>
-          <p style={{ marginTop: '20px', color: '#666' }}>正在加载内容...</p>
+          <p>加载中...</p>
         </div>
       );
     }
 
-    switch (currentView) {
-      case 'detail':
-        return (
-          <ArticleDetail 
-            article={selectedArticle}
-            onBack={handleBackToList}
-            onEdit={handleEditArticle}
-            onShare={handleShareArticle}
-            onExport={handleExportArticle}
-          />
-        );
-      case 'list':
-      default:
-        return (
-          <ArticleList 
-            articles={articles}
-            onCreateNew={handleCreateArticle}
-            onViewArticle={handleViewArticle}
-          />
-        );
-    }
+    return (
+      <ArticleList 
+        articles={articles}
+        onViewArticle={handleViewArticle}
+      />
+    );
   };
 
   return (
-    <div className="article-section-container">
+    <div className="article-section">
       {renderContent()}
     </div>
   );

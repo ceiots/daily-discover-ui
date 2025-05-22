@@ -3,114 +3,82 @@ import PropTypes from 'prop-types';
 import './ArticleCard.css';
 import { getImage } from '../DailyAiApp';
 
-const ArticleCard = ({ article, onView, onEdit, onDelete }) => {
-  // 格式化日期
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('zh-CN', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric'
-      });
-    } catch (error) {
-      return dateString;
-    }
-  };
-
+const ArticleCard = ({ article, onClick }) => {
+  const { title, summary, date, category, tags, coverImage } = article;
+  
   // 处理图片加载错误
   const handleImageError = (e) => {
     e.target.onerror = null;
-    e.target.src = getImage('placeholder');
+    e.target.src = getImage('theme1'); // 使用默认图片
   };
 
-  // 截断文章摘要
-  const truncateSummary = (text, maxLength = 120) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  // 格式化日期
+  const formatDate = (dateString) => {
+    if (!dateString) return '未知日期';
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
-    <div className="article-fullscreen-card" onClick={() => onView && onView(article)}>
+    <div className="article-card" onClick={() => onClick && onClick(article)}>
+      {/* 文章封面图片 */}
       <div className="article-image-container">
         <img 
-          src={article.coverImage || getImage('placeholder')} 
-          alt={article.title} 
+          src={getImage(coverImage)}
+          alt={title}
           className="article-cover-image"
           onError={handleImageError}
+          loading="lazy"
         />
+        {category && <span className="article-category-badge">{category}</span>}
       </div>
       
+      {/* 文章内容 */}
       <div className="article-content">
-        <h2 className="article-title">{article.title}</h2>
+        <h3 className="article-title">{title}</h3>
+        <p className="article-summary">{summary}</p>
         
         <div className="article-meta">
-          <div className="article-meta-item">
-            <i className="far fa-calendar"></i>
-            <span>{formatDate(article.date)}</span>
+          <div className="article-date">
+            <i className="far fa-calendar-alt"></i>
+            <span>{formatDate(date)}</span>
           </div>
           
-          <div className="article-meta-item">
-            <i className="far fa-folder"></i>
-            <span>{article.category || '未分类'}</span>
-          </div>
-          
-          <div className="article-meta-item">
-            <i className="far fa-eye"></i>
-            <span>{article.views || 0} 阅读</span>
-          </div>
+          {tags && tags.length > 0 && (
+            <div className="article-tags">
+              {tags.slice(0, 2).map((tag, index) => (
+                <span key={index} className="article-tag">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         
-        <div className="article-tags">
-          {(article.tags || ['智能家居']).map((tag, index) => (
-            <span key={index} className="article-tag">{tag}</span>
-          ))}
+        <div className="article-read-more">
+          <span>阅读全文</span>
+          <i className="fas fa-arrow-right"></i>
         </div>
-        
-        <p className="article-desc">{truncateSummary(article.summary)}</p>
-      </div>
-      
-      <div className="article-actions">
-        <button 
-          className="article-action-btn secondary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit && onEdit(article);
-          }}
-        >
-          <i className="far fa-edit"></i>编辑
-        </button>
-        
-        <button 
-          className="article-action-btn primary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onView && onView(article);
-          }}
-        >
-          <i className="far fa-eye"></i>查看
-        </button>
-        
-        <button 
-          className="article-action-btn secondary"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete && onDelete(article.id);
-          }}
-        >
-          <i className="far fa-trash-alt"></i>删除
-        </button>
       </div>
     </div>
   );
 };
 
 ArticleCard.propTypes = {
-  article: PropTypes.object.isRequired,
-  onView: PropTypes.func,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func
+  article: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    title: PropTypes.string.isRequired,
+    summary: PropTypes.string,
+    date: PropTypes.string,
+    category: PropTypes.string,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    coverImage: PropTypes.string
+  }).isRequired,
+  onClick: PropTypes.func
 };
 
 export default ArticleCard; 

@@ -1,98 +1,54 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './ArticleCard.css'; // 复用相同的CSS文件
+import ArticleCard from './ArticleCard';
 import { getImage } from '../DailyAiApp';
 
-const ArticleList = ({ articles, onCreateNew, onViewArticle }) => {
-  // 处理图片加载错误
-  const handleImageError = (e) => {
-    e.target.onerror = null;
-    e.target.src = getImage('placeholder');
-  };
+// 默认文章封面图片
+const DEFAULT_COVER_IMAGES = [
+  'theme1',
+  'product1',
+  'product2',
+  'product3',
+  'product4'
+];
 
-  // 格式化日期
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('zh-CN', { 
-        year: 'numeric', 
-        month: 'numeric', 
-        day: 'numeric'
-      });
-    } catch (error) {
-      return dateString;
+// 获取随机封面图片
+const getRandomCover = () => {
+  const randomIndex = Math.floor(Math.random() * DEFAULT_COVER_IMAGES.length);
+  return DEFAULT_COVER_IMAGES[randomIndex];
+};
+
+const ArticleList = ({ articles, onViewArticle }) => {
+  // 确保文章有封面图片
+  const articlesWithCovers = articles.map(article => {
+    if (!article.coverImage) {
+      return {
+        ...article,
+        coverImage: getRandomCover()
+      };
     }
-  };
-
+    return article;
+  });
+  
   return (
-    <div className="articles-list">
-      {/* <div style={{ padding: '16px' }}>
-        <button 
-          className="article-action-btn primary"
-          style={{ width: '100%' }}
-        >
-          <i className="fas"></i>AI文章
-        </button>
-      </div> */}
-      
-      {articles && articles.length > 0 ? (
-        articles.map((article) => (
-          <div 
-            key={article.id} 
-            className="article-list-item"
-            onClick={() => onViewArticle(article)}
-          >
-            <div className="article-list-image">
-              <img 
-                src={article.coverImage || getImage('placeholder')} 
-                alt={article.title}
-                onError={handleImageError}
-              />
-            </div>
-            
-            <div className="article-list-info">
-              <h3 className="article-list-title">{article.title}</h3>
-              
-              <div className="article-list-meta">
-                <span>
-                  <i className="far fa-calendar"></i>
-                  {formatDate(article.date)}
-                </span>
-                
-                <span>
-                  <i className="far fa-folder"></i>
-                  {article.category || '未分类'}
-                </span>
-              </div>
-              
-              <p className="article-list-desc">
-                {article.summary ? (
-                  article.summary.length > 70 
-                    ? article.summary.substring(0, 70) + '...' 
-                    : article.summary
-                ) : '暂无简介'}
-              </p>
-            </div>
+    <div className="article-list">
+      {articlesWithCovers.length === 0 ? (
+        <div className="empty-article-list">
+          <div className="empty-icon">
+            <i className="far fa-file-alt"></i>
           </div>
-        ))
+          <h3 className="empty-title">暂无文章</h3>
+          <p className="empty-subtitle">AI将为您推荐精选内容</p>
+        </div>
       ) : (
-        <div style={{ 
-          padding: '50px 20px', 
-          textAlign: 'center', 
-          color: '#888',
-          background: '#f9f9f9',
-          margin: '0 16px',
-          borderRadius: '8px'
-        }}>
-          <i className="far fa-file-alt" style={{ fontSize: '48px', marginBottom: '16px', display: 'block', opacity: 0.5 }}></i>
-          <h3 style={{ margin: '0 0 12px 0', color: '#666' }}>暂无文章</h3>
-          <p style={{ margin: '0 0 16px 0', fontSize: '14px' }}>点击上方按钮创建您的第一篇文章</p>
-          <button 
-            className="article-action-btn primary"
-            onClick={onCreateNew}
-          >
-            <i className="fas fa-plus"></i>创建文章
-          </button>
+        <div className="article-grid">
+          {articlesWithCovers.map(article => (
+            <ArticleCard 
+              key={article.id} 
+              article={article} 
+              onClick={onViewArticle}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -100,9 +56,8 @@ const ArticleList = ({ articles, onCreateNew, onViewArticle }) => {
 };
 
 ArticleList.propTypes = {
-  articles: PropTypes.array,
-  onCreateNew: PropTypes.func.isRequired,
-  onViewArticle: PropTypes.func.isRequired
+  articles: PropTypes.array.isRequired,
+  onViewArticle: PropTypes.func
 };
 
 export default ArticleList; 
