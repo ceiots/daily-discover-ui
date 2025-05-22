@@ -60,35 +60,35 @@ const DailyAiApp = () => {
   const [recommendedTopics, setRecommendedTopics] = useState([
     {
       id: 1,
-      title: 'AI驱动的智能工作',
-      description: '提升工作效率、自动化任务处理、创意辅助',
-      icon: 'brain',
+      title: 'AI驱动的工作效率',
+      description: '1.智能文档处理 2.会议内容自动记录 3.高效任务管理',
+      icon: 'briefcase',
       views: 1342,
       hotLevel: 3,
       tag: '热门话题',
-      color: '#8b5cf6',
+      color: '#4f46e5',
       route: '/ai-explore'
     },
     {
       id: 2,
-      title: '智能家居生活新体验',
-      description: '智能设备互联、语音控制系统、场景自动化',
+      title: '智能家居生活',
+      description: '1.智能设备互联 2.语音控制系统 3.场景自动化配置',
       icon: 'home',
       views: 986,
       hotLevel: 2,
       tag: '为您推荐',
-      color: '#0ea5e9',
+      color: '#4f46e5',
       route: '/recommendations'
     },
     {
       id: 3,
-      title: '数字化娱乐新时代',
-      description: 'AI游戏体验、虚拟现实互动、智能内容推荐',
+      title: '数字娱乐体验',
+      description: '1.AI个性化推荐 2.虚拟现实互动 3.智能内容创作',
       icon: 'gamepad',
       views: 658,
       hotLevel: 1,
       tag: '近期热点',
-      color: '#ec4899',
+      color: '#4f46e5',
       route: '/games'
     }
   ]);
@@ -462,13 +462,13 @@ const DailyAiApp = () => {
             <div className="recommendation-topics">
               <div className="topics-header">
                 <h3 className="topics-title">
-                  <i className="fas fa-chart-line pulse-animation" style={{ color: '#4f46e5', marginRight: '8px' }}></i>
+                  <i className="fas fa-chart-line" style={{ color: '#4f46e5', marginRight: '8px' }}></i>
                   热门AI应用领域
                 </h3>
                 <div className="topics-subtitle">探索三大核心领域，体验AI革新生活方式</div>
               </div>
               
-              {/* 三点论风格设计 - 优化版 */}
+              {/* 三点论风格设计 - 简洁版 */}
               <div className="topics-points-container">
                 {recommendedTopics.map((topic, index) => (
                   <div 
@@ -515,68 +515,108 @@ const DailyAiApp = () => {
               </div>
             </div>
             
-            <div className="entry-cards-container">
-              <div 
-                className="entry-card" 
-                onClick={() => navigate('/ai-explore')}
-                role="button"
-                aria-label="AI探索"
-              >
-                <div className="entry-card-icon" style={{
-                  background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-                  boxShadow: "0 4px 8px rgba(139, 92, 246, 0.15)"
-                }}>
-                  <i className="fas fa-brain"></i>
-                </div>
-                <div className="entry-card-content">
-                  <h3 className="entry-card-title">AI探索</h3>
-                  <p className="entry-card-desc">了解AI洞察和趋势</p>
-                </div>
-                <div className="entry-card-arrow">
-                  <i className="fas fa-chevron-right"></i>
-                </div>
-              </div>
             
-              <div 
-                className="entry-card" 
-                onClick={() => navigate('/recommendations')}
-                role="button"
-                aria-label="智能推荐"
-              >
-                <div className="entry-card-icon" style={{
-                  background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                  boxShadow: "0 4px 8px rgba(99, 102, 241, 0.15)"
-                }}>
-                  <i className="fas fa-lightbulb"></i>
-                </div>
-                <div className="entry-card-content">
-                  <h3 className="entry-card-title">智能推荐</h3>
-                  <p className="entry-card-desc">发现专属好物</p>
-                </div>
-                <div className="entry-card-arrow">
-                  <i className="fas fa-chevron-right"></i>
-                </div>
-              </div>
+          </section>
 
-              <div 
-                className="entry-card" 
-                onClick={() => navigate('/games')}
-                role="button"
-                aria-label="互动游戏"
-              >
-                <div className="entry-card-icon" style={{
-                  background: "linear-gradient(135deg, #ec4899, #db2777)",
-                  boxShadow: "0 4px 8px rgba(236, 72, 153, 0.15)"
-                }}>
-                  <i className="fas fa-gamepad"></i>
+          {/* AI精选文章/信息展示区域 */}
+          <section className="ai-content-section">
+            <div className="section-header">
+              <h2 className="section-title">
+                <i className="fas fa-robot" style={{ color: '#4f46e5', marginRight: '8px' }}></i>
+                AI精选内容
+              </h2>
+              <p className="section-subtitle">基于智能分析，为您筛选高价值内容</p>
+            </div>
+
+            {/* 飘动标签效果区域 */}
+            <div className="floating-tags-container">
+              <div className="floating-tags-wrapper">
+                {['智能家居', '数据分析', '生成式AI', '机器学习', '深度学习', '自然语言处理', '智能助手', '效率提升', '未来趋势'].map((tag, index) => (
+                  <div 
+                    key={index} 
+                    className="floating-tag"
+                    style={{
+                      animationDelay: `${index * 0.3}s`,
+                      top: `${20 + Math.random() * 30}%`
+                    }}
+                  >
+                    {tag}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI精选文章卡片布局 */}
+            <div className="ai-content-grid">
+              {articles.map((article, index) => (
+                <div key={index} className="ai-content-card" onClick={() => handleViewArticle(article)}>
+                  <div className="card-image-container">
+                    <img 
+                      src={getImage(article.coverImage)} 
+                      alt={article.title} 
+                      className="card-image" 
+                      onError={handleImageError}
+                    />
+                    <div className="image-overlay">
+                      <span className="reading-time">{Math.ceil(article.content.length / 500)}分钟阅读</span>
+                    </div>
+                  </div>
+                  <div className="card-content">
+                    <div className="card-category">
+                      <span>{article.category}</span>
+                      {index < 2 && <span className="card-hot">热门</span>}
+                    </div>
+                    <h3 className="card-title">{article.title}</h3>
+                    <p className="card-summary">{article.summary}</p>
+                    
+                    <div className="card-tags">
+                      {/* 从文章内容中提取关键词作为标签 */}
+                      {extractKeywords(article.content).map((keyword, i) => (
+                        <span key={i} className="card-tag">{keyword}</span>
+                      ))}
+                    </div>
+
+                    <div className="card-ai-reason">
+                      <div className="ai-badge">
+                        <i className="fas fa-brain"></i> AI推荐理由
+                      </div>
+                      <p>{generateAiReason(article)}</p>
+                    </div>
+                    
+                    <div className="card-footer">
+                      <div className="card-meta">
+                        <span className="card-date">{article.createdAt}</span>
+                      </div>
+                      <button className="read-more-btn">
+                        <span>了解更多</span>
+                        <i className="fas fa-arrow-right"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="entry-card-content">
-                  <h3 className="entry-card-title">互动游戏</h3>
-                  <p className="entry-card-desc">赢取专属奖励</p>
-                </div>
-                <div className="entry-card-arrow">
-                  <i className="fas fa-chevron-right"></i>
-                </div>
+              ))}
+            </div>
+
+            {/* 相关主题导航 */}
+            <div className="related-topics">
+              <h3>相关探索</h3>
+              <div className="topics-slider">
+                {['AI前沿', '智能家居', '健康科技', '办公效率', '数字营销'].map((topic, index) => (
+                  <div key={index} className="topic-item">
+                    <i className="fas fa-hashtag"></i> {topic}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 阅读进度 */}
+            <div className="reading-progress">
+              <div className="progress-bar">
+                <div className="progress-filled" style={{width: '35%'}}></div>
+              </div>
+              <div className="progress-text">
+                <span>已阅读内容</span>
+                <span>2/5</span>
               </div>
             </div>
           </section>
@@ -584,6 +624,45 @@ const DailyAiApp = () => {
       <NavBar />
     </div>
   );
+};
+
+// 从文章内容中提取关键词
+const extractKeywords = (content) => {
+  // 实际项目中应该使用更复杂的算法或API来提取关键词
+  // 这里简化处理，提取h3标签内的内容作为关键词
+  const keywords = [];
+  const h3Regex = /<h3>(.*?)<\/h3>/g;
+  let match;
+  
+  while ((match = h3Regex.exec(content)) !== null) {
+    if (match[1] && keywords.length < 3) { // 最多提取3个关键词
+      keywords.push(match[1]);
+    }
+  }
+  
+  // 如果没有足够的h3标签，添加一些默认关键词
+  const defaultKeywords = ['AI应用', '智能科技', '数字化', '机器学习', '用户体验'];
+  while (keywords.length < 3) {
+    const randomKeyword = defaultKeywords[Math.floor(Math.random() * defaultKeywords.length)];
+    if (!keywords.includes(randomKeyword)) {
+      keywords.push(randomKeyword);
+    }
+  }
+  
+  return keywords;
+};
+
+// 生成AI推荐理由
+const generateAiReason = (article) => {
+  const reasons = [
+    `该内容与您最近浏览的${article.category}相关话题高度相关，提供了新的视角。`,
+    `基于您的阅读偏好，这篇关于${article.title.split('：')[0]}的深度分析将对您有所启发。`,
+    `90%与您兴趣相似的用户对此内容给予了好评，特别是其中的核心观点。`,
+    `这篇内容涵盖了您可能感兴趣的${article.category}领域最新进展。`,
+    `根据您的阅读习惯，此文章提供的观点和解决方案与您的需求匹配度高。`
+  ];
+  
+  return reasons[Math.floor(Math.random() * reasons.length)];
 };
 
 export default DailyAiApp;
