@@ -60,29 +60,35 @@ const DailyAiApp = () => {
   const [recommendedTopics, setRecommendedTopics] = useState([
     {
       id: 1,
-      title: 'AI与未来工作',
+      title: 'AI驱动的智能工作',
+      description: '提升工作效率、自动化任务处理、创意辅助',
       icon: 'brain',
       views: 1342,
       hotLevel: 3,
       tag: '热门话题',
+      color: '#8b5cf6',
       route: '/ai-explore'
     },
     {
       id: 2,
-      title: '智能家居新趋势',
-      icon: 'lightbulb',
+      title: '智能家居生活新体验',
+      description: '智能设备互联、语音控制系统、场景自动化',
+      icon: 'home',
       views: 986,
       hotLevel: 2,
       tag: '为您推荐',
+      color: '#0ea5e9',
       route: '/recommendations'
     },
     {
       id: 3,
-      title: '数字化娱乐体验',
+      title: '数字化娱乐新时代',
+      description: 'AI游戏体验、虚拟现实互动、智能内容推荐',
       icon: 'gamepad',
       views: 658,
       hotLevel: 1,
       tag: '近期热点',
+      color: '#ec4899',
       route: '/games'
     }
   ]);
@@ -340,14 +346,80 @@ const DailyAiApp = () => {
           setDailyTheme(response.data.data.theme || '科技改变生活');
         }
       } else {
-        const newTopics = [...recommendedTopics];
-        newTopics.forEach(topic => {
-          topic.views = Math.max(100, topic.views + Math.floor(Math.random() * 50 - 10));
-          topic.hotLevel = Math.min(3, Math.max(1, topic.hotLevel + Math.floor(Math.random() * 2 - 1)));
-        });
-        setRecommendedTopics(newTopics.sort((a, b) => b.hotLevel - a.hotLevel));
+        // 更丰富的模拟主题内容
+        const topicOptions = [
+          {
+            id: 1,
+            title: 'AI驱动的智能工作',
+            description: '提升工作效率、自动化任务处理、创意辅助',
+            icon: 'brain',
+            views: 1000 + Math.floor(Math.random() * 500),
+            hotLevel: 3,
+            tag: '热门话题',
+            color: '#8b5cf6',
+            route: '/ai-explore'
+          },
+          {
+            id: 2,
+            title: '智能家居生活新体验',
+            description: '智能设备互联、语音控制系统、场景自动化',
+            icon: 'home',
+            views: 800 + Math.floor(Math.random() * 400),
+            hotLevel: 2,
+            tag: '为您推荐',
+            color: '#0ea5e9',
+            route: '/recommendations'
+          },
+          {
+            id: 3,
+            title: '数字化娱乐新时代',
+            description: 'AI游戏体验、虚拟现实互动、智能内容推荐',
+            icon: 'gamepad',
+            views: 500 + Math.floor(Math.random() * 300),
+            hotLevel: 1,
+            tag: '近期热点',
+            color: '#ec4899',
+            route: '/games'
+          },
+          {
+            id: 4,
+            title: 'AI辅助健康管理',
+            description: '个性化健康方案、实时监测数据、智能饮食建议',
+            icon: 'heartbeat',
+            views: 600 + Math.floor(Math.random() * 350),
+            hotLevel: 2,
+            tag: '生活应用',
+            color: '#10b981',
+            route: '/ai-explore'
+          },
+          {
+            id: 5,
+            title: '智能学习与教育',
+            description: '个性化学习路径、知识图谱构建、智能答疑系统',
+            icon: 'graduation-cap',
+            views: 750 + Math.floor(Math.random() * 400),
+            hotLevel: 2,
+            tag: '知识拓展',
+            color: '#f59e0b',
+            route: '/ai-explore'
+          }
+        ];
         
-        const themeOptions = ['科技改变生活', '智能时代探索', '数字创新前沿', 'AI赋能未来'];
+        // 随机选择3个主题
+        const shuffled = [...topicOptions].sort(() => 0.5 - Math.random());
+        const selectedTopics = shuffled.slice(0, 3);
+        selectedTopics.sort((a, b) => b.hotLevel - a.hotLevel);
+        
+        setRecommendedTopics(selectedTopics);
+        
+        const themeOptions = [
+          '科技改变生活', 
+          '智能时代探索', 
+          '数字创新前沿', 
+          'AI赋能未来',
+          '人机协作新纪元',
+          '智能科技应用实践'
+        ];
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / (24 * 60 * 60 * 1000));
         setDailyTheme(themeOptions[dayOfYear % themeOptions.length]);
       }
@@ -389,22 +461,38 @@ const DailyAiApp = () => {
             
             <div className="recommendation-topics">
               <div className="topics-header">
-                <h3 className="topics-title">热门AI论点</h3>
-                <div className="topics-subtitle">探索三大核心观点，启发思考</div>
+                <h3 className="topics-title">
+                  <i className="fas fa-chart-line pulse-animation" style={{ color: '#4f46e5', marginRight: '8px' }}></i>
+                  热门AI应用领域
+                </h3>
+                <div className="topics-subtitle">探索三大核心领域，体验AI革新生活方式</div>
               </div>
               
-              {/* 三点论风格设计 */}
+              {/* 三点论风格设计 - 优化版 */}
               <div className="topics-points-container">
                 {recommendedTopics.map((topic, index) => (
-                  <div key={topic.id} className="topic-point-item" onClick={() => navigate(topic.route)}>
-                    <div className="point-number">{index + 1}</div>
+                  <div 
+                    key={topic.id} 
+                    className="topic-point-item" 
+                    onClick={() => navigate(topic.route)}
+                    style={{
+                      borderLeft: `3px solid ${topic.color}`
+                    }}
+                  >
+                    <div className="point-number" style={{
+                      background: topic.color
+                    }}>{index + 1}</div>
                     <div className="point-content">
                       <div className="point-title">
-                        <div className="point-icon">
+                        <div className="point-icon" style={{
+                          backgroundColor: `${topic.color}15`,
+                          color: topic.color
+                        }}>
                           <i className={`fas fa-${topic.icon}`}></i>
                         </div>
                         <h4>{topic.title}</h4>
                       </div>
+                      <p className="point-description">{topic.description}</p>
                       <div className="point-stats">
                         <span className="point-views"><i className="fas fa-eye"></i> {topic.views}人关注</span>
                         <span className="point-hot-level">
@@ -412,7 +500,11 @@ const DailyAiApp = () => {
                             <i key={i} className="fas fa-fire"></i>
                           ))}
                         </span>
-                        <span className="point-tag">{topic.tag}</span>
+                        <span className="point-tag" style={{
+                          backgroundColor: `${topic.color}20`,
+                          color: topic.color,
+                          borderColor: `${topic.color}40`
+                        }}>{topic.tag}</span>
                       </div>
                     </div>
                     <div className="point-arrow">

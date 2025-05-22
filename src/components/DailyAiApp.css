@@ -3797,9 +3797,9 @@ img {
 }
 
 .topics-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0 0 4px 0;
   display: flex;
   align-items: center;
@@ -3807,87 +3807,92 @@ img {
 
 .topics-subtitle {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .topics-points-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
 .topic-point-item {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   background: white;
   border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  cursor: pointer;
-  position: relative;
+  padding: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+  border-left-width: 3px;
+  border-left-style: solid;
 }
 
 .topic-point-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
 }
 
 .point-number {
-  width: 28px;
-  height: 28px;
-  background: linear-gradient(135deg, #4f46e5, #8b5cf6);
-  color: white;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;
   font-weight: 700;
-  font-size: 14px;
-  margin-right: 14px;
-  flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.25);
-}
-
-.topic-point-item:nth-child(1) .point-number {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
-}
-
-.topic-point-item:nth-child(2) .point-number {
-  background: linear-gradient(135deg, #10b981, #059669);
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+  color: white;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .point-content {
   flex: 1;
+  padding: 16px 12px 16px 60px;
 }
 
 .point-title {
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .point-icon {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 8px;
-  color: #4f46e5;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.point-icon i {
   font-size: 14px;
-  background: rgba(79, 70, 229, 0.1);
 }
 
 .point-title h4 {
-  font-size: 15px;
-  font-weight: 600;
-  color: #1f2937;
   margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.point-description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
 }
 
 .point-stats {
@@ -3895,73 +3900,57 @@ img {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
+  font-size: 12px;
 }
 
 .point-views, .point-tag {
-  font-size: 12px;
-  color: #6b7280;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .point-hot-level {
   display: flex;
+  align-items: center;
   gap: 2px;
   color: #f59e0b;
-  font-size: 12px;
 }
 
 .point-tag {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #f3f4f6;
-  border-radius: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid;
 }
 
 .point-arrow {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
   color: #9ca3af;
-  transition: all 0.3s ease;
-  font-size: 14px;
+  transition: transform 0.3s ease;
 }
 
 .topic-point-item:hover .point-arrow {
-  color: #4f46e5;
-  transform: translateX(4px);
+  transform: translateX(3px);
+  color: var(--primary-color);
 }
 
-/* 深色模式支持 */
 @media (prefers-color-scheme: dark) {
-  .daily-theme-header {
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.2), rgba(124, 58, 237, 0.25));
-    border-left-color: #6366f1;
-  }
-  
-  .theme-description, .topics-subtitle {
-    color: #d1d5db;
-  }
-  
-  .topics-title {
-    color: #f3f4f6;
-  }
-  
   .topic-point-item {
-    background: #2a2a2a;
+    background-color: #1f2937;
   }
   
   .point-title h4 {
     color: #f3f4f6;
   }
   
-  .point-views, .point-tag {
+  .point-description {
     color: #d1d5db;
   }
   
-  .point-tag {
-    background: #3a3a3a;
-  }
-  
-  .point-arrow {
+  .point-views {
     color: #9ca3af;
   }
 }

@@ -16,7 +16,7 @@ const NavBar = () => {
         >
         {({ isActive }) => (
           <>
-            <i className={`fas fa-compass ${isActive ? 'text-primary' : 'text-gray-400'}`}></i>
+            <i className={`ri-calendar-line ri-lg ${isActive ? 'text-primary' : 'text-gray-400'}`}></i>
             <span className={`text-xs mt-1 ${isActive ? 'text-primary' : 'text-gray-400'}`}>每日</span>
           </>
         )}
@@ -35,7 +35,7 @@ const NavBar = () => {
         >
         {({ isActive }) => (
           <>
-            <i className={`fas fa-robot ${isActive ? 'text-primary' : 'text-gray-400'}`}></i>
+            <i className={`ri-compass-discover-line ri-lg ${isActive ? 'text-primary' : 'text-gray-400'}`}></i>
             <span className={`text-xs mt-1 ${isActive ? 'text-primary' : 'text-gray-400'}`}>发现</span>
           </>
         )}
