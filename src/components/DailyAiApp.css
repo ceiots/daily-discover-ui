@@ -1726,7 +1726,7 @@ img {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  animation: modalFadeIn 0.3s;
+  animation: modalFadeIn 0.3s ease forwards;
 }
 
 .article-preview-modal {
@@ -4365,4 +4365,561 @@ img {
   .progress-text {
     color: #9ca3af;
   }
+}
+
+/* 新增碎片化体验相关样式 */
+.fragment-experience-container {
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: rgba(249, 250, 251, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.dark .fragment-experience-container {
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.fragment-experience-title {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #4b5563;
+}
+
+.dark .fragment-experience-title {
+  color: #d1d5db;
+}
+
+.fragment-bubbles-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.fragment-bubble {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  min-width: 200px;
+  max-width: 280px;
+  animation: bubbleSlideIn 0.5s ease forwards;
+  transform-origin: center bottom;
+  opacity: 0;
+}
+
+.dark .fragment-bubble {
+  background-color: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.fragment-bubble.info {
+  border-left: 3px solid #4f46e5;
+}
+
+.fragment-bubble.product {
+  border-left: 3px solid #f59e0b;
+}
+
+.fragment-bubble.task {
+  border-left: 3px solid #10b981;
+}
+
+.bubble-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.info .bubble-icon {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.product .bubble-icon {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.task .bubble-icon {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.bubble-content {
+  flex-grow: 1;
+  font-size: 12px;
+  color: #4b5563;
+  margin-right: 8px;
+}
+
+.dark .bubble-content {
+  color: #e5e7eb;
+}
+
+.bubble-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.bubble-action {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+
+.bubble-action.view {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.bubble-action.dismiss {
+  background-color: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+}
+
+.bubble-action:hover {
+  transform: scale(1.1);
+}
+
+.bubble-action.view:hover {
+  background-color: rgba(79, 70, 229, 0.2);
+}
+
+.bubble-action.dismiss:hover {
+  background-color: rgba(156, 163, 175, 0.2);
+}
+
+@keyframes bubbleSlideIn {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* 进度条容器 */
+.ai-progress-container {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dark .ai-progress-container {
+  background-color: #2d2d2d;
+}
+
+/* 默认脉冲波进度条 */
+.themed-progress.pulse-wave {
+  width: 100%;
+}
+
+.themed-progress.pulse-wave .progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.dark .themed-progress.pulse-wave .progress-bar {
+  background-color: #3d3d3d;
+}
+
+.themed-progress.pulse-wave .progress-filled {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed, #9333ea);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  animation: gradientShift 2s infinite;
+  background-size: 200% 200%;
+}
+
+.themed-progress .progress-text {
+  font-size: 10px;
+  color: #6b7280;
+  text-align: right;
+}
+
+.dark .themed-progress .progress-text {
+  color: #9ca3af;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 神经网络进度条 */
+.themed-progress.neural-network {
+  position: relative;
+  width: 100%;
+  padding: 15px 0 10px;
+}
+
+.themed-progress.neural-network .network {
+  position: relative;
+  height: 6px;
+  background-color: #f3f4f6;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.dark .themed-progress.neural-network .network {
+  background-color: #3d3d3d;
+}
+
+.themed-progress.neural-network .connection {
+  position: absolute;
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.themed-progress.neural-network .node {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: white;
+  border: 2px solid #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c3aed;
+  z-index: 2;
+  font-size: 10px;
+  box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
+  transition: all 0.3s ease;
+}
+
+.dark .themed-progress.neural-network .node {
+  background-color: #2d2d2d;
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.themed-progress.neural-network .node1 {
+  left: 0%;
+  transform: translateX(-50%);
+}
+
+.themed-progress.neural-network .node2 {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.themed-progress.neural-network .node3 {
+  left: 100%;
+  transform: translateX(-50%);
+}
+
+.themed-progress.neural-network .progress-text {
+  text-align: center;
+  font-size: 10px;
+  color: #7c3aed;
+}
+
+.dark .themed-progress.neural-network .progress-text {
+  color: #8b5cf6;
+}
+
+/* 碎片化体验页面样式 */
+.fragmented-experience-page {
+  width: 100%;
+  margin: 15px 0 25px 0;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .fragmented-experience-page {
+  background-color: #1a1a1a;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.fragmented-experience-page:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6, #ec4899);
+}
+
+.experience-page-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dark .experience-page-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.experience-page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.dark .experience-page-header h2 {
+  color: #f3f4f6;
+}
+
+.experience-page-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+  max-width: 600px;
+}
+
+.dark .experience-page-description {
+  color: #9ca3af;
+}
+
+.experience-items-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.experience-history {
+  margin-top: 15px;
+}
+
+.history-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 12px;
+  padding-left: 8px;
+  border-left: 3px solid #4f46e5;
+}
+
+.dark .history-title {
+  color: #d1d5db;
+}
+
+.experience-history-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  animation: slideIn 0.5s ease-out;
+}
+
+.dark .experience-history-item {
+  background-color: rgba(30, 30, 30, 0.8);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.experience-query-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.dark .experience-query-info {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.query-text {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.dark .query-text {
+  color: #e5e7eb;
+}
+
+.query-time {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dark .query-time {
+  color: #9ca3af;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 碎片化体验切换按钮 */
+.experience-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px auto;
+  padding: 8px 16px;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6);
+  color: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  max-width: fit-content;
+  position: relative;
+}
+
+.experience-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.experience-toggle-btn i {
+  margin-right: 8px;
+  font-size: 0.9rem;
+}
+
+.experience-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark .experience-toggle-btn {
+  background: linear-gradient(to right, #6366f1, #a855f7);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+/* 碎片化体验历史记录样式 */
+.experience-history-container {
+  margin: 20px 0;
+  background-color: rgba(249, 250, 251, 0.8);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.dark .experience-history-container {
+  background-color: rgba(30, 30, 30, 0.8);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.history-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  color: #111827;
+}
+
+.dark .history-title {
+  color: #f3f4f6;
+}
+
+.experience-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.experience-history-list .history-item {
+  margin: 0 0 8px 0;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+}
+
+.experience-history-list .history-item:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.view-more-history {
+  text-align: center;
+  padding: 8px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4f46e5;
+  margin-top: 10px;
+  transition: all 0.2s ease;
+}
+
+.dark .view-more-history {
+  background-color: #374151;
+  color: #a78bfa;
+}
+
+.view-more-history:hover {
+  background-color: #e5e7eb;
+  color: #4338ca;
+}
+
+.dark .view-more-history:hover {
+  background-color: #4b5563;
+}
+
+/* 碎片化体验在卡片前的样式 */
+.before-card {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-radius: 8px;
 }

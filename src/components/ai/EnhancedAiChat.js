@@ -28,6 +28,15 @@ const KEYWORD_MAPPING = {
     progressTheme: 'running-track',
     miniGame: { type: 'click', title: '能量收集挑战', icon: 'bolt' }
   },
+  '运动': {
+    bubbles: [
+      { type: 'info', content: '坚持有氧运动可以显著提高心肺功能', icon: 'running' },
+      { type: 'product', content: '专业运动鞋限时折扣，让运动更轻松', icon: 'shoe-prints' },
+      { type: 'task', content: '参与运动知识小测验，获取健身指导', icon: 'dumbbell' }
+    ],
+    progressTheme: 'running-track',
+    miniGame: { type: 'click', title: '能量收集挑战', icon: 'bolt' }
+  },
   '旅行': {
     bubbles: [
       { type: 'info', content: '最新研究：旅行有助于减轻压力，提升创造力', icon: 'info-circle' },
@@ -77,7 +86,7 @@ const DEFAULT_LOADING_EXPERIENCE = {
   miniGame: { type: 'click', title: '能量收集', icon: 'tachometer-alt' }
 };
 
-const EnhancedAiChat = ({ onRequestArticle }) => {
+const EnhancedAiChat = ({ onRequestArticle, onLoadingChange }) => {
   const { isLoggedIn, userInfo } = useAuth();
   const [messages, setMessages] = useState([
     { type: 'ai', text: '您好！我是今日发现AI助手。请告诉我您想了解什么，我可以帮您找到商品、回答问题或创建个性化内容。' }
@@ -88,20 +97,6 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const speechRecognition = useRef(null);
-  const [showSuggestions, setShowSuggestions] = useState(true);
-  
-  // 碎片化体验相关状态
-  const [showInfoBubbles, setShowInfoBubbles] = useState(false);
-  const [bubbles, setBubbles] = useState([]);
-  const [loadingProgress, setLoadingProgress] = useState(0);
-  const [progressTheme, setProgressTheme] = useState('pulse-wave');
-  const [showSideExplorer, setShowSideExplorer] = useState(false);
-  const [showMiniGame, setShowMiniGame] = useState(false);
-  const [currentMiniGame, setCurrentMiniGame] = useState(null);
-  const [gameScore, setGameScore] = useState(0);
-  const [clickedBubbles, setClickedBubbles] = useState(0);
-  const [showExplorerContent, setShowExplorerContent] = useState(null);
-  const progressInterval = useRef(null);
 
   // 快捷提问选项 - 更现代化的设计和描述
   const quickSuggestions = [
@@ -109,28 +104,31 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       id: 1,
       title: "无线降噪耳机推荐", 
       icon: "headphones",
-      color: "#4f46e5",
+      color: "#4a5568",
       description: "高音质长续航"
     },
     { 
       id: 2,
       title: "智能手表排行榜", 
       icon: "smartwatch",
-      color: "#10b981",
+      color: "#4a5568",
       description: "多功能健康监测"
     },
     { 
       id: 3,
       title: "抽奖赢好礼", 
       icon: "gift",
-      color: "#f43f5e",
+      color: "#4a5568",
       description: "限时活动进行中"
     }
   ];
 
   // 自动滚动到最新消息
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) {
+      // 延迟执行确保DOM已更新，延长延迟确保渲染完成
+      setTimeout(() => scrollToBottom(), 300);
+    }
   }, [messages]);
 
   // 聚焦输入框
@@ -142,8 +140,39 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
     }
   }, []);
 
+  // 确保页面加载时显示快捷建议
+  useEffect(() => {
+    // 空白函数，不再需要设置showSuggestions
+  }, []);
+
+  // 通知父组件加载状态变化
+  useEffect(() => {
+    if (onLoadingChange) {
+      onLoadingChange(isLoading, userInput);
+    }
+  }, [isLoading, userInput, onLoadingChange]);
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      console.log("执行滚动到底部");
+      
+      // 添加额外检查，确保滚动生效
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          const chatBody = messagesEndRef.current.closest('.ai-chat-body');
+          if (chatBody) {
+            const isScrolledToBottom = 
+              chatBody.scrollHeight - chatBody.clientHeight <= chatBody.scrollTop + 50;
+            
+            if (!isScrolledToBottom) {
+              messagesEndRef.current.scrollIntoView({ behavior: 'auto', block: 'end' });
+              console.log("执行额外滚动检查");
+            }
+          }
+        }
+      }, 500);
+    }
   };
 
   // 初始化语音识别
@@ -200,43 +229,43 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
     const userMessage = { type: 'user', text: userInput };
     setMessages([...messages, userMessage]);
     
+    // 记录当前输入值（用于父组件展示）
+    const currentInput = userInput;
+    
     // 清空输入框并设置加载状态
     setUserInput('');
     setIsLoading(true);
-    // 发送后隐藏快捷提问
-    setShowSuggestions(false);
-
-    // 生成基于用户输入的碎片化等待体验
-    generateFragmentedExperience(userMessage.text);
     
     // 确保滚动到底部显示用户消息
-    setTimeout(() => scrollToBottom(), 100);
+    setTimeout(() => scrollToBottom(), 200);
 
     try {
       // 检查是否登录
       if (!isLoggedIn) {
         setMessages(prev => [...prev, { type: 'ai', text: '请先登录后再使用AI助手功能，登录后可以获得个性化推荐和更多专属内容。' }]);
         setIsLoading(false);
-        completeLoading(); // 完成加载动画
+        setTimeout(() => scrollToBottom(), 300);
         return;
       }
 
       // 检查是否请求创建文章
-      if (userInput.includes('写篇') || userInput.includes('创建文章') || userInput.includes('生成文章')) {
-        onRequestArticle && onRequestArticle(userInput);
+      if (currentInput.includes('写篇') || currentInput.includes('创建文章') || currentInput.includes('生成文章')) {
+        onRequestArticle && onRequestArticle(currentInput);
         setMessages(prev => [...prev, { type: 'ai', text: '好的，我可以帮您创建一篇文章。请在弹出的表单中补充详细信息，我会根据您的需求生成高质量的内容。' }]);
         setIsLoading(false);
-        completeLoading(); // 完成加载动画
+        setTimeout(() => scrollToBottom(), 300);
         return;
       }
 
       // 模拟AI响应 - 在实际项目中替换为真实API调用
       let aiResponse = "";
       
-      if (userInput.includes('推荐') || userInput.includes('好物')) {
+      if (currentInput.includes('推荐') || currentInput.includes('好物')) {
         aiResponse = "根据最新数据，我为您推荐几款好评产品：\n\n1. 索尼WH-1000XM5无线降噪耳机 - 音质和降噪效果出色\n2. 小米空气净化器Pro - 高效过滤PM2.5\n3. Dyson V12 Detect Slim - 轻量化设计，清洁效果好\n\n要了解更多详情，您可以点击下方的\"智能推荐\"查看完整列表。";
-      } else if (userInput.includes('游戏') || userInput.includes('互动')) {
-        aiResponse = "我们有多款互动游戏可以体验：\n\n1. 「每日挑战」- 答对题目可获得积分\n2. 「知识问答」- 测试您的商品知识\n3. 「幸运抽奖」- 有机会获得折扣券\n\n您可以点击\"互动游戏\"开始体验，玩游戏还能获得积分哦！";
+      } else if (currentInput.includes('游戏') || currentInput.includes('互动')) {
+        aiResponse = "我们有多款互动游戏可以体验：\n\n1. \"每日挑战\"- 答对题目可获得积分\n2. \"知识问答\"- 测试您的商品知识\n3. \"幸运抽奖\"- 有机会获得折扣券\n\n您可以点击\"互动游戏\"开始体验，玩游戏还能获得积分哦！";
+      } else if (currentInput.includes('健身') || currentInput.includes('运动')) {
+        aiResponse = "健身对身体有很多好处：\n\n1. 增强心肺功能 - 有氧运动可以提高心肺耐力\n2. 增加肌肉量 - 力量训练可以塑造更好的体型\n3. 改善心情 - 运动时大脑会分泌更多内啡肽\n\n建议根据自身情况选择合适的运动类型和强度，保持规律锻炼！";
       } else {
         // 模拟通用回复
         aiResponse = "感谢您的提问。作为每日发现AI助手，我可以帮您：\n\n• 查找和推荐适合您的商品\n• 解答商品相关问题\n• 生成个性化内容\n• 提供购物建议\n\n您可以尝试询问特定产品推荐，或点击下方功能入口探索更多服务。";
@@ -246,22 +275,20 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       setTimeout(() => {
         setMessages(prev => [...prev, { type: 'ai', text: aiResponse }]);
         setIsLoading(false);
-        completeLoading(); // 完成加载动画
         
-        // 回复后重新显示快捷提问
-        setTimeout(() => setShowSuggestions(true), 1000);
-        
-        // 滚动到回复内容
-        setTimeout(() => scrollToBottom(), 100);
+        // 回复后滚动到回复内容
+        setTimeout(() => {
+          scrollToBottom();
+        }, 400);
       }, 3000); // 增加延迟以展示碎片化体验
       
     } catch (error) {
       console.error('AI请求失败:', error);
       setMessages(prev => [...prev, { type: 'ai', text: '连接AI服务出错，请稍后再试' }]);
       setIsLoading(false);
-      completeLoading(); // 完成加载动画
-      setTimeout(() => setShowSuggestions(true), 1000);
-      setTimeout(() => scrollToBottom(), 100);
+      setTimeout(() => {
+        scrollToBottom();
+      }, 400);
     }
   };
 
@@ -292,7 +319,6 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
         // 实际项目中这里应该上传图片到服务器并获取URL
         const userMessage = { type: 'user', text: '上传了一张图片', isImage: true };
         setMessages([...messages, userMessage]);
-        setShowSuggestions(false);
         
         // 模拟AI响应
         setTimeout(() => {
@@ -301,7 +327,6 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
             text: '我看到您上传了一张图片。这似乎是一个商品的照片，我可以帮您：\n\n1. 查找类似的商品\n2. 分析商品特性\n3. 提供购买建议\n\n请告诉我您需要什么帮助？' 
           }]);
           setIsLoading(false);
-          setTimeout(() => setShowSuggestions(true), 1000);
         }, 1500);
       }
     };
@@ -311,448 +336,6 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   const handleImageError = (e) => {
     e.target.onerror = null;
     e.target.src = getImage('avatar');
-  };
-
-  // 处理气泡点击
-  const handleBubbleClick = (bubble) => {
-    setClickedBubbles(prev => prev + 1);
-    
-    // 如果点击了3个气泡，触发彩蛋效果
-    if (clickedBubbles + 1 >= 3) {
-      // 添加彩蛋效果，如奖励积分或者展示特殊内容
-      setMessages(prev => [...prev, { 
-        type: 'ai', 
-        text: '🎉 恭喜您触发了彩蛋！您获得了10积分奖励，可在"我的账户"中查看。' 
-      }]);
-      
-      // 重置点击计数
-      setClickedBubbles(0);
-    }
-    
-    if (bubble.type === 'task') {
-      setShowMiniGame(true);
-    } else if (bubble.type === 'info') {
-      setShowExplorerContent({
-        type: 'article',
-        title: '相关知识',
-        content: bubble.content,
-        icon: bubble.icon
-      });
-      setShowSideExplorer(true);
-    } else if (bubble.type === 'product') {
-      setShowExplorerContent({
-        type: 'product',
-        title: '推荐商品',
-        content: bubble.content,
-        icon: bubble.icon
-      });
-      setShowSideExplorer(true);
-    }
-  };
-  
-  // 关闭气泡
-  const handleDismissBubble = (index) => {
-    setBubbles(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  // 更新游戏分数
-  const updateGameScore = (points) => {
-    setGameScore(prev => prev + points);
-  };
-  
-  // 关闭迷你游戏
-  const handleCloseGame = () => {
-    setShowMiniGame(false);
-    // 如果游戏分数大于特定值，添加奖励消息
-    if (gameScore > 5) {
-      setMessages(prev => [...prev, { 
-        type: 'ai', 
-        text: `🏆 游戏结束！您获得了${gameScore}分，赢得了优惠券奖励！查看"我的奖品"领取。` 
-      }]);
-    }
-    setGameScore(0);
-  };
-  
-  // 处理探索面板关闭
-  const handleCloseExplorer = () => {
-    setShowSideExplorer(false);
-    setShowExplorerContent(null);
-  };
-  
-  // 基于用户输入生成碎片化体验内容
-  const generateFragmentedExperience = (input) => {
-    let matchedKeyword = null;
-    let matchedExperience = DEFAULT_LOADING_EXPERIENCE;
-    
-    // 查找匹配的关键词
-    for (const keyword in KEYWORD_MAPPING) {
-      if (input.toLowerCase().includes(keyword.toLowerCase())) {
-        matchedKeyword = keyword;
-        matchedExperience = KEYWORD_MAPPING[keyword];
-        break;
-      }
-    }
-    
-    // 设置气泡内容
-    setBubbles(matchedExperience.bubbles);
-    setProgressTheme(matchedExperience.progressTheme);
-    setCurrentMiniGame(matchedExperience.miniGame);
-    
-    // 显示气泡和边栏
-    setShowInfoBubbles(true);
-    
-    // 启动进度条更新
-    startProgressAnimation();
-    
-    // 0.5秒后显示侧边栏，确保先显示气泡
-    setTimeout(() => {
-      if (isLoading) { // 只有在仍然加载时才显示
-        setShowSideExplorer(true);
-      }
-    }, 500);
-  };
-  
-  // 启动进度条动画
-  const startProgressAnimation = () => {
-    // 清除之前的进度条间隔
-    if (progressInterval.current) {
-      clearInterval(progressInterval.current);
-    }
-    
-    // 重置进度
-    setLoadingProgress(0);
-    
-    // 设置新的进度条更新间隔
-    progressInterval.current = setInterval(() => {
-      setLoadingProgress(prev => {
-        // 随机增加进度，模拟不规则加载
-        const increment = Math.random() * 8 + 2;
-        const newProgress = prev + increment;
-        
-        // 如果进度接近100%，停止更新
-        if (newProgress >= 90) {
-          clearInterval(progressInterval.current);
-          return 90; // 留下最后10%在真正完成请求时添加
-        }
-        
-        return newProgress;
-      });
-    }, 300);
-  };
-  
-  // 停止进度动画并完成加载
-  const completeLoading = () => {
-    if (progressInterval.current) {
-      clearInterval(progressInterval.current);
-    }
-    
-    // 设置100%进度
-    setLoadingProgress(100);
-    
-    // 隐藏碎片化体验元素
-    setTimeout(() => {
-      setShowInfoBubbles(false);
-      setShowSideExplorer(false);
-      setShowMiniGame(false);
-      setLoadingProgress(0);
-    }, 500);
-  };
-  
-  // 渲染动态气泡
-  const renderInfoBubbles = () => {
-    if (!showInfoBubbles || bubbles.length === 0) return null;
-    
-    return (
-      <div className="info-bubbles-container">
-        {bubbles.map((bubble, index) => (
-          <div 
-            key={index} 
-            className={`info-bubble ${bubble.type}`}
-            style={{
-              animationDelay: `${index * 0.2}s`,
-              left: `${15 + Math.floor(Math.random() * 10) + index * 20}%`,
-              bottom: `${10 + Math.floor(Math.random() * 20)}px`
-            }}
-          >
-            <div className="bubble-icon">
-              <i className={`fas fa-${bubble.icon}`}></i>
-            </div>
-            <div className="bubble-content">{bubble.content}</div>
-            <div className="bubble-actions">
-              <button className="bubble-action view" onClick={() => handleBubbleClick(bubble)}>
-                <i className="fas fa-eye"></i>
-              </button>
-              <button className="bubble-action dismiss" onClick={() => handleDismissBubble(index)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
-  
-  // 渲染进度条
-  const renderProgressBar = () => {
-    if (!isLoading) return null;
-    
-    let progressBarContent;
-    
-    // 根据主题渲染不同风格的进度条
-    switch (progressTheme) {
-      case 'coffee-cup':
-        progressBarContent = (
-          <div className="themed-progress coffee-cup">
-            <div className="cup-body">
-              <div className="coffee-level" style={{ height: `${loadingProgress}%` }}>
-                <div className="coffee-bubbles">
-                  <div className="bubble"></div>
-                  <div className="bubble"></div>
-                  <div className="bubble"></div>
-                </div>
-              </div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      case 'running-track':
-        progressBarContent = (
-          <div className="themed-progress running-track">
-            <div className="track">
-              <div className="runner" style={{ left: `${loadingProgress}%` }}>
-                <i className="fas fa-running"></i>
-              </div>
-              <div className="finish-line">
-                <i className="fas fa-flag-checkered"></i>
-              </div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      case 'flight-path':
-        progressBarContent = (
-          <div className="themed-progress flight-path">
-            <div className="sky">
-              <div className="plane" style={{ left: `${loadingProgress}%` }}>
-                <i className="fas fa-plane"></i>
-              </div>
-              <div className="cloud cloud1"><i className="fas fa-cloud"></i></div>
-              <div className="cloud cloud2"><i className="fas fa-cloud"></i></div>
-              <div className="cloud cloud3"><i className="fas fa-cloud"></i></div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      case 'tech-circuit':
-        progressBarContent = (
-          <div className="themed-progress tech-circuit">
-            <div className="circuit-board">
-              <div className="data-packet" style={{ left: `${loadingProgress}%` }}>
-                <i className="fas fa-microchip"></i>
-              </div>
-              <div className="circuit-path" style={{ width: `${loadingProgress}%` }}></div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      case 'neural-network':
-        progressBarContent = (
-          <div className="themed-progress neural-network">
-            <div className="network">
-              <div className="connection" style={{ width: `${loadingProgress}%` }}></div>
-              <div className="node node1"><i className="fas fa-brain"></i></div>
-              <div className="node node2"><i className="fas fa-brain"></i></div>
-              <div className="node node3"><i className="fas fa-brain"></i></div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      case 'film-reel':
-        progressBarContent = (
-          <div className="themed-progress film-reel">
-            <div className="reel">
-              <div className="film" style={{ width: `${loadingProgress}%` }}></div>
-              <div className="frame frame1"></div>
-              <div className="frame frame2"></div>
-              <div className="frame frame3"></div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-        break;
-        
-      default:
-        // 默认脉冲波进度条
-        progressBarContent = (
-          <div className="themed-progress pulse-wave">
-            <div className="progress-bar">
-              <div className="progress-filled" style={{ width: `${loadingProgress}%` }}></div>
-            </div>
-            <div className="progress-text">{Math.round(loadingProgress)}%</div>
-          </div>
-        );
-    }
-    
-    return (
-      <div className="ai-progress-container">
-        {progressBarContent}
-      </div>
-    );
-  };
-  
-  // 渲染迷你游戏
-  const renderMiniGame = () => {
-    if (!showMiniGame || !currentMiniGame) return null;
-    
-    let gameContent;
-    
-    switch (currentMiniGame.type) {
-      case 'click':
-        gameContent = (
-          <div className="mini-game click-game">
-            <h3><i className={`fas fa-${currentMiniGame.icon}`}></i> {currentMiniGame.title}</h3>
-            <p>点击飘落的能量球收集积分！</p>
-            <div className="game-area">
-              {[...Array(5)].map((_, i) => (
-                <div 
-                  key={i}
-                  className="energy-ball"
-                  style={{
-                    left: `${10 + Math.random() * 80}%`,
-                    animationDuration: `${2 + Math.random() * 3}s`,
-                    animationDelay: `${Math.random() * 2}s`
-                  }}
-                  onClick={() => updateGameScore(1)}
-                >
-                  <i className="fas fa-star"></i>
-                </div>
-              ))}
-            </div>
-            <div className="game-score">得分: {gameScore}</div>
-            <button className="game-close-btn" onClick={handleCloseGame}>
-              完成
-            </button>
-          </div>
-        );
-        break;
-        
-      case 'quiz':
-        // 知识问答简易实现
-        gameContent = (
-          <div className="mini-game quiz-game">
-            <h3><i className={`fas fa-${currentMiniGame.icon}`}></i> {currentMiniGame.title}</h3>
-            <div className="question">
-              AI之父被称为?
-            </div>
-            <div className="options">
-              <button className="option" onClick={() => { updateGameScore(3); handleCloseGame(); }}>
-                阿兰·图灵
-              </button>
-              <button className="option" onClick={handleCloseGame}>
-                比尔·盖茨
-              </button>
-              <button className="option" onClick={handleCloseGame}>
-                马克·扎克伯格
-              </button>
-            </div>
-          </div>
-        );
-        break;
-        
-      // 其他游戏类型...
-      
-      default:
-        gameContent = (
-          <div className="mini-game default-game">
-            <h3><i className={`fas fa-${currentMiniGame.icon}`}></i> {currentMiniGame.title}</h3>
-            <p>游戏加载中...</p>
-            <button className="game-close-btn" onClick={handleCloseGame}>
-              关闭
-            </button>
-          </div>
-        );
-    }
-    
-    return (
-      <div className="mini-game-overlay">
-        <div className="mini-game-container">
-          {gameContent}
-        </div>
-      </div>
-    );
-  };
-  
-  // 渲染侧边探索面板
-  const renderSideExplorer = () => {
-    if (!showSideExplorer || !showExplorerContent) return null;
-    
-    return (
-      <div className="side-explorer">
-        <div className="explorer-header">
-          <div className="explorer-title">
-            <i className={`fas fa-${showExplorerContent.icon}`}></i>
-            <h3>{showExplorerContent.title}</h3>
-          </div>
-          <button className="explorer-close" onClick={handleCloseExplorer}>
-            <i className="fas fa-times"></i>
-          </button>
-        </div>
-        
-        <div className="explorer-content">
-          {showExplorerContent.type === 'article' && (
-            <div className="article-content">
-              <p>{showExplorerContent.content}</p>
-              <div className="article-extended">
-                <h4>延伸阅读</h4>
-                <ul>
-                  <li>相关主题1</li>
-                  <li>相关主题2</li>
-                  <li>相关主题3</li>
-                </ul>
-              </div>
-            </div>
-          )}
-          
-          {showExplorerContent.type === 'product' && (
-            <div className="product-content">
-              <div className="product-card">
-                <div className="product-image">
-                  <i className="fas fa-box"></i>
-                </div>
-                <div className="product-details">
-                  <h4>{showExplorerContent.content}</h4>
-                  <div className="product-price">¥199.00</div>
-                  <button className="product-action">查看详情</button>
-                </div>
-              </div>
-              <div className="related-products">
-                <h4>相关商品</h4>
-                <div className="product-grid">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="mini-product">
-                      <div className="mini-product-image">
-                        <i className="fas fa-gift"></i>
-                      </div>
-                      <div className="mini-product-name">相关商品{i}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
   };
 
   const renderInputArea = () => {
@@ -772,6 +355,7 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
           onKeyDown={handleKeyPress}
+          ref={inputRef}
           placeholder="输入问题或需求..."
           style={{ 
             flex: 1,
@@ -851,8 +435,6 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       </div>
       
       <div className="ai-chat-body">
-        {renderProgressBar()}
-        
         <div className="chat-messages">
           {messages.map((message, index) => (
             <div 
@@ -887,52 +469,32 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
               <div className="typing-dot"></div>
             </div>
           )}
-          <div ref={messagesEndRef} style={{ float: 'left', clear: 'both' }} />
+          
+          <div ref={messagesEndRef} style={{ float: 'left', clear: 'both', height: 1, width: '100%' }} />
         </div>
-        
-        {/* 动态信息气泡 */}
-        {renderInfoBubbles()}
-        
-        {/* 侧边探索面板 */}
-        {renderSideExplorer()}
-        
-        {/* 迷你游戏 */}
-        {renderMiniGame()}
       </div>
       
       <div className="ai-chat-footer">
-        {showSuggestions && (
-          <div className="suggestion-cards">
-            {quickSuggestions.map((suggestion) => (
-              <div 
-                key={suggestion.id} 
-                className="suggestion-card"
-                onClick={() => handleQuickQuestion(suggestion)}
-                style={{
-                  borderLeft: `3px solid ${suggestion.color}`
-                }}
-              >
-                <div 
-                  className="suggestion-icon"
-                  style={{
-                    backgroundColor: `${suggestion.color}15`,
-                    color: suggestion.color
-                  }}
-                >
-                  <i className={`fas fa-${suggestion.icon}`}></i>
-                </div>
-                <div className="suggestion-content">
-                  <div className="suggestion-title">{suggestion.title}</div>
-                  {suggestion.description && (
-                    <div className="suggestion-description" style={{ fontSize: '10px', color: '#666', marginTop: '2px' }}>
-                      {suggestion.description}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="quick-suggestions-hint">
+          热门问题：
+        </div>
+        <div className="quick-suggestions-row">
+          {quickSuggestions.map((suggestion) => (
+            <div 
+              key={suggestion.id}
+              className="quick-suggestion-pill"
+              onClick={() => handleQuickQuestion(suggestion)}
+              style={{
+                backgroundColor: `rgba(74, 85, 104, 0.1)`,
+                color: suggestion.color,
+                border: `1px solid rgba(74, 85, 104, 0.2)`,
+              }}
+            >
+              <i className={`fas fa-${suggestion.icon}`}></i>
+              <span>{suggestion.title}</span>
+            </div>
+          ))}
+        </div>
         
         {renderInputArea()}
       </div>
@@ -941,7 +503,8 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
 };
 
 EnhancedAiChat.propTypes = {
-  onRequestArticle: PropTypes.func
+  onRequestArticle: PropTypes.func,
+  onLoadingChange: PropTypes.func
 };
 
 export default EnhancedAiChat; 

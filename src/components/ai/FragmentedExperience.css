@@ -1,0 +1,805 @@
+.fragmented-experience {
+  width: 100%;
+  position: relative;
+}
+
+/* 碎片化体验容器 */
+.fragment-experience-container {
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: rgba(249, 250, 251, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-top: 1px solid rgba(99, 102, 241, 0.1);
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.fragment-experience-container.before-card {
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.dark .fragment-experience-container {
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.fragment-experience-title {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #4b5563;
+}
+
+.dark .fragment-experience-title {
+  color: #d1d5db;
+}
+
+.fragment-bubbles-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.fragment-bubble {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  position: relative;
+  animation: bubbleSlideIn 0.5s forwards;
+  cursor: pointer;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.dark .fragment-bubble {
+  background-color: #262626;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fragment-bubble:hover .bubble-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.fragment-bubble.info {
+  border-left-color: #4a5568;
+}
+
+.fragment-bubble.product {
+  border-left-color: #4a5568;
+}
+
+.fragment-bubble.task {
+  border-left-color: #4a5568;
+}
+
+.bubble-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.fragment-bubble.info .bubble-icon {
+  background-color: rgba(74, 85, 104, 0.15);
+  color: #4a5568;
+}
+
+.fragment-bubble.product .bubble-icon {
+  background-color: rgba(74, 85, 104, 0.15);
+  color: #4a5568;
+}
+
+.fragment-bubble.task .bubble-icon {
+  background-color: rgba(74, 85, 104, 0.15);
+  color: #4a5568;
+}
+
+.bubble-content {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #4b5563;
+}
+
+.dark .bubble-content {
+  color: #d1d5db;
+}
+
+.bubble-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.bubble-action {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.bubble-action.view {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.bubble-action.dismiss {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.bubble-action:hover {
+  opacity: 1;
+}
+
+.bubble-action.view:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.bubble-action.dismiss:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+@keyframes bubbleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 进度条样式 */
+.ai-progress-container {
+  margin: 15px 0;
+  padding: 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.dark .ai-progress-container {
+  background-color: #262626;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.themed-progress.pulse-wave {
+  position: relative;
+}
+
+.themed-progress.pulse-wave .progress-bar {
+  height: 6px;
+  background: linear-gradient(to right, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.05));
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dark .themed-progress.pulse-wave .progress-bar {
+  background: linear-gradient(to right, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.1));
+}
+
+.themed-progress.pulse-wave .progress-filled {
+  height: 100%;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6);
+  animation: gradientShift 2s ease infinite;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.themed-progress .progress-text {
+  text-align: right;
+  font-size: 12px;
+  margin-top: 5px;
+  color: #6b7280;
+}
+
+.dark .themed-progress .progress-text {
+  color: #9ca3af;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 神经网络主题进度条 */
+.themed-progress.neural-network {
+  padding: 5px 0;
+}
+
+.themed-progress.neural-network .network {
+  height: 20px;
+  position: relative;
+  margin: 0 10px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(139, 92, 246, 0.05);
+  border-radius: 10px;
+}
+
+.dark .themed-progress.neural-network .network {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.themed-progress.neural-network .connection {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6);
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.themed-progress.neural-network .node {
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  z-index: 2;
+  color: #8b5cf6;
+  font-size: 12px;
+}
+
+.dark .themed-progress.neural-network .node {
+  background-color: #262626;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: #a78bfa;
+}
+
+.themed-progress.neural-network .node1 {
+  left: 10%;
+}
+
+.themed-progress.neural-network .node2 {
+  left: 50%;
+}
+
+.themed-progress.neural-network .node3 {
+  left: 90%;
+}
+
+.themed-progress.neural-network .progress-text {
+  margin-top: 10px;
+}
+
+.dark .themed-progress.neural-network .progress-text {
+  color: #9ca3af;
+}
+
+/* 侧边探索面板 */
+.side-explorer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 300px;
+  background-color: white;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: transform 0.3s ease;
+  overflow-y: auto;
+  animation: slideInRight 0.3s forwards;
+}
+
+.dark .side-explorer {
+  background-color: #1a1a1a;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.explorer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .explorer-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.explorer-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.explorer-title i {
+  color: #4f46e5;
+}
+
+.explorer-title h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.explorer-close {
+  background: none;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: background-color 0.2s ease;
+}
+
+.explorer-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #4b5563;
+}
+
+.dark .explorer-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #d1d5db;
+}
+
+.explorer-content {
+  padding: 15px;
+}
+
+.article-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.dark .article-content {
+  color: #d1d5db;
+}
+
+.article-extended {
+  margin-top: 20px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  padding-top: 10px;
+}
+
+.dark .article-extended {
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.article-extended h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.article-extended ul {
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.article-extended li {
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.product-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-card {
+  display: flex;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.dark .product-card {
+  background-color: #262626;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.product-image {
+  width: 60px;
+  height: 60px;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #6b7280;
+  font-size: 20px;
+}
+
+.dark .product-image {
+  background-color: #374151;
+  color: #9ca3af;
+}
+
+.product-details {
+  flex: 1;
+}
+
+.product-details h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 5px 0;
+}
+
+.product-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 10px;
+}
+
+.product-action {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.product-action:hover {
+  background-color: #3730a3;
+}
+
+.related-products h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mini-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.mini-product-image {
+  width: 40px;
+  height: 40px;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 5px;
+  color: #6b7280;
+}
+
+.dark .mini-product-image {
+  background-color: #374151;
+  color: #9ca3af;
+}
+
+.mini-product-name {
+  font-size: 12px;
+  text-align: center;
+}
+
+/* 迷你游戏 */
+.mini-game-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.3s ease;
+}
+
+.mini-game-container {
+  width: 80%;
+  max-width: 500px;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: scaleIn 0.3s ease;
+}
+
+.dark .mini-game-container {
+  background-color: #1a1a1a;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.mini-game {
+  padding: 20px;
+}
+
+.mini-game h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+}
+
+.dark .mini-game h3 {
+  color: #f3f4f6;
+}
+
+.mini-game h3 i {
+  color: #8b5cf6;
+}
+
+.mini-game p {
+  font-size: 14px;
+  margin-bottom: 20px;
+  color: #4b5563;
+}
+
+.dark .mini-game p {
+  color: #d1d5db;
+}
+
+.game-area {
+  height: 200px;
+  position: relative;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.dark .game-area {
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.energy-ball {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(139, 92, 246, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+  cursor: pointer;
+  animation: fallDown linear infinite;
+  animation-duration: 3s;
+}
+
+.energy-ball:hover {
+  transform: scale(1.2);
+}
+
+@keyframes fallDown {
+  from {
+    top: -30px;
+  }
+  to {
+    top: calc(100% + 30px);
+  }
+}
+
+.game-score {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #4f46e5;
+}
+
+.game-close-btn {
+  display: block;
+  width: 100%;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.game-close-btn:hover {
+  background-color: #3730a3;
+}
+
+/* 问答游戏 */
+.question {
+  background-color: #f3f4f6;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.dark .question {
+  background-color: #262626;
+  color: #f3f4f6;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.option {
+  padding: 10px 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background-color: white;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark .option {
+  border: 1px solid #374151;
+  background-color: #1f2937;
+  color: #e5e7eb;
+}
+
+.option:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.dark .option:hover {
+  background-color: #262626;
+  border-color: #4b5563;
+}
+
+/* 历史记录样式 */
+.experience-history {
+  margin-top: 20px;
+}
+
+.history-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border-left: 3px solid #4f46e5;
+}
+
+.dark .history-title {
+  color: #e5e7eb;
+}
+
+.experience-history-item {
+  margin-bottom: 15px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease;
+}
+
+.dark .experience-history-item {
+  background-color: #262626;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.experience-query-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.dark .experience-query-info {
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.query-text {
+  font-weight: 500;
+  color: #111827;
+}
+
+.dark .query-text {
+  color: #f3f4f6;
+}
+
+.query-time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.dark .query-time {
+  color: #9ca3af;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 
