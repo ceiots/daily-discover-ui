@@ -1441,13 +1441,15 @@ img {
   max-width: 100%;
   margin: 0 auto;
   position: relative;
+  background-color: #ffffff; /* 将背景色改为纯白色 */
 }
 
 .ai-app-container {
   flex: 1;
   position: relative;
-  padding-bottom: 70px; /* 增加底部内边距，为底部导航留足够空间 */
+  padding-bottom: 70px;
   width: 100%;
+  background-color: #ffffff; /* 确保容器背景为白色 */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1611,11 +1613,11 @@ img {
   font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 .article-summary {
-  font-size: 13px;
+  font-size: 15px;
   color: #666;
   margin-bottom: 12px;
   line-height: 1.4;
@@ -3318,7 +3320,7 @@ img {
 
 /* 优化标题样式 */
 .feature-section-title {
-  font-size: 14px; /* 减小标题字体 */
+  font-size: 13px; /* 减小标题字体 */
   font-weight: 600;
   color: #333;
   margin: 6px 10px 12px; /* 减小间距 */

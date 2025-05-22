@@ -319,13 +319,13 @@ const DailyAiApp = () => {
               >
                 <div className="entry-card-icon" style={{
                   background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                  boxShadow: "0 8px 16px rgba(99, 102, 241, 0.15)"
+                  boxShadow: "0 4px 8px rgba(99, 102, 241, 0.15)"
                 }}>
                   <i className="fas fa-lightbulb"></i>
                 </div>
                 <div className="entry-card-content">
                   <h3 className="entry-card-title">智能推荐</h3>
-                  <p className="entry-card-desc">个性化分析，发现专属好物</p>
+                  <p className="entry-card-desc">发现专属好物</p>
                 </div>
                 <div className="entry-card-arrow">
                   <i className="fas fa-chevron-right"></i>
@@ -340,13 +340,13 @@ const DailyAiApp = () => {
               >
                 <div className="entry-card-icon" style={{
                   background: "linear-gradient(135deg, #ec4899, #db2777)",
-                  boxShadow: "0 8px 16px rgba(236, 72, 153, 0.15)"
+                  boxShadow: "0 4px 8px rgba(236, 72, 153, 0.15)"
                 }}>
                   <i className="fas fa-gamepad"></i>
                 </div>
                 <div className="entry-card-content">
                   <h3 className="entry-card-title">互动游戏</h3>
-                  <p className="entry-card-desc">趣味互动，赢取专属奖励</p>
+                  <p className="entry-card-desc">赢取专属奖励</p>
                 </div>
                 <div className="entry-card-arrow">
                   <i className="fas fa-chevron-right"></i>
@@ -361,25 +361,19 @@ const DailyAiApp = () => {
               onClick={() => navigate('/trending')}
               role="button"
               aria-label="热门榜单"
-              style={{
-                borderRadius: "12px",
-                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.06)",
-                overflow: "hidden",
-                transition: "transform 0.3s ease, box-shadow 0.3s ease"
-              }}
             >
               <div className="trending-entry-icon" style={{
                 background: "linear-gradient(135deg, #f59e0b, #d97706)",
-                boxShadow: "0 6px 12px rgba(245, 158, 11, 0.2)"
+                boxShadow: "0 3px 6px rgba(245, 158, 11, 0.2)"
               }}>
                 <i className="fas fa-crown"></i>
               </div>
               <div className="trending-entry-content">
-                <h3 style={{ fontSize: "14px", fontWeight: "600", marginBottom: "4px" }}>热门榜单</h3>
-                <p style={{ fontSize: "12px", color: "#666" }}>发现流行趋势与人气好物</p>
+                <h3 className="entry-card-title">热门榜单</h3>
+                <p className="entry-card-desc">发现流行趋势</p>
               </div>
-              <div className="trending-entry-indicator">
-                <i className="fas fa-arrow-right"></i>
+              <div className="entry-card-arrow">
+                <i className="fas fa-chevron-right"></i>
               </div>
             </div>
           </section>
@@ -399,7 +393,7 @@ const DailyAiApp = () => {
                   borderRadius: "2px" 
                 }}></div>
                 <h2 style={{ 
-                  fontSize: "16px", 
+                  fontSize: "13px", 
                   fontWeight: "600", 
                   color: "#333"
                 }}>精选文章</h2>
@@ -412,7 +406,7 @@ const DailyAiApp = () => {
                     color: "#4f46e5",
                     display: "flex",
                     alignItems: "center",
-                    fontSize: "12px",
+                    fontSize: "11px",
                     cursor: "pointer"
                   }}
                 >
