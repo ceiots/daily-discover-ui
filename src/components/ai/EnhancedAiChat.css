@@ -293,10 +293,11 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  padding: 10px 12px;
-  max-height: 140px;
+  padding: 5px 20px;
+  max-height: 120px;
   overflow-y: auto;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  margin-top: 10px;
 }
 
 .suggestion-card {
@@ -335,8 +336,8 @@
 }
 
 .suggestion-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -347,16 +348,38 @@
 }
 
 .suggestion-icon i {
-  font-size: 14px;
+  font-size: 16px;
+}
+
+.suggestion-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 .suggestion-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text-primary, #1f2937);
   line-height: 1.4;
   position: relative;
   z-index: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-description {
+  font-size: 11px;
+  color: #666;
+  line-height: 1.2;
+  margin-top: 2px;
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 媒体查询适配 */

@@ -3794,10 +3794,11 @@ img {
   display: flex;
   flex-direction: column;
   margin-bottom: 16px;
+  margin-left: 12px;
 }
 
 .topics-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 4px 0;
@@ -3806,7 +3807,7 @@ img {
 }
 
 .topics-subtitle {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
 }
