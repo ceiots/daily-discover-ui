@@ -1035,3 +1035,970 @@
     color: #d1d5db;
   }
 }
+
+/* 信息气泡容器 */
+.info-bubbles-container {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 信息气泡 */
+.info-bubble {
+  position: absolute;
+  bottom: -80px;
+  pointer-events: auto;
+  background-color: white;
+  border-radius: 16px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  max-width: 300px;
+  min-width: 200px;
+  animation: bubbleFloat 5s ease-in-out forwards;
+  transform-origin: center bottom;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.info-bubble:hover {
+  transform: scale(1.05) translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 信息气泡类型样式 */
+.info-bubble.info {
+  border-left: 3px solid #4f46e5;
+}
+
+.info-bubble.product {
+  border-left: 3px solid #10b981;
+}
+
+.info-bubble.task {
+  border-left: 3px solid #f43f5e;
+}
+
+/* 气泡图标 */
+.bubble-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.info-bubble.info .bubble-icon {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.info-bubble.product .bubble-icon {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.info-bubble.task .bubble-icon {
+  background-color: rgba(244, 63, 94, 0.1);
+  color: #f43f5e;
+}
+
+/* 气泡内容 */
+.bubble-content {
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-right: 10px;
+}
+
+/* 气泡操作 */
+.bubble-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.bubble-action {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bubble-action:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.bubble-action.view {
+  color: #4f46e5;
+}
+
+.bubble-action.dismiss {
+  color: #9ca3af;
+}
+
+/* 气泡浮动动画 */
+@keyframes bubbleFloat {
+  0% {
+    bottom: -80px;
+    opacity: 0;
+  }
+  10% {
+    bottom: 10px;
+    opacity: 1;
+  }
+  90% {
+    bottom: 10px;
+    opacity: 1;
+  }
+  100% {
+    bottom: 10px;
+    opacity: 0.9;
+  }
+}
+
+/* 进度条容器 */
+.ai-progress-container {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+  z-index: 20;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+/* 主题化进度条 */
+.themed-progress {
+  position: relative;
+  height: 60px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 进度文本 */
+.progress-text {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f46e5;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 3px 10px;
+  border-radius: 12px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 默认进度条 */
+.pulse-wave .progress-bar {
+  width: 100%;
+  height: 12px;
+  background-color: rgba(79, 70, 229, 0.1);
+  border-radius: 6px;
+  margin-top: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pulse-wave .progress-filled {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #9333ea);
+  border-radius: 6px;
+  position: relative;
+  transition: width 0.3s ease;
+}
+
+.pulse-wave .progress-filled::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: wave 1.5s linear infinite;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* 咖啡杯进度条 */
+.coffee-cup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.coffee-cup .cup-body {
+  width: 80px;
+  height: 60px;
+  background-color: rgba(79, 70, 229, 0.1);
+  border: 2px solid #4f46e5;
+  border-radius: 0 0 12px 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.coffee-cup .cup-body::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -20px;
+  width: 20px;
+  height: 40px;
+  border: 2px solid #4f46e5;
+  border-radius: 0 20px 40px 0;
+  border-left: none;
+}
+
+.coffee-cup .coffee-level {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #8b5cf6;
+  transition: height 0.3s ease;
+}
+
+.coffee-cup .coffee-bubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 10px;
+}
+
+.coffee-cup .bubble {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: bubbleRise 2s infinite ease-in-out;
+}
+
+.coffee-cup .bubble:nth-child(1) {
+  left: 15%;
+  animation-delay: 0s;
+}
+
+.coffee-cup .bubble:nth-child(2) {
+  left: 45%;
+  animation-delay: 0.5s;
+}
+
+.coffee-cup .bubble:nth-child(3) {
+  left: 75%;
+  animation-delay: 1s;
+}
+
+@keyframes bubbleRise {
+  0% {
+    bottom: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    bottom: 100%;
+    opacity: 0;
+  }
+}
+
+/* 跑步轨道进度条 */
+.running-track {
+  background: linear-gradient(to bottom, #87CEEB, #4f46e5);
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+}
+
+.running-track .track {
+  height: 10px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  position: relative;
+}
+
+.running-track .runner {
+  position: absolute;
+  top: -10px;
+  font-size: 20px;
+  color: #f43f5e;
+  transition: left 0.3s ease;
+  animation: running 0.5s infinite alternate ease-in-out;
+}
+
+.running-track .finish-line {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  font-size: 16px;
+  color: #10b981;
+}
+
+@keyframes running {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-3px);
+  }
+}
+
+/* 飞行路径进度条 */
+.flight-path {
+  background: linear-gradient(to bottom, #87CEEB 0%, #def 100%);
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+}
+
+.flight-path .sky {
+  height: 40px;
+  position: relative;
+}
+
+.flight-path .plane {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #4f46e5;
+  transition: left 0.3s ease;
+  animation: planeWobble 2s infinite ease-in-out;
+}
+
+.flight-path .cloud {
+  position: absolute;
+  font-size: 16px;
+  color: white;
+  opacity: 0.8;
+}
+
+.flight-path .cloud1 {
+  top: 10px;
+  left: 20%;
+  animation: cloudFloat 10s infinite linear;
+}
+
+.flight-path .cloud2 {
+  bottom: 10px;
+  left: 70%;
+  animation: cloudFloat 15s infinite linear reverse;
+}
+
+.flight-path .cloud3 {
+  top: 20px;
+  left: 40%;
+  animation: cloudFloat 12s infinite linear;
+  animation-delay: 5s;
+}
+
+@keyframes cloudFloat {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes planeWobble {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50%) rotate(5deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+}
+
+/* 科技电路进度条 */
+.tech-circuit {
+  background-color: #1a1a2e;
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+}
+
+.tech-circuit .circuit-board {
+  height: 30px;
+  position: relative;
+  background-color: #0f3460;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.tech-circuit .circuit-path {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00b4d8, #4cc9f0);
+  transform: translateY(-50%);
+  box-shadow: 0 0 8px rgba(76, 201, 240, 0.8);
+}
+
+.tech-circuit .data-packet {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #4cc9f0;
+  transition: left 0.3s ease;
+  animation: pulse 1.5s infinite;
+}
+
+/* 神经网络进度条 */
+.neural-network {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+}
+
+.neural-network .network {
+  height: 40px;
+  position: relative;
+}
+
+.neural-network .connection {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899);
+  transform: translateY(-50%);
+}
+
+.neural-network .node {
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.neural-network .node i {
+  font-size: 12px;
+  color: #8b5cf6;
+}
+
+.neural-network .node1 {
+  left: 10%;
+}
+
+.neural-network .node2 {
+  left: 50%;
+}
+
+.neural-network .node3 {
+  left: 90%;
+}
+
+.neural-network .node1, .neural-network .node2, .neural-network .node3 {
+  animation: nodeGlow 2s infinite alternate;
+}
+
+.neural-network .node2 {
+  animation-delay: 0.6s;
+}
+
+.neural-network .node3 {
+  animation-delay: 1.2s;
+}
+
+@keyframes nodeGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
+  }
+}
+
+/* 电影胶片进度条 */
+.film-reel {
+  background-color: #1c1917;
+  border-radius: 12px;
+  padding: 10px;
+  position: relative;
+}
+
+.film-reel .reel {
+  height: 40px;
+  position: relative;
+  background-color: #292524;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  overflow: hidden;
+}
+
+.film-reel .film {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  height: 24px;
+  background: linear-gradient(90deg, #f43f5e, #f97316);
+  border-style: solid;
+  border-color: black;
+  border-width: 6px 0;
+  border-top-color: #000;
+  border-bottom-color: #000;
+  box-sizing: border-box;
+}
+
+.film-reel .frame {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 24px;
+  transform: translateY(-50%);
+  background-color: #292524;
+  border: 1px solid #444;
+}
+
+.film-reel .frame1 {
+  left: 30%;
+}
+
+.film-reel .frame2 {
+  left: 60%;
+}
+
+.film-reel .frame3 {
+  left: 90%;
+}
+
+/* 迷你游戏弹窗 */
+.mini-game-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.mini-game-container {
+  background-color: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 游戏基础样式 */
+.mini-game {
+  padding: 20px;
+}
+
+.mini-game h3 {
+  margin: 0 0 15px;
+  font-size: 18px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini-game h3 i {
+  color: #4f46e5;
+}
+
+.mini-game p {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* 点击游戏 */
+.click-game .game-area {
+  height: 200px;
+  background-color: #f8f9fe;
+  border-radius: 12px;
+  position: relative;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.click-game .energy-ball {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(79, 70, 229, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: ballFloat 3s infinite linear;
+  top: -30px;
+}
+
+.click-game .energy-ball i {
+  color: #f59e0b;
+}
+
+@keyframes ballFloat {
+  0% {
+    top: -30px;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    top: 230px;
+    transform: scale(0.5) rotate(180deg);
+  }
+}
+
+.click-game .energy-ball:hover {
+  transform: scale(1.2);
+}
+
+.click-game .energy-ball:active {
+  transform: scale(0.8);
+  background-color: rgba(79, 70, 229, 0.5);
+}
+
+/* 知识问答游戏 */
+.quiz-game .question {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f9fe;
+  border-radius: 12px;
+}
+
+.quiz-game .options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.quiz-game .option {
+  padding: 12px 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quiz-game .option:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.quiz-game .option:active {
+  background-color: #e5e7eb;
+}
+
+/* 游戏分数和按钮 */
+.game-score {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4f46e5;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.game-close-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.game-close-btn:hover {
+  background-color: #4338ca;
+}
+
+.game-close-btn:active {
+  transform: translateY(1px);
+}
+
+/* 侧边探索面板 */
+.side-explorer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 900;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.explorer-header {
+  padding: 15px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 2;
+}
+
+.explorer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.explorer-title i {
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.explorer-title h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.explorer-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.explorer-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.explorer-content {
+  padding: 15px;
+}
+
+/* 文章内容 */
+.article-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.article-content p {
+  margin-bottom: 15px;
+}
+
+.article-extended {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.article-extended h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #4f46e5;
+}
+
+.article-extended ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.article-extended li {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+/* 产品内容 */
+.product-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.product-card {
+  padding: 15px;
+  border-radius: 12px;
+  background-color: #f8f9fe;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  gap: 15px;
+}
+
+.product-image {
+  width: 80px;
+  height: 80px;
+  background-color: #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #4f46e5;
+}
+
+.product-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-details h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.product-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f43f5e;
+}
+
+.product-action {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto;
+}
+
+.product-action:hover {
+  background-color: #4338ca;
+}
+
+/* 相关产品 */
+.related-products h4 {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #4f46e5;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.mini-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.mini-product-image {
+  width: 50px;
+  height: 50px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #4f46e5;
+}
+
+.mini-product-name {
+  font-size: 11px;
+  color: #4b5563;
+  text-align: center;
+}
