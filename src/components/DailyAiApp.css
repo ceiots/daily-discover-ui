@@ -3413,3 +3413,287 @@ img {
     background: rgba(245, 158, 11, 0.2);
   }
 }
+
+/* 移除底部冲击波动画效果 */
+.pulse-dot:before {
+  display: none; /* 移除闪烁动画 */
+}
+
+/* 增大字体大小和优化UI样式 */
+.feature-section-title {
+  font-size: 22px; /* 增大标题字体 */
+  font-weight: 600;
+  color: #333;
+  margin: 12px 16px 20px; /* 增加间距 */
+  display: flex;
+  align-items: center;
+}
+
+.entry-card-title {
+  font-size: 18px; /* 增大卡片标题字体 */
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.entry-card-desc {
+  font-size: 16px; /* 增大描述文字字体 */
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 确保卡片可点击且样式美观 */
+.entry-card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); /* 增强阴影效果 */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  padding: 16px; /* 增加内边距 */
+  cursor: pointer; /* 确保显示为可点击状态 */
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px; /* 增加卡片间距 */
+}
+
+/* 优化热门榜单卡片 */
+.trending-entry-card {
+  padding: 20px; /* 增加内边距 */
+  margin: 16px; /* 增加外边距 */
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.trending-entry-content h3 {
+  font-size: 18px; /* 增大标题字体 */
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.trending-entry-content p {
+  font-size: 16px; /* 增大描述字体 */
+  color: #666;
+}
+
+/* 优化文章区域样式 */
+.ai-article-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px; /* 增加内边距 */
+  margin-top: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 修复第三个按钮问题 - 确保按钮组件显示正常 */
+.chat-input-container {
+  background: white;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin: 0 6px;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 24px;
+}
+
+.chat-input-container button,
+.chat-input-icons button {
+  opacity: 1 !important; /* 确保按钮可见 */
+  visibility: visible !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px; /* 固定宽度 */
+  height: 40px; /* 固定高度 */
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1); /* 轻微背景色 */
+  margin: 0 4px;
+  cursor: pointer;
+}
+
+.chat-input-icons {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+/* 确保AI文章可点击 */
+.article-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 20px; /* 增加内边距 */
+  transition: all 0.3s ease;
+  border-left: 3px solid #4f46e5;
+  margin-bottom: 16px;
+  cursor: pointer; /* 确保显示为可点击状态 */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.article-title {
+  font-size: 18px; /* 增大标题字体 */
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.article-summary {
+  font-size: 16px; /* 增大摘要字体 */
+  color: #666;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.article-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px; /* 增大按钮内边距 */
+  border-radius: 8px;
+  font-size: 14px; /* 增大按钮字体 */
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.article-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.article-action-btn.view {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.article-action-btn.primary {
+  background-color: #4f46e5;
+  color: white;
+}
+
+/* 深色模式优化 */
+@media (prefers-color-scheme: dark) {
+  .entry-card {
+    background: #2a2a2a;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+  
+  .entry-card-title {
+    color: #f0f0f0;
+  }
+  
+  .entry-card-desc {
+    color: #bbb;
+  }
+  
+  .trending-entry-card {
+    background: #2a2a2a;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+  
+  .trending-entry-content h3 {
+    color: #f0f0f0;
+  }
+  
+  .trending-entry-content p {
+    color: #bbb;
+  }
+  
+  .feature-section-title {
+    color: #f0f0f0;
+  }
+  
+  .ai-article-section {
+    background: #2a2a2a;
+  }
+  
+  .article-card {
+    background-color: #2a2a2a;
+  }
+  
+  .article-title {
+    color: #f0f0f0;
+  }
+  
+  .article-summary {
+    color: #bbb;
+  }
+}
+
+/* 专门优化输入框和按钮样式 */
+.ai-chat-fullscreen .chat-input-container {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px 16px !important;
+  border-radius: 24px !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  margin: 12px 8px !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.ai-chat-fullscreen .chat-input {
+  flex: 1 !important;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  padding: 8px 0 !important;
+}
+
+/* 修复发送按钮样式 */
+.ai-chat-fullscreen .send-btn,
+.ai-chat-fullscreen .voice-input-btn,
+.ai-chat-fullscreen .image-input-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+  margin: 0 4px !important;
+  cursor: pointer !important;
+  color: #4f46e5 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  z-index: 11 !important;
+}
+
+.ai-chat-fullscreen .send-btn {
+  background: #4f46e5 !important;
+  color: white !important;
+}
+
+.ai-chat-fullscreen .send-btn:disabled {
+  background: rgba(99, 102, 241, 0.4) !important;
+  cursor: not-allowed !important;
+}
+
+/* 其他按钮悬停状态 */
+.ai-chat-fullscreen .voice-input-btn:hover,
+.ai-chat-fullscreen .image-input-btn:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+.ai-chat-fullscreen .send-btn:hover:not(:disabled) {
+  background: #4338ca !important;
+  transform: translateY(-2px) !important;
+}
+
+/* 修复按钮图标样式 */
+.ai-chat-fullscreen .send-btn i,
+.ai-chat-fullscreen .voice-input-btn i,
+.ai-chat-fullscreen .image-input-btn i {
+  font-size: 16px !important;
+}

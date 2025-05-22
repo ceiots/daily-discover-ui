@@ -441,12 +441,18 @@ const DailyAiApp = () => {
                   borderRadius: "2px" 
                 }}></div>
                 <h2 style={{ 
-                  fontSize: "18px", 
+                  fontSize: "20px", 
                   fontWeight: "600", 
                   color: "#333"
                 }}>精选文章</h2>
               </div>
-              <ArticleSection onRequestArticle={handleArticleRequest} />
+              <ArticleSection 
+                onRequestArticle={handleArticleRequest} 
+                onArticleClick={(article) => {
+                  setSelectedArticle(article);
+                  setShowArticlePreview(true);
+                }}
+              />
             </div>
           </section>
         

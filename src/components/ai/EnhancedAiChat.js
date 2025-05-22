@@ -199,6 +199,103 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
     e.target.src = getImage('avatar');
   };
 
+  const renderInputArea = () => {
+    return (
+      <div className="chat-input-container" style={{ 
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 16px',
+        borderRadius: '24px',
+        border: '1px solid rgba(99, 102, 241, 0.2)',
+        background: 'white',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+        margin: '12px 6px'
+      }}>
+        <input
+          type="text"
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="输入问题或需求..."
+          style={{ 
+            flex: 1,
+            border: 'none',
+            outline: 'none',
+            fontSize: '16px',
+            backgroundColor: 'transparent'
+          }}
+        />
+        <div className="chat-input-icons" style={{ 
+          display: 'flex',
+          alignItems: 'center',
+          marginLeft: '8px'
+        }}>
+          <button
+            className="voice-button"
+            onClick={toggleVoiceInput}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              color: '#4f46e5',
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            <i className="fas fa-microphone"></i>
+          </button>
+          <button
+            className="image-button"
+            onClick={handleImageUpload}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              color: '#4f46e5',
+              cursor: 'pointer',
+              marginRight: '8px'
+            }}
+          >
+            <i className="fas fa-image"></i>
+          </button>
+          <button
+            className="send-button"
+            onClick={sendMessage}
+            disabled={isLoading || userInput.trim() === ''}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: (isLoading || userInput.trim() === '') ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.9)',
+              color: 'white',
+              cursor: (isLoading || userInput.trim() === '') ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isLoading ? (
+              <div className="loading-spinner" style={{ width: '20px', height: '20px' }}></div>
+            ) : (
+              <i className="fas fa-paper-plane"></i>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="ai-chat-card">
       <div className="ai-chat-header">
@@ -267,33 +364,7 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
           </div>
         )}
         
-        <div className="chat-input-container">
-          <input
-            ref={inputRef}
-            type="text"
-            className="chat-input"
-            placeholder="输入问题或需求..."
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <button 
-            className={`voice-input-btn ${isVoiceActive ? 'active' : ''}`}
-            onClick={toggleVoiceInput}
-          >
-            <i className={`fas ${isVoiceActive ? 'fa-stop' : 'fa-microphone'}`}></i>
-          </button>
-          <button className="image-input-btn" onClick={handleImageUpload}>
-            <i className="fas fa-image"></i>
-          </button>
-          <button 
-            className="send-btn"
-            onClick={sendMessage}
-            disabled={!userInput.trim()}
-          >
-            <i className="fas fa-paper-plane"></i>
-          </button>
-        </div>
+        {renderInputArea()}
       </div>
     </div>
   );

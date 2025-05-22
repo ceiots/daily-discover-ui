@@ -29,7 +29,7 @@ const sampleArticles = [
   }
 ];
 
-const ArticleSection = ({ onRequestArticle }) => {
+const ArticleSection = ({ onRequestArticle, onArticleClick }) => {
   const [articles, setArticles] = useState(sampleArticles);
   const [currentView, setCurrentView] = useState('list'); // 'list', 'detail', 'create'
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -66,6 +66,11 @@ const ArticleSection = ({ onRequestArticle }) => {
   const handleViewArticle = (article) => {
     setSelectedArticle(article);
     setCurrentView('detail');
+    
+    // 如果提供了外部点击处理函数，则调用它
+    if (onArticleClick) {
+      onArticleClick(article);
+    }
   };
 
   // 编辑文章
@@ -150,7 +155,8 @@ const ArticleSection = ({ onRequestArticle }) => {
 };
 
 ArticleSection.propTypes = {
-  onRequestArticle: PropTypes.func
+  onRequestArticle: PropTypes.func,
+  onArticleClick: PropTypes.func
 };
 
 export default ArticleSection; 
