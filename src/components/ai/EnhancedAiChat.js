@@ -21,12 +21,26 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
   const speechRecognition = useRef(null);
   const [showSuggestions, setShowSuggestions] = useState(true);
 
-  // 快捷提问选项 - 更直观引导的问题，缩短字数
-  const quickQuestions = [
-    "今日值得买好物",
-    "智能产品推荐",
-    "个性化购物清单",
-    "互动游戏活动"
+  // 快捷提问选项 - 更现代化的设计和描述
+  const quickSuggestions = [
+    { 
+      id: 1,
+      title: "今日好物推荐", 
+      icon: "gift",
+      color: "#4f46e5"
+    },
+    { 
+      id: 2,
+      title: "智能科技产品", 
+      icon: "microchip",
+      color: "#0ea5e9"
+    },
+    { 
+      id: 3,
+      title: "互动游戏活动", 
+      icon: "gamepad",
+      color: "#f43f5e"
+    }
   ];
 
   // 自动滚动到最新消息
@@ -161,7 +175,7 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
 
   // 处理快捷问题点击
   const handleQuickQuestion = (question) => {
-    setUserInput(question);
+    setUserInput(question.title);
     setTimeout(() => {
       sendMessage();
     }, 100);
@@ -335,14 +349,26 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       
       <div className="ai-chat-footer">
         {showSuggestions && (
-          <div className="quick-questions-grid">
-            {quickQuestions.map((question, index) => (
+          <div className="suggestion-cards">
+            {quickSuggestions.map((suggestion) => (
               <div 
-                key={index} 
-                className="quick-question"
-                onClick={() => handleQuickQuestion(question)}
+                key={suggestion.id} 
+                className="suggestion-card"
+                onClick={() => handleQuickQuestion(suggestion)}
+                style={{
+                  borderLeft: `3px solid ${suggestion.color}`
+                }}
               >
-                {question}
+                <div 
+                  className="suggestion-icon"
+                  style={{
+                    backgroundColor: `${suggestion.color}15`,
+                    color: suggestion.color
+                  }}
+                >
+                  <i className={`fas fa-${suggestion.icon}`}></i>
+                </div>
+                <div className="suggestion-title">{suggestion.title}</div>
               </div>
             ))}
           </div>

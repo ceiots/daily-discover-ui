@@ -145,6 +145,9 @@ const AiExplore = () => {
   return (
     <div className="ai-explore-wrapper">
       <div className="ai-explore-header">
+        <div className="back-button" onClick={() => navigate(-1)}>
+          <i className="fas fa-arrow-left"></i>
+        </div>
         <div className="header-content">
           <h1 className="explore-title">AI 探索空间</h1>
           <p className="explore-subtitle">发现AI带来的无限可能</p>

@@ -288,58 +288,102 @@
   }
 }
 
-/* 新增：垂直排列的快速提问网格 */
-.quick-questions-grid {
+/* 新的快捷提问卡片样式 */
+.suggestion-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-  padding: 0 2px;
-  margin-bottom: 8px;
+  gap: 10px;
+  padding: 10px 12px;
+  max-height: 140px;
+  overflow-y: auto;
+  margin-bottom: 10px;
 }
 
-/* 减小现有快捷提问按钮的大小和间距 */
-.quick-question {
-  white-space: normal;
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-  padding: 4px 8px;
+.suggestion-card {
+  background-color: white;
   border-radius: 12px;
-  font-size: 11px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.suggestion-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+  z-index: 1;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-card:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+.suggestion-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 24px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  display: -webkit-box;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 
-.quick-question:hover, .quick-question:active {
-  background-color: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #6366f1;
-  transform: translateY(-1px);
+.suggestion-icon i {
+  font-size: 14px;
 }
 
-/* 深色模式下的快速提问网格样式 */
+.suggestion-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.4;
+  position: relative;
+  z-index: 2;
+}
+
+/* 媒体查询适配 */
+@media (max-width: 480px) {
+  .suggestion-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
-  .quick-question {
+  .suggestion-card {
     background-color: #1f2937;
-    color: #d1d5db;
-    border-color: #374151;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
   
-  .quick-question:hover, .quick-question:active {
-    background-color: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
-    color: #a5b4fc;
+  .suggestion-title {
+    color: #f3f4f6;
   }
+  
+  .suggestion-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 移除旧的样式 */
+.quick-questions-grid {
+  display: none;
 }
 
 /* 输入容器 */
