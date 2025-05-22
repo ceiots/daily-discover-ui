@@ -38,6 +38,7 @@ import ShopDetailPage from './components/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
 import DailyAiApp from './components/DailyAiApp'; 
 import QuizGame from './components/games/QuizGame';
+import H5GamePage from './components/games/H5GamePage'; // 引入H5游戏页面
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -233,6 +234,7 @@ const App = () => {
           <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
           <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
           <Route path="/game/:gameId" element={<ProtectedRoute><QuizGame /></ProtectedRoute>} />
+          <Route path="/h5game/:gameId" element={<ProtectedRoute><H5GamePage /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>

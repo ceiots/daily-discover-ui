@@ -508,6 +508,18 @@ const DailyAiApp = () => {
         difficulty: 3,
         playerCount: 876,
         imageUrl: getImage('brandQuiz')
+      },
+      {
+        id: 'discoveryJourney',
+        title: '发现之旅',
+        description: '沉浸式探索商品世界，在互动场景中寻找和了解每日推荐商品',
+        icon: 'compass',
+        difficulty: 1,
+        playerCount: 1485,
+        imageUrl: getImage('theme1'),
+        isH5Game: true,
+        isNew: true,
+        theme: 'linear-gradient(135deg, #10b981, #059669)'
       }
     ]);
   };
@@ -515,52 +527,6 @@ const DailyAiApp = () => {
   // 用户头像点击事件处理
   const handleUserAvatarClick = () => {
     setShowUserPopup(!showUserPopup);
-  };
-
-  // 渲染用户信息弹窗
-  const renderUserPopup = () => {
-    if (!showUserPopup) return null;
-
-    return (
-      <div className="user-popup">
-        <div className="user-popup-header">
-          <div className="user-popup-avatar-container">
-            <img
-              src={isLoggedIn && userInfo && userInfo.avatar ? userInfo.avatar : DEFAULT_AVATAR}
-              alt="用户头像"
-              className="user-popup-avatar"
-              onError={handleImageError}
-            />
-          </div>
-          <div>
-            <h3 className="user-popup-name">{isLoggedIn && userInfo ? userInfo.nickname || '用户' : '未登录用户'}</h3>
-            <p className="user-popup-info">AI体验测试员</p>
-          </div>
-        </div>
-        <div className="user-popup-body">
-          <div className="user-popup-stat">
-            <i className="fas fa-star"></i>
-            <span>AI互动: 12次</span>
-          </div>
-          <div className="user-popup-stat">
-            <i className="fas fa-shopping-cart"></i>
-            <span>收藏商品: 5件</span>
-          </div>
-          <div className="user-popup-stat">
-            <i className="fas fa-gamepad"></i>
-            <span>游戏积分: 320分</span>
-          </div>
-        </div>
-        <div className="user-popup-footer">
-          <button className="user-popup-button">
-            <i className="fas fa-cog"></i> 设置
-          </button>
-          <button className="user-popup-button primary">
-            <i className="fas fa-user-edit"></i> 编辑资料
-          </button>
-        </div>
-      </div>
-    );
   };
 
   // 获取相似用户推荐
@@ -1008,13 +974,9 @@ const DailyAiApp = () => {
           </div>
         )}
 
-        {/* <div className="accessibility-button" onClick={toggleDarkMode}>
-          <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-        </div> */}
-
       {renderFirstVisitGuide()}
 
-      <header className="ai-app-header">
+      <header className="ai-app-header fixed-header">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-lg font-semibold">每日发现 AI</h1>
@@ -1054,7 +1016,7 @@ const DailyAiApp = () => {
         </div>
       </header>
 
-        <main ref={mainRef} className="flex-grow p-4 overflow-y-auto overflow-x-visible pb-24" style={{width: '100%', maxWidth: '100%'}}> {/* 确保可垂直滚动但水平方向内容完全可见 */}
+        <main ref={mainRef} className="scrollable-content" style={{width: '100%', maxWidth: '100%'}}> {/* 确保可垂直滚动但水平方向内容完全可见 */}
         {/* 使用增强型AI聊天组件替换原来的AI助手区域 */}
         <EnhancedAiChat onRequestArticle={handleArticleRequest} />
 
@@ -1074,28 +1036,79 @@ const DailyAiApp = () => {
             >
               互动游戏
             </button>
-              {/*               <button
-                className={`flex-1 py-2 text-sm font-medium ${activeTab === 'trending' ? 'text-primary border-b-2 border-primary' : 'text-gray-500'}`}
-                onClick={() => setActiveTab('trending')}
-              >
-                热门榜单
-              </button> */}
           </div>
         </section>
 
         {/* 智能推荐选项卡内容 */}
         {activeTab === 'recommendations' && (
           <section className="fade-in">
-            
              {/* {renderSimilarUserRecommendations()} */}
           </section>
         )}
 
-        {/* 个性化体验选项卡内容 - 已移除 */}
 
         {/* 互动游戏选项卡内容 - 使用新的渲染函数 */}
         {activeTab === 'games' && (
           <section className="games-section fade-in">
+            {/* H5游戏特色展示区 */}
+            <div className="h5-game-preview">
+              {interactiveGames.filter(game => game.isH5Game).map((game) => (
+                <div 
+                  key={game.id} 
+                  className="h5-game-mini"
+                >
+                  <div className="h5-mini-header">
+                    <h3 className="h5-mini-title">{game.title}</h3>
+                    {game.isNew && <span className="h5-mini-badge">新</span>}
+                  </div>
+                  
+                  <div className="h5-mini-scene">
+                    <div className="h5-mini-background">
+                      <img src={getImage(game.imageUrl)} alt={game.title} onError={handleImageError} />
+                    </div>
+                    
+                    <div className="h5-mini-items">
+                      {/* 展示4个模拟的游戏物品 */}
+                      <div className="h5-mini-item" style={{ left: '30%', top: '45%' }}>
+                        <div className="mini-item-dot"></div>
+                      </div>
+                      <div className="h5-mini-item" style={{ left: '65%', top: '25%' }}>
+                        <div className="mini-item-dot"></div>
+                      </div>
+                      <div className="h5-mini-item" style={{ left: '75%', top: '65%' }}>
+                        <div className="mini-item-dot"></div>
+                      </div>
+                      <div className="h5-mini-item" style={{ left: '15%', top: '75%' }}>
+                        <div className="mini-item-dot"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="h5-mini-message">
+                      <p>点击开始体验{'发现之旅'}小游戏</p>
+                      <button 
+                        className="h5-mini-button"
+                        onClick={() => navigate(`/h5game/${game.id}`)}
+                      >
+                        立即体验
+                        <i className="fas fa-arrow-right"></i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="h5-mini-info">
+                    <div className="h5-mini-stat">
+                      <i className="fas fa-user-friends"></i>
+                      <span>{game.playerCount || 0}人体验</span>
+                    </div>
+                    <div className="h5-mini-stat">
+                      <i className="fas fa-clock"></i>
+                      <span>约5分钟</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
             <div className="featured-games">
               <h2 className="section-title">趣味知识问答</h2>
               <div className="games-cards-container">

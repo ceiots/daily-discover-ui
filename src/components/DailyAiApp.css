@@ -1,4 +1,26 @@
-/* 基础样式 */
+/* 更新全局颜色变量 */
+:root {
+  --primary-color: #7269ef;
+  --primary-light: #8c85f7;
+  --primary-dark: #5a51db;
+  --secondary-color: #4fd1c5;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-light: #888888;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-light: #f3f4f6;
+  --bg-dark: #e5e7eb;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+/* 基础样式优化 */
 body {
   font-family: 'PingFang SC', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
   background-color: #F8F9FA;
@@ -2853,6 +2875,440 @@ img {
   
   .challenge-stat {
     color: #d1d5db;
+  }
+}
+
+/* H5游戏展示区样式 */
+.h5-game-showcase {
+  margin-bottom: 24px;
+}
+
+.h5-game-card {
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.h5-game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.h5-game-background {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .h5-game-background {
+    flex-direction: row;
+  }
+}
+
+.h5-game-content {
+  padding: 24px;
+  flex: 2;
+  z-index: 2;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.h5-game-header {
+  margin-bottom: 16px;
+}
+
+.h5-game-badge {
+  display: inline-block;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.h5-game-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.h5-game-description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.h5-game-theme {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.theme-label {
+  opacity: 0.8;
+  margin-right: 4px;
+}
+
+.theme-name {
+  font-weight: 600;
+}
+
+.h5-game-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .h5-game-footer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.h5-game-stats {
+  display: flex;
+  gap: 16px;
+}
+
+.h5-game-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.h5-game-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.h5-game-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.h5-game-visual {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.h5-game-image-container {
+  width: 160px;
+  height: 160px;
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.h5-game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.h5-game-card:hover .h5-game-image {
+  transform: scale(1.1);
+}
+
+.h5-game-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
+
+.h5-game-icon {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 2;
+}
+
+.h5-game-icon i {
+  font-size: 26px;
+  color: #059669;
+}
+
+.pulse-animation {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 1;
+  animation: pulse 2s infinite;
+}
+
+/* 响应式适配 */
+@media (max-width: 640px) {
+  .h5-game-background {
+    min-height: auto;
+  }
+  
+  .h5-game-content {
+    padding: 16px;
+  }
+  
+  .h5-game-title {
+    font-size: 18px;
+  }
+  
+  .h5-game-visual {
+    padding: 10px;
+  }
+  
+  .h5-game-image-container {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+/* 暗黑模式适配 */
+@media (prefers-color-scheme: dark) {
+  .h5-game-card {
+    background-color: #1f2937;
+  }
+  
+  .h5-game-icon {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .h5-game-icon i {
+    color: #047857;
+  }
+}
+
+/* 添加H5游戏预览的样式 */
+.h5-game-preview {
+  margin-bottom: 20px;
+}
+
+.h5-game-mini {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  margin-bottom: 16px;
+}
+
+.h5-mini-header {
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.h5-mini-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.h5-mini-badge {
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.h5-mini-scene {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.h5-mini-background img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.h5-mini-items {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.h5-mini-item {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+}
+
+.mini-item-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #1890ff;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 rgba(24, 144, 255, 0.7);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(24, 144, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(24, 144, 255, 0);
+  }
+}
+
+.h5-mini-message {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.h5-mini-message p {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.h5-mini-button {
+  background-color: #7269ef;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.3s ease;
+}
+
+.h5-mini-button:hover {
+  background-color: #5d56c9;
+  transform: translateY(-2px);
+}
+
+.h5-mini-info {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 15px;
+  background-color: #f5f6fa;
+}
+
+.h5-mini-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #666;
+}
+
+.h5-mini-stat i {
+  color: #7269ef;
+}
+
+/* 添加固定顶部和可滚动内容的样式 */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.scrollable-content {
+  flex-grow: 1;
+  padding: 16px;
+  padding-top: 92px; /* 为固定的顶部预留空间 */
+  padding-bottom: 80px; /* 为底部导航栏预留空间 */
+  overflow-y: auto;
+  overflow-x: visible;
+  height: calc(100vh - 70px); /* 减去底部导航栏的高度 */
+  width: 100%;
+  -webkit-overflow-scrolling: touch; /* 提升iOS滚动体验 */
+}
+
+/* 确保H5游戏预览正确显示 */
+.h5-game-preview {
+  margin-bottom: 20px;
+  display: block;
+  width: 100%;
+}
+
+/* 调整H5游戏卡片样式以确保正确显示 */
+.h5-game-mini {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  margin-bottom: 16px;
+  display: block;
+  width: 100%;
+}
+
+/* 媒体查询，适配不同屏幕大小 */
+@media (max-width: 768px) {
+  .scrollable-content {
+    padding-top: 80px; /* 在小屏幕上减少顶部间距 */
   }
 }
 
