@@ -288,58 +288,53 @@
   }
 }
 
-/* 快捷问题 */
-.quick-questions {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 10px;
-  padding: 14px 20px;
-  background-color: #f8f9fe;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-  position: relative;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+/* 新增：垂直排列的快速提问网格 */
+.quick-questions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  padding: 0 4px;
+  margin-bottom: 10px;
 }
 
-.quick-questions::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
-}
-
-.quick-questions::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40px;
-  height: 100%;
-  background: linear-gradient(to right, transparent, #f8f9fe);
-  pointer-events: none;
-}
-
-.quick-question-btn {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
-  color: #4f46e5;
-  border: 1px solid rgba(79, 70, 229, 0.2);
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  white-space: nowrap;
-  transition: all 0.25s ease;
+/* 减小现有快捷提问按钮的大小和间距 */
+.quick-question {
+  white-space: normal;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 12px;
   cursor: pointer;
-  flex-shrink: 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
 }
 
-.quick-question-btn:hover {
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+.quick-question:hover, .quick-question:active {
+  background-color: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #6366f1;
+  transform: translateY(-1px);
 }
 
-.quick-question-btn:active {
-  transform: translateY(0);
+/* 深色模式下的快速提问网格样式 */
+@media (prefers-color-scheme: dark) {
+  .quick-question {
+    background-color: #1f2937;
+    color: #d1d5db;
+    border-color: #374151;
+  }
+  
+  .quick-question:hover, .quick-question:active {
+    background-color: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+  }
 }
 
 /* 输入容器 */

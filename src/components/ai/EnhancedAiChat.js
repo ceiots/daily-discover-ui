@@ -204,12 +204,12 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       <div className="chat-input-container" style={{ 
         display: 'flex',
         alignItems: 'center',
-        padding: '12px 16px',
-        borderRadius: '24px',
+        padding: '6px 4px',
+        borderRadius: '20px',
         border: '1px solid rgba(99, 102, 241, 0.2)',
         background: 'white',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
-        margin: '12px 6px'
+        margin: '6px 1px 1px 1px'
       }}>
         <input
           type="text"
@@ -221,40 +221,22 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
             flex: 1,
             border: 'none',
             outline: 'none',
-            fontSize: '16px',
-            backgroundColor: 'transparent'
+            fontSize: '12px',
+            backgroundColor: 'transparent',
+            padding: '6px 8px'
           }}
         />
         <div className="chat-input-icons" style={{ 
           display: 'flex',
           alignItems: 'center',
-          marginLeft: '8px'
+          marginLeft: '4px'
         }}>
-          <button
-            className="voice-button"
-            onClick={toggleVoiceInput}
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: 'rgba(99, 102, 241, 0.1)',
-              color: '#4f46e5',
-              cursor: 'pointer',
-              marginRight: '8px'
-            }}
-          >
-            <i className="fas fa-microphone"></i>
-          </button>
           <button
             className="image-button"
             onClick={handleImageUpload}
             style={{
-              width: '40px',
-              height: '40px',
+              width: '22px',
+              height: '22px',
               borderRadius: '50%',
               border: 'none',
               display: 'flex',
@@ -263,7 +245,8 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
               backgroundColor: 'rgba(99, 102, 241, 0.1)',
               color: '#4f46e5',
               cursor: 'pointer',
-              marginRight: '8px'
+              marginRight: '6px',
+              fontSize: '10px'
             }}
           >
             <i className="fas fa-image"></i>
@@ -273,8 +256,8 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
             onClick={sendMessage}
             disabled={isLoading || userInput.trim() === ''}
             style={{
-              width: '40px',
-              height: '40px',
+              width: '22px',
+              height: '22px',
               borderRadius: '50%',
               border: 'none',
               display: 'flex',
@@ -282,11 +265,12 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
               justifyContent: 'center',
               backgroundColor: (isLoading || userInput.trim() === '') ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.9)',
               color: 'white',
-              cursor: (isLoading || userInput.trim() === '') ? 'not-allowed' : 'pointer'
+              cursor: (isLoading || userInput.trim() === '') ? 'not-allowed' : 'pointer',
+              fontSize: '10px'
             }}
           >
             {isLoading ? (
-              <div className="loading-spinner" style={{ width: '20px', height: '20px' }}></div>
+              <div className="loading-spinner" style={{ width: '16px', height: '16px' }}></div>
             ) : (
               <i className="fas fa-paper-plane"></i>
             )}
@@ -351,7 +335,7 @@ const EnhancedAiChat = ({ onRequestArticle }) => {
       
       <div className="ai-chat-footer">
         {showSuggestions && (
-          <div className="quick-questions">
+          <div className="quick-questions-grid">
             {quickQuestions.map((question, index) => (
               <div 
                 key={index} 
