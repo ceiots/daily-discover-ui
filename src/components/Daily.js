@@ -40,8 +40,7 @@ const Daily = () => {
   const horizontalScrollRefs = {
     tips: useRef(null),
     history: useRef(null),
-    focus: useRef(null),
-    hotArticles: useRef(null) // 添加热门文章的引用
+    focus: useRef(null)
   };
 
   useEffect(() => {
@@ -187,6 +186,17 @@ const Daily = () => {
         tag: "科技"
       }
     ]);
+    
+    // 添加热门话题数据
+    setAiTopics([
+      { id: 1, text: "数字极简主义", icon: "mobile-alt" },
+      { id: 2, text: "每日冥想技巧", icon: "brain" },
+      { id: 3, text: "健康饮食新趋势", icon: "apple-alt" },
+      { id: 4, text: "高效工作法", icon: "briefcase" },
+      { id: 5, text: "睡眠质量提升", icon: "moon" },
+      { id: 6, text: "减压放松方法", icon: "spa" },
+      { id: 7, text: "居家健身计划", icon: "dumbbell" },
+    ]);
   }, []);
   
   useEffect(() => {
@@ -282,22 +292,51 @@ const Daily = () => {
     
     // 添加用户消息到聊天历史
     setAiChatHistory(prev => [...prev, { type: 'user', message: userMessage }]);
+    
+    // 保存当前用户消息
+    const currentMessage = userMessage;
+    
+    // 清空输入框
     setUserMessage('');
     
     // 模拟AI响应
     setIsTyping(true);
+    
+    // 根据关键词生成更智能的回复
     setTimeout(() => {
-      const responses = [
-        "我理解你的问题，让我来帮助你解决。",
-        "这是个很好的问题！根据我的分析...",
-        "我找到了一些相关信息，希望对你有帮助。",
-        "我建议你可以尝试这个方法...",
-        "很高兴能帮到你！还有其他问题吗？"
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      setAiChatHistory(prev => [...prev, { type: 'ai', message: randomResponse }]);
+      let aiResponse;
+      
+      // 检查是否为热门话题，提供更个性化的回答
+      if (currentMessage.includes("数字极简主义")) {
+        aiResponse = "数字极简主义是一种减少数字干扰的生活方式，研究表明它能提高专注力40%，每天节省约1.5小时的时间。要开始实践，可以从设置手机免打扰、整理应用和限制社交媒体使用时间开始。";
+      } else if (currentMessage.includes("冥想")) {
+        aiResponse = "每天进行10-15分钟的冥想可以显著降低压力水平，提高注意力，改善睡眠质量。我可以推荐一些适合初学者的冥想技巧和应用，你想了解哪方面的信息？";
+      } else if (currentMessage.includes("健康饮食") || currentMessage.includes("饮食")) {
+        aiResponse = "植物性饮食是2023年的主要趋势之一，研究表明它可以减少30%的慢性疾病风险。均衡的饮食结构应包括多样化的蔬果、全谷物、优质蛋白和健康脂肪，每天喝足够的水也很重要。";
+      } else if (currentMessage.includes("高效工作") || currentMessage.includes("效率")) {
+        aiResponse = "高效工作的关键包括：番茄工作法（25分钟专注工作+5分钟休息）、批处理类似任务、减少多任务处理、设定明确目标和优先级，以及创建无干扰的工作环境。";
+      } else if (currentMessage.includes("睡眠") || currentMessage.includes("失眠")) {
+        aiResponse = "提升睡眠质量的技巧：坚持规律的睡眠时间表、睡前1小时避免电子屏幕、创建舒适的睡眠环境（温度18-20℃、黑暗、安静）、睡前放松活动如阅读或冥想，以及白天适度运动。";
+      } else if (currentMessage.includes("减压") || currentMessage.includes("压力") || currentMessage.includes("放松")) {
+        aiResponse = "有效的减压方法包括：深呼吸练习（4秒吸气-7秒屏息-8秒呼气）、规律运动、与朋友交流、适当休息、大自然疗愈和限制咖啡因摄入。持续的高压可能导致多种健康问题，建议及时寻求专业帮助。";
+      } else if (currentMessage.includes("健身") || currentMessage.includes("运动")) {
+        aiResponse = "居家健身不需要复杂器材，高效的计划应包括：每周3-5次锻炼、结合有氧和力量训练、专注大肌群复合动作（如深蹲、俯卧撑）、合理休息和充分水分摄入。科学表明每周150分钟中等强度运动可显著改善健康。";
+      } else {
+        // 随机通用回复
+        const responses = [
+          "这是个很好的问题！根据最新研究，" + currentMessage + "相关的领域有很多新发现。您想了解哪方面的具体内容？",
+          "关于" + currentMessage + "，有几个关键点值得注意：首先，它与我们的日常习惯密切相关；其次，小的改变可以带来显著效果；最后，坚持是最重要的。您需要更详细的建议吗？",
+          "我找到了一些关于" + currentMessage + "的实用信息。研究表明，70%的人通过调整日常习惯获得了明显改善。您想了解如何开始吗？",
+          "关于" + currentMessage + "，专家建议从小目标开始，逐步建立长期习惯。这种方法的成功率提高了约60%。我可以提供一个简单的入门计划。",
+          "很高兴您对" + currentMessage + "感兴趣！这是近期热门话题，对提升生活质量有显著帮助。您是想了解理论知识还是实践方法？"
+        ];
+        aiResponse = responses[Math.floor(Math.random() * responses.length)];
+      }
+      
+      // 添加AI回复到聊天历史
+      setAiChatHistory(prev => [...prev, { type: 'ai', message: aiResponse }]);
       setIsTyping(false);
-    }, 1500);
+    }, 1000);
   };
 
   const handleCategorySelect = (category) => {
@@ -327,10 +366,15 @@ const Daily = () => {
     // 随机选择AI标签类型
     const aiTagType = Math.random() > 0.5 ? "AI精选" : "AI推荐";
     
+    // 确保使用unsplash图片
+    const imageUrl = focus.image.includes('unsplash.com') 
+      ? focus.image 
+      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
+    
     return (
       <div key={focus.id} className="daily-card today-focus-card">
         <div className="focus-image-container">
-          <img src={focus.image} alt={focus.title} className="focus-image"/>
+          <img src={imageUrl} alt={focus.title} className="focus-image"/>
           <div className="focus-overlay">
             <span className="focus-ai-tag">
               <i className="fas fa-robot"></i> {aiTagType}
@@ -430,11 +474,16 @@ const Daily = () => {
     // 生成个性化推荐理由
     const aiReason = generatePersonalizedReason(product);
     
+    // 确保使用unsplash图片
+    const imageUrl = product.imageUrl && product.imageUrl.includes('unsplash.com') 
+      ? product.imageUrl 
+      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
+    
     return (
       <Link to={`/product/${product.id}`} key={product.id} className="product-card-link">
         <div className="product-card">
           <div className="product-image-container">
-            <img src={product.imageUrl} alt={product.title} className="product-image"/>
+            <img src={imageUrl} alt={product.title} className="product-image"/>
             {product.discount && (
               <div className="discount-tag">-{product.discount}%</div>
             )}
@@ -479,27 +528,42 @@ const Daily = () => {
     return reasons[Math.floor(Math.random() * reasons.length)];
   };
 
-  // 处理话题点击
+  // 处理话题点击 - 优化功能实现一键代入热门词
   const handleTopicClick = (topic) => {
+    // 设置搜索词
     setSearchQuery(topic.text);
-    // 这里可以添加搜索逻辑或导航到相关页面
-    console.log(`搜索: ${topic.text}`);
     
-    // 如果有AI聊天功能，可以自动打开并填入内容
-    if (typeof handleAiChatToggle === 'function') {
-      setUserMessage(topic.text);
-      if (!showAiChat) {
-        handleAiChatToggle();
-      }
+    // 直接设置到AI聊天输入框
+    setUserMessage(topic.text);
+    
+    // 如果聊天框没有打开，则自动打开
+    if (!showAiChat) {
+      handleAiChatToggle();
     }
+    
+    // 可选：添加动画效果提示用户已选择
+    const topicElements = document.querySelectorAll('.ai-topic-bubble');
+    topicElements.forEach(el => {
+      if (el.textContent.includes(topic.text)) {
+        el.classList.add('topic-selected');
+        setTimeout(() => {
+          el.classList.remove('topic-selected');
+        }, 500);
+      }
+    });
   };
 
   // 渲染热门文章卡片
   const renderHotArticleCard = (article) => {
+    // 确保使用unsplash图片
+    const imageUrl = article.image.includes('unsplash.com') 
+      ? article.image 
+      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
+    
     return (
       <div key={article.id} className="hot-article-card">
         <div className="article-image-container">
-          <img src={article.image} alt={article.title} className="article-image" />
+          <img src={imageUrl} alt={article.title} className="article-image" />
           <div className="article-tag">{article.tag}</div>
         </div>
         <div className="article-content">
@@ -714,16 +778,8 @@ const Daily = () => {
           <h3><i className="fas fa-fire"></i> 今日热文</h3>
           <Link to="/articles" className="see-all-link">查看更多 <i className="fas fa-chevron-right"></i></Link>
         </div>
-        <div className="hot-articles-scroll" ref={horizontalScrollRefs.hotArticles}>
+        <div className="hot-articles-grid">
           {hotArticles.map(article => renderHotArticleCard(article))}
-        </div>
-        <div className="scroll-navigation">
-          <button className="scroll-nav-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.hotArticles, 'left')}>
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button className="scroll-nav-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.hotArticles, 'right')}>
-            <i className="fas fa-chevron-right"></i>
-          </button>
         </div>
       </div>
 

@@ -261,12 +261,11 @@ const DiscoverPage = () => {
   // 水平滚动处理函数
   const scrollHorizontally = (ref, direction) => {
     if (ref.current) {
-      const scrollAmount = 200;
-      if (direction === 'left') {
-        ref.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      ref.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -315,257 +314,252 @@ const DiscoverPage = () => {
     console.log('搜索:', searchTerm);
     navigate(`/discover/search?q=${encodeURIComponent(searchTerm)}`);
   };
-
+  
   // 加载状态展示
   if (isLoading) {
     return (
       <div className="discover-loading-container">
         <div className="discover-spinner"></div>
         <p>正在加载发现内容...</p>
-        <NavBar />
+        <NavBar /> 
       </div>
     );
   }
-
+  
   return (
     <div className={`discover-tab-wrapper ${isDarkMode ? 'dark' : ''}`}>
-      {scrollProgress > 0 && <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>}
+      <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
       
-      <div className="discover-main-content" ref={mainRef}>
-        {/* 顶部搜索栏 - 紫色渐变背景 */}
-        <div className="discover-search-header">
-          <div className="discover-search-bar">
-            <i className="fas fa-search search-bar-icon"></i>
-            <input 
-              type="text" 
-              placeholder="搜索节日、事件、商品、AI内容..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-          </div>
+      {/* 搜索栏 - 紫色主题 */}
+      <div className="discover-search-header">
+        <div className="discover-search-bar">
+          <i className="fas fa-search search-bar-icon"></i>
+          <input
+            type="text"
+            placeholder="搜索节日、事件、商品、AI内容..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
         </div>
-
-       
-
-        {/* 2. 休闲一刻 */}
-        <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-gamepad"></i> 休闲一刻</h2>
-            <div className="section-controls">
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-              <Link to="/discover/games" className="view-all-link">查看全部</Link>
+      </div>
+      
+      <div className="discover-main-content" ref={mainRef} onScroll={handleScroll}>
+        
+        {/* 1. 推荐创作模块 */}
+        <div className="content-module-container creative-content-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-star"></i> 推荐创作
             </div>
-          </div>
-          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.casualGames}>
-            {casualGames.map(game => (
-              <div key={game.id} className="game-card">
-                <img src={game.icon} alt={game.name} className="game-card-icon"/>
-                <h3 className="game-card-title">{game.name}</h3>
-                <p className="game-card-description">{game.description}</p>
-                <span className="game-card-category">{game.category}</span>
-                <div className="game-card-stats">
-                  <span className="game-popularity"><i className="fas fa-fire"></i> {game.popularity}</span>
-                  <span className="game-players">{game.playerCount} 玩家</span>
-                </div>
-                <button className="play-game-btn">立即玩</button>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 3. 热门商品 */}
-        <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-shopping-bag"></i> 热门商品</h2>
-            <div className="section-controls">
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-              <Link to="/discover/products" className="view-all-link">查看全部</Link>
-            </div>
-          </div>
-          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.popularProducts}>
-            {popularProducts.map(product => (
-              <div key={product.id} className="product-card">
-                <div className="product-card-image-container">
-                  <img src={product.image} alt={product.name} className="product-card-image"/>
-                  {product.promotionTag && <span className="product-promotion-tag">{product.promotionTag}</span>}
-                </div>
-                <h3 className="product-card-name">{product.name}</h3>
-                <div className="product-card-prices">
-                  <span className="product-current-price">{product.price}</span>
-                  {product.originalPrice && <span className="product-original-price">{product.originalPrice}</span>}
-                </div>
-                <div className="product-card-rating">
-                  <span className="stars">{'★'.repeat(Math.floor(product.rating))}{'☆'.repeat(5-Math.floor(product.rating))}</span>
-                  <span className="rating-value">{product.rating}</span>
-                </div>
-                <div className="product-card-sales">{product.salesCount} 已售</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-         {/* 1. 推荐创作 */}
-         <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-star"></i> 推荐创作</h2>
-            <div className="section-controls">
+            <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.recommendedContent, 'left')}>
                 <i className="fas fa-chevron-left"></i>
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.recommendedContent, 'right')}>
                 <i className="fas fa-chevron-right"></i>
               </button>
-              <Link to="/discover/recommended" className="view-all-link">查看全部</Link>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.recommendedContent}>
             {recommendedContent.map(item => (
-              <Link to={`/discover/content/${item.id}`} key={item.id} className="content-card-link">
-                <div className="content-card">
-                  <img src={item.image} alt={item.title} className="content-card-image"/>
-                  <div className="content-card-info">
-                    <span className="content-card-category">{item.category}</span>
-                    <h3 className="content-card-title">{item.title}</h3>
-                    <p className="content-card-summary">{item.summary}</p>
-                    <div className="content-card-author">
-                      <img src={item.author.avatar} alt={item.author.name} className="author-avatar"/>
-                      <span>{item.author.name}</span>
-                    </div>
-                    <div className="content-card-stats">
-                      <span><i className="fas fa-eye"></i> {item.readCount}</span>
-                      <span><i className="fas fa-heart"></i> {item.likeCount}</span>
-                    </div>
-                  </div>
+              <div key={item.id} className="module-card content-card">
+                <img src={item.image} alt={item.title} className="content-card-image" />
+                <div className="content-card-info">
+                  <span className="content-card-category">{item.category}</span>
+                  <h3 className="content-card-title">{item.title}</h3>
+                  <p className="content-card-summary">{item.summary}</p>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
-        </section>
-
-        {/* 4. 游戏挑战 */}
-        <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-trophy"></i> 游戏挑战</h2>
-            <div className="section-controls">
+        </div>
+        
+        {/* 2. 休闲一刻模块 */}
+        <div className="content-module-container leisure-moment-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-gamepad"></i> 休闲一刻
+            </div>
+            <div className="scroll-controls">
+              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'left')}>
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'right')}>
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.casualGames}>
+            {casualGames.map(game => (
+              <div key={game.id} className="module-card game-card">
+                <div className="game-card-header">
+                  <img src={game.icon} alt={game.name} className="game-card-icon" />
+                  <div className="game-card-title-container">
+                    <h4 className="game-card-title">{game.name}</h4>
+                    <div className="game-card-category">{game.category}</div>
+                  </div>
+                </div>
+                <div className="game-card-stats">
+                  <div>{game.popularity}</div>
+                  <div>{game.playerCount}人在玩</div>
+                </div>
+                <button className="play-game-btn">开始游戏</button>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* 3. 热门商品模块 */}
+        <div className="content-module-container popular-products-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-shopping-bag"></i> 热门商品
+            </div>
+            <div className="scroll-controls">
+              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'left')}>
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'right')}>
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.popularProducts}>
+            {popularProducts.map(product => (
+              <div key={product.id} className="product-card">
+                <div className="product-card-image-container">
+                  <img src={product.image} alt={product.name} className="product-card-image" />
+                  {product.promotionTag && <div className="product-promotion-tag">{product.promotionTag}</div>}
+                </div>
+                <div className="product-card-info">
+                  <h4 className="product-card-name">{product.name}</h4>
+                  <div className="product-card-prices">
+                    <div className="product-current-price">{product.price}</div>
+                    <div className="product-original-price">{product.originalPrice}</div>
+                  </div>
+                  <div className="product-card-rating">
+                    <div className="stars">★{product.rating}</div>
+                    <div className="rating-value">{product.salesCount} 已售</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* 4. 游戏挑战模块 */}
+        <div className="content-module-container game-challenge-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-trophy"></i> 游戏挑战
+            </div>
+            <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.gameChallenges, 'left')}>
                 <i className="fas fa-chevron-left"></i>
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.gameChallenges, 'right')}>
                 <i className="fas fa-chevron-right"></i>
               </button>
-              <Link to="/discover/challenges" className="view-all-link">查看全部</Link>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.gameChallenges}>
             {gameChallenges.map(challenge => (
-              <div key={challenge.id} className="challenge-card">
-                <img src={challenge.image} alt={challenge.title} className="challenge-card-image"/>
-                <h3 className="challenge-card-title">{challenge.title}</h3>
-                <div className="challenge-card-details">
-                  <div className="challenge-reward">
-                    <span className="detail-label">奖励:</span>
-                    <span className="detail-value">{challenge.reward}</span>
+              <div key={challenge.id} className="module-card challenge-card">
+                <img src={challenge.image} alt={challenge.title} className="challenge-card-image" />
+                <div className="challenge-card-info">
+                  <h4 className="challenge-card-title">{challenge.title}</h4>
+                  <div className="challenge-card-details">
+                    <div><span className="detail-label">难度:</span> <span className={`difficulty-badge ${challenge.difficulty}`}>{challenge.difficulty}</span></div>
+                    <div><span className="detail-label">奖励:</span> <span className="detail-value">{challenge.reward}</span></div>
+                    <div><span className="detail-label">参与:</span> <span className="detail-value">{challenge.participantsCount}</span></div>
+                    <div><span className="detail-label">截止:</span> <span className="detail-value">{challenge.endTime}</span></div>
                   </div>
-                  <div className="challenge-difficulty">
-                    <span className="detail-label">难度:</span>
-                    <span className={`difficulty-badge ${challenge.difficulty.toLowerCase()}`}>{challenge.difficulty}</span>
-                  </div>
-                  <div className="challenge-participants">
-                    <span className="detail-label">参与:</span>
-                    <span className="detail-value">{challenge.participantsCount}</span>
-                  </div>
-                  <div className="challenge-time">
-                    <span className="detail-label">截止:</span>
-                    <span className="detail-value">{challenge.endTime}</span>
-                  </div>
+                  <button className="join-challenge-btn">参与挑战</button>
                 </div>
-                <button className="join-challenge-btn">参与挑战</button>
               </div>
             ))}
           </div>
-        </section>
-
-        {/* 5. 热门视频 */}
-        <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-play-circle"></i> 热门视频</h2>
-            <div className="section-controls">
+        </div>
+        
+        {/* 5. 热门视频模块 */}
+        <div className="content-module-container trending-videos-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-video"></i> 热门视频
+            </div>
+            <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'left')}>
                 <i className="fas fa-chevron-left"></i>
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'right')}>
                 <i className="fas fa-chevron-right"></i>
               </button>
-              <Link to="/discover/videos" className="view-all-link">查看全部</Link>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.hotVideos}>
             {hotVideos.map(video => (
               <div key={video.id} className="video-card">
                 <div className="video-card-cover-container">
-                  <img src={video.cover} alt={video.title} className="video-card-cover"/>
-                  <span className="video-duration">{video.duration}</span>
+                  <img src={video.cover} alt={video.title} className="video-card-cover" />
+                  <div className="video-duration">{video.duration}</div>
                   <div className="video-play-button">
                     <i className="fas fa-play"></i>
                   </div>
                 </div>
-                <h3 className="video-card-title">{video.title}</h3>
-                <div className="video-card-creator">{video.creator}</div>
-                <div className="video-card-views"><i className="fas fa-eye"></i> {video.viewCount}</div>
+                <div className="video-card-info">
+                  <h4 className="video-card-title">{video.title}</h4>
+                  <div className="video-card-creator">{video.creator}</div>
+                  <div className="video-card-views">
+                    <i className="fas fa-eye"></i> {video.viewCount}次观看
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        </section>
-
-        {/* 6. 互动话题 */}
-        <section className="discover-section">
-          <div className="section-header-with-controls">
-            <h2 className="discover-section-title"><i className="fas fa-comments"></i> 互动话题</h2>
-            <div className="section-controls">
+        </div>
+        
+        {/* 6. 互动话题模块 */}
+        <div className="content-module-container interactive-topics-container">
+          <div className="content-module-header">
+            <div className="module-title">
+              <i className="fas fa-comments"></i> 互动话题
+            </div>
+            <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.interactiveTopics, 'left')}>
                 <i className="fas fa-chevron-left"></i>
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.interactiveTopics, 'right')}>
                 <i className="fas fa-chevron-right"></i>
               </button>
-              <Link to="/discover/topics" className="view-all-link">查看全部</Link>
             </div>
           </div>
-          <div className="horizontal-scroll-container topic-container" ref={horizontalScrollRefs.interactiveTopics}>
+          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.interactiveTopics}>
             {interactiveTopics.map(topic => (
-              <Link to={`/topic/${topic.id}`} key={topic.id} className="topic-card">
+              <div key={topic.id} className="topic-card">
+                <span className="topic-category">{topic.category}</span>
                 <h4 className="topic-title">{topic.title}</h4>
                 <div className="topic-meta">
-                  <span className="topic-participation">{topic.participation}</span>
-                  {topic.trending && <span className="topic-trending"><i className="fas fa-chart-line"></i> 热门</span>}
+                  <div className="topic-participation">{topic.participation}</div>
+                  {topic.trending && (
+                    <div className="topic-trending">
+                      <i className="fas fa-fire"></i> 热门
+                    </div>
+                  )}
                 </div>
-                <span className="topic-category">{topic.category}</span>
                 <button className="join-topic-btn">参与讨论</button>
-              </Link>
+              </div>
             ))}
           </div>
-        </section>
-
-        {/* 回到顶部按钮 */}
+        </div>
+        
+        {/* 返回顶部按钮 */}
         {showBackToTop && (
-          <div className="discover-back-to-top visible" onClick={scrollToTop}>
+          <div className="discover-back-to-top" onClick={scrollToTop}>
             <i className="fas fa-arrow-up"></i>
           </div>
         )}
       </div>
-
-      {/* 底部导航栏 */}
       <NavBar />
     </div>
   );
