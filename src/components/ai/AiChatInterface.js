@@ -220,7 +220,7 @@ const AiChatInterface = ({ onLoadingChange, onRequestArticle, placeholder }) => 
         </div>
         
         {/* 提示建议 */}
-        {messages.length === 0 && (
+        {/* {messages.length === 0 && (
           <div className="prompt-suggestions">
             {promptSuggestions.map((suggestion, index) => (
               <div 
@@ -232,7 +232,7 @@ const AiChatInterface = ({ onLoadingChange, onRequestArticle, placeholder }) => 
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </form>
     </div>
   );
