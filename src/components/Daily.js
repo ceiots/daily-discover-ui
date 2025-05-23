@@ -229,6 +229,7 @@ const Daily = () => {
         if (recommendationsRes.data && recommendationsRes.data.code === 200) {
           const recData = recommendationsRes.data.data || {};
           const newContent = recData.content || [];
+          console.log(newContent);
           if (page === 0) {
             setRecommendations(newContent);
             setOriginalRecommendations(newContent);
@@ -579,7 +580,7 @@ const Daily = () => {
             <div key={product.id || index} className="product-recommendation-card">
               <div className="product-image-container">
                 <img 
-                  src={product.image || `https://source.unsplash.com/featured/800x600/?product`}
+                  src={product.imageUrl || `https://source.unsplash.com/featured/800x600/?product`}
                   data-category={`product-${product.name?.substring(0, 10) || "generic"}`}
                   alt={product.name || product.title || `产品${index+1}`} 
                   className="product-image" 
