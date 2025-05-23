@@ -626,7 +626,7 @@ const Daily = () => {
         {/* 热门话题整合到AI助手卡片中 */}
         <div className="ai-topics-wrapper">
           <div className="ai-topics-label">
-            <i className="fas fa-fire"></i>热门话题
+            <i className="fas fa-fire"></i>猜你想了解
           </div>
           <div className="ai-topics-scroll">
             {aiTopics.map(topic => (
