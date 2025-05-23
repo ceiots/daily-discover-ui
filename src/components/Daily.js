@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import NavBar from "./NavBar";
 // import DailyFocus from "./DailyFocus"; // Assuming DailyFocus will be part of the new structure or replaced
 
 // Helper function to get Lunar Date (simplified)
@@ -32,7 +33,7 @@ const getGreeting = () => {
   return "夜深了";
 };
 
-const Discover = () => {
+const Daily = () => {
   const { isLoggedIn, userInfo, refreshUserInfo } = useAuth();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
@@ -322,6 +323,19 @@ const Discover = () => {
       </div>
 
       <div className="daily-scrollable-content" ref={scrollRef}>
+        {/* 类别筛选条 */}
+        <div className="category-filter-bar">
+          {categories.map(category => (
+            <button 
+              key={category} 
+              className={`category-filter-btn ${activeCategory === category ? 'active' : ''}`}
+              onClick={() => handleCategorySelect(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
         <div className="horizontal-scroll-section">
           <div className="horizontal-scroll-header">
             <h3><i className="fas fa-star"></i> 今日焦点</h3>
@@ -329,25 +343,35 @@ const Discover = () => {
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.focus}>
             {todayFocus.map(focus => (
-              <div key={focus.id} className="daily-card today-focus-card" style={{minWidth: '280px', width: '280px'}}>
+              <div key={focus.id} className="daily-card today-focus-card">
                 <div className="focus-image-container">
                   <img src={focus.image} alt={focus.title} className="focus-image"/>
                   <div className="focus-overlay">
                     <span className="focus-tag">今日焦点</span>
                   </div>
                 </div>
-                <h3>{focus.title}</h3>
-                <p>{focus.content}</p>
-                <button className="card-button">
-                  查看详情
-                  <i className="fas fa-arrow-right button-icon"></i>
-                </button>
+                <div className="focus-content">
+                  <h3>{focus.title}</h3>
+                  <p>{focus.content}</p>
+                  <button className="card-button">
+                    查看详情
+                    <i className="fas fa-arrow-right button-icon"></i>
+                  </button>
+                </div>
               </div>
             ))}
           </div>
+          <div className="scroll-controls">
+            <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'left')}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'right')}>
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
 
-       {/*  {productSummary && (
+        {productSummary && (
           <div className="ai-product-summary">
             <div className="ai-product-summary-header">
               <i className="fas fa-robot"></i>
@@ -355,7 +379,7 @@ const Discover = () => {
             </div>
             <p>{productSummary.content}</p>
           </div>
-        )} */}
+        )}
 
         {aiSuggestion && (
           <div className="daily-card ai-suggestion-card" onClick={handleAiChatToggle}>
@@ -371,7 +395,7 @@ const Discover = () => {
           </div>
         )}
 
-        {/* {dailyQuote && (
+        {dailyQuote && (
           <div className="daily-card daily-quote-card">
             <i className="fas fa-quote-left quote-symbol-start"></i>
             <p className="quote-text">{`"${dailyQuote.text}"`}</p>
@@ -383,7 +407,7 @@ const Discover = () => {
               <button className="action-btn"><i className="fas fa-bookmark"></i></button>
             </div>
           </div>
-        )} */}
+        )}
 
         {dailyTips.length > 0 && (
           <div className="horizontal-scroll-section">
@@ -412,6 +436,14 @@ const Discover = () => {
                 </div>
               ))}
             </div>
+            <div className="scroll-controls">
+              <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.tips, 'left')}>
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.tips, 'right')}>
+                <i className="fas fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
         )}
 
@@ -428,6 +460,14 @@ const Discover = () => {
                   <p className="history-title">{event.title}</p>
                 </div>
               ))}
+            </div>
+            <div className="scroll-controls">
+              <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'left')}>
+                <i className="fas fa-chevron-left"></i>
+              </button>
+              <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'right')}>
+                <i className="fas fa-chevron-right"></i>
+              </button>
             </div>
           </div>
         )}
@@ -526,8 +566,10 @@ const Discover = () => {
           </button>
         </div>
       </div>
+      
+      <NavBar />
     </div>
   );
 };
 
-export default Discover;
+export default Daily;

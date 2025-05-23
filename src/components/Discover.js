@@ -11,13 +11,16 @@ const DEFAULT_PRODUCT2 = '/default-product2.png';
 const DEFAULT_THEME = '/default-theme.png'; // Example: for featured content
 
 export const getImage = (imageName) => {
-  switch (imageName) {
-    case 'avatar': return DEFAULT_AVATAR;
-    case 'product1': return DEFAULT_PRODUCT1;
-    case 'product2': return DEFAULT_PRODUCT2;
-    case 'theme': return DEFAULT_THEME;
-    default: return DEFAULT_IMAGE;
-  }
+  // 使用Unsplash高质量图片
+  const unsplashImages = {
+    'theme': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'product1': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'product2': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'tech': 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'food': 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'travel': 'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+  };
+  return unsplashImages[imageName] || DEFAULT_IMAGE;
 };
 
 // Mock data for "Discover" Tab (to be replaced with API calls or props)
@@ -37,21 +40,30 @@ const mockDiscoverData = {
   curatedCollections: [
     { id: 'c1', title: '提升效率的App', image: getImage('product1'), itemsCount: 8, link: '/collections/productivity-apps' },
     { id: 'c2', title: '夏日特饮秘方', image: getImage('product2'), itemsCount: 12, link: '/collections/summer-drinks' },
+    { id: 'c3', title: '居家健身指南', image: getImage('travel'), itemsCount: 6, link: '/collections/home-fitness' },
   ],
   trendingContent: [
     { id: 't1', title: 'AI在艺术创作中的应用', category: '科技', views: '1.2M', image: getImage('theme') },
     { id: 't2', title: '最新智能家居体验报告', category: '生活', views: '890K', image: getImage('product1') },
+    { id: 't3', title: '2024年必看科幻电影清单', category: '娱乐', views: '756K', image: getImage('tech') },
   ],
   productShowcase: {
     title: "编辑严选好物",
     items: [
       { id: 'p1', name: '智能降噪耳机X1', price: '¥899', image: getImage('product2'), rating: 4.8, tag: '新品' },
       { id: 'p2', name: '便携咖啡机Go', price: '¥299', image: getImage('product1'), rating: 4.5, tag: '热门' },
+      { id: 'p3', name: '多功能智能手表', price: '¥1299', image: getImage('tech'), rating: 4.7, tag: '限时' },
     ]
   },
   eventCalendar: [
     { id: 'e1', title: '全球数字艺术展', date: '2024年11月5日 - 15日', type: '展览', image: getImage('theme')},
     { id: 'e2', title: '线上编程马拉松', date: '2024年12月1日', type: '竞赛', image: getImage('product2')},
+  ],
+  hotTopics: [
+    { id: 'h1', title: '#数字游民生活方式', posts: 3420, trending: true },
+    { id: 'h2', title: '#AI绘画教程', posts: 2815, trending: true },
+    { id: 'h3', title: '#极简主义生活', posts: 1950, trending: false },
+    { id: 'h4', title: '#可持续时尚', posts: 1680, trending: true },
   ]
 };
 
@@ -71,7 +83,11 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
   const [trendingContent, setTrendingContent] = useState([]);
   const [productShowcase, setProductShowcase] = useState(null);
   const [eventCalendar, setEventCalendar] = useState([]);
+  const [hotTopics, setHotTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('全部');
+
+  const categories = ['全部', '科技', '生活', '健康', '学习', '娱乐'];
 
   const handleScroll = useCallback(() => {
     if (!mainRef.current) return;
@@ -93,6 +109,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
       setTrendingContent(mockDiscoverData.trendingContent);
       setProductShowcase(mockDiscoverData.productShowcase);
       setEventCalendar(mockDiscoverData.eventCalendar);
+      setHotTopics(mockDiscoverData.hotTopics);
       setIsLoading(false);
     };
 
@@ -129,11 +146,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
     navigate(`/discover/search?q=${encodeURIComponent(searchTerm)}`);
   };
   
-  const handleCategoryFilter = (category) => {
-    console.log("Filtering Discover Tab by category:", category);
-    // Implement category filtering logic for the Discover tab
-    // This might involve re-fetching data or filtering existing state
-  };
+
   
   // Placeholder for isLoading state
   if (isLoading) {
@@ -165,17 +178,9 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
           </div>
         </div>
 
-        {/* Optional: Category Filters / Tag Cloud */}
-        <div className="category-filters-container">
-          {['热门', '最新', '科技', '生活', '艺术'].map(cat => (
-            <button key={cat} onClick={() => handleCategoryFilter(cat)} className="category-filter-tag">{cat}</button>
-          ))}
-        </div>
-
         {/* Banner/Featured Section */}
-        {bannerItems.length > 0 && (
+        {/* {bannerItems.length > 0 && (
           <section className="discover-section discover-banner-section">
-            {/* Example: Show first banner. Implement carousel for multiple items. */}
             {bannerItems.slice(0, 1).map(item => (
               <Link to={item.link} key={item.id} className="banner-item-link">
                 <div className="banner-item">
@@ -188,10 +193,10 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
               </Link>
             ))}
           </section>
-        )}
+        )} */}
 
         {/* AI For You Section */}
-        {aiForYou && aiForYou.items.length > 0 && (
+        {/* {aiForYou && aiForYou.items.length > 0 && (
           <section className="discover-section ai-for-you-section">
             <h2 className="discover-section-title">{aiForYou.title || "AI智能推荐"}</h2>
             <div className="ai-for-you-grid">
@@ -208,10 +213,10 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
               ))}
             </div>
           </section>
-        )}
+        )} */}
 
         {/* Curated Collections Section */}
-        {curatedCollections.length > 0 && (
+        {/* {curatedCollections.length > 0 && (
           <section className="discover-section curated-collections-section">
             <h2 className="discover-section-title">专题合集</h2>
             <div className="horizontal-scroll-container">
@@ -228,7 +233,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
               ))}
             </div>
           </section>
-        )}
+        )} */}
 
         {/* Trending Content Section */}
         {trendingContent.length > 0 && (
@@ -243,8 +248,8 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                       <span className="trending-item-category">{item.category}</span>
                       <h4>{item.title}</h4>
                       <span className="trending-item-views"><i className="fas fa-fire"></i> {item.views} 热度</span>
-          </div>
-            </div>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -252,7 +257,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
         )}
         
         {/* Product Showcase Section */}
-        {productShowcase && productShowcase.items.length > 0 && (
+        {/* {productShowcase && productShowcase.items.length > 0 && (
           <section className="discover-section product-showcase-section">
             <h2 className="discover-section-title">{productShowcase.title || "编辑严选好物"}</h2>
             <div className="horizontal-scroll-container product-scroll">
@@ -265,37 +270,34 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                       <div className="product-meta">
                         <span className="price">{product.price}</span>
                         <span className="rating"><i className="fas fa-star"></i> {product.rating}</span>
-            </div>
-                      {product.tag && <span className="product-tag">{product.tag}</span>}
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-          </section>
-        )}
-
-        {/* Event Calendar Section */}
-        {eventCalendar.length > 0 && (
-           <section className="discover-section event-calendar-section">
-            <h2 className="discover-section-title">新功能与活动日历</h2>
-            <div className="event-list">
-              {eventCalendar.map(event => (
-                <Link to={`/discover/event/${event.id}`} key={event.id} className="event-card-link">
-                  <div className="event-card">
-                    <img src={event.image} alt={event.title} className="event-image"/>
-                    <div className="event-info">
-                      <span className="event-type">{event.type}</span>
-                      <h5>{event.title}</h5>
-                      <p className="event-date">{event.date}</p>
+                      {product.tag && <span className="product-tag">{product.tag}</span>}
                     </div>
                   </div>
                 </Link>
-          ))}
-                </div>
+              ))}
+            </div>
           </section>
-          )}
-        
+        )} */}
+
+        {/* Hot Topics Section */}
+        {hotTopics.length > 0 && (
+          <section className="discover-section hot-topics-section">
+            <h2 className="discover-section-title">热门话题</h2>
+            <div className="hot-topics-grid">
+              {hotTopics.map(topic => (
+                <Link to={`/topic/${topic.id}`} key={topic.id} className="hot-topic-card">
+                  <h4>{topic.title}</h4>
+                  <div className="topic-meta">
+                    <span className="topic-posts">{topic.posts}篇内容</span>
+                    {topic.trending && <span className="topic-trending"><i className="fas fa-chart-line"></i> 热门</span>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         {showBackToTop && (
           <div className="discover-back-to-top visible" onClick={scrollToTop}>
             <i className="fas fa-arrow-up"></i>
