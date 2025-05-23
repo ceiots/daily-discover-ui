@@ -931,7 +931,7 @@
 
 /* 卡片样式 - 固定宽度以显示2个 */
 .module-card {
-  flex: 0 0 calc(50% - 12px); /* 每行2个，考虑间距 */
+  flex: 0 0 calc(50% - 12px);
   min-width: calc(50% - 12px);
   max-width: calc(50% - 12px);
   background: var(--bg-card);
@@ -939,6 +939,7 @@
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
   border: 1px solid rgba(124, 58, 237, 0.1);
+  min-height: 150px; /* 增加最小高度 */
 }
 
 /* 滚动控制按钮样式 */
@@ -972,12 +973,12 @@
 
 /* 1. 推荐创作模块 */
 .creative-content-container .module-card {
-  height: 180px;
+  height: 220px; /* 从180px增加到220px */
 }
 
 /* 2. 休闲一刻模块 */
 .leisure-moment-container .module-card {
-  height: 160px;
+  height: 190px; /* 从160px增加到190px */
 }
 
 /* 3. 热门商品模块 */
@@ -989,7 +990,7 @@
 
 /* 4. 游戏挑战模块 */
 .game-challenge-container .module-card {
-  height: 130px;
+  height: 150px; /* 从130px增加到150px */
 }
 
 /* 5. 热门视频模块 */
@@ -1189,6 +1190,7 @@
 
 .content-card-info {
   padding: var(--spacing-card);
+  min-height: 70px; /* 增加最小高度 */
 }
 
 .content-card-category {
@@ -1208,10 +1210,11 @@
   margin: 2px 0;
   color: var(--text-primary);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3; /* 从2行增加到3行 */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.3;
+  line-height: 1.4; /* 增加行高 */
+  min-height: 2.8em; /* 确保至少能显示2行文字 */
 }
 
 .content-card-summary {
@@ -1219,10 +1222,10 @@
   color: var(--text-secondary);
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3; /* 从2行增加到3行 */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.3;
+  line-height: 1.4; /* 增加行高 */
 }
 
 /* 游戏卡片样式 - 简洁大气 */
@@ -1236,6 +1239,7 @@
   border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
+  min-height: 140px; /* 增加最小高度 */
 }
 
 .game-card:active {
@@ -1343,15 +1347,20 @@
 
 .product-card-info {
   padding: var(--spacing-card);
+  min-height: 65px; /* 增加商品信息区域高度 */
 }
 
 .product-card-name {
   font-size: var(--font-subtitle);
   font-weight: 500;
   margin: 0 0 4px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 允许显示2行 */
+  -webkit-box-orient: vertical;
+  line-height: 1.3;
+  min-height: 2.6em; /* 确保高度足够显示2行 */
 }
 
 .product-card-prices {
@@ -1545,10 +1554,11 @@
   font-weight: 500;
   margin: 0 0 2px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3; /* 从2行增加到3行 */
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.3;
+  min-height: 2.6em; /* 确保高度足够 */
 }
 
 .video-card-creator {
@@ -1597,10 +1607,11 @@
   margin: 0 0 4px;
   color: var(--text-primary);
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3; /* 从2行增加到3行 */
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.3;
+  min-height: 2.6em; /* 确保高度足够 */
 }
 
 .topic-meta {

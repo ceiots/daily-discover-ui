@@ -63,20 +63,39 @@ body {
   padding-bottom: 60px;
 }
 
-/* 优化顶部区域设计 */
+/* 优化顶部区域设计 - 减少紫色占比 */
 .daily-header-compact {
-  background: linear-gradient(135deg, #7c3aed, #6366f1);
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   color: white;
-  padding: 10px 12px;
+  padding: 10px 12px 15px;
   border-radius: 0 0 16px 16px;
   box-shadow: 0 3px 10px rgba(99, 102, 241, 0.15);
+  margin-bottom: 12px;
 }
 
+/* 优化顶部元素排版 */
 .header-top-row {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center; /* 改为中心对齐，使购物车和头像在同一线上 */
   margin-bottom: 6px;
+}
+
+/* 优化头像和购物车图标 */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 设置间距 */
+}
+
+.cart-icon, .user-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .greeting-compact {
@@ -159,369 +178,12 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* AI推荐搜索词/热门话题样式 */
-.ai-topics-container {
-  background: rgba(124, 58, 237, 0.8);
-  border-radius: 12px;
-  padding: 6px 8px;
-  margin-top: 6px;
-  margin-bottom: 4px;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
-
-.ai-topics-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  margin-right: 6px;
-  color: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-}
-
-.ai-topics-label i {
-  font-size: 0.65rem;
-  margin-right: 4px;
-  color: #fff06c;
-}
-
-.ai-topics-scroll {
-  display: flex;
-  overflow-x: auto;
-  gap: 6px;
-  padding: 2px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.ai-topics-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.ai-topic-bubble {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 3px 8px;
-  border-radius: 12px;
-  font-size: 0.65rem;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ai-topic-bubble i {
-  font-size: 0.6rem;
-}
-
-.ai-topic-bubble:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
-}
-
-.ai-topic-bubble:active {
-  transform: translateY(0);
-}
-
-/* 新增: 热门话题选中动画 */
-.topic-selected {
-  background: rgba(255, 255, 255, 0.5) !important;
-  transform: scale(0.95);
-  transition: all 0.2s ease;
-}
-
-/* 更新各种卡片标题 */
-.section-header h3 {
-  font-size: var(--font-md);
-  font-weight: var(--font-semibold);
-  color: var(--primary-dark);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  letter-spacing: 0.01em;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 0 4px;
-}
-
-.see-all-link {
-  color: var(--primary-color);
-  font-size: var(--font-xs);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-weight: var(--font-medium);
-}
-
-/* 修改文章卡片样式 */
-.article-title {
-  font-size: var(--font-sm);
-  font-weight: var(--font-medium);
-  margin: 0 0 4px 0;
-  color: var(--text-primary);
-  line-height: var(--line-height-tight);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  letter-spacing: 0.01em;
-}
-
-.article-tag {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  background: var(--primary-color);
-  color: white;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-size: var(--font-xs);
-  font-weight: var(--font-medium);
-  letter-spacing: 0.01em;
-}
-
-.article-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: calc(var(--font-xs) - 0.05rem);
-  color: var(--text-light);
-}
-
-.article-views i {
-  font-size: calc(var(--font-xs) - 0.1rem);
-}
-
-/* 今日热文模块样式 */
-.hot-articles-section {
-  margin: 16px 0 20px;
-}
-
-.hot-articles-grid {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 4px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.hot-articles-grid::-webkit-scrollbar {
-  display: none;
-}
-
-.hot-article-card {
-  width: 180px;
-  margin-right: 12px;
-  flex-shrink: 0;
-  scroll-snap-align: start;
-}
-
-/* 最后一个卡片不需要右边距 */
-.hot-article-card:last-child {
-  margin-right: 0;
-}
-
-/* 确保水平滚动容器样式一致 */
-.horizontal-scroll-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 4px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.horizontal-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* 确保卡片样式一致 */
-.daily-card,
-.history-event-card,
-.product-card {
-  flex-shrink: 0;
-  scroll-snap-align: start;
-  margin-right: 12px;
-}
-
-/* 最后一个卡片不需要右边距 */
-.daily-card:last-child,
-.history-event-card:last-child,
-.product-card:last-child {
-  margin-right: 0;
-}
-
-/* AI聊天界面样式 */
-.ai-chat-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.2s ease;
-}
-
-.ai-chat-container {
-  background: white;
-  width: 90%;
-  max-width: 360px;
-  height: 75vh;
-  max-height: 500px;
-  border-radius: 14px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-  animation: slideUp 0.3s ease;
-}
-
-.ai-chat-header {
-  background: var(--primary-color);
-  color: white;
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ai-chat-header h3 {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: var(--font-semibold);
-}
-
-.close-chat-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: var(--font-lg);
-  cursor: pointer;
-  padding: 2px;
-}
-
-.ai-chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.chat-message {
-  max-width: 85%;
-  padding: 8px 10px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  line-height: 1.4;
-}
-
-.chat-message.user {
-  background: #f0f0f0;
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
-}
-
-.chat-message.ai {
-  background: rgba(124, 58, 237, 0.08);
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-}
-
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-}
-
-.typing-indicator span {
-  width: 5px;
-  height: 5px;
-  background: var(--text-light);
-  border-radius: 50%;
-  animation: typing 1s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.typing-indicator span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes typing {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-.ai-chat-input {
-  display: flex;
-  padding: 8px 10px;
-  border-top: 1px solid #eee;
-  gap: 8px;
-}
-
-.ai-chat-input input {
-  flex: 1;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  padding: 6px 10px;
-  font-size: 0.7rem;
-  outline: none;
-}
-
-.ai-chat-input button {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.ai-chat-input button:disabled {
-  background: #ccc;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-/* 新增: 优化AI助手建议卡片 */
+/* AI助手建议区域 - 整合热门话题 */
 .ai-suggestion-card {
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   border-radius: 12px;
-  padding: 10px 12px;
-  margin: 8px 0;
+  padding: 12px;
+  margin: 8px 12px 16px;
   color: white;
   box-shadow: 0 2px 8px rgba(109, 40, 217, 0.15);
 }
@@ -530,7 +192,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .ai-suggestion-header i {
@@ -553,31 +215,943 @@ body {
 .ai-suggestion-content {
   font-size: 0.7rem;
   line-height: 1.4;
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   opacity: 0.95;
 }
 
-.ai-chat-button {
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  color: white;
+/* 整合热门话题到AI助手卡片中 */
+.ai-topics-wrapper {
+  margin-top: 8px;
+}
+
+.ai-topics-label {
   font-size: 0.65rem;
-  padding: 4px 10px;
-  border-radius: 20px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+}
+
+.ai-topics-label i {
+  font-size: 0.6rem;
+  margin-right: 4px;
+  color: #fff06c;
+}
+
+.ai-topics-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  padding: 4px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin-bottom: 5px;
+}
+
+/* 今日焦点 - 左右滑动设计 */
+.today-focus-section {
+  margin: 0 12px 16px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* 优化iOS触摸滑动 */
+  scroll-snap-type: x mandatory; /* 添加滚动捕捉 */
+  position: relative;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 滑动指示器和控制按钮 */
+.scroll-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-control-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:hover {
+  background: var(--primary-light);
+  color: white;
+}
+
+.scroll-control-btn:active {
+  transform: scale(0.95);
+}
+
+/* 滑动指示器点 */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.scroll-dot.active {
+  width: 18px;
+  border-radius: 3px;
+  background-color: var(--primary-color);
+}
+
+/* 滑动卡片样式优化 */
+.focus-card, .recommendation-card {
+  flex: 0 0 calc(85% - 12px);
+  min-width: calc(85% - 12px);
+  scroll-snap-align: start; /* 滚动捕捉对齐 */
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.focus-card:hover, .recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 3. 解决图片加载问题 */
+
+/* 图片容器样式 */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f1f5f9; /* 图片加载前的背景色 */
+}
+
+/* 图片加载失败时的备用样式 */
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #94a3b8;
+  font-size: var(--font-sm);
+}
+
+.image-fallback i {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+/* 图片加载中的动画 */
+.image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* 用户头像图片修复 */
+.user-icon img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f1f5f9;
+}
+
+.user-icon img[src=""], 
+.user-icon img:not([src]) {
+  visibility: hidden;
+  position: relative;
+}
+
+.user-icon img[src=""]:after, 
+.user-icon img:not([src]):after {
+  content: '\f007'; /* FontAwesome用户图标 */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  font-size: 16px;
+  visibility: visible;
+}
+
+/* 4. 优化"热门话题"的左右滑动设计 */
+
+/* 热门话题滚动容器 */
+.ai-topics-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 6px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  margin: 0 -4px; /* 负边距创造视觉提示 */
+  padding: 6px 4px;
+}
+
+.ai-topics-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 添加渐变遮罩指示可滑动 */
+.ai-topics-wrapper {
+  position: relative;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ai-topics-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 24px;
+  background: linear-gradient(90deg, transparent, rgba(109, 40, 217, 0.2));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 话题气泡样式优化 */
+.ai-topic-bubble {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ai-topic-bubble:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.ai-topic-bubble i {
+  font-size: 0.65rem;
+}
+
+/* 添加滑动指示动画 */
+@keyframes slideHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.ai-topics-scroll:empty::before {
+  content: '← 滑动查看更多话题';
+  display: block;
+  padding: 6px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-xs);
+  animation: slideHint 1.5s ease-in-out infinite;
+}
+
+/* 确保今日推荐卡片中的图片正确显示 */
+.product-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background-color: #f1f5f9;
+  transition: transform 0.3s ease;
+}
+
+.product-recommendation-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* 添加图片加载错误处理 */
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 120px;
+  background-color: #f1f5f9;
+}
+
+/* 1. 为"今日焦点"和"今日推荐"部分添加明显的AI元素 */
+
+/* AI标签通用样式 */
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  gap: 3px;
+  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.1);
+}
+
+.ai-tag-primary {
+  background-color: var(--ai-tag-bg);
+  color: var(--ai-tag-text);
+}
+
+.ai-tag-light {
+  background-color: var(--ai-tag-light-bg);
+  color: var(--ai-tag-light-text);
+  border: 1px solid var(--ai-tag-border);
+}
+
+.ai-tag i {
+  font-size: 0.55rem;
+}
+
+/* AI洞察/总结区域样式 */
+.ai-insight-container {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(124, 58, 237, 0.05);
+  border-left: 2px solid var(--primary-color);
+  border-radius: 0 4px 4px 0;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.ai-insight-header {
   display: flex;
   align-items: center;
   gap: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  align-self: flex-start;
+  margin-bottom: 3px;
+  font-weight: var(--font-medium);
+  color: var(--primary-color);
 }
 
-.ai-chat-button i {
+.ai-insight-header i {
   font-size: 0.6rem;
 }
 
-.ai-chat-button:hover {
+.ai-insight-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* AI筛选功能视觉元素 */
+.ai-filtered-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.9), rgba(109, 40, 217, 0.9));
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.ai-filtered-badge i {
+  font-size: 0.55rem;
+}
+
+.ai-match-percentage {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+}
+
+.ai-match-percentage i {
+  color: #f9d71c;
+  font-size: 0.55rem;
+}
+
+/* 2. 修复"今日焦点"卡片的左右滑动功能 */
+
+/* 确保水平滚动容器正常工作 */
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* 优化iOS触摸滑动 */
+  scroll-snap-type: x mandatory; /* 添加滚动捕捉 */
+  position: relative;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 滑动指示器和控制按钮 */
+.scroll-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-control-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:hover {
+  background: var(--primary-light);
+  color: white;
+}
+
+.scroll-control-btn:active {
+  transform: scale(0.95);
+}
+
+/* 滑动指示器点 */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.scroll-dot.active {
+  width: 18px;
+  border-radius: 3px;
+  background-color: var(--primary-color);
+}
+
+/* 滑动卡片样式优化 */
+.focus-card, .recommendation-card {
+  flex: 0 0 calc(85% - 12px);
+  min-width: calc(85% - 12px);
+  scroll-snap-align: start; /* 滚动捕捉对齐 */
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.focus-card:hover, .recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 3. 解决图片加载问题 */
+
+/* 图片容器样式 */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f1f5f9; /* 图片加载前的背景色 */
+}
+
+/* 图片加载失败时的备用样式 */
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #94a3b8;
+  font-size: var(--font-sm);
+}
+
+.image-fallback i {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+/* 图片加载中的动画 */
+.image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* 用户头像图片修复 */
+.user-icon img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f1f5f9;
+}
+
+.user-icon img[src=""], 
+.user-icon img:not([src]) {
+  visibility: hidden;
+  position: relative;
+}
+
+.user-icon img[src=""]:after, 
+.user-icon img:not([src]):after {
+  content: '\f007'; /* FontAwesome用户图标 */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  font-size: 16px;
+  visibility: visible;
+}
+
+/* 4. 优化"热门话题"的左右滑动设计 */
+
+/* 热门话题滚动容器 */
+.ai-topics-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 6px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  margin: 0 -4px; /* 负边距创造视觉提示 */
+  padding: 6px 4px;
+}
+
+.ai-topics-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 添加渐变遮罩指示可滑动 */
+.ai-topics-wrapper {
+  position: relative;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ai-topics-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 24px;
+  background: linear-gradient(90deg, transparent, rgba(109, 40, 217, 0.2));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 话题气泡样式优化 */
+.ai-topic-bubble {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ai-topic-bubble:hover {
   background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.ai-topic-bubble i {
+  font-size: 0.65rem;
+}
+
+/* 添加滑动指示动画 */
+@keyframes slideHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.ai-topics-scroll:empty::before {
+  content: '← 滑动查看更多话题';
+  display: block;
+  padding: 6px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-xs);
+  animation: slideHint 1.5s ease-in-out infinite;
+}
+
+/* 确保今日推荐卡片中的图片正确显示 */
+.product-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background-color: #f1f5f9;
+  transition: transform 0.3s ease;
+}
+
+.product-recommendation-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* 添加图片加载错误处理 */
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 120px;
+  background-color: #f1f5f9;
+}
+
+/* 今日焦点 - 左右滑动设计 */
+.today-focus-section {
+  margin: 0 12px 16px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 卡片布局 - 两列设计 */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 0 12px;
+}
+
+/* 历史的今天 - 左右滑动和两列布局 */
+.history-events-section {
+  margin: 0 12px 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.history-events-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.history-events-header h3 {
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  color: var(--primary-dark);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.history-events-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.history-events-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.history-event-card {
+  flex: 0 0 calc(50% - 6px);
+  min-width: calc(50% - 6px);
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.history-event-year {
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  color: var(--primary-color);
+  margin: 0 0 4px;
+}
+
+.history-event-title {
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  line-height: 1.3;
+}
+
+.history-event-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ai-tag-light-bg);
+  color: var(--primary-color);
+  font-size: var(--font-xs);
+  padding: 2px 6px;
+  border-radius: 4px;
+  gap: 3px;
+}
+
+.history-event-tag i {
+  font-size: calc(var(--font-xs) - 0.05rem);
+}
+
+/* 今日推荐 - 左右滑动和两列布局 */
+.daily-recommendations-section {
+  margin: 0 12px 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.recommendations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.recommendations-header h3 {
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  color: var(--primary-dark);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.recommendations-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 8px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.recommendations-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.product-recommendation-card {
+  flex: 0 0 calc(50% - 6px);
+  min-width: calc(50% - 6px);
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.product-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 8px;
+}
+
+.product-name {
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-price {
+  font-size: var(--font-sm);
+  font-weight: var(--font-semibold);
+  color: var(--primary-color);
+  margin: 0 0 2px;
+}
+
+.product-match {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.product-match i {
+  font-size: calc(var(--font-xs) - 0.05rem);
+  color: var(--primary-color);
+}
+
+/* 滚动控制按钮 */
+.scroll-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.scroll-control-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 减少内容区域的紫色使用，改为更加协调的配色 */
+.section-header h3 {
+  color: #1f2937; /* 使用更深的灰色而非紫色 */
+}
+
+.section-header h3 i {
+  color: var(--primary-color); /* 只在图标保留紫色 */
 }
 
 /* 修复用户头像尺寸问题 */
@@ -586,7 +1160,7 @@ body {
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
-  margin: 0 8px 0 0;
+  margin: 0;
 }
 
 /* 添加各部分的通用样式 */
@@ -599,3 +1173,382 @@ body {
   background-color: #ffffff;
   margin-bottom: 16px;
 }
+
+/* 1. 为"今日焦点"和"今日推荐"部分添加明显的AI元素 */
+
+/* AI标签通用样式 */
+.ai-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  gap: 3px;
+  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.1);
+}
+
+.ai-tag-primary {
+  background-color: var(--ai-tag-bg);
+  color: var(--ai-tag-text);
+}
+
+.ai-tag-light {
+  background-color: var(--ai-tag-light-bg);
+  color: var(--ai-tag-light-text);
+  border: 1px solid var(--ai-tag-border);
+}
+
+.ai-tag i {
+  font-size: 0.55rem;
+}
+
+/* AI洞察/总结区域样式 */
+.ai-insight-container {
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: rgba(124, 58, 237, 0.05);
+  border-left: 2px solid var(--primary-color);
+  border-radius: 0 4px 4px 0;
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.ai-insight-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+  font-weight: var(--font-medium);
+  color: var(--primary-color);
+}
+
+.ai-insight-header i {
+  font-size: 0.6rem;
+}
+
+.ai-insight-content {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* AI筛选功能视觉元素 */
+.ai-filtered-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.9), rgba(109, 40, 217, 0.9));
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.ai-filtered-badge i {
+  font-size: 0.55rem;
+}
+
+.ai-match-percentage {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  z-index: 2;
+}
+
+.ai-match-percentage i {
+  color: #f9d71c;
+  font-size: 0.55rem;
+}
+
+/* 2. 修复"今日焦点"卡片的左右滑动功能 */
+
+/* 确保水平滚动容器正常工作 */
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 4px 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch; /* 优化iOS触摸滑动 */
+  scroll-snap-type: x mandatory; /* 添加滚动捕捉 */
+  position: relative;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* 滑动指示器和控制按钮 */
+.scroll-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-control-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:hover {
+  background: var(--primary-light);
+  color: white;
+}
+
+.scroll-control-btn:active {
+  transform: scale(0.95);
+}
+
+/* 滑动指示器点 */
+.scroll-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.scroll-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(124, 58, 237, 0.2);
+  transition: all 0.3s ease;
+}
+
+.scroll-dot.active {
+  width: 18px;
+  border-radius: 3px;
+  background-color: var(--primary-color);
+}
+
+/* 滑动卡片样式优化 */
+.focus-card, .recommendation-card {
+  flex: 0 0 calc(85% - 12px);
+  min-width: calc(85% - 12px);
+  scroll-snap-align: start; /* 滚动捕捉对齐 */
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.focus-card:hover, .recommendation-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 3. 解决图片加载问题 */
+
+/* 图片容器样式 */
+.image-container {
+  position: relative;
+  overflow: hidden;
+  background-color: #f1f5f9; /* 图片加载前的背景色 */
+}
+
+/* 图片加载失败时的备用样式 */
+.image-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #94a3b8;
+  font-size: var(--font-sm);
+}
+
+.image-fallback i {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+/* 图片加载中的动画 */
+.image-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* 用户头像图片修复 */
+.user-icon img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: #f1f5f9;
+}
+
+.user-icon img[src=""], 
+.user-icon img:not([src]) {
+  visibility: hidden;
+  position: relative;
+}
+
+.user-icon img[src=""]:after, 
+.user-icon img:not([src]):after {
+  content: '\f007'; /* FontAwesome用户图标 */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  font-size: 16px;
+  visibility: visible;
+}
+
+/* 4. 优化"热门话题"的左右滑动设计 */
+
+/* 热门话题滚动容器 */
+.ai-topics-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 6px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  margin: 0 -4px; /* 负边距创造视觉提示 */
+  padding: 6px 4px;
+}
+
+.ai-topics-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* 添加渐变遮罩指示可滑动 */
+.ai-topics-wrapper {
+  position: relative;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.ai-topics-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 24px;
+  background: linear-gradient(90deg, transparent, rgba(109, 40, 217, 0.2));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 话题气泡样式优化 */
+.ai-topic-bubble {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  white-space: nowrap;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.ai-topic-bubble:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.ai-topic-bubble i {
+  font-size: 0.65rem;
+}
+
+/* 添加滑动指示动画 */
+@keyframes slideHint {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(5px); }
+}
+
+.ai-topics-scroll:empty::before {
+  content: '← 滑动查看更多话题';
+  display: block;
+  padding: 6px 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-xs);
+  animation: slideHint 1.5s ease-in-out infinite;
+}
+
+/* 确保今日推荐卡片中的图片正确显示 */
+.product-image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background-color: #f1f5f9;
+  transition: transform 0.3s ease;
+}
+
+.product-recommendation-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* 添加图片加载错误处理 */
+.product-image-container {
+  position: relative;
+  overflow: hidden;
+  height: 120px;
+  background-color: #f1f5f9;
+}
+

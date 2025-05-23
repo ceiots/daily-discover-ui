@@ -11,20 +11,20 @@ const DEFAULT_PRODUCT2 = '/default-product2.png';
 const DEFAULT_THEME = '/default-theme.png'; // Example: for featured content
 
 export const getImage = (imageName) => {
-  // 使用Unsplash高质量图片
+  // 使用更高质量、主题更匹配的Unsplash图片
   const unsplashImages = {
     'theme': 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
     'product1': 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
     'product2': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'tech': 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'food': 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'travel': 'https://images.unsplash.com/photo-1503220317375-aaad61436b1b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'ai': 'https://images.unsplash.com/photo-1677442135136-760c813170d6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'health': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'education': 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'game': 'https://images.unsplash.com/photo-1511512578047-dfb367046420?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'video': 'https://images.unsplash.com/photo-1616469829941-c7200edec809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    'challenge': 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'tech': 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'food': 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'travel': 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'ai': 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'health': 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'education': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'game': 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'video': 'https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'challenge': 'https://images.unsplash.com/photo-1528543606781-2f6e6857f318?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
   };
   return unsplashImages[imageName] || DEFAULT_IMAGE;
 };
@@ -41,7 +41,8 @@ const mockDiscoverData = {
       category: '科技', 
       image: getImage('ai'),
       readCount: '3.5K',
-      likeCount: '286'
+      likeCount: '286',
+      aiInsight: '核心要点：自动化重复任务可节省40%时间，AI辅助写作提升产出质量' // 添加AI总结
     },
     { 
       id: 'rc2', 
@@ -51,7 +52,8 @@ const mockDiscoverData = {
       category: '工作', 
       image: getImage('tech'),
       readCount: '2.8K',
-      likeCount: '195'
+      likeCount: '195',
+      aiInsight: '精选推荐：Notion全能笔记、Todoist任务管理、Calendly日程安排' // 添加AI总结
     },
     { 
       id: 'rc3', 
@@ -61,7 +63,8 @@ const mockDiscoverData = {
       category: '生活', 
       image: getImage('theme'),
       readCount: '4.2K',
-      likeCount: '367'
+      likeCount: '367',
+      aiInsight: '研究表明：减少30%物品拥有量可提升幸福感达25%' // 添加AI总结
     },
   ],
   
@@ -74,7 +77,8 @@ const mockDiscoverData = {
       description: '轻松休闲的三消游戏', 
       category: '休闲', 
       popularity: '热门',
-      playerCount: '1.2M'
+      playerCount: '1.2M',
+      aiRecommend: '匹配度92%：基于您的游戏偏好推荐' // 添加AI推荐
     },
     { 
       id: 'cg2', 
@@ -83,7 +87,8 @@ const mockDiscoverData = {
       description: '锻炼大脑的数字游戏', 
       category: '益智', 
       popularity: '推荐',
-      playerCount: '845K'
+      playerCount: '845K',
+      aiRecommend: '匹配度88%：有助于提升逻辑思维能力' // 添加AI推荐
     },
     { 
       id: 'cg3', 
@@ -92,7 +97,8 @@ const mockDiscoverData = {
       description: '考验反应力的休闲游戏', 
       category: '动作', 
       popularity: '新品',
-      playerCount: '560K'
+      playerCount: '560K',
+      aiRecommend: '匹配度85%：适合短时间放松的最佳选择' // 添加AI推荐
     },
   ],
   
@@ -106,7 +112,8 @@ const mockDiscoverData = {
       originalPrice: '¥1099', 
       promotionTag: '限时特惠', 
       rating: 4.8,
-      salesCount: '2.3万件'
+      salesCount: '2.3万件',
+      aiInsight: '智能分析：降噪效果领先同类产品35%' // 添加AI分析
     },
     { 
       id: 'pp2', 
@@ -116,7 +123,8 @@ const mockDiscoverData = {
       originalPrice: '¥399', 
       promotionTag: '新品上市', 
       rating: 4.5,
-      salesCount: '1.5万件'
+      salesCount: '1.5万件',
+      aiInsight: '智能分析：92%用户认为性价比极高' // 添加AI分析
     },
     { 
       id: 'pp3', 
@@ -126,7 +134,8 @@ const mockDiscoverData = {
       originalPrice: '¥1499', 
       promotionTag: '抢购中', 
       rating: 4.7,
-      salesCount: '8.7千件'
+      salesCount: '8.7千件',
+      aiInsight: '智能分析：续航能力超出同价位产品50%' // 添加AI分析
     },
   ],
   
@@ -139,7 +148,8 @@ const mockDiscoverData = {
       reward: '金币×500',
       difficulty: '简单',
       participantsCount: '12.5万',
-      endTime: '2024-09-30'
+      endTime: '2024-09-30',
+      aiTip: 'AI提示：设置每日提醒可提高完成率达85%' // 添加AI提示
     },
     { 
       id: 'gc2', 
@@ -148,7 +158,8 @@ const mockDiscoverData = {
       reward: '实物奖品+奖金',
       difficulty: '困难',
       participantsCount: '3.2万',
-      endTime: '2024-10-15'
+      endTime: '2024-10-15',
+      aiTip: 'AI提示：提前练习特定地图可提升胜率30%' // 添加AI提示
     },
     { 
       id: 'gc3', 
@@ -157,7 +168,8 @@ const mockDiscoverData = {
       reward: '会员天数×7',
       difficulty: '中等',
       participantsCount: '8.6万',
-      endTime: '2024-09-25'
+      endTime: '2024-09-25',
+      aiTip: 'AI提示：历史和科技类题目出现频率最高' // 添加AI提示
     },
   ],
   
@@ -169,7 +181,8 @@ const mockDiscoverData = {
       cover: getImage('education'),
       duration: '05:28',
       creator: '效率专家',
-      viewCount: '23.5万'
+      viewCount: '23.5万',
+      aiSummary: 'AI摘要：重点是番茄工作法和任务分类优先级' // 添加AI摘要
     },
     { 
       id: 'hv2', 
@@ -177,7 +190,8 @@ const mockDiscoverData = {
       cover: getImage('tech'),
       duration: '08:45',
       creator: '科技达人',
-      viewCount: '18.2万'
+      viewCount: '18.2万',
+      aiSummary: 'AI摘要：智能音箱和安防系统性价比最高' // 添加AI摘要
     },
     { 
       id: 'hv3', 
@@ -185,7 +199,8 @@ const mockDiscoverData = {
       cover: getImage('health'),
       duration: '15:20',
       creator: '健康生活',
-      viewCount: '32.6万'
+      viewCount: '32.6万',
+      aiSummary: 'AI摘要：无需器械，燃脂效果优于60%同类视频' // 添加AI摘要
     },
   ],
   
@@ -196,28 +211,32 @@ const mockDiscoverData = {
       title: '#数字游民生活方式', 
       participation: '3420人参与',
       trending: true, 
-      category: '生活' 
+      category: '生活',
+      aiInsight: 'AI洞察：近期讨论热度上升42%' // 添加AI洞察
     },
     { 
       id: 'it2', 
       title: '#AI绘画教程', 
       participation: '2815人参与',
       trending: true, 
-      category: '科技' 
+      category: '科技',
+      aiInsight: 'AI洞察：Midjourney相关内容最受关注' // 添加AI洞察
     },
     { 
       id: 'it3', 
       title: '#极简主义生活', 
       participation: '1950人参与',
       trending: false, 
-      category: '生活' 
+      category: '生活',
+      aiInsight: 'AI洞察：与心理健康话题高度相关' // 添加AI洞察
     },
     { 
       id: 'it4', 
       title: '#居家办公效率提升', 
       participation: '1520人参与',
       trending: true, 
-      category: '工作' 
+      category: '工作',
+      aiInsight: 'AI洞察：工作环境布置是热门讨论点' // 添加AI洞察
     },
   ]
 };
@@ -368,7 +387,8 @@ const DiscoverPage = () => {
                 <div className="content-card-info">
                   <span className="content-card-category">{item.category}</span>
                   <h3 className="content-card-title">{item.title}</h3>
-                  <p className="content-card-summary">{item.summary}</p>
+                  {/* 添加AI总结元素 */}
+                  <p className="ai-insight-text">{item.aiInsight}</p>
                 </div>
               </div>
             ))}
@@ -403,6 +423,10 @@ const DiscoverPage = () => {
                 <div className="game-card-stats">
                   <div>{game.popularity}</div>
                   <div>{game.playerCount}人在玩</div>
+                </div>
+                {/* 添加AI推荐元素 */}
+                <div className="ai-recommend-badge">
+                  <i className="fas fa-brain"></i> {game.aiRecommend}
                 </div>
                 <button className="play-game-btn">开始游戏</button>
               </div>
@@ -442,6 +466,10 @@ const DiscoverPage = () => {
                     <div className="stars">★{product.rating}</div>
                     <div className="rating-value">{product.salesCount} 已售</div>
                   </div>
+                  {/* 添加AI分析元素 */}
+                  <div className="ai-product-insight">
+                    <i className="fas fa-chart-line"></i> {product.aiInsight}
+                  </div>
                 </div>
               </div>
             ))}
@@ -474,6 +502,10 @@ const DiscoverPage = () => {
                     <div><span className="detail-label">奖励:</span> <span className="detail-value">{challenge.reward}</span></div>
                     <div><span className="detail-label">参与:</span> <span className="detail-value">{challenge.participantsCount}</span></div>
                     <div><span className="detail-label">截止:</span> <span className="detail-value">{challenge.endTime}</span></div>
+                  </div>
+                  {/* 添加AI提示元素 */}
+                  <div className="ai-tip-container">
+                    <i className="fas fa-lightbulb"></i> {challenge.aiTip}
                   </div>
                   <button className="join-challenge-btn">参与挑战</button>
                 </div>
@@ -511,7 +543,11 @@ const DiscoverPage = () => {
                   <h4 className="video-card-title">{video.title}</h4>
                   <div className="video-card-creator">{video.creator}</div>
                   <div className="video-card-views">
-                    <i className="fas fa-eye"></i> {video.viewCount}次观看
+                    <i className="fas fa-eye"></i> {video.viewCount}
+                  </div>
+                  {/* 添加AI摘要元素 */}
+                  <div className="ai-video-summary">
+                    <i className="fas fa-magic"></i> {video.aiSummary}
                   </div>
                 </div>
               </div>
@@ -547,6 +583,10 @@ const DiscoverPage = () => {
                     </div>
                   )}
                 </div>
+                {/* 添加AI洞察元素 */}
+                <div className="ai-topic-insight">
+                  <i className="fas fa-brain"></i> {topic.aiInsight}
+                </div>
                 <button className="join-topic-btn">参与讨论</button>
               </div>
             ))}
@@ -566,3 +606,5 @@ const DiscoverPage = () => {
 };
 
 export default DiscoverPage;
+
+
