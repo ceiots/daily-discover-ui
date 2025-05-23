@@ -40,7 +40,8 @@ const Daily = () => {
   const horizontalScrollRefs = {
     tips: useRef(null),
     history: useRef(null),
-    focus: useRef(null)
+    focus: useRef(null),
+    hotArticles: useRef(null) // 添加热门文章的引用
   };
 
   useEffect(() => {
@@ -76,6 +77,9 @@ const Daily = () => {
   const [loadMoreLoading, setLoadMoreLoading] = useState(false);
   const [originalRecommendations, setOriginalRecommendations] = useState([]);
   const [activeCategory, setActiveCategory] = useState('全部');
+  const [aiTopics, setAiTopics] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hotArticles, setHotArticles] = useState([]);
 
   const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
   const weekday = `星期${['日', '一', '二', '三', '四', '五', '六'][currentDate.getDay()]}`;
@@ -147,6 +151,42 @@ const Daily = () => {
       title: "今日商品推荐分析",
       content: "根据您的浏览历史，我们发现您对科技产品和健康用品特别感兴趣。今日推荐中包含了多款高性价比智能手表和健康监测设备，适合您的需求。"
     });
+    
+    // 设置热门文章数据
+    setHotArticles([
+      {
+        id: 1,
+        title: "AI如何重塑我们的日常生活？从智能家居到个人助手",
+        image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        views: 2456,
+        publishTime: "3小时前",
+        tag: "科技"
+      },
+      {
+        id: 2,
+        title: "数字极简主义：如何在信息爆炸时代保持专注",
+        image: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        views: 1872,
+        publishTime: "5小时前",
+        tag: "生活"
+      },
+      {
+        id: 3,
+        title: "每天10分钟冥想，一个月后身心的惊人变化",
+        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        views: 1543,
+        publishTime: "8小时前",
+        tag: "健康"
+      },
+      {
+        id: 4,
+        title: "2023年最值得关注的五款智能家居设备",
+        image: "https://images.unsplash.com/photo-1558002038-1055e2dae2d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        views: 1298,
+        publishTime: "12小时前",
+        tag: "科技"
+      }
+    ]);
   }, []);
   
   useEffect(() => {
@@ -279,210 +319,367 @@ const Daily = () => {
     }
   };
 
+  // 渲染今日焦点卡片
+  const renderFocusCard = (focus) => {
+    // 生成AI摘要，如果没有提供则从内容中提取
+    const aiSummary = focus.aiInsight || generateAiSummary(focus.content);
+    
+    // 随机选择AI标签类型
+    const aiTagType = Math.random() > 0.5 ? "AI精选" : "AI推荐";
+    
+    return (
+      <div key={focus.id} className="daily-card today-focus-card">
+        <div className="focus-image-container">
+          <img src={focus.image} alt={focus.title} className="focus-image"/>
+          <div className="focus-overlay">
+            <span className="focus-ai-tag">
+              <i className="fas fa-robot"></i> {aiTagType}
+            </span>
+          </div>
+        </div>
+        <div className="focus-content">
+          <h3>{focus.title}</h3>
+          <div className="ai-insight-badge">
+            <i className="fas fa-lightbulb"></i> AI洞察
+          </div>
+          <p className="focus-ai-summary">{aiSummary}</p>
+          <button className="card-button">
+            {focus.interactionPrompt || "查看详情"} <i className="fas fa-arrow-right button-icon"></i>
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // 生成AI摘要
+  const generateAiSummary = (content) => {
+    const summaries = [
+      "研究表明，每天10分钟冥想可降低40%压力，提升25%专注力",
+      "植物性饮食可减少30%慢性疾病风险，增强免疫系统功能",
+      "数字极简主义帮助用户每天节省1.5小时，减少42%分心次数",
+      "每日阅读30分钟可提升认知能力，延缓大脑衰老达32%",
+      "适度运动能提高工作效率35%，改善睡眠质量达40%"
+    ];
+    
+    // 根据内容关键词选择相关摘要
+    if (content.includes("冥想") || content.includes("压力")) {
+      return summaries[0];
+    } else if (content.includes("饮食") || content.includes("健康")) {
+      return summaries[1];
+    } else if (content.includes("数字") || content.includes("极简")) {
+      return summaries[2];
+    } else if (content.includes("阅读") || content.includes("书")) {
+      return summaries[3];
+    } else if (content.includes("运动") || content.includes("健身")) {
+      return summaries[4];
+    }
+    
+    // 默认返回随机摘要
+    return summaries[Math.floor(Math.random() * summaries.length)];
+  };
+
+  // 渲染历史上的今天卡片
+  const renderHistoryCard = (event) => {
+    // 生成AI解析，如果没有提供则随机生成
+    const aiInsight = event.aiInsight || generateHistoryInsight(event.title);
+    
+    return (
+      <div key={event.year} className="history-event-card">
+        <div className="history-year">{event.year}年</div>
+        <div className="history-title">{event.title}</div>
+        <div className="ai-history-insight">
+          <i className="fas fa-brain"></i> AI解析
+        </div>
+        <div className="history-ai-analysis">{aiInsight}</div>
+      </div>
+    );
+  };
+
+  // 生成历史事件AI解析
+  const generateHistoryInsight = (eventTitle) => {
+    const insights = [
+      "改变了世界科技格局",
+      "影响至今的历史转折点",
+      "开创了新的时代篇章",
+      "人类文明的重要里程碑",
+      "塑造了现代社会结构"
+    ];
+    
+    // 根据事件标题选择相关解析
+    if (eventTitle.includes("登月")) {
+      return "太空探索的里程碑事件";
+    } else if (eventTitle.includes("奥运")) {
+      return "体育外交的典范案例";
+    } else if (eventTitle.includes("宣言")) {
+      return "影响深远的思想转折点";
+    } else if (eventTitle.includes("回归")) {
+      return "民族复兴的重要节点";
+    } else if (eventTitle.includes("联合国")) {
+      return "全球治理体系的基石";
+    }
+    
+    // 默认返回随机解析
+    return insights[Math.floor(Math.random() * insights.length)];
+  };
+
+  // 渲染推荐产品卡片
+  const renderProductCard = (product) => {
+    // 生成85%-98%的随机匹配度
+    const matchScore = Math.floor(85 + Math.random() * 14);
+    
+    // 生成个性化推荐理由
+    const aiReason = generatePersonalizedReason(product);
+    
+    return (
+      <Link to={`/product/${product.id}`} key={product.id} className="product-card-link">
+        <div className="product-card">
+          <div className="product-image-container">
+            <img src={product.imageUrl} alt={product.title} className="product-image"/>
+            {product.discount && (
+              <div className="discount-tag">-{product.discount}%</div>
+            )}
+            <div className="ai-match-tag">
+              <i className="fas fa-robot"></i> 匹配度{matchScore}%
+            </div>
+          </div>
+          <div className="product-info">
+            <h4>{product.title}</h4>
+            <div className="ai-reason-tag">
+              <i className="fas fa-magic"></i> {aiReason}
+            </div>
+            <div className="product-details">
+              <div className="price">¥{product.price}</div>
+              <div className="sold-count">已售{product.soldCount}</div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
+  // 生成个性化推荐理由
+  const generatePersonalizedReason = (product) => {
+    const reasons = [
+      "基于您的浏览历史推荐",
+      "与您的兴趣高度匹配",
+      "90%相似用户都喜欢",
+      "符合您的购物偏好",
+      "为您的需求量身定制",
+      "近期热门，好评如潮"
+    ];
+    
+    // 根据产品类型或价格选择更相关的理由
+    if (product.price > 500) {
+      return "高品质选择，值得投资";
+    } else if (product.soldCount > 1000) {
+      return "热销产品，用户好评如潮";
+    }
+    
+    // 默认返回随机理由
+    return reasons[Math.floor(Math.random() * reasons.length)];
+  };
+
+  // 处理话题点击
+  const handleTopicClick = (topic) => {
+    setSearchQuery(topic.text);
+    // 这里可以添加搜索逻辑或导航到相关页面
+    console.log(`搜索: ${topic.text}`);
+    
+    // 如果有AI聊天功能，可以自动打开并填入内容
+    if (typeof handleAiChatToggle === 'function') {
+      setUserMessage(topic.text);
+      if (!showAiChat) {
+        handleAiChatToggle();
+      }
+    }
+  };
+
+  // 渲染热门文章卡片
+  const renderHotArticleCard = (article) => {
+    return (
+      <div key={article.id} className="hot-article-card">
+        <div className="article-image-container">
+          <img src={article.image} alt={article.title} className="article-image" />
+          <div className="article-tag">{article.tag}</div>
+        </div>
+        <div className="article-content">
+          <h4 className="article-title">{article.title}</h4>
+          <div className="article-meta">
+            <span className="article-time">{article.publishTime}</span>
+            <span className="article-views">
+              <i className="fas fa-eye"></i> {article.views}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="daily-page-container">
-      <div className="daily-header-section">
-        <div className="greeting-date-weather">
-          <div className="greeting-date">
+      <div className="daily-header-compact">
+        <div className="header-top-row">
+          <div className="greeting-compact">
             <h2>{greeting}好, {userInfo?.nickname || '朋友'}!</h2>
-            <p className="date-gregorian">{formattedDate} {weekday}</p>
-            <p className="date-lunar">{lunarDateInfo.year} {lunarDateInfo.month}{lunarDateInfo.day}</p>
+            <p className="date-compact">{formattedDate} {weekday} · {lunarDateInfo.month}{lunarDateInfo.day}</p>
           </div>
+          <div className="user-actions">
+            <Link to="/cart" className="action-icon cart-icon">
+              <i className="fas fa-shopping-cart"></i>
+              {cartItemCount > 0 && (
+                <span className="cart-count">{cartItemCount}</span>
+              )}
+            </Link>
+            {isLoggedIn ? (
+              <Link to="/profile" className="action-icon profile-icon">
+                <img
+                  src={userInfo?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80"}
+                  alt="用户头像"
+                />
+              </Link>
+            ) : (
+              <button onClick={() => navigate('/login')} className="login-button-daily">
+                登录
+              </button>
+            )}
+          </div>
+        </div>
+        
+        <div className="weather-ai-row">
           {weatherInfo && (
-            <div className="weather-summary">
+            <div className="weather-compact">
               <i className={`weather-icon fas fa-${weatherInfo.icon}`}></i>
-              <div className="weather-details">
-                <span className="temperature">{weatherInfo.temperature}°C</span>
-                <span className="condition">{weatherInfo.condition}</span>
-                <span className="city-aqi">{weatherInfo.city} · AQI {weatherInfo.airQuality}</span>
-              </div>
+              <span>{weatherInfo.temperature}°C</span>
+              <span className="weather-condition">{weatherInfo.condition}</span>
+              <span className="weather-city">{weatherInfo.city}</span>
+            </div>
+          )}
+          
+          {aiSuggestion && (
+            <div className="ai-suggestion-compact" onClick={handleAiChatToggle}>
+              <i className="fas fa-lightbulb"></i>
+              <span>{aiSuggestion.content.substring(0, 30)}...</span>
+              <i className="fas fa-chevron-right"></i>
             </div>
           )}
         </div>
-         {/* Profile and Cart Icons */}
-        <div className="user-actions">
-          <Link to="/cart" className="action-icon cart-icon">
-            <i className="fas fa-shopping-cart"></i>
-            {cartItemCount > 0 && (
-              <span className="cart-count">{cartItemCount}</span>
-            )}
-          </Link>
-          {isLoggedIn ? (
-            <Link to="/profile" className="action-icon profile-icon">
-              <img
-                src={userInfo?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80"}
-                alt="用户头像"
-              />
-            </Link>
-          ) : (
-            <button onClick={() => navigate('/login')} className="login-button-daily">
-              登录
-            </button>
-          )}
+        
+        {/* AI推荐搜索词/热门话题 */}
+        <div className="ai-topics-container">
+          <div className="ai-topics-label">
+            <i className="fas fa-fire"></i> 热门话题
+          </div>
+          <div className="ai-topics-scroll">
+            {aiTopics.map(topic => (
+              <div 
+                key={topic.id} 
+                className="ai-topic-bubble"
+                onClick={() => handleTopicClick(topic)}
+              >
+                <i className={`fas fa-${topic.icon}`}></i>
+                <span>{topic.text}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <div className="daily-scrollable-content" ref={scrollRef}>
-        {/* 类别筛选条 */}
-        <div className="category-filter-bar">
-          {categories.map(category => (
-            <button 
-              key={category} 
-              className={`category-filter-btn ${activeCategory === category ? 'active' : ''}`}
-              onClick={() => handleCategorySelect(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
 
+        {/* AI助手建议卡片 */}
+        {aiSuggestion && (
+          <div className="ai-suggestion-card">
+            <div className="ai-suggestion-header">
+              <i className={`fas fa-${aiSuggestion.icon || 'lightbulb'}`}></i>
+              <h3>{aiSuggestion.title}</h3>
+            </div>
+            <p className="ai-suggestion-content">{aiSuggestion.content}</p>
+            <button className="ai-chat-button" onClick={handleAiChatToggle}>
+              开始对话 <i className="fas fa-comment"></i>
+            </button>
+          </div>
+        )}
+        
+        {/* 今日焦点板块 */}
         <div className="horizontal-scroll-section">
           <div className="horizontal-scroll-header">
             <h3><i className="fas fa-star"></i> 今日焦点</h3>
-            <span className="see-all-link">查看全部</span>
+            <span className="see-all-link">查看全部 <i className="fas fa-chevron-right"></i></span>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.focus}>
-            {todayFocus.map(focus => (
-              <div key={focus.id} className="daily-card today-focus-card">
-                <div className="focus-image-container">
-                  <img src={focus.image} alt={focus.title} className="focus-image"/>
-                  <div className="focus-overlay">
-                    <span className="focus-tag">今日焦点</span>
-                  </div>
-                </div>
-                <div className="focus-content">
-                  <h3>{focus.title}</h3>
-                  <p>{focus.content}</p>
-                  <button className="card-button">
-                    查看详情
-                    <i className="fas fa-arrow-right button-icon"></i>
-                  </button>
-                </div>
-              </div>
-            ))}
+            {todayFocus.map(focus => renderFocusCard(focus))}
           </div>
-          <div className="scroll-controls">
-            <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'left')}>
+          <div className="scroll-navigation">
+            <button className="scroll-nav-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'left')}>
               <i className="fas fa-chevron-left"></i>
             </button>
-            <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'right')}>
+            <button className="scroll-nav-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.focus, 'right')}>
               <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div className="section-footer">
+            <button className="view-more-btn">
+              发现更多焦点内容 <i className="fas fa-arrow-right"></i>
             </button>
           </div>
         </div>
 
-        {productSummary && (
-          <div className="ai-product-summary">
-            <div className="ai-product-summary-header">
-              <i className="fas fa-robot"></i>
-              <h3>{productSummary.title}</h3>
-            </div>
-            <p>{productSummary.content}</p>
+        {/* 历史上的今天板块 */}
+        <div className="horizontal-scroll-section">
+          <div className="horizontal-scroll-header">
+            <h3><i className="fas fa-history"></i> 历史上的今天</h3>
+          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.history}>
+            {historyTodayEvents.map(event => renderHistoryCard(event))}
           </div>
-        )}
-
-        {aiSuggestion && (
-          <div className="daily-card ai-suggestion-card" onClick={handleAiChatToggle}>
-            <div className="ai-suggestion-header">
-              <i className={`fas fa-${aiSuggestion.icon}`}></i>
-              <h3>{aiSuggestion.title}</h3>
-            </div>
-            <p>{aiSuggestion.content}</p>
-            <div className="ai-chat-prompt">
-              <span>点击开始对话</span>
-              <i className="fas fa-comment-dots"></i>
-            </div>
-          </div>
-        )}
-
-        {dailyQuote && (
-          <div className="daily-card daily-quote-card">
-            <i className="fas fa-quote-left quote-symbol-start"></i>
-            <p className="quote-text">{`"${dailyQuote.text}"`}</p>
-            <p className="quote-author">- {dailyQuote.author}</p>
-            <i className="fas fa-quote-right quote-symbol-end"></i>
-            <div className="card-actions">
-              <button className="action-btn"><i className="fas fa-share-alt"></i></button>
-              <button className="action-btn"><i className="fas fa-heart"></i></button>
-              <button className="action-btn"><i className="fas fa-bookmark"></i></button>
-            </div>
-          </div>
-        )}
-
-        {dailyTips.length > 0 && (
-          <div className="horizontal-scroll-section">
-            <div className="horizontal-scroll-header">
-              <h3><i className="fas fa-tasks"></i> 今日小贴士</h3>
-              <div className="completion-status">
-                {dailyTips.filter(tip => tip.completed).length}/{dailyTips.length}
-              </div>
-            </div>
-            <div className="progress-bar-container">
-              <div 
-                className="progress-bar" 
-                style={{width: `${(dailyTips.filter(tip => tip.completed).length / dailyTips.length) * 100}%`}}
-              ></div>
-            </div>
-            <div className="horizontal-scroll-container" ref={horizontalScrollRefs.tips}>
-              {dailyTips.map(tip => (
-                <div 
-                  key={tip.id} 
-                  className={`daily-tips-item ${tip.completed ? 'completed' : ''}`}
-                  onClick={() => handleTipToggle(tip.id)}
-                >
-                  <i className={`fas fa-${tip.icon} tip-icon`}></i>
-                  <span>{tip.text}</span>
-                  <i className={`fas ${tip.completed ? 'fa-check-square' : 'fa-square'} checkbox-icon`}></i>
-                </div>
-              ))}
-            </div>
-            <div className="scroll-controls">
-              <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.tips, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.tips, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {historyTodayEvents.length > 0 && (
-          <div className="horizontal-scroll-section">
-            <div className="horizontal-scroll-header">
-              <h3><i className="fas fa-history"></i> 历史上的今天</h3>
-              <span className="see-all-link">更多历史</span>
-            </div>
-            <div className="horizontal-scroll-container" ref={horizontalScrollRefs.history}>
-              {historyTodayEvents.map((event, index) => (
-                <div key={index} className="history-event-card">
-                  <span className="history-year">{event.year}</span>
-                  <p className="history-title">{event.title}</p>
-                </div>
-              ))}
-            </div>
-            <div className="scroll-controls">
-              <button className="scroll-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
-              <button className="scroll-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="daily-recommendations-section">
-          <div className="recommendations-header">
-            <h3><i className="fas fa-crown"></i> 今日推荐</h3>
-            <button onClick={handleRefreshRecommendations} className="refresh-button">
-              换一换 <i className="fas fa-sync-alt"></i>
+          <div className="scroll-navigation">
+            <button className="scroll-nav-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'left')}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="scroll-nav-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.history, 'right')}>
+              <i className="fas fa-chevron-right"></i>
             </button>
           </div>
+          <div className="section-footer">
+            <button className="view-more-btn">
+              探索更多历史事件 <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+        
+        
+        
+        {/* 今日推荐部分 */}
+        <div className="daily-recommendations-section">
+          <div className="recommendations-header">
+            <h3><i className="fas fa-thumbs-up"></i> 今日推荐</h3>
+            <div className="ai-recommendation-badge">
+              <i className="fas fa-robot"></i> AI精选
+            </div>
+            <button className="refresh-button" onClick={handleRefreshRecommendations}>
+              <i className="fas fa-sync-alt"></i> 换一批
+            </button>
+          </div>
+          
+          {/* 商品总结 */}
+          {productSummary && (
+            <div className="ai-product-summary">
+              <i className="fas fa-chart-line"></i>
+              <p>{productSummary.content}</p>
+            </div>
+          )}
+          
+          {/* 商品推荐网格 */}
           {loading && page === 0 ? (
-            <div className="loading-container">
-              <div className="loading-spinner"></div>
-              <p>加载推荐中...</p>
+            <div className="recommendations-grid">
+              {Array(4).fill().map((_, index) => (
+                <div key={index} className="product-card skeleton">
+                  <div className="product-image-container skeleton"></div>
+                  <div className="product-info">
+                    <div className="skeleton-text"></div>
+                    <div className="skeleton-text short"></div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : error ? (
             <p className="error-message">{error}</p>
@@ -491,85 +688,91 @@ const Daily = () => {
               <p>暂时没有推荐内容</p>
             </div>
           ) : (
-            <>
-              <div className="recommendations-grid">
-                {recommendations.map((product) => (
-                  <Link to={`/product/${product.id}`} key={product.id} className="product-card-link">
-                    <div className="product-card">
-                      <div className="product-image-container">
-                        <img src={product.imageUrl} alt={product.title} className="product-image" />
-                        {product.discount && <span className="discount-tag">-{product.discount}%</span>}
-                      </div>
-                      <div className="product-info">
-                        <h4>{product.title}</h4>
-                        <div className="product-details">
-                          <span className="price">¥{product.price}</span>
-                          <span className="sold-count">已售{product.soldCount}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-              {page < totalPages - 1 && (
-                <div className="load-more-container">
-                  <button onClick={handleLoadMore} disabled={loadMoreLoading} className="load-more-button">
-                    {loadMoreLoading ? (
-                      <>
-                        <span className="spinner"></span> 加载中...
-                      </>
-                    ) : '加载更多'}
-                  </button>
-                </div>
-              )}
-            </>
+            <div className="recommendations-grid">
+              {recommendations.map(product => renderProductCard(product))}
+            </div>
+          )}
+          
+          {/* 加载更多按钮 */}
+          {!loading && page < totalPages - 1 && (
+            <div className="load-more-container">
+              <button className="load-more-button" onClick={handleLoadMore} disabled={loadMoreLoading}>
+                {loadMoreLoading ? (
+                  <><span className="spinner"></span> 加载中...</>
+                ) : (
+                  <>查看更多推荐 <i className="fas fa-chevron-down"></i></>
+                )}
+              </button>
+            </div>
           )}
         </div>
       </div>
 
-      <div className={`ai-chat-modal ${showAiChat ? 'show' : ''}`}>
-        <div className="ai-chat-header">
-          <h3>AI智能助手</h3>
-          <button className="close-button" onClick={handleAiChatToggle}>
-            <i className="fas fa-times"></i>
+      {/* 在页面底部添加今日热文模块 */}
+      <div className="hot-articles-section">
+        <div className="section-header">
+          <h3><i className="fas fa-fire"></i> 今日热文</h3>
+          <Link to="/articles" className="see-all-link">查看更多 <i className="fas fa-chevron-right"></i></Link>
+        </div>
+        <div className="hot-articles-scroll" ref={horizontalScrollRefs.hotArticles}>
+          {hotArticles.map(article => renderHotArticleCard(article))}
+        </div>
+        <div className="scroll-navigation">
+          <button className="scroll-nav-btn left" onClick={() => scrollHorizontally(horizontalScrollRefs.hotArticles, 'left')}>
+            <i className="fas fa-chevron-left"></i>
           </button>
-        </div>
-        <div className="ai-chat-messages">
-          {aiChatHistory.map((chat, index) => (
-            <div key={index} className={`chat-message ${chat.type}-message`}>
-              {chat.type === 'ai' && <div className="ai-avatar"><i className="fas fa-robot"></i></div>}
-              <div className="message-content">{chat.message}</div>
-              {chat.type === 'user' && <div className="user-avatar">{userInfo?.nickname?.charAt(0) || '我'}</div>}
-            </div>
-          ))}
-          {isTyping && (
-            <div className="chat-message ai-message">
-              <div className="ai-avatar"><i className="fas fa-robot"></i></div>
-              <div className="typing-indicator">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="ai-chat-input">
-          <input 
-            type="text" 
-            placeholder="输入你的问题..." 
-            value={userMessage}
-            onChange={(e) => setUserMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          />
-          <button onClick={handleSendMessage} disabled={!userMessage.trim()}>
-            <i className="fas fa-paper-plane"></i>
+          <button className="scroll-nav-btn right" onClick={() => scrollHorizontally(horizontalScrollRefs.hotArticles, 'right')}>
+            <i className="fas fa-chevron-right"></i>
           </button>
         </div>
       </div>
-      
+
+      {/* AI聊天界面 */}
+      {showAiChat && (
+        <div className="ai-chat-overlay">
+          <div className="ai-chat-container">
+            <div className="ai-chat-header">
+              <h3>AI助手</h3>
+              <button className="close-chat-btn" onClick={handleAiChatToggle}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <div className="ai-chat-messages">
+              {aiChatHistory.map((msg, index) => (
+                <div key={index} className={`chat-message ${msg.type}`}>
+                  <div className="message-content">{msg.message}</div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="chat-message ai">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="ai-chat-input">
+              <input
+                type="text"
+                value={userMessage}
+                onChange={(e) => setUserMessage(e.target.value)}
+                placeholder="输入您的问题..."
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <button onClick={handleSendMessage} disabled={!userMessage.trim()}>
+                <i className="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <NavBar />
     </div>
-  );
+  </div>
+);
 };
 
 export default Daily;

@@ -1155,3 +1155,985 @@
   }
 }
 
+/* 分类入口区域 */
+.category-entrance-section {
+  margin-top: 15px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding: 5px 0;
+}
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.category-item:active {
+  transform: scale(0.95);
+}
+
+.category-icon-container {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  border: 2px solid transparent;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.category-icon-container i {
+  font-size: 1.2rem;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.dark .category-name {
+  color: #d1d5db;
+}
+
+/* 区块标题与控制按钮 */
+.section-header-with-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.scroll-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.scroll-control-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--bg-white);
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:active {
+  background-color: var(--primary-color);
+  color: white;
+  transform: scale(0.95);
+}
+
+.dark .scroll-control-btn {
+  background-color: #374151;
+  border-color: var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.dark .scroll-control-btn:active {
+  background-color: var(--secondary-color);
+  color: #1f2937;
+}
+
+/* 热门话题左右滑动 */
+.topics-scroll {
+  padding: 5px 0;
+}
+
+.topics-scroll .hot-topic-card {
+  min-width: 200px;
+  margin-right: 0;
+  flex-shrink: 0;
+}
+
+/* 热门内容左右滑动 */
+.trending-scroll {
+  padding: 5px 0;
+}
+
+.trending-item-card.horizontal {
+  min-width: 280px;
+  flex-shrink: 0;
+  margin-right: 0;
+  height: 110px;
+}
+
+.trending-item-card-link {
+  text-decoration: none;
+}
+
+/* 修改AI卡片样式 */
+.ai-for-you-card {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.ai-card-icon {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  color: white;
+  font-size: 1.5rem;
+}
+
+.ai-card-content {
+  padding: 10px 12px;
+  flex: 1;
+}
+
+/* 响应式调整 */
+@media (max-width: 480px) {
+  .category-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  
+  .category-icon-container {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .trending-item-card.horizontal {
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 360px) {
+  .category-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .category-icon-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .category-name {
+    font-size: 0.7rem;
+  }
+  
+  .trending-item-card.horizontal {
+    min-width: 220px;
+  }
+}
+
+/* 发现页面 - 主题样式 */
+:root {
+  /* 颜色规范 */
+  --primary-color: #7c3aed; /* 主色：紫色 */
+  --primary-light: #a78bfa; /* 辅助色：浅紫色 */
+  --bg-color: #f5f7ff; /* 背景色：浅灰蓝 */
+  --text-primary: #333333; /* 文字主色 */
+  --text-secondary: #666666; /* 文字次要色 */
+  --text-tertiary: #999999; /* 文字辅助色 */
+  --border-color: #e5e7eb; /* 边框色 */
+  --white: #ffffff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* 字体规范 */
+  --font-main-title: 18px;
+  --font-sub-title: 16px;
+  --font-body: 14px;
+  --font-small: 12px;
+  --font-emphasis: 16px;
+  
+  /* 圆角规范 */
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  
+  /* 间距规范 */
+  --spacing-card: 12px;
+  --spacing-between-cards: 10px;
+  --spacing-section: 16px;
+  --spacing-icon-text: 4px;
+}
+
+/* 主容器样式 */
+.discover-tab-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.discover-tab-wrapper.dark {
+  --bg-color: #121212;
+  --text-primary: #f5f5f5;
+  --text-secondary: #d4d4d4;
+  --text-tertiary: #a0a0a0;
+  --border-color: #333333;
+}
+
+.discover-main-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 60px; /* 为底部导航栏留出空间 */
+  scroll-behavior: smooth;
+}
+
+/* 顶部搜索栏 */
+.discover-search-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  box-shadow: var(--shadow-sm);
+}
+
+.discover-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 8px 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.search-bar-icon {
+  color: var(--primary-color);
+  margin-right: 8px;
+}
+
+.discover-search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: var(--font-body);
+  color: var(--text-primary);
+  padding: 4px 0;
+  outline: none;
+}
+
+.discover-search-bar input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* 滚动进度条 */
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background-color: var(--primary-color);
+  z-index: 1000;
+  transition: width 0.2s ease;
+}
+
+/* 回到顶部按钮 */
+.discover-back-to-top {
+  position: fixed;
+  bottom: 70px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.discover-back-to-top.visible {
+  opacity: 1;
+}
+
+/* 内容区块通用样式 */
+.discover-section {
+  margin: 16px 12px;
+  padding: 12px 0;
+  background-color: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.section-header-with-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.discover-section-title {
+  font-size: var(--font-main-title);
+  font-weight: bold;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.discover-section-title i {
+  color: var(--primary-color);
+  margin-right: var(--spacing-icon-text);
+}
+
+.section-controls {
+  display: flex;
+  align-items: center;
+}
+
+.scroll-control-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:hover {
+  background-color: var(--primary-light);
+  color: var(--white);
+}
+
+.view-all-link {
+  margin-left: 12px;
+  color: var(--primary-color);
+  font-size: var(--font-small);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* 水平滚动容器 */
+.horizontal-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* 1. 推荐创作卡片 */
+.content-card-link {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 280px;
+  margin-right: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.content-card {
+  border-radius: var(--radius-md);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.content-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.content-card-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+}
+
+.content-card-info {
+  padding: var(--spacing-card);
+}
+
+.content-card-category {
+  display: inline-block;
+  background-color: var(--primary-light);
+  color: var(--white);
+  font-size: var(--font-small);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.content-card-title {
+  font-size: var(--font-sub-title);
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content-card-summary {
+  font-size: var(--font-body);
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content-card-author {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.author-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 8px;
+}
+
+.content-card-author span {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+}
+
+.content-card-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+}
+
+.content-card-stats span {
+  display: flex;
+  align-items: center;
+}
+
+.content-card-stats i {
+  margin-right: var(--spacing-icon-text);
+}
+
+/* 2. 休闲游戏卡片 */
+.game-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 160px;
+  margin-right: 12px;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-card);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.game-card-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.game-card-title {
+  font-size: var(--font-sub-title);
+  font-weight: bold;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.game-card-description {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.game-card-category {
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+  font-size: var(--font-small);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+.game-card-stats {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+
+.game-popularity {
+  color: #f59e0b;
+}
+
+.game-popularity i {
+  margin-right: var(--spacing-icon-text);
+}
+
+.play-game-btn {
+  width: 100%;
+  padding: 6px 0;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-small);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* 3. 热门商品卡片 */
+.product-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 160px;
+  margin-right: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.product-card-image-container {
+  position: relative;
+  height: 160px;
+}
+
+.product-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-promotion-tag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #ef4444;
+  color: var(--white);
+  font-size: var(--font-small);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.product-card-name {
+  font-size: var(--font-sub-title);
+  font-weight: 500;
+  margin: 8px 12px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-card-prices {
+  display: flex;
+  align-items: center;
+  margin: 0 12px 4px;
+}
+
+.product-current-price {
+  font-size: var(--font-emphasis);
+  font-weight: bold;
+  color: var(--primary-color);
+  margin-right: 6px;
+}
+
+.product-original-price {
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}
+
+.product-card-rating {
+  display: flex;
+  align-items: center;
+  margin: 0 12px 4px;
+}
+
+.stars {
+  color: #f59e0b;
+  margin-right: 4px;
+  font-size: var(--font-small);
+}
+
+.rating-value {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+}
+
+.product-card-sales {
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+  margin: 0 12px 8px;
+}
+
+/* 4. 游戏挑战卡片 */
+.challenge-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 280px;
+  margin-right: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.challenge-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.challenge-card-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+.challenge-card-title {
+  font-size: var(--font-sub-title);
+  font-weight: bold;
+  margin: 12px;
+  color: var(--text-primary);
+}
+
+.challenge-card-details {
+  padding: 0 12px 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.detail-label {
+  color: var(--text-tertiary);
+  font-size: var(--font-small);
+  margin-right: 4px;
+}
+
+.detail-value {
+  color: var(--text-secondary);
+  font-size: var(--font-small);
+  font-weight: 500;
+}
+
+.difficulty-badge {
+  font-size: var(--font-small);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--white);
+}
+
+.difficulty-badge.简单 {
+  background-color: #10b981;
+}
+
+.difficulty-badge.中等 {
+  background-color: #f59e0b;
+}
+
+.difficulty-badge.困难 {
+  background-color: #ef4444;
+}
+
+.join-challenge-btn {
+  width: calc(100% - 24px);
+  margin: 0 12px 12px;
+  padding: 8px 0;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 5. 热门视频卡片 */
+.video-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 240px;
+  margin-right: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--white);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.video-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.video-card-cover-container {
+  position: relative;
+  height: 135px;
+}
+
+.video-card-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: var(--white);
+  font-size: var(--font-small);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.video-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--white);
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.video-card-cover-container:hover .video-play-button {
+  opacity: 1;
+}
+
+.video-card-title {
+  font-size: var(--font-sub-title);
+  font-weight: 500;
+  margin: 8px 12px 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.video-card-creator {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+  margin: 0 12px 4px;
+}
+
+.video-card-views {
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+  margin: 0 12px 8px;
+  display: flex;
+  align-items: center;
+}
+
+.video-card-views i {
+  margin-right: var(--spacing-icon-text);
+}
+
+/* 6. 互动话题卡片 */
+.topic-container {
+  padding-bottom: 8px;
+}
+
+.topic-card {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: 200px;
+  margin-right: 12px;
+  padding: var(--spacing-card);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(167, 139, 250, 0.1));
+  border: 1px solid var(--primary-light);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.topic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.topic-title {
+  font-size: var(--font-sub-title);
+  font-weight: bold;
+  color: var(--primary-color);
+  margin: 0 0 8px 0;
+}
+
+.topic-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.topic-participation {
+  font-size: var(--font-small);
+  color: var(--text-secondary);
+}
+
+.topic-trending {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-small);
+  color: #ef4444;
+}
+
+.topic-trending i {
+  margin-right: var(--spacing-icon-text);
+}
+
+.topic-category {
+  font-size: var(--font-small);
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+.join-topic-btn {
+  padding: 6px 0;
+  background-color: var(--white);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-small);
+  font-weight: 500;
+  margin-top: auto;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.join-topic-btn:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+/* 加载状态 */
+.discover-loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.discover-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(124, 58, 237, 0.1);
+  border-radius: 50%;
+  border-top: 4px solid var(--primary-color);
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 响应式调整 */
+@media (max-width: 360px) {
+  .content-card-link {
+    width: 260px;
+  }
+  
+  .challenge-card {
+    width: 260px;
+  }
+  
+  .video-card {
+    width: 220px;
+  }
+  
+  .topic-card {
+    width: 180px;
+  }
+}
+
+@media (min-width: 768px) {
+  .discover-section {
+    margin: 20px 16px;
+  }
+  
+  .horizontal-scroll-container {
+    padding: 20px;
+  }
+}
+
