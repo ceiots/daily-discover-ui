@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ArticleCard.css';
-import { getImage } from '../DailyAiApp';
+import { getImage } from '../Discover';
 
 const ArticleCard = ({ article, onClick }) => {
   const { title, summary, date, category, tags, coverImage } = article;

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import instance from './utils/axios';
-import Discover from './components/Discover';
+import Daily from './components/Daily';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
 import Profile from './components/Profile';
@@ -36,7 +36,7 @@ import CategoryManagePage from './components/CategoryManagePage'; // 商品分�
 import ShopCreationPage from './components/ShopCreationPage'; // 店铺创建页
 import ShopDetailPage from './components/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
-import DailyAiApp from './components/DailyAiApp'; 
+import Discover from './components/Discover'; 
 import QuizGame from './components/games/QuizGame';
 import H5GamePage from './components/games/H5GamePage'; // 引入H5游戏页面
 import AiExplore from './components/AiExplore'; // 引入AI探索空间页面
@@ -198,9 +198,10 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/daily-ai" element={<ProtectedRoute><DailyAiApp /></ProtectedRoute>} />
+          <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
           <Route path="/ai-explore" element={<ProtectedRoute><AiExplore /></ProtectedRoute>} />
-          <Route path="/" element={<Discover />} />
+          <Route path="/" element={<Daily />} />
+          <Route path="/daily" element={<Daily />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/payment" element={<Payment />} />

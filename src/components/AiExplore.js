@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import instance from '../utils/axios';
-import { getImage } from './DailyAiApp';
+import { getImage } from './Discover';
 import NavBar from './NavBar';
 import ArticleCard from './ai/ArticleCard';
 import './AiExplore.css';

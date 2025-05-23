@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './H5GamePage.css';
 import { useAuth } from '../../App';
-import { getImage } from '../DailyAiApp'; // 导入图片处理函数
+import { getImage } from '../Discover'; // 导入图片处理函数
 import NavBar from '../NavBar';
 
 const H5GamePage = () => {
