@@ -350,16 +350,16 @@ const DiscoverPage = () => {
       <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>
       
       {/* 搜索栏 - 紫色主题 */}
-      <div className="discover-search-header">
-        <div className="discover-search-bar">
-          <i className="fas fa-search search-bar-icon"></i>
-          <input
-            type="text"
-            placeholder="搜索节日、事件、商品、AI内容..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          />
+        <div className="discover-search-header">
+          <div className="discover-search-bar">
+            <i className="fas fa-search search-bar-icon"></i>
+            <input 
+              type="text" 
+              placeholder="搜索节日、事件、商品、AI内容..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+            />
         </div>
       </div>
       
@@ -394,7 +394,7 @@ const DiscoverPage = () => {
             ))}
           </div>
         </div>
-        
+
         {/* 2. 休闲一刻模块 */}
         <div className="content-module-container leisure-moment-container">
           <div className="content-module-header">
@@ -407,7 +407,7 @@ const DiscoverPage = () => {
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'right')}>
                 <i className="fas fa-chevron-right"></i>
-              </button>
+            </button>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.casualGames}>
@@ -440,13 +440,13 @@ const DiscoverPage = () => {
             <div className="module-title">
               <i className="fas fa-shopping-bag"></i> 热门商品
             </div>
-            <div className="scroll-controls">
+              <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
+                  <i className="fas fa-chevron-left"></i>
+                </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.popularProducts, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
+                  <i className="fas fa-chevron-right"></i>
+                </button>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.popularProducts}>
@@ -520,13 +520,13 @@ const DiscoverPage = () => {
             <div className="module-title">
               <i className="fas fa-video"></i> 热门视频
             </div>
-            <div className="scroll-controls">
+              <div className="scroll-controls">
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'left')}>
-                <i className="fas fa-chevron-left"></i>
-              </button>
+                  <i className="fas fa-chevron-left"></i>
+                </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'right')}>
-                <i className="fas fa-chevron-right"></i>
-              </button>
+                  <i className="fas fa-chevron-right"></i>
+            </button>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.hotVideos}>
@@ -569,7 +569,7 @@ const DiscoverPage = () => {
                 <i className="fas fa-chevron-right"></i>
               </button>
             </div>
-          </div>
+                      </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.interactiveTopics}>
             {interactiveTopics.map(topic => (
               <div key={topic.id} className="topic-card">

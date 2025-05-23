@@ -346,7 +346,7 @@ const Daily = () => {
         aiResponse = "居家健身不需要复杂器材，高效的计划应包括：每周3-5次锻炼、结合有氧和力量训练、专注大肌群复合动作（如深蹲、俯卧撑）、合理休息和充分水分摄入。科学表明每周150分钟中等强度运动可显著改善健康。";
       } else {
         // 随机通用回复
-        const responses = [
+      const responses = [
           "这是个很好的问题！根据最新研究，" + currentMessage + "相关的领域有很多新发现。您想了解哪方面的具体内容？",
           "关于" + currentMessage + "，有几个关键点值得注意：首先，它与我们的日常习惯密切相关；其次，小的改变可以带来显著效果；最后，坚持是最重要的。您需要更详细的建议吗？",
           "我找到了一些关于" + currentMessage + "的实用信息。研究表明，70%的人通过调整日常习惯获得了明显改善。您想了解如何开始吗？",
@@ -500,7 +500,7 @@ const Daily = () => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
         
         {/* 滑动指示器 */}
         <div className="focus-scroll-indicator">
@@ -578,7 +578,7 @@ const Daily = () => {
         <div className="recommendations-scroll" ref={scrollRefs.recommendations}>
           {recommendations.slice(0, 6).map((product, index) => (
             <div key={product.id || index} className="product-recommendation-card">
-              <div className="product-image-container">
+          <div className="product-image-container">
                 <img 
                   src={product.imageUrl || `https://source.unsplash.com/featured/800x600/?product`}
                   data-category={`product-${product.name?.substring(0, 10) || "generic"}`}
@@ -637,7 +637,7 @@ const Daily = () => {
               >
                 {topic.icon && <i className={`fas fa-${topic.icon}`}></i>}
                 {topic.text}
-              </div>
+            </div>
             ))}
           </div>
         </div>
@@ -728,7 +728,7 @@ const Daily = () => {
 
   // 修改顶部区域组件函数以修复引用错误
   const renderHeader = () => {
-    return (
+  return (
       <div className="daily-header-compact">
         <div className="header-top-row">
           <div className="greeting-compact">
@@ -742,7 +742,7 @@ const Daily = () => {
             <div className="user-icon">
               <img 
                 src={userInfo?.avatar || DEFAULT_AVATAR} 
-                alt="用户头像" 
+                  alt="用户头像"
                 onError={handleAvatarError}
               />
             </div>
@@ -754,13 +754,9 @@ const Daily = () => {
             <div className="weather-compact">
               <i className={`fas fa-${weatherInfo.icon} weather-icon`}></i>
               <span>{weatherInfo.temperature}°C {weatherInfo.condition}</span>
-              <span className="weather-city">{weatherInfo.city}</span>
+              <span className="weather-city"> {weatherInfo.city}</span>
             </div>
           )}
-          <div className="ai-suggestion-compact" onClick={() => setShowAiChat(true)}>
-            <i className="fas fa-magic"></i>
-            <span>根据您最近的兴趣，我推荐您可以了解</span>
-          </div>
         </div>
       </div>
     );
@@ -801,8 +797,8 @@ const Daily = () => {
       {renderRecommendations()}
       {/* 其他内容... */}
       <NavBar />
-    </div>
-  );
+  </div>
+);
 };
 
 export default Daily;

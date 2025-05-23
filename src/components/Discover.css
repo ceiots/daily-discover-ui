@@ -488,19 +488,40 @@
 
 /* 发现页面核心样式 */
 :root {
-  --primary-color: #7c3aed;
-  --secondary-color: #a78bfa;
+  /* 颜色规范 - 加深紫色系 */
+  --primary-color: #7c3aed; /* 主色：明亮紫色 */
+  --primary-light: #8b5cf6; /* 辅助色：浅紫色 */
   --primary-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --text-light: #999999;
-  --bg-light: #f5f7ff;
-  --bg-white: #ffffff;
-  --shadow-sm: 0 2px 8px rgba(124, 58, 237, 0.08);
-  --shadow-md: 0 5px 15px rgba(124, 58, 237, 0.12);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --primary-dark: #6d28d9; /* 深紫色 */
+  --secondary-color: #a78bfa; /* 次要色：淡紫色 */
+  --accent-color: #c4b5fd; /* 强调色：极淡紫色 */
+  --bg-color: #f8f5ff; /* 背景色：淡紫色 */
+  --bg-card: #ffffff; /* 卡片背景：纯白 */
+  --text-primary: #1f2937; /* 文字主色：深灰 */
+  --text-secondary: #4b5563; /* 文字次要色：中灰 */
+  --text-tertiary: #9ca3af; /* 文字辅助色：浅灰 */
+  --border-color: #e9d5ff; /* 边框色：淡紫色 */
+  --white: #ffffff;
+  --shadow-sm: 0 1px 2px rgba(124, 58, 237, 0.05);
+  --shadow-md: 0 2px 4px rgba(124, 58, 237, 0.08);
+  
+  /* 字体规范 - 根据截图调整 */
+  --font-title: 0.68rem;     /* 从0.62rem增大，模块标题太小 */
+  --font-subtitle: 0.64rem;  /* 从0.58rem增大，副标题太小 */
+  --font-body: 0.58rem;      /* 从0.52rem增大，正文太小 */
+  --font-small: 0.52rem;     /* 从0.48rem增大，小字体太小 */
+  --font-mini: 0.48rem;      /* 从0.44rem增大，迷你字体太小 */
+  
+  /* 圆角规范 */
+  --radius-lg: 10px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  
+  /* 间距规范 - 统一一致 */
+  --spacing-card: 7px;      
+  --spacing-inner: 3px;     
+  --spacing-between-cards: 8px;
+  --spacing-section: 14px;  
 }
 
 .discover-tab-wrapper {
@@ -540,44 +561,69 @@
 .discover-search-header {
   position: sticky;
   top: 0;
-  padding: 15px 15px 10px;
-  background: #7c3aed; /* 纯紫色，不使用变量以确保颜色正确 */
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); /* 紫色渐变效果 */
-  z-index: 10;
+  padding: 12px 15px;
+  background: var(--primary-color);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  z-index: 100;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.25); /* 添加明显的阴影效果 */
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
 }
 
 .discover-search-bar {
   flex: 1;
-  background-color: rgba(255, 255, 255, 0.2); /* 更加明显的半透明白色 */
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  height: 36px; /* 固定高度以确保对齐 */
 }
 
 .search-bar-icon {
-  color: rgba(255, 255, 255, 0.9); /* 更加明显的白色图标 */
+  color: rgba(255, 255, 255, 0.9);
+  margin-right: 6px;
 }
 
 .discover-search-bar input {
-  background: transparent;
-  border: none;
-  color: white;
   flex: 1;
-  font-size: 0.9rem;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem; /* 从0.65rem增大 */
+  color: white;
+  padding: 0;
+  outline: none;
+  height: 100%;
 }
 
 .discover-search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.8); /* 更加明显的提示文字 */
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem; /* 增加占位符字体大小 */
+}
+
+/* 购物车和头像容器样式，确保对齐 */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px; /* 与搜索栏同高 */
+}
+
+.discover-profile-icon,
+.shopping-cart-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
 
 .discover-profile-icon {
-  width: 36px;
-  height: 36px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.5);
@@ -648,9 +694,9 @@
 }
 
 .discover-section-title {
-  font-size: 1.1rem;
+  font-size: 0.72rem; /* 从0.62rem增大 */
   font-weight: 700;
-  color: #7c3aed;
+  color: var(--primary-color);
   margin: 0 0 12px;
   display: flex;
   align-items: center;
@@ -658,7 +704,7 @@
 }
 
 .discover-section-title i {
-  color: #7c3aed;
+  color: var(--primary-color);
   font-size: 0.9em;
 }
 
@@ -853,7 +899,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.7rem;
+  font-size: 0.56rem; /* 从0.48rem增大 */
+  margin-bottom: 4px;
 }
 
 .topic-posts {
@@ -879,50 +926,50 @@
 .horizontal-scroll-container {
   display: flex;
   overflow-x: auto;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 10px; /* 减小间距 */
+  padding: 6px 0; /* 减小内边距 */
   -ms-overflow-style: none;
   scrollbar-width: none;
-  scroll-behavior: smooth; /* 平滑滚动 */
-  -webkit-overflow-scrolling: touch; /* 提升移动端滑动体验 */
-  padding-left: 12px; /* 左侧留出间距 */
-  padding-right: 12px; /* 右侧留出间距 */
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 10px; /* 减小左侧间距 */
+  padding-right: 10px; /* 减小右侧间距 */
 }
 
 .horizontal-scroll-container::-webkit-scrollbar {
-  display: none; /* 隐藏滚动条 */
+  display: none;
 }
 
 /* 内容卡片容器 - 每行显示2个 */
 .content-module-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 16px; /* 减小底部间距 */
 }
 
 .content-module-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
-  margin-bottom: 8px;
+  padding: 0 10px; /* 减小内边距 */
+  margin-bottom: 6px; /* 减小底部间距 */
 }
 
 .module-title {
-  font-size: var(--font-title);
+  font-size: 0.72rem; /* 从0.62rem增大 */
   font-weight: 700;
-  color: #7c3aed;
+  color: var(--primary-color);
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .module-title i {
-  color: #7c3aed;
+  color: var(--primary-color);
 }
 
 .view-all {
-  font-size: var(--font-small);
+  font-size: 0.48rem; /* 从var(--font-small)减小 */
   color: var(--primary-color);
   display: flex;
   align-items: center;
@@ -931,41 +978,41 @@
 
 /* 卡片样式 - 固定宽度以显示2个 */
 .module-card {
-  flex: 0 0 calc(50% - 12px);
-  min-width: calc(50% - 12px);
-  max-width: calc(50% - 12px);
+  flex: 0 0 calc(50% - 10px); /* 调整宽度和间距 */
+  min-width: calc(50% - 10px);
+  max-width: calc(50% - 10px);
   background: var(--bg-card);
   border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.1);
   border: 1px solid rgba(124, 58, 237, 0.1);
-  min-height: 150px; /* 增加最小高度 */
+  min-height: 140px; /* 减小最小高度 */
 }
 
 /* 滚动控制按钮样式 */
 .scroll-controls {
   display: flex;
-  gap: 8px;
+  gap: 6px; /* 减小间距 */
 }
 
 .scroll-control-btn {
-  width: 26px;
-  height: 26px;
+  width: 24px; /* 减小尺寸 */
+  height: 24px; /* 减小尺寸 */
   border-radius: 50%;
   background: white;
-  border: 1px solid #7c3aed;
-  color: #7c3aed;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.65rem; /* 减小字体 */
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(124, 58, 237, 0.15);
 }
 
 .scroll-control-btn:active {
-  background: #7c3aed;
+  background: var(--primary-color);
   color: white;
 }
 
@@ -1029,43 +1076,15 @@
 
 /* 发现页面 - 主题样式 */
 :root {
-  /* 颜色规范 - 加深紫色系 */
-  --primary-color: #7c3aed; /* 主色：明亮紫色 */
-  --primary-light: #8b5cf6; /* 辅助色：浅紫色 */
-  --primary-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
-  --primary-dark: #6d28d9; /* 深紫色 */
-  --secondary-color: #a78bfa; /* 次要色：淡紫色 */
-  --accent-color: #c4b5fd; /* 强调色：极淡紫色 */
-  --bg-color: #f9fafb; /* 背景色：纯净白 */
-  --bg-card: #ffffff; /* 卡片背景：纯白 */
-  --text-primary: #1f2937; /* 文字主色：深灰 */
-  --text-secondary: #4b5563; /* 文字次要色：中灰 */
-  --text-tertiary: #9ca3af; /* 文字辅助色：浅灰 */
-  --border-color: #f3f4f6; /* 边框色：浅灰 */
-  --white: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.05);
-  
-  /* 字体规范 - 精致小巧 */
-  --font-title: 0.75rem;
-  --font-subtitle: 0.7rem;
-  --font-body: 0.6rem;
-  --font-small: 0.55rem;
-  --font-mini: 0.5rem;
-  
-  /* 圆角规范 */
-  --radius-lg: 10px;
-  --radius-md: 8px;
-  --radius-sm: 4px;
-  
-  /* 间距规范 - 统一一致 */
-  --spacing-card: 8px;
-  --spacing-inner: 4px;
-  --spacing-between-cards: 10px;
-  --spacing-section: 16px;
+  /* 字体规范 - 根据截图调整 */
+  --font-title: 0.68rem;     /* 从0.62rem增大，模块标题太小 */
+  --font-subtitle: 0.64rem;  /* 从0.58rem增大，副标题太小 */
+  --font-body: 0.58rem;      /* 从0.52rem增大，正文太小 */
+  --font-small: 0.52rem;     /* 从0.48rem增大，小字体太小 */
+  --font-mini: 0.48rem;      /* 从0.44rem增大，迷你字体太小 */
 }
 
-/* 主容器样式 */
+/* 主容器样式 - 更加突出紫色背景 */
 .discover-tab-wrapper {
   display: flex;
   flex-direction: column;
@@ -1078,43 +1097,82 @@
   letter-spacing: 0.01em;
 }
 
-/* 顶部搜索栏 - 明亮紫色 */
+/* 顶部搜索栏 - 更明亮的紫色，确保购物车与头像对齐 */
 .discover-search-header {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 12px;
+  padding: 12px 15px;
   background: var(--primary-color);
-  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.1);
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .discover-search-bar {
-  position: relative;
+  flex: 1;
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.18);
   border-radius: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 6px 10px;
+  height: 36px; /* 固定高度以确保对齐 */
 }
 
 .search-bar-icon {
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
   margin-right: 6px;
-  opacity: 0.8;
 }
 
 .discover-search-bar input {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: var(--font-body);
+  font-size: 0.75rem; /* 从0.65rem增大 */
   color: white;
   padding: 0;
   outline: none;
+  height: 100%;
 }
 
 .discover-search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem; /* 增加占位符字体大小 */
+}
+
+/* 购物车和头像容器样式，确保对齐 */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px; /* 与搜索栏同高 */
+}
+
+.discover-profile-icon,
+.shopping-cart-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.discover-profile-icon {
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.discover-profile-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* 内容区域样式 */
@@ -1130,10 +1188,10 @@
 }
 
 .discover-section-title {
-  font-size: var(--font-title);
+  font-size: 0.62rem; /* 从var(--font-title)减小 */
   font-weight: 600;
   margin: 0 0 var(--spacing-inner);
-  color: var(--text-primary);
+  color: var(--primary-color); /* 强调紫色主题 */
   display: flex;
   align-items: center;
   gap: 4px;
@@ -1143,7 +1201,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px; /* 减小间距 */
   width: 100%;
 }
 
@@ -1190,12 +1248,12 @@
 
 .content-card-info {
   padding: var(--spacing-card);
-  min-height: 70px; /* 增加最小高度 */
+  min-height: 65px; /* 减小最小高度 */
 }
 
 .content-card-category {
   display: inline-block;
-  font-size: var(--font-mini);
+  font-size: 0.44rem; /* 从var(--font-mini)减小 */
   color: var(--primary-color);
   background-color: rgba(124, 58, 237, 0.08);
   padding: 1px 4px;
@@ -1205,27 +1263,27 @@
 }
 
 .content-card-title {
-  font-size: var(--font-subtitle);
+  font-size: 0.68rem; /* 从0.58rem增大 */
   font-weight: 600;
   margin: 2px 0;
   color: var(--text-primary);
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* 从2行增加到3行 */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4; /* 增加行高 */
-  min-height: 2.8em; /* 确保至少能显示2行文字 */
+  line-height: 1.4;
+  min-height: 2.7em;
 }
 
 .content-card-summary {
-  font-size: var(--font-body);
+  font-size: 0.6rem; /* 从0.52rem增大 */
   color: var(--text-secondary);
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* 从2行增加到3行 */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.4; /* 增加行高 */
+  line-height: 1.4;
 }
 
 /* 游戏卡片样式 - 简洁大气 */
@@ -1290,12 +1348,12 @@
 .play-game-btn {
   margin-top: auto;
   width: 100%;
-  padding: 4px 0;
+  padding: 6px 0; /* 增加按钮内边距 */
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--font-small);
+  font-size: 0.6rem; /* 从0.48rem增大 */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1477,12 +1535,12 @@
 
 .join-challenge-btn {
   width: 100%;
-  padding: 4px 0;
+  padding: 6px 0; /* 增加按钮内边距 */
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--font-small);
+  font-size: 0.6rem; /* 从0.48rem增大 */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1526,7 +1584,7 @@
   right: 4px;
   background-color: rgba(0, 0, 0, 0.6);
   color: white;
-  font-size: var(--font-mini);
+  font-size: 0.44rem; /* 从var(--font-mini)减小 */
   padding: 1px 4px;
   border-radius: var(--radius-sm);
 }
@@ -1551,19 +1609,19 @@
 }
 
 .video-card-title {
-  font-size: var(--font-subtitle);
+  font-size: 0.58rem; /* 从var(--font-subtitle)减小 */
   font-weight: 500;
   margin: 0 0 2px;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* 从2行增加到3行 */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.3;
-  min-height: 2.6em; /* 确保高度足够 */
+  min-height: 2.6em;
 }
 
 .video-card-creator {
-  font-size: var(--font-small);
+  font-size: 0.48rem; /* 从var(--font-small)减小 */
   color: var(--text-secondary);
   margin-bottom: 2px;
   white-space: nowrap;
@@ -1572,7 +1630,7 @@
 }
 
 .video-card-views {
-  font-size: var(--font-mini);
+  font-size: 0.44rem; /* 从var(--font-mini)减小 */
   color: var(--text-tertiary);
   display: flex;
   align-items: center;
@@ -1582,9 +1640,9 @@
 /* 话题卡片样式 - 简洁大气 */
 .topic-card {
   width: 100%;
-  padding: 10px;
+  padding: 8px; /* 减小内边距 */
   height: auto;
-  min-height: 130px; /* 设定最小高度 */
+  min-height: 120px; /* 减小最小高度 */
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-md);
@@ -1603,23 +1661,23 @@
 }
 
 .topic-title {
-  font-size: var(--font-subtitle);
+  font-size: 0.68rem; /* 从0.58rem增大 */
   font-weight: 600;
   margin: 0 0 4px;
   color: var(--text-primary);
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* 从2行增加到3行 */
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.3;
-  min-height: 2.6em; /* 确保高度足够 */
+  min-height: 2.6em;
 }
 
 .topic-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: var(--font-small);
+  font-size: 0.56rem; /* 从0.48rem增大 */
   margin-bottom: 4px;
 }
 
@@ -1637,7 +1695,7 @@
 
 .topic-category {
   display: inline-block;
-  font-size: var(--font-mini);
+  font-size: 0.44rem; /* 从var(--font-mini)减小 */
   color: var(--primary-color);
   background-color: rgba(124, 58, 237, 0.08);
   padding: 1px 4px;
@@ -1646,14 +1704,14 @@
 }
 
 .join-topic-btn {
-  margin-top: auto; /* 将按钮推到底部 */
+  margin-top: auto;
   width: 100%;
-  padding: 4px 0;
+  padding: 6px 0; /* 增加按钮内边距 */
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--font-small);
+  font-size: 0.6rem; /* 从0.48rem增大 */
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1674,100 +1732,17 @@
 
 @media (max-width: 320px) {
   :root {
-    --font-title: 0.7rem;
-    --font-subtitle: 0.65rem;
-    --font-body: 0.55rem;
-    --font-small: 0.5rem;
-    --font-mini: 0.45rem;
+    --font-title: 0.64rem;
+    --font-subtitle: 0.6rem;
+    --font-body: 0.56rem;
+    --font-small: 0.52rem;
+    --font-mini: 0.48rem;
   }
 }
 
-/* 发现页面 - 主题样式 */
-:root {
-  /* 颜色规范 - 加深紫色系 */
-  --primary-color: #7c3aed; /* 主色：明亮紫色 */
-  --primary-light: #8b5cf6; /* 辅助色：浅紫色 */
-  --primary-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
-  --primary-dark: #6d28d9; /* 深紫色 */
-  --secondary-color: #a78bfa; /* 次要色：淡紫色 */
-  --accent-color: #c4b5fd; /* 强调色：极淡紫色 */
-  --bg-color: #f9fafb; /* 背景色：纯净白 */
-  --bg-card: #ffffff; /* 卡片背景：纯白 */
-  --text-primary: #1f2937; /* 文字主色：深灰 */
-  --text-secondary: #4b5563; /* 文字次要色：中灰 */
-  --text-tertiary: #9ca3af; /* 文字辅助色：浅灰 */
-  --border-color: #f3f4f6; /* 边框色：浅灰 */
-  --white: #ffffff;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* 顶部搜索栏 - 设置为更突出的紫色 */
-.discover-search-header {
-  position: sticky;
-  top: 0;
-  padding: 15px 15px 10px;
-  background: #7c3aed; /* 纯紫色，不使用变量以确保颜色正确 */
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); /* 紫色渐变效果 */
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.25); /* 添加明显的阴影效果 */
-}
-
-/* 更改搜索栏背景色，使其在紫色背景上更加明显 */
-.discover-search-bar {
-  background-color: rgba(255, 255, 255, 0.2); /* 更加明显的半透明白色 */
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 8px 12px;
-}
-
-.search-bar-icon {
-  color: rgba(255, 255, 255, 0.9); /* 更加明显的白色图标 */
-}
-
-.discover-search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.8); /* 更加明显的提示文字 */
-}
-
-/* 模块标题使用紫色，强化主题 */
-.module-title {
-  color: #7c3aed; /* 使用紫色标题 */
-  font-weight: 700; /* 加粗字体 */
-}
-
-.module-title i {
-  color: #7c3aed; /* 图标也使用同样的紫色 */
-}
-
-/* 按钮也使用紫色主题 */
-.play-game-btn,
-.join-challenge-btn,
-.join-topic-btn {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-small);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(124, 58, 237, 0.25);
-}
-
-.play-game-btn:active,
-.join-challenge-btn:active,
-.join-topic-btn:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.15);
-}
-
-/* 调整互动话题与底部的距离 */
+/* 优化最后一个板块底部间距 */
 .interactive-topics-container {
-  margin-bottom: 60px; /* 从80px减小到60px */
+  margin-bottom: 50px; /* 调整底部间距，避免与导航栏重叠 */
 }
 
 /* 修复最后一个板块留白问题 */
@@ -1829,4 +1804,42 @@ nav {
   z-index: 100;
 }
 
+/* 游戏匹配度文字 - 增大 */
+.match-percentage {
+  font-size: 0.68rem; /* 增大游戏匹配度字体 */
+  font-weight: 600;
+  color: var(--text-primary);
+}
 
+/* 游戏推荐描述 - 增大 */
+.match-description {
+  font-size: 0.64rem; /* 增大游戏推荐描述字体 */
+  line-height: 1.3;
+  color: var(--text-primary);
+}
+
+
+.ai-topic-insight{
+  font-size: 0.68rem; 
+  margin-bottom: 10px;
+}
+
+.ai-video-summary{
+  font-size: 0.68rem; 
+  margin-top: 5px;
+}
+
+.ai-product-insight{
+  font-size: 0.68rem; 
+  margin-bottom: 3px;
+  margin-top: 1px;
+}
+
+.ai-recommend-badge{
+  font-size: 0.68rem; 
+  margin-top: 3px;
+}
+
+.ai-insight-text{
+  line-height: 1.3;
+}
