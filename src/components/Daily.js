@@ -106,7 +106,8 @@ const Daily = () => {
         id: 1,
         title: "冥想的治愈力量",
         content: "探索冥想如何帮助你减轻压力，提高专注力，改善睡眠质量。每天只需10分钟，就能感受内心的平静。",
-        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+        category: "meditation",
         relevance: "今日精选",
         aiInsight: "研究表明，每天10分钟冥想可降低40%压力，提升25%专注力，有助于促进深度睡眠。"
       },
@@ -114,7 +115,8 @@ const Daily = () => {
         id: 2,
         title: "健康饮食新趋势",
         content: "了解2023年最新的健康饮食趋势，从植物性饮食到间歇性断食，找到适合你的健康生活方式。",
-        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+        category: "healthy-food",
         relevance: "今日热门",
         aiInsight: "植物性饮食可减少30%慢性疾病风险，增强免疫系统功能，有助于维持健康体重。"
       },
@@ -122,7 +124,8 @@ const Daily = () => {
         id: 3,
         title: "数字极简主义",
         content: "在信息过载的时代，学习如何减少数字干扰，提高专注力和生产力，重新掌控你的时间和注意力。",
-        image: "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        image: "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+        category: "digital-minimalism",
         relevance: "今日最佳",
         aiInsight: "数字极简主义帮助用户每天节省1.5小时，减少42%分心次数，提升工作效率达35%。"
       }
@@ -409,19 +412,38 @@ const Daily = () => {
     }
   };
   
-  // 处理图片加载错误，使用unsplash备选图片
+  // 优化图片加载错误处理函数
   const handleImageError = (event) => {
     const target = event.target;
-    // 随机unsplash图片
-    const fallbackUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(target.alt || 'nature')}`;
+    const category = target.dataset.category || target.alt || 'nature';
+    // 使用unsplash作为图片备选源
+    const fallbackUrl = `https://source.unsplash.com/featured/800x600/?${encodeURIComponent(category)}`;
     
-    // 设置数据属性而非直接修改src，以避免循环触发error事件
-    target.classList.add('error-image');
-    target.parentElement.style.backgroundImage = `url(${fallbackUrl})`;
-    target.parentElement.style.backgroundSize = 'cover';
+    // 添加错误标记类
+    target.classList.add('image-error');
+    
+    // 设置新的图片源并防止循环触发error事件
+    target.onerror = null;  
+    target.src = fallbackUrl;
+    
+    console.log(`图片加载失败，替换为: ${fallbackUrl}`);
   };
   
-  // 修改今日焦点渲染函数，添加左右滑动和AI总结
+  // 添加头像图片加载错误处理
+  const handleAvatarError = (event) => {
+    const target = event.target;
+    target.classList.add('load-error');
+    target.style.display = 'none';
+    
+    // 将父容器样式修改为显示默认用户图标
+    const userIcon = target.closest('.user-icon');
+    if (userIcon) {
+      userIcon.classList.add('avatar-fallback');
+      userIcon.innerHTML = '<i class="fas fa-user"></i>';
+    }
+  };
+
+  // 修改今日焦点渲染函数，实现单卡片左右滑动
   const renderTodayFocus = () => {
     return (
       <div className="today-focus-section">
@@ -442,12 +464,13 @@ const Daily = () => {
           ref={focusScrollRef}
           onScroll={handleFocusScroll}
         >
-          {todayFocus.map(item => (
+          {todayFocus.map((item, index) => (
             <div key={item.id} className="focus-card">
               <div className="focus-card-image-container">
                 <img 
                   src={item.image} 
-                  alt={item.title} 
+                  alt={item.title}
+                  data-category={item.category || "nature"}
                   className="focus-card-image"
                   onError={handleImageError}
                 />
@@ -556,8 +579,9 @@ const Daily = () => {
             <div key={product.id || index} className="product-recommendation-card">
               <div className="product-image-container">
                 <img 
-                  src={product.image || `https://source.unsplash.com/random/800x600/?product${index}`} 
-                  alt={product.name || product.title} 
+                  src={product.image || `https://source.unsplash.com/featured/800x600/?product`}
+                  data-category={`product-${product.name?.substring(0, 10) || "generic"}`}
+                  alt={product.name || product.title || `产品${index+1}`} 
                   className="product-image" 
                   onError={handleImageError}
                 />
@@ -713,7 +737,11 @@ const Daily = () => {
               <i className="fas fa-shopping-cart"></i>
             </div>
             <div className="user-icon">
-              <img src={userInfo?.avatar || DEFAULT_AVATAR} alt="用户头像" />
+              <img 
+                src={userInfo?.avatar || DEFAULT_AVATAR} 
+                alt="用户头像" 
+                onError={handleAvatarError}
+              />
             </div>
           </div>
         </div>
@@ -770,46 +798,6 @@ const Daily = () => {
       {renderRecommendations()}
       {/* 其他内容... */}
       <NavBar />
-      {showAiChat && (
-        <div className="ai-chat-overlay">
-          <div className="ai-chat-container">
-            <div className="ai-chat-header">
-              <h3>AI助手</h3>
-              <button className="close-chat-btn" onClick={() => setShowAiChat(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            <div className="ai-chat-messages">
-              {aiChatHistory.map((msg, index) => (
-                <div key={index} className={`chat-message ${msg.type}`}>
-                  <div className="message-content">{msg.message}</div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="chat-message ai">
-                  <div className="typing-indicator">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="ai-chat-input">
-              <input
-                type="text"
-                value={userMessage}
-                onChange={(e) => setUserMessage(e.target.value)}
-                placeholder="输入您的问题..."
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <button onClick={handleSendMessage} disabled={!userMessage.trim()}>
-                <i className="fas fa-paper-plane"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
