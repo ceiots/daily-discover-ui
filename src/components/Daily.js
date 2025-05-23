@@ -347,7 +347,7 @@ const Discover = () => {
           </div>
         </div>
 
-        {/* {productSummary && (
+       {/*  {productSummary && (
           <div className="ai-product-summary">
             <div className="ai-product-summary-header">
               <i className="fas fa-robot"></i>

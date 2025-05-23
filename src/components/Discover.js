@@ -265,7 +265,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                       <div className="product-meta">
                         <span className="price">{product.price}</span>
                         <span className="rating"><i className="fas fa-star"></i> {product.rating}</span>
-                      </div>
+            </div>
                       {product.tag && <span className="product-tag">{product.tag}</span>}
                       </div>
                     </div>
