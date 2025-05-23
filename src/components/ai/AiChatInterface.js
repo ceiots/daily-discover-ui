@@ -10,10 +10,10 @@ const AiChatInterface = ({ onLoadingChange, onRequestArticle, placeholder }) => 
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [promptSuggestions, setPromptSuggestions] = useState([
-    '推荐高效办公AI工具',
-    '如何利用AI提升效率？',
-    '帮我写篇关于AI的文章',
-    '最新AI技术趋势'
+    '推荐一些高效办公的AI工具',
+    '如何利用AI提升工作效率？',
+    '帮我写篇关于人工智能的文章',
+    '最新的AI技术趋势有哪些？'
   ]);
   const [selectedSuggestion, setSelectedSuggestion] = useState(null);
   const messagesEndRef = useRef(null);
@@ -220,7 +220,7 @@ const AiChatInterface = ({ onLoadingChange, onRequestArticle, placeholder }) => 
         </div>
         
         {/* 提示建议 */}
-        {messages.length === 0 && (
+        {/* {messages.length === 0 && (
           <div className="prompt-suggestions">
             {promptSuggestions.map((suggestion, index) => (
               <div 
@@ -232,7 +232,7 @@ const AiChatInterface = ({ onLoadingChange, onRequestArticle, placeholder }) => 
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </form>
     </div>
   );

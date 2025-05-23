@@ -321,18 +321,6 @@ const Discover = () => {
         </div>
       </div>
 
-      <div className="daily-category-filter">
-        {categories.map(category => (
-          <button 
-            key={category}
-            className={`category-button ${activeCategory === category ? 'active' : ''}`}
-            onClick={() => handleCategorySelect(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
-
       <div className="daily-scrollable-content" ref={scrollRef}>
         <div className="horizontal-scroll-section">
           <div className="horizontal-scroll-header">
@@ -359,7 +347,7 @@ const Discover = () => {
           </div>
         </div>
 
-        {productSummary && (
+        {/* {productSummary && (
           <div className="ai-product-summary">
             <div className="ai-product-summary-header">
               <i className="fas fa-robot"></i>
@@ -367,7 +355,7 @@ const Discover = () => {
             </div>
             <p>{productSummary.content}</p>
           </div>
-        )}
+        )} */}
 
         {aiSuggestion && (
           <div className="daily-card ai-suggestion-card" onClick={handleAiChatToggle}>
@@ -383,7 +371,7 @@ const Discover = () => {
           </div>
         )}
 
-        {dailyQuote && (
+        {/* {dailyQuote && (
           <div className="daily-card daily-quote-card">
             <i className="fas fa-quote-left quote-symbol-start"></i>
             <p className="quote-text">{`"${dailyQuote.text}"`}</p>
@@ -395,7 +383,7 @@ const Discover = () => {
               <button className="action-btn"><i className="fas fa-bookmark"></i></button>
             </div>
           </div>
-        )}
+        )} */}
 
         {dailyTips.length > 0 && (
           <div className="horizontal-scroll-section">
