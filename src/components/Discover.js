@@ -145,7 +145,7 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
       </div>
     );
   }
-
+  
   return (
     <div className={`discover-tab-wrapper ${isDarkMode ? 'dark' : ''}`}>
       {scrollProgress > 0 && <div className="scroll-progress-bar" style={{ width: `${scrollProgress}%` }}></div>}
@@ -243,8 +243,8 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                       <span className="trending-item-category">{item.category}</span>
                       <h4>{item.title}</h4>
                       <span className="trending-item-views"><i className="fas fa-fire"></i> {item.views} 热度</span>
-                    </div>
-                  </div>
+          </div>
+            </div>
                 </Link>
               ))}
             </div>
@@ -267,11 +267,11 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                         <span className="rating"><i className="fas fa-star"></i> {product.rating}</span>
                       </div>
                       {product.tag && <span className="product-tag">{product.tag}</span>}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
           </section>
         )}
 
@@ -292,9 +292,9 @@ const DailyAiApp = () => { // This component now represents the "Discover" Tab
                   </div>
                 </Link>
           ))}
-        </div>
+                </div>
           </section>
-        )}
+          )}
         
         {showBackToTop && (
           <div className="discover-back-to-top visible" onClick={scrollToTop}>

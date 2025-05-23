@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
-import AiChatInterface from './ai/AiChatInterface';
 // import DailyFocus from "./DailyFocus"; // Assuming DailyFocus will be part of the new structure or replaced
 
 // Helper function to get Lunar Date (simplified)
@@ -322,6 +321,17 @@ const Discover = () => {
         </div>
       </div>
 
+      <div className="daily-category-filter">
+        {categories.map(category => (
+          <button 
+            key={category}
+            className={`category-button ${activeCategory === category ? 'active' : ''}`}
+            onClick={() => handleCategorySelect(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
 
       <div className="daily-scrollable-content" ref={scrollRef}>
         <div className="horizontal-scroll-section">
@@ -349,7 +359,7 @@ const Discover = () => {
           </div>
         </div>
 
-        {/* {productSummary && (
+        {productSummary && (
           <div className="ai-product-summary">
             <div className="ai-product-summary-header">
               <i className="fas fa-robot"></i>
@@ -357,10 +367,35 @@ const Discover = () => {
             </div>
             <p>{productSummary.content}</p>
           </div>
-        )} */}
-        
-        {/* 引入AiChatInterface */}
-        <AiChatInterface />
+        )}
+
+        {aiSuggestion && (
+          <div className="daily-card ai-suggestion-card" onClick={handleAiChatToggle}>
+            <div className="ai-suggestion-header">
+              <i className={`fas fa-${aiSuggestion.icon}`}></i>
+              <h3>{aiSuggestion.title}</h3>
+            </div>
+            <p>{aiSuggestion.content}</p>
+            <div className="ai-chat-prompt">
+              <span>点击开始对话</span>
+              <i className="fas fa-comment-dots"></i>
+            </div>
+          </div>
+        )}
+
+        {dailyQuote && (
+          <div className="daily-card daily-quote-card">
+            <i className="fas fa-quote-left quote-symbol-start"></i>
+            <p className="quote-text">{`"${dailyQuote.text}"`}</p>
+            <p className="quote-author">- {dailyQuote.author}</p>
+            <i className="fas fa-quote-right quote-symbol-end"></i>
+            <div className="card-actions">
+              <button className="action-btn"><i className="fas fa-share-alt"></i></button>
+              <button className="action-btn"><i className="fas fa-heart"></i></button>
+              <button className="action-btn"><i className="fas fa-bookmark"></i></button>
+            </div>
+          </div>
+        )}
 
         {dailyTips.length > 0 && (
           <div className="horizontal-scroll-section">
