@@ -1,35 +1,39 @@
+/* 更新整体配色为更突出的紫色，并适当增大字体 */
 :root {
-  --primary-color: #7c3aed;
-  --primary-light: #a78bfa;
-  --primary-dark: #6d28d9;
-  --primary-gradient: linear-gradient(135deg, #7c3aed, #8b5cf6);
-  --secondary-gradient: linear-gradient(135deg, #6d28d9, #9333ea);
+  /* 更突出的紫色配色方案 */
+  --primary-color: #8b5cf6; /* 明亮紫色 */
+  --primary-light: #a78bfa; /* 浅紫色 */
+  --primary-dark: #7c3aed; /* 深紫色 */
+  --primary-gradient: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  --secondary-gradient: linear-gradient(135deg, #7c3aed, #6d28d9);
+  --accent-color: #c4b5fd; /* 淡紫色强调 */
+  
+  /* 文本颜色 */
   --text-primary: #1f2937;
   --text-secondary: #4b5563;
   --text-light: #9ca3af;
+  
+  /* 背景颜色 */
   --bg-light: #f8fafc;
   --bg-white: #ffffff;
-  --shadow-sm: 0 2px 6px rgba(124, 58, 237, 0.06);
-  --shadow-md: 0 3px 10px rgba(124, 58, 237, 0.1);
-  --shadow-lg: 0 8px 20px rgba(124, 58, 237, 0.15);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --ai-tag-bg: rgba(124, 58, 237, 0.9);
-  --ai-tag-light-bg: rgba(124, 58, 237, 0.08);
-  --ai-tag-border: rgba(124, 58, 237, 0.2);
-  --ai-tag-text: white;
-  --ai-tag-light-text: var(--primary-color);
+  --bg-purple-light: #f5f3ff; /* 淡紫色背景 */
   
-  /* 更新字体尺寸，使其更小更精致 */
-  --font-xl: 1rem; /* 16px */
-  --font-lg: 0.875rem; /* 14px */
-  --font-md: 0.75rem; /* 12px */
-  --font-sm: 0.688rem; /* 11px */
-  --font-xs: 0.625rem; /* 10px */
+  /* 阴影 - 紫色调 */
+  --shadow-sm: 0 2px 6px rgba(139, 92, 246, 0.08);
+  --shadow-md: 0 3px 10px rgba(139, 92, 246, 0.12);
+  --shadow-lg: 0 8px 20px rgba(139, 92, 246, 0.18);
   
-  /* 字体系列 */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* AI标签颜色 */
+  --ai-tag-bg: rgba(139, 92, 246, 0.9);
+  --ai-tag-light-bg: rgba(139, 92, 246, 0.08);
+  --ai-tag-border: rgba(139, 92, 246, 0.2);
+  
+  /* 字体尺寸 - 适当增大 */
+  --font-xl: 0.95rem;   /* 15px */
+  --font-lg: 0.85rem;   /* 13.6px */
+  --font-md: 0.75rem;   /* 12px */
+  --font-sm: 0.7rem;    /* 11.2px */
+  --font-xs: 0.65rem;   /* 10.4px */
   
   /* 字体粗细 */
   --font-regular: 400;
@@ -40,52 +44,46 @@
   /* 行高 */
   --line-height-tight: 1.25;
   --line-height-normal: 1.4;
-  --line-height-relaxed: 1.6;
+  --line-height-relaxed: 1.5;
+  
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 16px;
 }
 
-/* 更新整体字体样式 */
-body {
-  font-family: var(--font-family);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: var(--font-md);
-  letter-spacing: 0.01em;
-}
-
-/* Discover.css - Styles for the "Daily" Tab */
+/* 主页面容器 - 添加淡紫色背景 */
 .daily-page-container {
-  padding: 0;
-  max-width: 100%;
-  margin: 0 auto;
-  background-color: var(--bg-light);
+  background-color: var(--bg-purple-light);
   min-height: 100vh;
   position: relative;
   padding-bottom: 60px;
 }
 
-/* 优化顶部区域设计 - 减少紫色占比 */
+/* 顶部区域设计 - 更突出的紫色渐变 */
 .daily-header-compact {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  background: var(--primary-gradient);
   color: white;
-  padding: 10px 12px 15px;
-  border-radius: 0 0 16px 16px;
-  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.15);
-  margin-bottom: 12px;
+  padding: 14px 16px 16px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  margin-bottom: 16px;
 }
 
-/* 优化顶部元素排版 */
+/* 顶部元素排版 */
 .header-top-row {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* 改为中心对齐，使购物车和头像在同一线上 */
-  margin-bottom: 6px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 /* 优化头像和购物车图标 */
 .header-icons {
   display: flex;
   align-items: center;
-  gap: 10px; /* 设置间距 */
+  gap: 10px;
 }
 
 .cart-icon, .user-icon {
@@ -96,6 +94,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .greeting-compact {
@@ -104,9 +105,10 @@ body {
 
 .greeting-compact h2 {
   font-size: var(--font-lg);
-  margin: 0 0 2px 0;
+  margin: 0 0 3px 0;
   font-weight: var(--font-semibold);
   letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .date-compact {
@@ -120,7 +122,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 
 .weather-compact {
@@ -178,28 +180,29 @@ body {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* AI助手建议区域 - 修改为与其他模块一致的样式 */
+/* AI助手建议区域 - 改为白色背景 */
 .ai-suggestion-card {
   background: white;
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: var(--radius-lg);
+  padding: 14px;
   margin: 8px 12px 16px;
   color: var(--text-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(124, 58, 237, 0.1);
 }
 
 .ai-suggestion-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 8px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .ai-suggestion-header i {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   background: rgba(124, 58, 237, 0.1);
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -208,67 +211,77 @@ body {
 }
 
 .ai-suggestion-header h3 {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
   margin: 0;
   color: var(--text-primary);
 }
 
 .ai-suggestion-content {
-  font-size: 0.7rem;
-  line-height: 1.4;
-  margin: 0 0 10px;
+  font-size: var(--font-sm);
+  line-height: var(--line-height-normal);
+  margin: 0 0 12px;
   color: var(--text-secondary);
 }
 
 /* AI聊天按钮样式优化 */
 .ai-chat-button {
-  background-color: var(--primary-color);
+  background: var(--primary-gradient);
   color: white;
   border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 6px 12px;
   font-size: var(--font-xs);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   cursor: pointer;
   width: fit-content;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 5px rgba(124, 58, 237, 0.2);
+  transition: all 0.2s ease;
 }
 
-/* 整合热门话题到AI助手卡片中 - 修改颜色 */
+.ai-chat-button:active {
+  transform: scale(0.98);
+}
+
+/* 热门话题样式优化 */
 .ai-topics-wrapper {
   position: relative;
-  margin-top: 10px;
+  margin-top: 12px;
   overflow: hidden;
 }
 
-.ai-topics-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 24px;
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05));
-  pointer-events: none;
-  z-index: 1;
-}
-
 .ai-topics-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-size: var(--font-xs);
+  font-weight: var(--font-medium);
+  margin-bottom: 8px;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
 }
 
 .ai-topics-label i {
-  font-size: 0.6rem;
+  font-size: var(--font-xs);
   margin-right: 4px;
   color: #f59e0b;
+}
+
+.ai-topics-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  padding: 4px 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.ai-topics-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 /* 话题气泡样式优化 */
@@ -276,25 +289,25 @@ body {
   display: flex;
   align-items: center;
   padding: 6px 10px;
-  background: #f3f4f6;
+  background: #f5f3ff;
   border-radius: 16px;
   font-size: var(--font-xs);
   font-weight: var(--font-medium);
   white-space: nowrap;
   gap: 5px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #e9d5ff;
   transition: all 0.2s ease;
   cursor: pointer;
-  color: var(--text-primary);
+  color: var(--primary-color);
 }
 
 .ai-topic-bubble:hover {
-  background: #e5e7eb;
+  background: #ede9fe;
   transform: translateY(-2px);
 }
 
 .ai-topic-bubble i {
-  font-size: 0.65rem;
+  font-size: var(--font-xs);
   color: var(--primary-color);
 }
 
@@ -308,17 +321,73 @@ body {
 .today-focus-section {
   margin: 0 12px 16px;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
+  border: 1px solid rgba(124, 58, 237, 0.1);
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0;
+}
+
+.section-header h3 {
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-header h3 i {
+  font-size: var(--font-md);
+  color: var(--primary-color);
+}
+
+/* 滚动控制按钮样式 */
+.scroll-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.scroll-control-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.1);
+  transition: all 0.2s ease;
+}
+
+.scroll-control-btn:hover {
+  background: var(--primary-light);
+  color: white;
+}
+
+.scroll-control-btn:active {
+  transform: scale(0.95);
+}
+
+/* 焦点滚动容器 */
 .focus-scroll {
   overflow-x: auto;
   display: flex;
-  gap: 12px;
-  padding: 4px 0 8px;
+  gap: 15px;
+  padding: 4px 0 10px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
@@ -329,20 +398,27 @@ body {
   display: none;
 }
 
+/* 焦点卡片样式 */
 .focus-card {
   flex: 0 0 90%;
   min-width: 90%;
   scroll-snap-align: center;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   background: #f9fafb;
   border: 1px solid #f3f4f6;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.focus-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .focus-card-image-container {
   position: relative;
-  height: 140px;
+  height: 160px;
   overflow: hidden;
   background-color: #f3f4f6;
 }
@@ -351,49 +427,57 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.focus-card:hover .focus-card-image {
+  transform: scale(1.05);
 }
 
 .focus-card-content {
-  padding: 12px;
+  padding: 14px;
 }
 
 .focus-card-title {
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   color: var(--text-primary);
 }
 
 .focus-card-description {
   font-size: var(--font-sm);
   color: var(--text-secondary);
-  margin: 0 0 8px;
-  line-height: 1.4;
+  margin: 0 0 10px;
+  line-height: var(--line-height-normal);
 }
 
 .today-relevance {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0, 0, 0, 0.5);
+  top: 10px;
+  right: 10px;
+  background: rgba(124, 58, 237, 0.8);
   color: white;
-  padding: 3px 6px;
-  border-radius: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-xs);
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 .today-relevance i {
-  font-size: 0.6rem;
+  font-size: calc(var(--font-xs) - 0.05rem);
 }
 
+/* 滑动指示器优化 */
 .focus-scroll-indicator {
   display: flex;
   justify-content: center;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: 10px;
 }
 
 .focus-scroll-dot {
@@ -402,12 +486,38 @@ body {
   border-radius: 50%;
   background-color: #e5e7eb;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .focus-scroll-dot.active {
   width: 18px;
   border-radius: 3px;
   background-color: var(--primary-color);
+}
+
+/* AI洞察样式优化 */
+.ai-insight {
+  background: rgba(124, 58, 237, 0.05);
+  border-left: 2px solid var(--primary-color);
+  padding: 8px 10px;
+  margin-top: 8px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.ai-insight-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+  font-size: var(--font-xs);
+  color: var(--primary-color);
+  font-weight: var(--font-medium);
+}
+
+.ai-insight-text {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 /* 图片加载错误处理优化 */
@@ -449,132 +559,54 @@ body {
   object-fit: cover;
 }
 
-.user-icon::before {
-  content: '\f007';
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  color: #9ca3af;
-  position: absolute;
+.user-icon.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-icon.avatar-fallback i {
   font-size: 16px;
-  opacity: 0;
+  color: #9ca3af;
 }
 
-.user-icon img.load-error + .user-icon::before {
-  opacity: 1;
-}
-
-/* AI洞察样式优化 */
-.ai-insight {
-  background: rgba(124, 58, 237, 0.05);
-  border-left: 2px solid var(--primary-color);
-  padding: 6px 8px;
-  margin-top: 6px;
-  border-radius: 0 4px 4px 0;
-}
-
-.ai-insight-header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 2px;
-  font-size: var(--font-xs);
-  color: var(--primary-color);
-  font-weight: var(--font-medium);
-}
-
-.ai-insight-text {
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
-  line-height: 1.3;
-}
-
-/* 今日焦点 - 左右滑动设计 */
-.today-focus-section {
-  margin: 0 12px 16px;
-  overflow: hidden;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 0;
-}
-
-.section-header h3 {
-  font-size: var(--font-md);
-  font-weight: var(--font-semibold);
-  color: var(--text-primary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.section-header h3 i {
-  font-size: calc(var(--font-md) - 0.1rem);
-  color: var(--primary-color);
-}
-
-.horizontal-scroll-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 4px 0 8px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth;
-}
-
-.horizontal-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* 卡片布局 - 两列设计 */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin: 0 12px;
-}
-
-/* 历史的今天 - 左右滑动和两列布局 */
+/* 历史的今天 - 左右滑动和两列布局优化 */
 .history-events-section {
   margin: 0 12px 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
   overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.1);
 }
 
 .history-events-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .history-events-header h3 {
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
-  color: var(--primary-dark);
+  color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+}
+
+.history-events-header h3 i {
+  color: var(--primary-color);
 }
 
 .history-events-scroll {
   display: flex;
   overflow-x: auto;
   gap: 12px;
-  padding: 4px 0 8px;
+  padding: 4px 0 10px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
@@ -588,26 +620,33 @@ body {
   flex: 0 0 calc(50% - 6px);
   min-width: calc(50% - 6px);
   background: #f9fafb;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: var(--radius-md);
+  padding: 12px;
   border-left: 3px solid var(--primary-color);
+  transition: transform 0.2s ease;
+}
+
+.history-event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .history-event-year {
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
   color: var(--primary-color);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
 }
 
 .history-event-title {
   font-size: var(--font-sm);
   font-weight: var(--font-medium);
   color: var(--text-primary);
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   line-height: 1.3;
 }
 
+/* 修复历史解读与标题重复问题 */
 .history-event-tag {
   display: inline-flex;
   align-items: center;
@@ -617,44 +656,58 @@ body {
   padding: 2px 6px;
   border-radius: 4px;
   gap: 3px;
+  margin-bottom: 4px;
 }
 
 .history-event-tag i {
   font-size: calc(var(--font-xs) - 0.05rem);
 }
 
-/* 今日推荐 - 左右滑动和两列布局 */
+.history-event-description {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-normal);
+}
+
+/* 今日推荐 - 左右滑动和两列布局优化 */
 .daily-recommendations-section {
   margin: 0 12px 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
   overflow: hidden;
+  border: 1px solid rgba(124, 58, 237, 0.1);
 }
 
 .recommendations-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .recommendations-header h3 {
   font-size: var(--font-md);
   font-weight: var(--font-semibold);
-  color: var(--primary-dark);
+  color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
+.recommendations-header h3 i {
+  color: var(--primary-color);
+}
+
+/* 推荐卡片滚动容器 */
 .recommendations-scroll {
   display: flex;
   overflow-x: auto;
   gap: 12px;
-  padding: 4px 0 8px;
+  padding: 4px 0 10px;
   scrollbar-width: none;
   -ms-overflow-style: none;
   scroll-behavior: smooth;
@@ -664,474 +717,23 @@ body {
   display: none;
 }
 
+/* 产品推荐卡片样式 */
 .product-recommendation-card {
   flex: 0 0 calc(50% - 6px);
   min-width: calc(50% - 6px);
   background: white;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
 }
 
-.product-image {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-}
-
-.product-info {
-  padding: 8px;
-}
-
-.product-name {
-  font-size: var(--font-sm);
-  font-weight: var(--font-medium);
-  color: var(--text-primary);
-  margin: 0 0 4px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.product-price {
-  font-size: var(--font-sm);
-  font-weight: var(--font-semibold);
-  color: var(--primary-color);
-  margin: 0 0 2px;
-}
-
-.product-match {
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.product-match i {
-  font-size: calc(var(--font-xs) - 0.05rem);
-  color: var(--primary-color);
-}
-
-/* 滚动控制按钮 */
-.scroll-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.scroll-control-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: white;
-  border: 1px solid var(--primary-light);
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.scroll-control-btn:hover {
-  background: var(--primary-light);
-  color: white;
-}
-
-.scroll-control-btn:active {
-  transform: scale(0.95);
-}
-
-/* 用户头像后备样式 */
-.user-icon.avatar-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-icon.avatar-fallback i {
-  font-size: 16px;
-  color: #9ca3af;
-}
-
-/* 添加ai-topics-scroll样式 */
-.ai-topics-scroll {
-  display: flex;
-  overflow-x: auto;
-  gap: 8px;
-  padding: 6px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  position: relative;
-  margin: 0 -4px;
-  padding: 6px 4px;
-}
-
-.ai-topics-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* 添加各部分的通用样式 */
-.horizontal-scroll-section,
-.daily-recommendations-section,
-.hot-articles-section {
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 12px;
-  background-color: #ffffff;
-  margin-bottom: 16px;
-}
-
-/* 1. 为"今日焦点"和"今日推荐"部分添加明显的AI元素 */
-
-/* AI标签通用样式 */
-.ai-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: var(--font-xs);
-  font-weight: var(--font-medium);
-  gap: 3px;
-  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.1);
-}
-
-.ai-tag-primary {
-  background-color: var(--ai-tag-bg);
-  color: var(--ai-tag-text);
-}
-
-.ai-tag-light {
-  background-color: var(--ai-tag-light-bg);
-  color: var(--ai-tag-light-text);
-  border: 1px solid var(--ai-tag-border);
-}
-
-.ai-tag i {
-  font-size: 0.55rem;
-}
-
-/* AI洞察/总结区域样式 */
-.ai-insight-container {
-  margin-top: 8px;
-  padding: 6px 8px;
-  background: rgba(124, 58, 237, 0.05);
-  border-left: 2px solid var(--primary-color);
-  border-radius: 0 4px 4px 0;
-  font-size: var(--font-xs);
-  color: var(--text-secondary);
-  line-height: var(--line-height-normal);
-}
-
-.ai-insight-header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 3px;
-  font-weight: var(--font-medium);
-  color: var(--primary-color);
-}
-
-.ai-insight-header i {
-  font-size: 0.6rem;
-}
-
-.ai-insight-content {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* AI筛选功能视觉元素 */
-.ai-filtered-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.9), rgba(109, 40, 217, 0.9));
-  color: white;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: var(--font-xs);
-  font-weight: var(--font-medium);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
-  z-index: 2;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.ai-filtered-badge i {
-  font-size: 0.55rem;
-}
-
-.ai-match-percentage {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: var(--font-xs);
-  font-weight: var(--font-medium);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  z-index: 2;
-}
-
-.ai-match-percentage i {
-  color: #f9d71c;
-  font-size: 0.55rem;
-}
-
-/* 2. 修复"今日焦点"卡片的左右滑动功能 */
-
-/* 确保水平滚动容器正常工作 */
-.horizontal-scroll-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 4px 0 12px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch; /* 优化iOS触摸滑动 */
-  scroll-snap-type: x mandatory; /* 添加滚动捕捉 */
-  position: relative;
-}
-
-.horizontal-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* 滑动指示器和控制按钮 */
-.scroll-controls {
-  display: flex;
-  gap: 8px;
-}
-
-.scroll-control-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: white;
-  border: 1px solid var(--primary-light);
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.scroll-control-btn:hover {
-  background: var(--primary-light);
-  color: white;
-}
-
-.scroll-control-btn:active {
-  transform: scale(0.95);
-}
-
-/* 滑动指示器点 */
-.scroll-dots {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.scroll-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: rgba(124, 58, 237, 0.2);
-  transition: all 0.3s ease;
-}
-
-.scroll-dot.active {
-  width: 18px;
-  border-radius: 3px;
-  background-color: var(--primary-color);
-}
-
-/* 滑动卡片样式优化 */
-.focus-card, .recommendation-card {
-  flex: 0 0 calc(85% - 12px);
-  min-width: calc(85% - 12px);
-  scroll-snap-align: start; /* 滚动捕捉对齐 */
-  position: relative;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: white;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.focus-card:hover, .recommendation-card:hover {
+.product-recommendation-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 3. 解决图片加载问题 */
-
-/* 图片容器样式 */
-.image-container {
-  position: relative;
-  overflow: hidden;
-  background-color: #f1f5f9; /* 图片加载前的背景色 */
-}
-
-/* 图片加载失败时的备用样式 */
-.image-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-  color: #94a3b8;
-  font-size: var(--font-sm);
-}
-
-.image-fallback i {
-  font-size: 1.5rem;
-  margin-bottom: 4px;
-}
-
-/* 图片加载中的动画 */
-.image-loading {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #f1f5f9, #e2e8f0, #f1f5f9);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -100% 0; }
-  100% { background-position: 100% 0; }
-}
-
-/* 用户头像图片修复 */
-.user-icon img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  background-color: #f1f5f9;
-}
-
-.user-icon img[src=""], 
-.user-icon img:not([src]) {
-  visibility: hidden;
-  position: relative;
-}
-
-.user-icon img[src=""]:after, 
-.user-icon img:not([src]):after {
-  content: '\f007'; /* FontAwesome用户图标 */
-  font-family: 'Font Awesome 5 Free';
-  font-weight: 900;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #e2e8f0;
-  color: #94a3b8;
-  font-size: 16px;
-  visibility: visible;
-}
-
-/* 4. 优化"热门话题"的左右滑动设计 */
-
-/* 添加滑动指示动画 */
-@keyframes slideHint {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
-}
-
-.ai-topics-scroll:empty::before {
-  content: '← 滑动查看更多话题';
-  display: block;
-  padding: 6px 10px;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: var(--font-xs);
-  animation: slideHint 1.5s ease-in-out infinite;
-}
-
-/* 确保今日推荐卡片中的图片正确显示 */
-.product-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  background-color: #f1f5f9;
-  transition: transform 0.3s ease;
-}
-
-.product-recommendation-card:hover .product-image {
-  transform: scale(1.05);
-}
-
-/* 添加图片加载错误处理 */
-.product-image-container {
-  position: relative;
-  overflow: hidden;
-  height: 120px;
-  background-color: #f1f5f9;
-}
-
-/* 滚动控制按钮样式 */
-.scroll-controls {
-  display: flex;
-  gap: 6px;
-}
-
-.scroll-control-btn {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: white;
-  border: 1px solid var(--primary-light);
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.scroll-control-btn:hover {
-  background: var(--primary-light);
-  color: white;
-}
-
-.scroll-control-btn:active {
-  transform: scale(0.95);
-}
-
-/* 产品图片样式 */
 .product-image-container {
   position: relative;
   overflow: hidden;
@@ -1146,18 +748,12 @@ body {
   transition: transform 0.3s ease;
 }
 
-.product-recommendation-card {
-  flex: 0 0 calc(50% - 6px);
-  min-width: calc(50% - 6px);
-  background: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.product-recommendation-card:hover .product-image {
+  transform: scale(1.05);
 }
 
 .product-info {
-  padding: 8px;
+  padding: 10px;
 }
 
 .product-name {
@@ -1193,23 +789,179 @@ body {
 .product-ai-insight {
   font-size: var(--font-xs);
   color: var(--text-secondary);
-  margin-top: 4px;
-  padding-top: 4px;
+  margin-top: 5px;
+  padding-top: 5px;
   border-top: 1px dashed #e5e7eb;
+  line-height: var(--line-height-normal);
 }
 
-/* 推荐卡片滚动容器 */
-.recommendations-scroll {
+/* AI聊天界面样式 */
+.ai-chat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
   display: flex;
-  overflow-x: auto;
-  gap: 12px;
-  padding: 4px 0 8px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  scroll-behavior: smooth;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
 }
 
-.recommendations-scroll::-webkit-scrollbar {
-  display: none;
+.ai-chat-container {
+  width: 90%;
+  max-width: 400px;
+  height: 80%;
+  max-height: 600px;
+  background-color: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
 }
+
+.ai-chat-header {
+  padding: 15px;
+  background: var(--primary-gradient);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ai-chat-header h3 {
+  margin: 0;
+  font-weight: var(--font-semibold);
+  font-size: var(--font-lg);
+}
+
+.close-chat-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-message {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: var(--font-sm);
+  line-height: var(--line-height-normal);
+  animation: fadeIn 0.3s ease;
+}
+
+.chat-message.ai {
+  align-self: flex-start;
+  background-color: #f3f4f6;
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: var(--primary-gradient);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-light);
+  animation: pulse 1s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.ai-chat-input {
+  padding: 12px;
+  display: flex;
+  gap: 8px;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ai-chat-input input {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: var(--font-sm);
+  outline: none;
+}
+
+.ai-chat-input input:focus {
+  border-color: var(--primary-color);
+}
+
+.ai-chat-input button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.ai-chat-input button:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* 关键帧动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
 

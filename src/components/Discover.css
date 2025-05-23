@@ -1421,6 +1421,7 @@
 
 .challenge-card-info {
   padding: var(--spacing-card);
+  height: 40px;
 }
 
 .challenge-card-title {
@@ -1827,4 +1828,5 @@ nav {
   border-top: 1px solid rgba(124, 58, 237, 0.1);
   z-index: 100;
 }
+
 

@@ -535,28 +535,28 @@ const Daily = () => {
 
   // 生成历史事件AI解析
   const generateHistoryInsight = (eventTitle) => {
-    const insights = [
-      "改变了世界科技格局",
-      "影响至今的历史转折点",
-      "开创了新的时代篇章",
-      "人类文明的重要里程碑",
-      "塑造了现代社会结构"
-    ];
-    
-    // 根据事件标题选择相关解析
+    // 提供更有深度和教育意义的历史解析
     if (eventTitle.includes("登月")) {
-      return "太空探索的里程碑事件";
+      return "这一壮举标志着人类探索太空的重大突破，不仅展示了科技实力，也开启了太空探索的新纪元。";
     } else if (eventTitle.includes("奥运")) {
-      return "体育外交的典范案例";
+      return "北京奥运会成为中国向世界展示国家形象的重要窗口，其影响远超体育领域，促进了国际文化交流。";
     } else if (eventTitle.includes("宣言")) {
-      return "影响深远的思想转折点";
+      return "该宣言由多位顶尖科学家联名发表，呼吁和平利用核能，对国际核裁军进程产生深远影响。";
     } else if (eventTitle.includes("回归")) {
-      return "民族复兴的重要节点";
+      return "香港回归不仅是中国领土完整的重要里程碑，也开启了'一国两制'的伟大实践，具有重大历史意义。";
     } else if (eventTitle.includes("联合国")) {
-      return "全球治理体系的基石";
+      return "联合国的成立为战后国际秩序奠定基础，构建了全球治理的核心框架，至今仍是维护世界和平的重要机构。";
     }
     
-    // 默认返回随机解析
+    // 更丰富的默认解析选项
+    const insights = [
+      "这一事件深刻改变了当时的国际格局，其影响一直延续至今，塑造了现代社会的多个方面。",
+      "作为历史的重要转折点，该事件不仅反映了当时的社会变革，也为后世提供了宝贵的历史经验。",
+      "这一历史事件背后蕴含着深刻的政治、经济和文化因素，对全球发展产生了长远影响。",
+      "从历史视角看，这一事件标志着一个时代的结束和新时代的开始，是人类文明进程中的关键节点。",
+      "该事件不仅是历史的重要组成部分，也为我们理解当代世界提供了重要的历史参照。"
+    ];
+    
     return insights[Math.floor(Math.random() * insights.length)];
   };
 
@@ -687,7 +687,9 @@ const Daily = () => {
               <div className="history-event-tag">
                 <i className="fas fa-robot"></i> AI解析
               </div>
-              <p className="history-event-description">{event.title}</p>
+              <p className="history-event-description">
+                {event.aiInsight || generateHistoryInsight(event.title)}
+              </p>
             </div>
           ))}
         </div>
@@ -804,3 +806,4 @@ const Daily = () => {
 };
 
 export default Daily;
+
