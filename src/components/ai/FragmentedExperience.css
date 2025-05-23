@@ -7,173 +7,251 @@
 .fragment-experience-container {
   width: 100%;
   margin: 15px 0;
-  padding: 12px;
-  background-color: rgba(249, 250, 251, 0.8);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  border-top: 1px solid rgba(99, 102, 241, 0.1);
-  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px;
+  background-color: rgba(248, 250, 252, 0.8);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.fragment-experience-container.before-card {
-  margin-top: 0;
-  margin-bottom: 15px;
-  border-radius: 8px;
+.fragment-experience-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  animation: rotate 20s linear infinite;
 }
 
-.dark .fragment-experience-container {
-  background-color: rgba(30, 30, 30, 0.8);
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .fragment-experience-title {
   display: flex;
   align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(99, 102, 241, 0.2);
   font-size: 14px;
   font-weight: 600;
-  margin-bottom: 10px;
   color: #4b5563;
+  position: relative;
 }
 
-.dark .fragment-experience-title {
-  color: #d1d5db;
+/* 思考指示器样式 */
+.thinking-indicator {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  gap: 4px;
 }
 
+.thinking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #6366f1;
+  animation: thinking 1.4s infinite ease-in-out;
+}
+
+.thinking-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.thinking-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.thinking-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes thinking {
+  0%, 60%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  30% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+}
+
+/* 增强气泡样式 */
 .fragment-bubbles-wrapper {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  max-width: 100%;
-  overflow-x: auto;
-  padding-bottom: 5px;
+  justify-content: flex-start;
 }
 
 .fragment-bubble {
+  background-color: white;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
-  padding: 10px 12px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  max-width: 100%;
+  width: calc(100% - 10px);
+  animation: popIn 0.5s ease-out;
+  transform-origin: center;
+  transition: all 0.3s ease;
+  border: none;
   position: relative;
-  animation: bubbleSlideIn 0.5s forwards;
-  cursor: pointer;
-  min-width: 200px;
-  max-width: 320px;
+  overflow: hidden;
 }
 
-.dark .fragment-bubble {
-  background-color: #262626;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.fragment-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (min-width: 480px) {
+  .fragment-bubble {
+    width: calc(50% - 10px);
+  }
+}
+
+.fragment-bubble:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* 改进气泡图标 */
+.bubble-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .fragment-bubble:hover .bubble-icon {
   transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.1) !important;
 }
 
-.fragment-bubble.info {
-  border-left-color: #4a5568;
-}
-
-.fragment-bubble.product {
-  border-left-color: #4a5568;
-}
-
-.fragment-bubble.task {
-  border-left-color: #4a5568;
-}
-
-.bubble-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.fragment-bubble.info .bubble-icon {
-  background-color: rgba(74, 85, 104, 0.15);
-  color: #4a5568;
-}
-
-.fragment-bubble.product .bubble-icon {
-  background-color: rgba(74, 85, 104, 0.15);
-  color: #4a5568;
-}
-
-.fragment-bubble.task .bubble-icon {
-  background-color: rgba(74, 85, 104, 0.15);
-  color: #4a5568;
-}
-
+/* 气泡内容 */
 .bubble-content {
   flex: 1;
-  font-size: 12px;
-  line-height: 1.4;
-  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-right: 12px;
+  font-weight: 500;
+  color: #374151;
+  position: relative;
+  z-index: 2;
 }
 
-.dark .bubble-content {
-  color: #d1d5db;
-}
-
+/* 操作按钮工具提示 */
 .bubble-actions {
   display: flex;
-  gap: 6px;
-  margin-left: 8px;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .bubble-action {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #6366f1;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
   cursor: pointer;
-  font-size: 10px;
   transition: all 0.2s ease;
-  opacity: 0.7;
-}
-
-.bubble-action.view {
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-}
-
-.bubble-action.dismiss {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .bubble-action:hover {
+  background-color: #6366f1;
+  color: white;
+  transform: scale(1.1);
+}
+
+.action-tooltip {
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.bubble-action:hover .action-tooltip {
   opacity: 1;
+  visibility: visible;
 }
 
-.bubble-action.view:hover {
-  background-color: rgba(59, 130, 246, 0.2);
-}
-
-.bubble-action.dismiss:hover {
-  background-color: rgba(239, 68, 68, 0.2);
-}
-
-@keyframes bubbleSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .fragment-experience-container {
+    background-color: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.08);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  
+  .fragment-experience-title {
+    color: #e5e7eb;
+    border-bottom-color: rgba(99, 102, 241, 0.3);
+  }
+  
+  .fragment-bubble {
+    background-color: rgba(30, 41, 59, 0.9);
+  }
+  
+  .bubble-content {
+    color: #e5e7eb;
+  }
+  
+  .bubble-action {
+    background-color: rgba(30, 41, 59, 0.9);
+    color: #a5b4fc;
+  }
+  
+  .bubble-action:hover {
+    background-color: #6366f1;
+    color: #ffffff;
   }
 }
 

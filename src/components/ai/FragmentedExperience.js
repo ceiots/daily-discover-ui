@@ -263,7 +263,7 @@ const FragmentedExperience = ({
     
     // 延迟显示侧边探索面板，现在可以略微缩短延迟时间
     setTimeout(() => {
-      if (isLoading) { // 只有在仍然加载时才显示
+      //if (isLoading) { // 只有在仍然加载时才显示
         // 随机决定是否自动打开侧边栏，增加多样性
         if (Math.random() > 0.7) {
           const randomIndex = Math.floor(Math.random() * shuffledBubbles.length);
@@ -289,8 +289,8 @@ const FragmentedExperience = ({
             }
           }
         }
-      }
-    }, 3000);
+      //}
+    }, 180000);
   };
   
   // 启动进度条动画
@@ -348,18 +348,29 @@ const FragmentedExperience = ({
     
     return (
       <div className={`fragment-experience-container ${className}`} style={showAsHistory ? {} : { 
-        opacity: isLoading ? 1 : 0.8,
-        transition: 'opacity 0.5s ease'
+        opacity: 1,
+        transition: 'opacity 0.5s ease',
+        background: 'rgba(252, 252, 255, 0.8)',
+        backdropFilter: 'blur(8px)',
+        boxShadow: '0 8px 32px rgba(31, 38, 135, 0.15)',
+        border: '1px solid rgba(255, 255, 255, 0.18)'
       }}>
         <div className="fragment-experience-title">
-          <i className="fas fa-lightbulb" style={{ color: '#f59e0b', marginRight: '6px' }}></i>
+          <i className="fas fa-brain" style={{ color: '#6366f1', marginRight: '8px' }}></i>
           <span>
             {showAsHistory 
               ? `历史查询: "${userQuery}"` 
-              : `您可能感兴趣的内容${userQuery ? ` - 关于"${userQuery}"` : ''}`
+              : `AI灵感闪现${userQuery ? `：关于"${userQuery}"的思考` : ''}`
             }
             {timestamp && <span className="query-time"> ({timestamp})</span>}
           </span>
+          {!showAsHistory && (
+            <div className="thinking-indicator">
+              <span className="thinking-dot"></span>
+              <span className="thinking-dot"></span>
+              <span className="thinking-dot"></span>
+            </div>
+          )}
         </div>
         <div className="fragment-bubbles-wrapper">
           {bubbles.map((bubble, index) => (
@@ -367,19 +378,41 @@ const FragmentedExperience = ({
               key={index} 
               className={`fragment-bubble ${bubble.type}`}
               style={{
-                animationDelay: `${index * 0.2}s`
+                animationDelay: `${index * 0.2}s`,
+                background: bubble.type === 'info' 
+                  ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(99, 102, 241, 0.12))' 
+                  : bubble.type === 'product' 
+                    ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.12))' 
+                    : 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.12))',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                transform: 'translateZ(0)'
               }}
             >
-              <div className="bubble-icon">
+              <div className="bubble-icon"
+                style={{
+                  background: bubble.type === 'info' 
+                    ? 'rgba(99, 102, 241, 0.15)' 
+                    : bubble.type === 'product' 
+                      ? 'rgba(16, 185, 129, 0.15)' 
+                      : 'rgba(245, 158, 11, 0.15)',
+                  boxShadow: `0 0 0 4px ${bubble.type === 'info' 
+                    ? 'rgba(99, 102, 241, 0.05)' 
+                    : bubble.type === 'product' 
+                      ? 'rgba(16, 185, 129, 0.05)' 
+                      : 'rgba(245, 158, 11, 0.05)'}`,
+                }}
+              >
                 <i className={`fas fa-${bubble.icon}`}></i>
               </div>
               <div className="bubble-content">{bubble.content}</div>
               <div className="bubble-actions">
                 <button className="bubble-action view" onClick={() => handleBubbleClick(bubble)}>
                   <i className="fas fa-eye"></i>
+                  <span className="action-tooltip">探索</span>
                 </button>
                 <button className="bubble-action dismiss" onClick={() => handleDismissBubble(index)}>
                   <i className="fas fa-times"></i>
+                  <span className="action-tooltip">关闭</span>
                 </button>
               </div>
             </div>
@@ -391,6 +424,7 @@ const FragmentedExperience = ({
   
   // 渲染进度条
   const renderProgressBar = () => {
+    // 只有在加载中且不是历史记录时显示进度条
     if (showAsHistory || !isLoading) return null;
     
     let progressBarContent;

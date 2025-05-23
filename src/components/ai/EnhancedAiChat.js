@@ -424,16 +424,16 @@ const EnhancedAiChat = ({ onRequestArticle, onLoadingChange }) => {
     <div className="ai-chat-card">
       <div className="ai-chat-header">
         <div className="ai-info">
-          <div className="ai-avatar">
+        <div className="ai-avatar">
             <img src={AI_AVATAR} alt="AI助手" onError={handleImageError} />
           </div>
           <div>
             <h3 className="ai-name">每日发现</h3>
             <p className="ai-description">智能AI助手</p>
-          </div>
+        </div>
         </div>
       </div>
-      
+
       <div className="ai-chat-body">
         <div className="chat-messages">
           {messages.map((message, index) => (
@@ -472,8 +472,8 @@ const EnhancedAiChat = ({ onRequestArticle, onLoadingChange }) => {
           
           <div ref={messagesEndRef} style={{ float: 'left', clear: 'both', height: 1, width: '100%' }} />
         </div>
-      </div>
-      
+        </div>
+
       <div className="ai-chat-footer">
         <div className="quick-suggestions-hint">
           热门问题：
