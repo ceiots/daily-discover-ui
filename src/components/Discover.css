@@ -1766,7 +1766,7 @@
 
 /* 调整互动话题与底部的距离 */
 .interactive-topics-container {
-  margin-bottom: 80px; /* 增加与底部的距离 */
+  margin-bottom: 60px; /* 从80px减小到60px */
 }
 
 /* 修复最后一个板块留白问题 */
@@ -1827,3 +1827,4 @@ nav {
   border-top: 1px solid rgba(124, 58, 237, 0.1);
   z-index: 100;
 }
+

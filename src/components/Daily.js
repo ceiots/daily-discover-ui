@@ -80,6 +80,11 @@ const Daily = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [hotArticles, setHotArticles] = useState([]);
 
+  // 添加焦点活动索引状态
+  const [activeFocusIndex, setActiveFocusIndex] = useState(0);
+  const [aiInsights, setAiInsights] = useState({});
+  const focusScrollRef = useRef(null);
+
   const formattedDate = `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日`;
   const weekday = `星期${['日', '一', '二', '三', '四', '五', '六'][currentDate.getDay()]}`;
   const lunarDateInfo = getLunarDate(currentDate);
@@ -102,18 +107,24 @@ const Daily = () => {
         title: "冥想的治愈力量",
         content: "探索冥想如何帮助你减轻压力，提高专注力，改善睡眠质量。每天只需10分钟，就能感受内心的平静。",
         image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        relevance: "今日精选",
+        aiInsight: "研究表明，每天10分钟冥想可降低40%压力，提升25%专注力，有助于促进深度睡眠。"
       },
       {
         id: 2,
         title: "健康饮食新趋势",
         content: "了解2023年最新的健康饮食趋势，从植物性饮食到间歇性断食，找到适合你的健康生活方式。",
         image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        relevance: "今日热门",
+        aiInsight: "植物性饮食可减少30%慢性疾病风险，增强免疫系统功能，有助于维持健康体重。"
       },
       {
         id: 3,
         title: "数字极简主义",
         content: "在信息过载的时代，学习如何减少数字干扰，提高专注力和生产力，重新掌控你的时间和注意力。",
         image: "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+        relevance: "今日最佳",
+        aiInsight: "数字极简主义帮助用户每天节省1.5小时，减少42%分心次数，提升工作效率达35%。"
       }
     ]);
     
@@ -197,6 +208,14 @@ const Daily = () => {
       { id: 6, text: "减压放松方法", icon: "spa" },
       { id: 7, text: "居家健身计划", icon: "dumbbell" },
     ]);
+
+    // 设置AI洞察为每个推荐产品
+    setAiInsights({
+      product1: "基于您的搜索历史，这款产品比同类产品价格低15%，同时评分高出0.5分",
+      product2: "根据您的浏览习惯，这款产品最适合您的使用场景，满足度预计达90%",
+      product3: "本周热销榜首，库存仅剩不到10%，适合立即购买",
+      product4: "与您最近购买的商品搭配使用，可提升整体使用体验达35%"
+    });
   }, []);
   
   useEffect(() => {
@@ -358,68 +377,119 @@ const Daily = () => {
     }
   };
 
-  // 渲染今日焦点卡片
-  const renderFocusCard = (focus) => {
-    // 生成AI摘要，如果没有提供则从内容中提取
-    const aiSummary = focus.aiInsight || generateAiSummary(focus.content);
+  // 添加滚动处理函数
+  const handleFocusScroll = () => {
+    if (focusScrollRef.current) {
+      const scrollContainer = focusScrollRef.current;
+      const scrollWidth = scrollContainer.scrollWidth;
+      const clientWidth = scrollContainer.clientWidth;
+      const scrollLeft = scrollContainer.scrollLeft;
+      
+      // 计算当前滚动位置对应的卡片索引
+      const cardWidth = clientWidth * 0.9; // 90% 宽度的卡片
+      const currentIndex = Math.round(scrollLeft / (cardWidth + 15)); // 15px 是卡片间隔
+      
+      if (currentIndex !== activeFocusIndex) {
+        setActiveFocusIndex(currentIndex);
+      }
+    }
+  };
+
+  // 滑动到特定索引的卡片
+  const scrollToFocusCard = (index) => {
+    if (focusScrollRef.current) {
+      const scrollContainer = focusScrollRef.current;
+      const cardWidth = scrollContainer.clientWidth * 0.9; // 90% 宽度的卡片
+      const scrollPosition = index * (cardWidth + 15); // 15px 是卡片间隔
+      
+      scrollContainer.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  // 处理图片加载错误，使用unsplash备选图片
+  const handleImageError = (event) => {
+    const target = event.target;
+    // 随机unsplash图片
+    const fallbackUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(target.alt || 'nature')}`;
     
-    // 随机选择AI标签类型
-    const aiTagType = Math.random() > 0.5 ? "AI精选" : "AI推荐";
-    
-    // 确保使用unsplash图片
-    const imageUrl = focus.image.includes('unsplash.com') 
-      ? focus.image 
-      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
-    
+    // 设置数据属性而非直接修改src，以避免循环触发error事件
+    target.classList.add('error-image');
+    target.parentElement.style.backgroundImage = `url(${fallbackUrl})`;
+    target.parentElement.style.backgroundSize = 'cover';
+  };
+  
+  // 修改今日焦点渲染函数，添加左右滑动和AI总结
+  const renderTodayFocus = () => {
     return (
-      <div key={focus.id} className="daily-card today-focus-card">
-        <div className="focus-image-container">
-          <img src={imageUrl} alt={focus.title} className="focus-image"/>
-          <div className="focus-overlay">
-            <span className="focus-ai-tag">
-              <i className="fas fa-robot"></i> {aiTagType}
-            </span>
+      <div className="today-focus-section">
+        <div className="section-header">
+          <h3><i className="fas fa-star"></i> 今日焦点</h3>
+          <div className="scroll-controls">
+            <button className="scroll-control-btn" onClick={() => scrollToFocusCard(Math.max(0, activeFocusIndex - 1))}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="scroll-control-btn" onClick={() => scrollToFocusCard(Math.min(todayFocus.length - 1, activeFocusIndex + 1))}>
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
-        <div className="focus-content">
-          <h3>{focus.title}</h3>
-          <div className="ai-insight-badge">
-            <i className="fas fa-lightbulb"></i> AI洞察
-          </div>
-          <p className="focus-ai-summary">{aiSummary}</p>
-          <button className="card-button">
-            {focus.interactionPrompt || "查看详情"} <i className="fas fa-arrow-right button-icon"></i>
-          </button>
+        
+        <div 
+          className="focus-scroll" 
+          ref={focusScrollRef}
+          onScroll={handleFocusScroll}
+        >
+          {todayFocus.map(item => (
+            <div key={item.id} className="focus-card">
+              <div className="focus-card-image-container">
+                <img 
+                  src={item.image} 
+                  alt={item.title} 
+                  className="focus-card-image"
+                  onError={handleImageError}
+                />
+                {item.relevance && (
+                  <div className="today-relevance">
+                    <i className="fas fa-calendar-check"></i>
+                    {item.relevance}
+                  </div>
+                )}
+              </div>
+              <div className="focus-card-content">
+                <h4 className="focus-card-title">{item.title}</h4>
+                <p className="focus-card-description">{item.content}</p>
+                
+                {item.aiInsight && (
+                  <div className="ai-insight">
+                    <div className="ai-insight-header">
+                      <i className="fas fa-robot"></i>
+                      <span>AI洞察</span>
+                    </div>
+                    <div className="ai-insight-text">
+                      {item.aiInsight}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* 滑动指示器 */}
+        <div className="focus-scroll-indicator">
+          {todayFocus.map((_, index) => (
+            <div 
+              key={index} 
+              className={`focus-scroll-dot ${index === activeFocusIndex ? 'active' : ''}`}
+              onClick={() => scrollToFocusCard(index)}
+            ></div>
+          ))}
         </div>
       </div>
     );
-  };
-
-  // 生成AI摘要
-  const generateAiSummary = (content) => {
-    const summaries = [
-      "研究表明，每天10分钟冥想可降低40%压力，提升25%专注力",
-      "植物性饮食可减少30%慢性疾病风险，增强免疫系统功能",
-      "数字极简主义帮助用户每天节省1.5小时，减少42%分心次数",
-      "每日阅读30分钟可提升认知能力，延缓大脑衰老达32%",
-      "适度运动能提高工作效率35%，改善睡眠质量达40%"
-    ];
-    
-    // 根据内容关键词选择相关摘要
-    if (content.includes("冥想") || content.includes("压力")) {
-      return summaries[0];
-    } else if (content.includes("饮食") || content.includes("健康")) {
-      return summaries[1];
-    } else if (content.includes("数字") || content.includes("极简")) {
-      return summaries[2];
-    } else if (content.includes("阅读") || content.includes("书")) {
-      return summaries[3];
-    } else if (content.includes("运动") || content.includes("健身")) {
-      return summaries[4];
-    }
-    
-    // 默认返回随机摘要
-    return summaries[Math.floor(Math.random() * summaries.length)];
   };
 
   // 渲染历史上的今天卡片
@@ -466,91 +536,138 @@ const Daily = () => {
     return insights[Math.floor(Math.random() * insights.length)];
   };
 
-  // 渲染推荐产品卡片
-  const renderProductCard = (product) => {
-    // 生成85%-98%的随机匹配度
-    const matchScore = Math.floor(85 + Math.random() * 14);
-    
-    // 生成个性化推荐理由
-    const aiReason = generatePersonalizedReason(product);
-    
-    // 确保使用unsplash图片
-    const imageUrl = product.imageUrl && product.imageUrl.includes('unsplash.com') 
-      ? product.imageUrl 
-      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
-    
+  // 优化今日推荐的渲染函数，添加AI总结
+  const renderRecommendations = () => {
     return (
-      <Link to={`/product/${product.id}`} key={product.id} className="product-card-link">
-        <div className="product-card">
-          <div className="product-image-container">
-            <img src={imageUrl} alt={product.title} className="product-image"/>
-            {product.discount && (
-              <div className="discount-tag">-{product.discount}%</div>
-            )}
-            <div className="ai-match-tag">
-              <i className="fas fa-robot"></i> 匹配度{matchScore}%
-            </div>
-          </div>
-          <div className="product-info">
-            <h4>{product.title}</h4>
-            <div className="ai-reason-tag">
-              <i className="fas fa-magic"></i> {aiReason}
-            </div>
-            <div className="product-details">
-              <div className="price">¥{product.price}</div>
-              <div className="sold-count">已售{product.soldCount}</div>
-            </div>
+      <div className="daily-recommendations-section">
+        <div className="recommendations-header">
+          <h3><i className="fas fa-thumbs-up"></i> 今日推荐</h3>
+          <div className="scroll-controls">
+            <button className="scroll-control-btn" onClick={() => scrollRefs.recommendations.current?.scrollBy({left: -200, behavior: 'smooth'})}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="scroll-control-btn" onClick={() => scrollRefs.recommendations.current?.scrollBy({left: 200, behavior: 'smooth'})}>
+              <i className="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
-      </Link>
+        <div className="recommendations-scroll" ref={scrollRefs.recommendations}>
+          {recommendations.slice(0, 6).map((product, index) => (
+            <div key={product.id || index} className="product-recommendation-card">
+              <div className="product-image-container">
+                <img 
+                  src={product.image || `https://source.unsplash.com/random/800x600/?product${index}`} 
+                  alt={product.name || product.title} 
+                  className="product-image" 
+                  onError={handleImageError}
+                />
+              </div>
+              <div className="product-info">
+                <div className="product-name">{product.name || product.title}</div>
+                <div className="product-price">¥{product.price}</div>
+                <div className="product-match">
+                  <i className="fas fa-chart-line"></i>
+                  匹配度{product.matchScore || "90"}%
+                </div>
+                
+                {aiInsights[`product${index+1}`] && (
+                  <div className="product-ai-insight">
+                    {aiInsights[`product${index+1}`]}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   };
 
-  // 生成个性化推荐理由
-  const generatePersonalizedReason = (product) => {
-    const reasons = [
-      "基于您的浏览历史推荐",
-      "与您的兴趣高度匹配",
-      "90%相似用户都喜欢",
-      "符合您的购物偏好",
-      "为您的需求量身定制",
-      "近期热门，好评如潮"
-    ];
-    
-    // 根据产品类型或价格选择更相关的理由
-    if (product.price > 500) {
-      return "高品质选择，值得投资";
-    } else if (product.soldCount > 1000) {
-      return "热销产品，用户好评如潮";
-    }
-    
-    // 默认返回随机理由
-    return reasons[Math.floor(Math.random() * reasons.length)];
+  // AI助手建议区域 - 修改样式，去掉紫色背景
+  const renderAISuggestion = () => {
+    return (
+      <div className="ai-suggestion-card">
+        <div className="ai-suggestion-header">
+          <i className="fas fa-lightbulb"></i>
+          <h3>AI助手建议</h3>
+        </div>
+        <div className="ai-suggestion-content">
+          {aiSuggestion?.content || "根据您最近的兴趣，我推荐您可以了解「数字极简主义」，这是一种帮助人们减少数字干扰、提高专注力的生活理念。"}
+        </div>
+        <button className="ai-chat-button" onClick={() => setShowAiChat(true)}>
+          <i className="fas fa-comments"></i> 开始对话
+        </button>
+        
+        {/* 热门话题整合到AI助手卡片中 */}
+        <div className="ai-topics-wrapper">
+          <div className="ai-topics-label">
+            <i className="fas fa-fire"></i>热门话题
+          </div>
+          <div className="ai-topics-scroll">
+            {aiTopics.map(topic => (
+              <div 
+                key={topic.id} 
+                className={`ai-topic-bubble`}
+                onClick={() => handleTopicClick(topic)}
+              >
+                {topic.icon && <i className={`fas fa-${topic.icon}`}></i>}
+                {topic.text}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  // 处理话题点击 - 优化功能实现一键代入热门词
-  const handleTopicClick = (topic) => {
-    // 设置搜索词
-    setSearchQuery(topic.text);
-    
-    // 直接设置到AI聊天输入框
-    setUserMessage(topic.text);
-    
-    // 如果聊天框没有打开，则自动打开
-    if (!showAiChat) {
-      handleAiChatToggle();
+  // 添加滚动引用和处理函数
+  const scrollRefs = {
+    todayFocus: useRef(null),
+    historyEvents: useRef(null),
+    recommendations: useRef(null)
+  };
+
+  // 滚动处理函数
+  const handleScroll = (refName, direction) => {
+    const container = scrollRefs[refName].current;
+    if (container) {
+      const scrollAmount = direction === 'left' ? -180 : 180;
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
     }
-    
-    // 可选：添加动画效果提示用户已选择
-    const topicElements = document.querySelectorAll('.ai-topic-bubble');
-    topicElements.forEach(el => {
-      if (el.textContent.includes(topic.text)) {
-        el.classList.add('topic-selected');
-        setTimeout(() => {
-          el.classList.remove('topic-selected');
-        }, 500);
-      }
-    });
+  };
+
+  // 历史的今天 - 左右滑动和两列布局
+  const renderHistoryEvents = () => {
+    return (
+      <div className="history-events-section">
+        <div className="history-events-header">
+          <h3><i className="fas fa-history"></i> 历史上的今天</h3>
+          <div className="scroll-controls">
+            <button className="scroll-control-btn" onClick={() => handleScroll('historyEvents', 'left')}>
+              <i className="fas fa-chevron-left"></i>
+            </button>
+            <button className="scroll-control-btn" onClick={() => handleScroll('historyEvents', 'right')}>
+              <i className="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+        <div className="history-events-scroll" ref={scrollRefs.historyEvents}>
+          {historyTodayEvents.map(event => (
+            <div key={event.year} className="history-event-card">
+              <div className="history-event-year">{event.year}年</div>
+              <div className="history-event-title">{event.title}</div>
+              <div className="history-event-tag">
+                <i className="fas fa-robot"></i> AI解析
+              </div>
+              <p className="history-event-description">{event.title}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   // 渲染热门文章卡片
@@ -618,153 +735,29 @@ const Daily = () => {
     );
   };
 
-  // AI助手推荐区域 - 整合热门话题
-  const renderAISuggestion = () => {
-    return (
-      <div className="ai-suggestion-card">
-        <div className="ai-suggestion-header">
-          <i className="fas fa-lightbulb"></i>
-          <h3>AI助手建议</h3>
-        </div>
-        <div className="ai-suggestion-content">
-          {aiSuggestion?.content || "根据您最近的兴趣，我推荐您可以了解「数字极简主义」，这是一种帮助人们减少数字干扰、提高专注力的生活理念。"}
-        </div>
-        <button className="ai-chat-button" onClick={() => setShowAiChat(true)}>
-          <i className="fas fa-comments"></i> 开始对话
-        </button>
-        
-        {/* 热门话题整合到AI助手卡片中 */}
-        <div className="ai-topics-wrapper">
-          <div className="ai-topics-label">
-            <i className="fas fa-fire"></i>热门话题
-          </div>
-          <div className="ai-topics-scroll">
-            {aiTopics.map(topic => (
-              <div 
-                key={topic.id} 
-                className={`ai-topic-bubble`}
-                onClick={() => handleTopicClick(topic)}
-              >
-                {topic.icon && <i className={`fas fa-${topic.icon}`}></i>}
-                {topic.text}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // 添加滚动引用和处理函数
-  const scrollRefs = {
-    todayFocus: useRef(null),
-    historyEvents: useRef(null),
-    recommendations: useRef(null)
-  };
-
-  // 滚动处理函数
-  const handleScroll = (refName, direction) => {
-    const container = scrollRefs[refName].current;
-    if (container) {
-      const scrollAmount = direction === 'left' ? -180 : 180;
-      container.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
+  // 处理话题点击 - 优化功能实现一键代入热门词
+  const handleTopicClick = (topic) => {
+    // 设置搜索词
+    setSearchQuery(topic.text);
+    
+    // 直接设置到AI聊天输入框
+    setUserMessage(topic.text);
+    
+    // 如果聊天框没有打开，则自动打开
+    if (!showAiChat) {
+      handleAiChatToggle();
     }
-  };
-
-  // 今日焦点 - 左右滑动设计
-  const renderTodayFocus = () => {
-    return (
-      <div className="today-focus-section">
-        <div className="section-header">
-          <h3><i className="fas fa-star"></i> 今日焦点</h3>
-          <div className="scroll-controls">
-            <button className="scroll-control-btn" onClick={() => handleScroll('todayFocus', 'left')}>
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <button className="scroll-control-btn" onClick={() => handleScroll('todayFocus', 'right')}>
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-        <div className="horizontal-scroll-container" ref={scrollRefs.todayFocus}>
-          {todayFocus.map(item => (
-            <div key={item.id} className="focus-card" style={{flex: '0 0 calc(50% - 6px)', minWidth: 'calc(50% - 6px)'}}>
-              <img src={item.image} alt={item.title} className="focus-card-image" style={{width: '100%', height: '100px', objectFit: 'cover', borderRadius: '8px'}} />
-              <h4 className="focus-card-title">{item.title}</h4>
-              <p className="focus-card-description">{item.content}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // 历史的今天 - 左右滑动和两列布局
-  const renderHistoryEvents = () => {
-    return (
-      <div className="history-events-section">
-        <div className="history-events-header">
-          <h3><i className="fas fa-history"></i> 历史上的今天</h3>
-          <div className="scroll-controls">
-            <button className="scroll-control-btn" onClick={() => handleScroll('historyEvents', 'left')}>
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <button className="scroll-control-btn" onClick={() => handleScroll('historyEvents', 'right')}>
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-        <div className="history-events-scroll" ref={scrollRefs.historyEvents}>
-          {historyTodayEvents.map(event => (
-            <div key={event.year} className="history-event-card">
-              <div className="history-event-year">{event.year}年</div>
-              <div className="history-event-title">{event.title}</div>
-              <div className="history-event-tag">
-                <i className="fas fa-robot"></i> AI解析
-              </div>
-              <p className="history-event-description">{event.title}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
-  // 今日推荐 - 左右滑动和两列布局
-  const renderRecommendations = () => {
-    return (
-      <div className="daily-recommendations-section">
-        <div className="recommendations-header">
-          <h3><i className="fas fa-thumbs-up"></i> 今日推荐</h3>
-          <div className="scroll-controls">
-            <button className="scroll-control-btn" onClick={() => handleScroll('recommendations', 'left')}>
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <button className="scroll-control-btn" onClick={() => handleScroll('recommendations', 'right')}>
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-        <div className="recommendations-scroll" ref={scrollRefs.recommendations}>
-          {recommendations.map(product => (
-            <div key={product.id} className="product-recommendation-card">
-              <img src={product.image} alt={product.name} className="product-image" />
-              <div className="product-info">
-                <div className="product-name">{product.name || product.title}</div>
-                <div className="product-price">¥{product.price}</div>
-                <div className="product-match">
-                  <i className="fas fa-chart-line"></i>
-                  匹配度{product.matchScore || "90"}%
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    
+    // 可选：添加动画效果提示用户已选择
+    const topicElements = document.querySelectorAll('.ai-topic-bubble');
+    topicElements.forEach(el => {
+      if (el.textContent.includes(topic.text)) {
+        el.classList.add('topic-selected');
+        setTimeout(() => {
+          el.classList.remove('topic-selected');
+        }, 500);
+      }
+    });
   };
 
   // 调整主页面渲染
