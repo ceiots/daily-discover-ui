@@ -9,7 +9,7 @@ const AiAssistant = ({ userInfo }) => {
   const [aiTopics, setAiTopics] = useState([]);
   const [suggestedTopics, setSuggestedTopics] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentRecommendation, setCurrentRecommendation] = useState(null); // 当前推荐的内容
+  const [currentRecommendation, setCurrentRecommendation] = useState(null); // 当前推荐的内容`
   const [quickReads, setQuickReads] = useState([]);
   const [selectedReadItem, setSelectedReadItem] = useState(null); // 当前选中的阅读项
 
