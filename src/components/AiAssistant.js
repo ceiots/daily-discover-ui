@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
-
+import { API_BASE_URL } from '../config';
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -32,8 +32,6 @@ const AiAssistant = ({ userInfo }) => {
   const recommendationTimerRef = useRef(null);
   const eventSourceRef = useRef(null);
   
-  // API基础URL
-  const API_BASE_URL = window.location.origin;
 
   // 滚动到最新消息
   useEffect(() => {
@@ -91,6 +89,11 @@ const AiAssistant = ({ userInfo }) => {
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
+      }
+      
+      // 清除打字效果的计时器
+      if (window.typingTimer) {
+        clearInterval(window.typingTimer);
       }
     };
   }, []);
@@ -271,99 +274,278 @@ const AiAssistant = ({ userInfo }) => {
       eventSourceRef.current.close();
     }
     
+    // 清除之前的任何计时器
+    if (window.typingTimer) {
+      clearInterval(window.typingTimer);
+      window.typingTimer = null;
+    }
+    
     // 准备请求数据
     const requestData = {
       prompt: message,
       sessionId: currentSessionId
     };
     
-    // 使用axios实例发送请求
-    instance.post("/ai/chat/stream", requestData, {
-      responseType: 'blob',
-      headers: {
-        'Accept': 'text/event-stream'
-      }
-    }).then(response => {
-      // 处理响应数据流
-      const stream = response.data;
-      const reader = new Response(stream).body.getReader();
-      const decoder = new TextDecoder();
+    // 显示打字指示器
+    setIsTyping(true);
+    
+    // 使用EventSource建立SSE连接进行真正的流式接收
+    try {
+      // 创建查询参数
+      const params = new URLSearchParams();
+      params.append('prompt', message);
       
-      // 读取流数据
-      function readStream() {
-        reader.read().then(({ done, value }) => {
-          if (done) {
-            console.log('流式聊天完成');
-            setIsTyping(false);
-            setIsLoading(false);
-            
-            // 将流式消息添加到聊天历史
-            if (currentStreamingMessage) {
-              setAiChatHistory(prev => [
-                ...prev,
-                { type: "ai", message: currentStreamingMessage }
-              ]);
-              setCurrentStreamingMessage("");
-            }
-            return;
+      // 如果有会话ID，添加到请求中
+      if (currentSessionId) {
+        params.append('sessionId', currentSessionId);
+      }
+      
+      // 如果用户已登录，添加用户ID
+      if (!userInfo?.id) {
+        params.append('userId', userInfo.id.toString());
+      }
+      
+      // 创建EventSource连接
+      const baseUrl = `${API_BASE_URL}/ai/chat/stream/sse`;
+      const url = `${baseUrl}?${params.toString()}`;
+      console.log('连接SSE:', url);
+      
+      // 显示连接中的提示
+      setCurrentStreamingMessage("正在连接AI模型...");
+      
+      // 保存连接引用以便清理
+      eventSourceRef.current = new EventSource(url);
+      
+      // 存储收到的所有文字和待显示的队列
+      let fullText = '';
+      let charsToDisplay = [];
+      let isTypingActive = false;
+      const typingSpeed = 15; // 打字速度（毫秒）
+      let hasStartedReceiving = false;
+      
+      // 打字效果函数
+      const startTypingEffect = () => {
+        if (isTypingActive || charsToDisplay.length === 0) return;
+        
+        isTypingActive = true;
+        window.typingTimer = setInterval(() => {
+          if (charsToDisplay.length > 0) {
+            // 每次取出1-3个字符显示
+            const charsCount = Math.min(3, charsToDisplay.length);
+            const nextChars = charsToDisplay.splice(0, charsCount).join('');
+            setCurrentStreamingMessage(prev => prev + nextChars);
+          } else {
+            // 队列为空，暂停打字效果
+            clearInterval(window.typingTimer);
+            window.typingTimer = null;
+            isTypingActive = false;
+          }
+        }, typingSpeed);
+      };
+      
+      // 监听info事件，获取会话信息
+      eventSourceRef.current.addEventListener('info', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('收到会话信息:', data);
+          
+          // 更新会话ID
+          if (data.sessionId) {
+            setCurrentSessionId(data.sessionId);
           }
           
-          // 解码并处理响应数据
-          const chunk = decoder.decode(value, { stream: true });
-          
-          // 解析SSE数据
-          const lines = chunk.split('\n\n');
-          lines.forEach(line => {
-            if (line.startsWith('data:')) {
-              const data = line.substring(5).trim();
-              if (data) {
-                try {
-                  const parsedData = JSON.parse(data);
-                  if (parsedData.data) {
-                    setCurrentStreamingMessage(prev => prev + parsedData.data);
-                  }
-                } catch (e) {
-                  // 尝试直接使用数据
-                  setCurrentStreamingMessage(prev => prev + data);
-                }
+          // 显示模式信息
+          const mode = data.mode === 'guest' ? '访客模式' : '用户模式';
+          console.log(`AI聊天模式: ${mode}`);
+        } catch (e) {
+          console.error('解析会话信息失败:', e);
+        }
+      });
+      
+      // 监听消息事件
+      eventSourceRef.current.onmessage = (event) => {
+        const data = event.data;
+        console.log('SSE收到消息:', data);
+        
+        // 清除连接中的提示
+        if (!hasStartedReceiving) {
+          hasStartedReceiving = true;
+          setCurrentStreamingMessage("");
+        }
+        
+        if (data) {
+          try {
+            const parsedData = JSON.parse(data);
+            
+            // 处理错误消息
+            if (parsedData.error) {
+              console.error('AI服务错误:', parsedData.error);
+              setCurrentStreamingMessage(prev => 
+                prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
+              );
+              return;
+            }
+            
+            if (parsedData.data) {
+              // 移除event:message前缀和<think>标签
+              let cleanData = parsedData.data;
+              // 移除event:message前缀
+              if (cleanData.includes("event:message")) {
+                cleanData = cleanData.replace(/event:message\w*/g, "");
+              }
+              
+              // 移除<think>标签
+              if (cleanData.includes("<think>")) {
+                cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
+              }
+              
+              // 添加到完整文本
+              fullText += cleanData;
+              
+              // 将新字符添加到待显示队列
+              charsToDisplay = [...charsToDisplay, ...cleanData.split('')];
+              
+              // 如果打字效果未激活，启动它
+              if (!isTypingActive) {
+                startTypingEffect();
               }
             }
-          });
+          } catch (e) {
+            console.error('解析JSON错误:', e, data);
+            // 尝试直接使用数据
+            let cleanData = data;
+            // 移除event:message前缀
+            if (cleanData.includes("event:message")) {
+              cleanData = cleanData.replace(/event:message\w*/g, "");
+            }
+            
+            // 移除<think>标签
+            if (cleanData.includes("<think>")) {
+              cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
+            }
+            
+            // 添加到完整文本
+            fullText += cleanData;
+            
+            // 将新字符添加到待显示队列
+            charsToDisplay = [...charsToDisplay, ...cleanData.split('')];
+            
+            // 如果打字效果未激活，启动它
+            if (!isTypingActive) {
+              startTypingEffect();
+            }
+          }
+        }
+      };
+      
+      // 监听错误
+      eventSourceRef.current.onerror = (error) => {
+        console.error('SSE连接错误:', error);
+        
+        // 关闭连接
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        
+        // 清除打字计时器
+        if (window.typingTimer) {
+          clearInterval(window.typingTimer);
+          window.typingTimer = null;
+          isTypingActive = false;
+        }
+        
+        setIsTyping(false);
+        setIsLoading(false);
+        
+        // 处理错误情况
+        if (!fullText) {
+          // 如果没有收到任何文本，显示错误消息
+          const errorMsg = "⚠️ 无法连接到AI服务，请检查网络连接或稍后再试。";
+          setCurrentStreamingMessage(errorMsg);
           
-          // 继续读取
-          readStream();
-        }).catch(err => {
-          console.error('流式聊天错误:', err);
+          // 将错误消息添加到聊天历史
+          setAiChatHistory(prev => [
+            ...prev,
+            { type: "ai", message: errorMsg }
+          ]);
+          setCurrentStreamingMessage("");
+        } else {
+          // 如果已经有部分文本，则显示已接收的内容
+          setAiChatHistory(prev => [
+            ...prev,
+            { type: "ai", message: fullText }
+          ]);
+          setCurrentStreamingMessage("");
+        }
+      };
+      
+      // 监听连接打开
+      eventSourceRef.current.onopen = () => {
+        console.log('SSE连接已打开');
+        setCurrentStreamingMessage("AI模型思考中...");
+      };
+      
+      // 监听连接关闭或完成
+      const checkComplete = (e) => {
+        if (e.type === 'complete' || e.data === '[DONE]') {
+          console.log('SSE连接已完成');
+          
+          // 关闭连接
+          eventSourceRef.current.close();
+          eventSourceRef.current = null;
+          
+          // 清除打字计时器，确保显示完整内容
+          if (window.typingTimer) {
+            clearInterval(window.typingTimer);
+            window.typingTimer = null;
+          }
+          
+          // 确保所有文本都已显示
+          if (charsToDisplay.length > 0) {
+            setCurrentStreamingMessage(fullText);
+          }
+          
           setIsTyping(false);
           setIsLoading(false);
           
-          // 处理错误情况
-          if (!currentStreamingMessage) {
-            setCurrentStreamingMessage("抱歉，处理您的请求时出现错误。请稍后再试。");
+          // 将消息添加到聊天历史
+          if (fullText) {
+            setAiChatHistory(prev => [
+              ...prev,
+              { type: "ai", message: fullText }
+            ]);
+            setCurrentStreamingMessage("");
+          } else {
+            // 如果没有收到任何内容，显示错误信息
+            const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
+            setAiChatHistory(prev => [
+              ...prev,
+              { type: "ai", message: errorMsg }
+            ]);
+            setCurrentStreamingMessage("");
           }
-          
-          // 将流式消息添加到聊天历史
-          setAiChatHistory(prev => [
-            ...prev,
-            { type: "ai", message: currentStreamingMessage || "网络错误，无法连接到AI服务。" }
-          ]);
-          setCurrentStreamingMessage("");
-        });
-      }
+        }
+      };
       
-      // 开始读取流
-      readStream();
-    }).catch(error => {
-      console.error('发起流式聊天请求失败:', error);
+      // 监听自定义complete事件
+      eventSourceRef.current.addEventListener('complete', checkComplete);
+      eventSourceRef.current.addEventListener('message', (e) => {
+        if (e.data === '[DONE]') {
+          checkComplete(e);
+        }
+      });
+      
+    } catch (error) {
+      console.error('创建SSE连接失败:', error);
       setIsTyping(false);
       setIsLoading(false);
       
       // 处理连接错误
+      const errorMsg = `⚠️ 创建AI连接失败: ${error.message}`;
       setAiChatHistory(prev => [
         ...prev,
-        { type: "ai", message: "网络错误，无法连接到AI服务。请检查您的网络连接或稍后再试。" }
+        { type: "ai", message: errorMsg }
       ]);
-    });
+    }
   };
 
   const handleSendMessage = async () => {
@@ -454,9 +636,16 @@ const AiAssistant = ({ userInfo }) => {
 
   // 渲染消息内容，支持Markdown
   const renderMessageContent = (message) => {
+    // 去除<think>标签及其内容
+    let cleanedMessage = message;
+    cleanedMessage = cleanedMessage.replace(/<think>[\s\S]*?<\/think>/g, '');
+    
+    // 确保Markdown换行正确显示
+    cleanedMessage = cleanedMessage.replace(/\n/g, '  \n');
+    
     return (
       <ReactMarkdown className="ai-markdown-content">
-        {message}
+        {cleanedMessage}
       </ReactMarkdown>
     );
   };
@@ -694,12 +883,12 @@ const AiAssistant = ({ userInfo }) => {
                 className={`ai-chat-message ${chat.type}-message`}
               > 
                 <div className="ai-chat-bubble">
-                  {chat.type === "ai" && (
+                  {/* {chat.type === "ai" && (
                     <i className="fas fa-robot ai-icon"></i>
                   )}
                   {chat.type === "user" && (
                     <i className="fas fa-user ai-icon"></i>
-                  )}
+                  )} */}
                   <div className="ai-chat-text">
                     {chat.type === "ai" 
                       ? renderMessageContent(chat.message)
