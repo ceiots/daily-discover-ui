@@ -775,6 +775,11 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.ai-markdown-content{
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
 /* 头部操作按钮 */
 .ai-header-actions {
   display: flex;

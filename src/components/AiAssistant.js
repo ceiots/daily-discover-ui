@@ -3,6 +3,7 @@ import "./AiAssistant.css";
 import PropTypes from "prop-types";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from 'react-markdown';
 
 
 const AiAssistant = ({ userInfo }) => {
@@ -24,20 +25,23 @@ const AiAssistant = ({ userInfo }) => {
   const [currentSessionId, setCurrentSessionId] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
+  const [useStreamingChat, setUseStreamingChat] = useState(true);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const recommendationTimerRef = useRef(null);
+  const eventSourceRef = useRef(null);
   
   // API基础URL
-  const API_BASE_URL = window.location.origin ;
+  const API_BASE_URL = window.location.origin;
 
   // 滚动到最新消息
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [aiChatHistory]);
+  }, [aiChatHistory, currentStreamingMessage]);
 
   // 推荐内容自动关闭定时器
   useEffect(() => {
@@ -81,6 +85,15 @@ const AiAssistant = ({ userInfo }) => {
     // 加载聊天历史
     loadChatHistory();
     
+  }, []);
+
+  // 组件卸载时关闭EventSource连接
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
   }, []);
 
   // 创建新会话
@@ -246,7 +259,7 @@ const AiAssistant = ({ userInfo }) => {
     try {
       console.log('userInfo:',userInfo);
       // 检查用户是否已登录
-      if (!userInfo?.isLoggedIn) {
+      if (!userInfo?.id) {
         navigate("/login");
         return;
       }
@@ -269,6 +282,125 @@ const AiAssistant = ({ userInfo }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // 使用SSE流式聊天
+  const streamChatWithServer = (message) => {
+    console.log('使用流式聊天，userInfo:', userInfo);
+    
+    // 检查用户是否已登录
+    if (!userInfo?.id) {
+      navigate("/login");
+      return;
+    }
+    
+    setIsLoading(true);
+    setCurrentStreamingMessage("");
+    
+    // 关闭之前的连接
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+    }
+    
+    // 设置API URL
+    const apiUrl = `/ai/chat/stream`;
+    
+    // 创建表单数据
+    const formData = new FormData();
+    formData.append('prompt', message);
+    formData.append('sessionId', currentSessionId);
+    
+    // 使用fetch和SSE进行流式通信
+    instance.post(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token') || '',
+        'userId': userInfo.id
+      },
+      body: JSON.stringify({
+        prompt: message,
+        sessionId: currentSessionId
+      })
+    }).then(response => {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      
+      // 读取流数据
+      function readStream() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            console.log('流式聊天完成');
+            setIsTyping(false);
+            setIsLoading(false);
+            
+            // 将流式消息添加到聊天历史
+            if (currentStreamingMessage) {
+              setAiChatHistory(prev => [
+                ...prev,
+                { type: "ai", message: currentStreamingMessage }
+              ]);
+              setCurrentStreamingMessage("");
+            }
+            return;
+          }
+          
+          // 解码并处理响应数据
+          const chunk = decoder.decode(value, { stream: true });
+          
+          // 解析SSE数据
+          const lines = chunk.split('\n\n');
+          lines.forEach(line => {
+            if (line.startsWith('data:')) {
+              const data = line.substring(5).trim();
+              if (data) {
+                try {
+                  const parsedData = JSON.parse(data);
+                  if (parsedData.data) {
+                    setCurrentStreamingMessage(prev => prev + parsedData.data);
+                  }
+                } catch (e) {
+                  // 尝试直接使用数据
+                  setCurrentStreamingMessage(prev => prev + data);
+                }
+              }
+            }
+          });
+          
+          // 继续读取
+          readStream();
+        }).catch(err => {
+          console.error('流式聊天错误:', err);
+          setIsTyping(false);
+          setIsLoading(false);
+          
+          // 处理错误情况
+          if (!currentStreamingMessage) {
+            setCurrentStreamingMessage("抱歉，处理您的请求时出现错误。请稍后再试。");
+          }
+          
+          // 将流式消息添加到聊天历史
+          setAiChatHistory(prev => [
+            ...prev,
+            { type: "ai", message: currentStreamingMessage || "网络错误，无法连接到AI服务。" }
+          ]);
+          setCurrentStreamingMessage("");
+        });
+      }
+      
+      // 开始读取流
+      readStream();
+    }).catch(error => {
+      console.error('发起流式聊天请求失败:', error);
+      setIsTyping(false);
+      setIsLoading(false);
+      
+      // 处理连接错误
+      setAiChatHistory(prev => [
+        ...prev,
+        { type: "ai", message: "网络错误，无法连接到AI服务。请检查您的网络连接或稍后再试。" }
+      ]);
+    });
   };
 
   const handleSendMessage = async () => {
@@ -294,15 +426,20 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 调用AI服务获取响应
-    const aiResponse = await sendMessageToServer(currentMessage);
-
-    // 添加AI回复到聊天历史
-    setAiChatHistory((prev) => [
-      ...prev,
-      { type: "ai", message: aiResponse },
-    ]);
-    setIsTyping(false);
+    if (useStreamingChat) {
+      // 使用流式聊天
+      streamChatWithServer(currentMessage);
+    } else {
+      // 使用传统聊天
+      const aiResponse = await sendMessageToServer(currentMessage);
+      
+      // 添加AI回复到聊天历史
+      setAiChatHistory((prev) => [
+        ...prev,
+        { type: "ai", message: aiResponse },
+      ]);
+      setIsTyping(false);
+    }
 
     // 更新推荐话题
     updateSuggestedTopics(currentMessage);
@@ -338,14 +475,19 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 调用AI服务获取响应
-    const aiResponse = await sendMessageToServer(topic.text);
-    
-    setAiChatHistory((prev) => [
-      ...prev,
-      { type: "ai", message: aiResponse },
-    ]);
-    setIsTyping(false);
+    if (useStreamingChat) {
+      // 使用流式聊天
+      streamChatWithServer(topic.text);
+    } else {
+      // 使用传统聊天
+      const aiResponse = await sendMessageToServer(topic.text);
+      
+      setAiChatHistory((prev) => [
+        ...prev,
+        { type: "ai", message: aiResponse },
+      ]);
+      setIsTyping(false);
+    }
 
     // 更新推荐话题
     updateSuggestedTopics(topic.text);
@@ -368,6 +510,15 @@ const AiAssistant = ({ userInfo }) => {
         }, 500);
       }
     });
+  };
+
+  // 渲染消息内容，支持Markdown
+  const renderMessageContent = (message) => {
+    return (
+      <ReactMarkdown className="ai-markdown-content">
+        {message}
+      </ReactMarkdown>
+    );
   };
 
   // 根据用户输入更新推荐话题
@@ -535,6 +686,14 @@ const AiAssistant = ({ userInfo }) => {
           <div className="ai-header-actions">
             <button 
               className="ai-header-btn"
+              onClick={() => setUseStreamingChat(!useStreamingChat)}
+              aria-label={useStreamingChat ? "关闭流式聊天" : "开启流式聊天"}
+              title={useStreamingChat ? "关闭流式聊天" : "开启流式聊天"}
+            >
+              <i className={`fas fa-${useStreamingChat ? "stop" : "play"}`}></i>
+            </button>
+            <button 
+              className="ai-header-btn"
               onClick={toggleHistoryPanel}
               aria-label="历史记录"
               title="查看历史记录"
@@ -602,8 +761,6 @@ const AiAssistant = ({ userInfo }) => {
                 key={index}
                 className={`ai-chat-message ${chat.type}-message`}
               > 
-                {/* 滚动到最新消息的锚点 */}
-                <div ref={chatEndRef}></div>
                 <div className="ai-chat-bubble">
                   {chat.type === "ai" && (
                     <i className="fas fa-robot ai-icon"></i>
@@ -611,13 +768,30 @@ const AiAssistant = ({ userInfo }) => {
                   {chat.type === "user" && (
                     <i className="fas fa-user ai-icon"></i>
                   )}
-                  <div className="ai-chat-text">{chat.message}</div>
+                  <div className="ai-chat-text">
+                    {chat.type === "ai" 
+                      ? renderMessageContent(chat.message)
+                      : chat.message
+                    }
+                  </div>
                 </div>
               </div>
             ))}
 
+            {/* 正在流式生成的消息 */}
+            {currentStreamingMessage && (
+              <div className="ai-chat-message ai-message">
+                <div className="ai-chat-bubble">
+                  <i className="fas fa-robot ai-icon"></i>
+                  <div className="ai-chat-text">
+                    {renderMessageContent(currentStreamingMessage)}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* 输入指示器 */}
-            {isTyping && (
+            {isTyping && !currentStreamingMessage && (
               <div className="ai-chat-message ai-message">
                 <div className="ai-chat-bubble typing">
                   <i className="fas fa-robot ai-icon"></i>
@@ -629,6 +803,9 @@ const AiAssistant = ({ userInfo }) => {
                 </div>
               </div>
             )}
+            
+            {/* 滚动到最新消息的锚点 */}
+            <div ref={chatEndRef}></div>
           </div>
         )}
       </div>
@@ -758,8 +935,7 @@ AiAssistant.propTypes = {
   userInfo: PropTypes.shape({
     nickname: PropTypes.string,
     avatar: PropTypes.string,
-    isLoggedIn: PropTypes.bool.isRequired, // 新增此项
-    // 其他用户信息属性
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }),
 };
 
