@@ -32,13 +32,25 @@ const AiAssistant = ({ userInfo }) => {
   const recommendationTimerRef = useRef(null);
   const eventSourceRef = useRef(null);
   
-
-  // 滚动到最新消息
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  // 处理响应数据的辅助函数 - 移动到组件级别
+  const processResponseData = (data) => {
+    if (!data) return '';
+    
+    let cleanData = data;
+    
+    // 移除event:message前缀
+    if (cleanData.includes("event:message")) {
+      cleanData = cleanData.replace(/event:message\w*/g, "");
     }
-  }, [aiChatHistory, currentStreamingMessage]);
+    
+    // 移除<think>标签
+    if (cleanData.includes("<think>")) {
+      cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
+    }
+    
+    return cleanData;
+  };
+
 
   // 推荐内容自动关闭定时器
   useEffect(() => {
@@ -59,13 +71,6 @@ const AiAssistant = ({ userInfo }) => {
   useEffect(() => {
     // 添加默认欢迎消息
     if (aiChatHistory.length === 0) {
-      setAiChatHistory([
-        {
-          type: "ai",
-          message: "你好！我是你的AI助手，有什么我可以帮助你的吗？",
-        },
-      ]);
-      
       // 创建新会话
       createNewSession();
       
@@ -86,14 +91,40 @@ const AiAssistant = ({ userInfo }) => {
 
   // 组件卸载时关闭EventSource连接
   useEffect(() => {
+    // 添加CSS样式来防止水平滚动
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .ai-chat-text {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
+        max-width: 100%;
+      }
+      .ai-chat-bubble {
+        max-width: 100%;
+        overflow: hidden;
+      }
+      .ai-markdown-content {
+        width: 100%;
+        overflow-x: hidden;
+      }
+      .ai-markdown-content pre, .ai-markdown-content code {
+        white-space: pre-wrap;
+        word-break: break-all;
+        overflow-wrap: break-word;
+        max-width: 100%;
+      }
+      .ai-chat-message {
+        width: 100%;
+        max-width: 100%;
+      }
+    `;
+    document.head.appendChild(style);
+
     return () => {
+      document.head.removeChild(style);
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
-      }
-      
-      // 清除打字效果的计时器
-      if (window.typingTimer) {
-        clearInterval(window.typingTimer);
       }
     };
   }, []);
@@ -267,17 +298,10 @@ const AiAssistant = ({ userInfo }) => {
     }
     
     setIsLoading(true);
-    setCurrentStreamingMessage("");
     
     // 关闭之前的连接
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
-    }
-    
-    // 清除之前的任何计时器
-    if (window.typingTimer) {
-      clearInterval(window.typingTimer);
-      window.typingTimer = null;
     }
     
     // 准备请求数据
@@ -301,7 +325,7 @@ const AiAssistant = ({ userInfo }) => {
       }
       
       // 如果用户已登录，添加用户ID
-      if (!userInfo?.id) {
+      if (userInfo?.id) {
         params.append('userId', userInfo.id.toString());
       }
       
@@ -311,38 +335,15 @@ const AiAssistant = ({ userInfo }) => {
       console.log('连接SSE:', url);
       
       // 显示连接中的提示
-      setCurrentStreamingMessage("正在连接AI模型...");
+      setCurrentStreamingMessage("正在连接...");
       
       // 保存连接引用以便清理
       eventSourceRef.current = new EventSource(url);
-      
-      // 存储收到的所有文字和待显示的队列
+    
+      // 存储收到的所有文字
       let fullText = '';
-      let charsToDisplay = [];
-      let isTypingActive = false;
-      const typingSpeed = 15; // 打字速度（毫秒）
       let hasStartedReceiving = false;
-      
-      // 打字效果函数
-      const startTypingEffect = () => {
-        if (isTypingActive || charsToDisplay.length === 0) return;
-        
-        isTypingActive = true;
-        window.typingTimer = setInterval(() => {
-          if (charsToDisplay.length > 0) {
-            // 每次取出1-3个字符显示
-            const charsCount = Math.min(3, charsToDisplay.length);
-            const nextChars = charsToDisplay.splice(0, charsCount).join('');
-            setCurrentStreamingMessage(prev => prev + nextChars);
-          } else {
-            // 队列为空，暂停打字效果
-            clearInterval(window.typingTimer);
-            window.typingTimer = null;
-            isTypingActive = false;
-          }
-        }, typingSpeed);
-      };
-      
+    
       // 监听info事件，获取会话信息
       eventSourceRef.current.addEventListener('info', (event) => {
         try {
@@ -354,14 +355,13 @@ const AiAssistant = ({ userInfo }) => {
             setCurrentSessionId(data.sessionId);
           }
           
-          // 显示模式信息
-          const mode = data.mode === 'guest' ? '访客模式' : '用户模式';
-          console.log(`AI聊天模式: ${mode}`);
+          // 显示连接状态
+          setCurrentStreamingMessage("AI思考中...");
         } catch (e) {
           console.error('解析会话信息失败:', e);
         }
       });
-      
+    
       // 监听消息事件
       eventSourceRef.current.onmessage = (event) => {
         const data = event.data;
@@ -375,6 +375,7 @@ const AiAssistant = ({ userInfo }) => {
         
         if (data) {
           try {
+            // 尝试解析JSON
             const parsedData = JSON.parse(data);
             
             // 处理错误消息
@@ -389,51 +390,27 @@ const AiAssistant = ({ userInfo }) => {
             if (parsedData.data) {
               // 移除event:message前缀和<think>标签
               let cleanData = parsedData.data;
-              // 移除event:message前缀
-              if (cleanData.includes("event:message")) {
-                cleanData = cleanData.replace(/event:message\w*/g, "");
-              }
               
-              // 移除<think>标签
-              if (cleanData.includes("<think>")) {
-                cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
-              }
+              // 处理清理数据
+              cleanData = processResponseData(cleanData);
               
               // 添加到完整文本
               fullText += cleanData;
-              
-              // 将新字符添加到待显示队列
-              charsToDisplay = [...charsToDisplay, ...cleanData.split('')];
-              
-              // 如果打字效果未激活，启动它
-              if (!isTypingActive) {
-                startTypingEffect();
-              }
+              // 直接显示新收到的文本
+              setCurrentStreamingMessage(prev => prev + cleanData);
             }
           } catch (e) {
-            console.error('解析JSON错误:', e, data);
-            // 尝试直接使用数据
-            let cleanData = data;
-            // 移除event:message前缀
-            if (cleanData.includes("event:message")) {
-              cleanData = cleanData.replace(/event:message\w*/g, "");
-            }
+            // JSON解析失败，尝试作为纯文本处理
+            console.log('以纯文本处理响应数据');
             
-            // 移除<think>标签
-            if (cleanData.includes("<think>")) {
-              cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
-            }
+            // 处理清理数据
+            let cleanData = processResponseData(data);
             
             // 添加到完整文本
             fullText += cleanData;
             
-            // 将新字符添加到待显示队列
-            charsToDisplay = [...charsToDisplay, ...cleanData.split('')];
-            
-            // 如果打字效果未激活，启动它
-            if (!isTypingActive) {
-              startTypingEffect();
-            }
+            // 直接显示新收到的文本
+            setCurrentStreamingMessage(prev => prev + cleanData);
           }
         }
       };
@@ -445,13 +422,6 @@ const AiAssistant = ({ userInfo }) => {
         // 关闭连接
         eventSourceRef.current.close();
         eventSourceRef.current = null;
-        
-        // 清除打字计时器
-        if (window.typingTimer) {
-          clearInterval(window.typingTimer);
-          window.typingTimer = null;
-          isTypingActive = false;
-        }
         
         setIsTyping(false);
         setIsLoading(false);
@@ -481,7 +451,7 @@ const AiAssistant = ({ userInfo }) => {
       // 监听连接打开
       eventSourceRef.current.onopen = () => {
         console.log('SSE连接已打开');
-        setCurrentStreamingMessage("AI模型思考中...");
+        setCurrentStreamingMessage("AI思考中...");
       };
       
       // 监听连接关闭或完成
@@ -493,27 +463,22 @@ const AiAssistant = ({ userInfo }) => {
           eventSourceRef.current.close();
           eventSourceRef.current = null;
           
-          // 清除打字计时器，确保显示完整内容
-          if (window.typingTimer) {
-            clearInterval(window.typingTimer);
-            window.typingTimer = null;
-          }
-          
-          // 确保所有文本都已显示
-          if (charsToDisplay.length > 0) {
-            setCurrentStreamingMessage(fullText);
-          }
-          
           setIsTyping(false);
           setIsLoading(false);
           
-          // 将消息添加到聊天历史
-          if (fullText) {
-            setAiChatHistory(prev => [
-              ...prev,
-              { type: "ai", message: fullText }
-            ]);
-            setCurrentStreamingMessage("");
+          // 处理完成逻辑
+          if (fullText && fullText.length > 0) {
+            // 确保显示完整内容
+            setCurrentStreamingMessage(fullText);
+            
+            // 短暂延迟后将内容添加到聊天历史，并清空当前流式消息
+            setTimeout(() => {
+              setAiChatHistory(prev => [
+                ...prev,
+                { type: "ai", message: fullText }
+              ]);
+              setCurrentStreamingMessage("");
+            }, 100);
           } else {
             // 如果没有收到任何内容，显示错误信息
             const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
@@ -616,7 +581,7 @@ const AiAssistant = ({ userInfo }) => {
 
     // 滚动到最新消息位置
     if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     // 自动展开聊天区域
@@ -636,12 +601,20 @@ const AiAssistant = ({ userInfo }) => {
 
   // 渲染消息内容，支持Markdown
   const renderMessageContent = (message) => {
-    // 去除<think>标签及其内容
-    let cleanedMessage = message;
-    cleanedMessage = cleanedMessage.replace(/<think>[\s\S]*?<\/think>/g, '');
+    if (!message) return '';
     
-    // 确保Markdown换行正确显示
-    cleanedMessage = cleanedMessage.replace(/\n/g, '  \n');
+    // 处理特殊标签和前缀
+    let cleanedMessage = processResponseData(message);
+    
+    // 优化空格处理
+    // 1. 移除多余的空行（2个以上的连续换行符替换为1个）
+    cleanedMessage = cleanedMessage.replace(/\n{2,}/g, '\n');
+    
+    // 2. 处理列表项的缩进，确保列表正确渲染
+    cleanedMessage = cleanedMessage.replace(/^(\s*)[*-](\s)/gm, '$1* ');
+    
+    // 3. 处理标题格式，确保#后有空格
+    cleanedMessage = cleanedMessage.replace(/^(#+)([^\s#])/gm, '$1 $2');
     
     return (
       <ReactMarkdown className="ai-markdown-content">
@@ -795,19 +768,12 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
   
-  // 切换收藏面板显示
-  const toggleFavoritesPanel = () => {
-    setShowFavoritesPanel(!showFavoritesPanel);
-    if (showHistoryPanel) {
-      setShowHistoryPanel(false);
-    }
-  };
 
   return (
     <div className="ai-assistant-container">
       {/* 主要AI卡片区域 */}
       <div className="ai-card blue-theme">
-        <div className="ai-card-header">
+        {/* <div className="ai-card-header">
           <div className="ai-header-left">
             <i className="fas fa-robot"></i>
             <h3>AI智能助手</h3>
@@ -829,7 +795,7 @@ const AiAssistant = ({ userInfo }) => {
               <i className={`fas fa-chevron-${isExpanded ? "up" : "down"}`}></i>
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* 输入框区域 - 始终显示 */}
         <div className="ai-input-area">
@@ -899,11 +865,13 @@ const AiAssistant = ({ userInfo }) => {
               </div>
             ))}
 
+            {/* 滚动到最新消息的锚点 */}
+            <div ref={chatEndRef}></div>
+
             {/* 正在流式生成的消息 */}
             {currentStreamingMessage && (
               <div className="ai-chat-message ai-message">
                 <div className="ai-chat-bubble">
-                  <i className="fas fa-robot ai-icon"></i>
                   <div className="ai-chat-text">
                     {renderMessageContent(currentStreamingMessage)}
                   </div>
@@ -915,7 +883,6 @@ const AiAssistant = ({ userInfo }) => {
             {isTyping && !currentStreamingMessage && (
               <div className="ai-chat-message ai-message">
                 <div className="ai-chat-bubble typing">
-                  <i className="fas fa-robot ai-icon"></i>
                   <div className="typing-indicator">
                     <span></span>
                     <span></span>
@@ -924,11 +891,11 @@ const AiAssistant = ({ userInfo }) => {
                 </div>
               </div>
             )}
-            
-            {/* 滚动到最新消息的锚点 */}
-            <div ref={chatEndRef}></div>
+           
           </div>
         )}
+
+        
       </div>
 
       {/* 当前推荐内容 - 插入在聊天历史区域后面 */}
