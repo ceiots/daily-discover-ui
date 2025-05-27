@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./AiAssistant.css";
 import PropTypes from "prop-types";
+import instance from "../utils/axios";
 
 const AiAssistant = ({ userInfo }) => {
   const [userMessage, setUserMessage] = useState("");
@@ -9,13 +10,24 @@ const AiAssistant = ({ userInfo }) => {
   const [aiTopics, setAiTopics] = useState([]);
   const [suggestedTopics, setSuggestedTopics] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [currentRecommendation, setCurrentRecommendation] = useState(null); // 当前推荐的内容`
+  const [currentRecommendation, setCurrentRecommendation] = useState(null);
   const [quickReads, setQuickReads] = useState([]);
-  const [selectedReadItem, setSelectedReadItem] = useState(null); // 当前选中的阅读项
+  const [selectedReadItem, setSelectedReadItem] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [favoriteQuestions, setFavoriteQuestions] = useState([]);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
+  const [showFavoritesPanel, setShowFavoritesPanel] = useState(false);
+  const [currentSessionId, setCurrentSessionId] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
-  const recommendationTimerRef = useRef(null); // 定时器引用
+  const recommendationTimerRef = useRef(null);
+  
+  // API基础URL
+  const API_BASE_URL = window.location.origin ;
 
   // 滚动到最新消息
   useEffect(() => {
@@ -27,13 +39,11 @@ const AiAssistant = ({ userInfo }) => {
   // 推荐内容自动关闭定时器
   useEffect(() => {
     if (currentRecommendation) {
-      // 设置1分钟后自动关闭
       recommendationTimerRef.current = setTimeout(() => {
         setCurrentRecommendation(null);
-      }, 60000); // 60秒 = 1分钟
+      }, 60000);
     }
 
-    // 清除定时器
     return () => {
       if (recommendationTimerRef.current) {
         clearTimeout(recommendationTimerRef.current);
@@ -51,9 +61,64 @@ const AiAssistant = ({ userInfo }) => {
           message: "你好！我是你的AI助手，有什么我可以帮助你的吗？",
         },
       ]);
+      
+      // 创建新会话
+      createNewSession();
+      
+      // 加载快速问题
+      loadQuickQuestions();
     }
 
     // 加载热门话题
+    loadTopics();
+
+    // 设置快速阅读内容
+    loadQuickReads();
+    
+    // 加载聊天历史
+    loadChatHistory();
+    
+  }, []);
+
+  // 创建新会话
+  const createNewSession = () => {
+    const sessionId = `session_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    setCurrentSessionId(sessionId);
+    return sessionId;
+  };
+
+  // 加载快速问题
+  const loadQuickQuestions = async () => {
+    try {
+      const response = await instance.get("/ai/quick-questions");
+      if (response.data && response.data.data) {
+        const questionTopics = response.data.data.map((question, index) => ({
+          id: `q-${index}`,
+          text: question,
+          icon: getIconForQuestion(question)
+        }));
+        setAiTopics(questionTopics);
+        setSuggestedTopics(questionTopics.slice(0, 4));
+      }
+    } catch (error) {
+      console.error("加载快速问题失败:", error);
+      loadFallbackTopics();
+    }
+  };
+
+  // 根据问题内容选择合适的图标
+  const getIconForQuestion = (question) => {
+    if (question.includes("推荐") || question.includes("好物")) return "gift";
+    if (question.includes("热门")) return "fire";
+    if (question.includes("品质") || question.includes("生活")) return "star";
+    if (question.includes("厨房")) return "utensils";
+    if (question.includes("送礼")) return "gift-card";
+    if (question.includes("穿搭") || question.includes("衣")) return "tshirt";
+    return "lightbulb";
+  };
+
+  // 加载备用话题（当API调用失败时）
+  const loadFallbackTopics = () => {
     const initialTopics = [
       { id: 1, text: "数字极简主义", icon: "mobile-alt" },
       { id: 2, text: "每日冥想技巧", icon: "brain" },
@@ -66,8 +131,39 @@ const AiAssistant = ({ userInfo }) => {
 
     setAiTopics(initialTopics);
     setSuggestedTopics(initialTopics.slice(0, 4));
+  };
 
-    // 设置快速阅读内容
+  // 加载话题数据
+  const loadTopics = async () => {
+    try {
+      // 这里可以替换为实际的API调用
+      loadFallbackTopics(); // 暂时使用备用数据
+    } catch (error) {
+      console.error("加载话题失败:", error);
+      loadFallbackTopics();
+    }
+  };
+
+  // 加载快速阅读内容
+  const loadQuickReads = async () => {
+    try {
+      // 这里可以替换为实际的API调用，例如从后端获取推荐阅读内容
+      const response = await instance.get("/ai/daily-discovery");
+      if (response.data && response.data.data) {
+        // 处理返回的数据
+        // 暂时使用现有数据
+        setDefaultQuickReads();
+      } else {
+        setDefaultQuickReads();
+      }
+    } catch (error) {
+      console.error("加载快速阅读内容失败:", error);
+      setDefaultQuickReads();
+    }
+  };
+
+  // 设置默认快速阅读内容
+  const setDefaultQuickReads = () => {
     setQuickReads([
       {
         id: 1,
@@ -140,9 +236,32 @@ const AiAssistant = ({ userInfo }) => {
           "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
       },
     ]);
-  }, []);
+  };
 
-  const handleSendMessage = () => {
+  // 发送消息到服务器并获取响应
+  const sendMessageToServer = async (message) => {
+    try {
+      setIsLoading(true);
+      const response = await instance.post("/ai/chat", {
+        prompt: message,
+        sessionId: currentSessionId
+      });
+      
+      if (response.data && response.data.code === 200) {
+        return response.data.data;
+      } else {
+        console.error("AI响应错误:", response.data);
+        return "抱歉，我暂时无法回答这个问题。请稍后再试。";
+      }
+    } catch (error) {
+      console.error("AI聊天请求失败:", error);
+      return "网络错误，无法连接到AI服务。请检查您的网络连接或稍后再试。";
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
     // 添加用户消息到聊天历史
@@ -165,27 +284,23 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 模拟API延迟
-    setTimeout(() => {
-      let aiResponse = generateAiResponse(currentMessage);
+    // 调用AI服务获取响应
+    const aiResponse = await sendMessageToServer(currentMessage);
 
-      // 添加AI回复到聊天历史
-      setAiChatHistory((prev) => [
-        ...prev,
-        { type: "ai", message: aiResponse },
-      ]);
-      setIsTyping(false);
+    // 添加AI回复到聊天历史
+    setAiChatHistory((prev) => [
+      ...prev,
+      { type: "ai", message: aiResponse },
+    ]);
+    setIsTyping(false);
 
-      // 更新推荐话题
-      updateSuggestedTopics(currentMessage);
+    // 更新推荐话题
+    updateSuggestedTopics(currentMessage);
 
-      // 滚动到最新消息位置
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-
-    }, 1500);
-
+    // 滚动到最新消息位置
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 
     // 自动展开聊天区域
     setIsExpanded(true);
@@ -197,7 +312,7 @@ const AiAssistant = ({ userInfo }) => {
   };
 
   // 处理话题点击 - 直接发送到AI
-  const handleTopicClick = (topic) => {
+  const handleTopicClick = async (topic) => {
     // 设置消息并发送
     setUserMessage(topic.text);
 
@@ -213,24 +328,22 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 模拟API延迟
-    setTimeout(() => {
-      let aiResponse = generateAiResponse(topic.text);
-      setAiChatHistory((prev) => [
-        ...prev,
-        { type: "ai", message: aiResponse },
-      ]);
-      setIsTyping(false);
+    // 调用AI服务获取响应
+    const aiResponse = await sendMessageToServer(topic.text);
+    
+    setAiChatHistory((prev) => [
+      ...prev,
+      { type: "ai", message: aiResponse },
+    ]);
+    setIsTyping(false);
 
-      // 更新推荐话题
-      updateSuggestedTopics(topic.text);
+    // 更新推荐话题
+    updateSuggestedTopics(topic.text);
 
-      // 滚动到最新消息位置
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
-      }
-
-    }, 1500);
+    // 滚动到最新消息位置
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
 
     // 自动展开聊天区域
     setIsExpanded(true);
@@ -344,47 +457,59 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
-  // 生成AI回复的辅助函数
-  const generateAiResponse = (message) => {
-    // 根据关键词生成更智能的回复
-    if (message.includes("数字极简主义")) {
-      return "数字极简主义是一种减少数字干扰的生活方式，研究表明它能提高专注力40%，每天节省约1.5小时的时间。要开始实践，可以从设置手机免打扰、整理应用和限制社交媒体使用时间开始。";
-    } else if (message.includes("冥想")) {
-      return "每天进行10-15分钟的冥想可以显著降低压力水平，提高注意力，改善睡眠质量。我可以推荐一些适合初学者的冥想技巧和应用，你想了解哪方面的信息？";
-    } else if (message.includes("健康饮食") || message.includes("饮食")) {
-      return "植物性饮食是2023年的主要趋势之一，研究表明它可以减少30%的慢性疾病风险。均衡的饮食结构应包括多样化的蔬果、全谷物、优质蛋白和健康脂肪，每天喝足够的水也很重要。";
-    } else if (message.includes("高效工作") || message.includes("效率")) {
-      return "高效工作的关键包括：番茄工作法（25分钟专注工作+5分钟休息）、批处理类似任务、减少多任务处理、设定明确目标和优先级，以及创建无干扰的工作环境。";
-    } else if (message.includes("睡眠") || message.includes("失眠")) {
-      return "提升睡眠质量的技巧：坚持规律的睡眠时间表、睡前1小时避免电子屏幕、创建舒适的睡眠环境（温度18-20℃、黑暗、安静）、睡前放松活动如阅读或冥想，以及白天适度运动。";
-    } else if (
-      message.includes("减压") ||
-      message.includes("压力") ||
-      message.includes("放松")
-    ) {
-      return "有效的减压方法包括：深呼吸练习（4秒吸气-7秒屏息-8秒呼气）、规律运动、与朋友交流、适当休息、大自然疗愈和限制咖啡因摄入。持续的高压可能导致多种健康问题，建议及时寻求专业帮助。";
-    } else if (message.includes("健身") || message.includes("运动")) {
-      return "居家健身不需要复杂器材，高效的计划应包括：每周3-5次锻炼、结合有氧和力量训练、专注大肌群复合动作（如深蹲、俯卧撑）、合理休息和充分水分摄入。科学表明每周150分钟中等强度运动可显著改善健康。";
-    } else {
-      // 随机通用回复
-      const responses = [
-        "这是个很好的问题！根据最新研究，" +
-          message +
-          "相关的领域有很多新发现。您想了解哪方面的具体内容？",
-        "关于" +
-          message +
-          "，有几个关键点值得注意：首先，它与我们的日常习惯密切相关；其次，小的改变可以带来显著效果；最后，坚持是最重要的。您需要更详细的建议吗？",
-        "我找到了一些关于" +
-          message +
-          "的实用信息。研究表明，70%的人通过调整日常习惯获得了明显改善。您想了解如何开始吗？",
-        "关于" +
-          message +
-          "，专家建议从小目标开始，逐步建立长期习惯。这种方法的成功率提高了约60%。我可以提供一个简单的入门计划。",
-        "很高兴您对" +
-          message +
-          "感兴趣！这是近期热门话题，对提升生活质量有显著帮助。您是想了解理论知识还是实践方法？",
-      ];
-      return responses[Math.floor(Math.random() * responses.length)];
+  // 加载历史聊天记录
+  const loadChatHistory = async () => {
+    try {
+      const response = await instance.get("/ai/chat-history", {
+        params: {
+          pageNum: page,
+          pageSize: pageSize
+        }
+      });
+      if (response.data && response.data.code === 200 && response.data.data) {
+        setChatHistory(response.data.data);
+      }
+    } catch (error) {
+      console.error("加载聊天历史失败:", error);
+    }
+  };
+  
+
+  // 处理历史记录加载更多
+  const handleLoadMoreHistory = () => {
+    setPage(prevPage => prevPage + 1);
+    loadChatHistory();
+  };
+  
+  // 清空聊天历史
+  const handleClearHistory = async () => {
+    try {
+      const response = await instance.post("/ai/clear-chat-history");
+      
+      if (response.data && response.data.code === 200) {
+        // 清空本地聊天历史
+        setChatHistory([]);
+        // 创建新会话
+        createNewSession();
+      }
+    } catch (error) {
+      console.error("清空聊天历史失败:", error);
+    }
+  };
+  
+  // 切换历史面板显示
+  const toggleHistoryPanel = () => {
+    setShowHistoryPanel(!showHistoryPanel);
+    if (showFavoritesPanel) {
+      setShowFavoritesPanel(false);
+    }
+  };
+  
+  // 切换收藏面板显示
+  const toggleFavoritesPanel = () => {
+    setShowFavoritesPanel(!showFavoritesPanel);
+    if (showHistoryPanel) {
+      setShowHistoryPanel(false);
     }
   };
 
@@ -397,13 +522,23 @@ const AiAssistant = ({ userInfo }) => {
             <i className="fas fa-robot"></i>
             <h3>AI智能助手</h3>
           </div>
-          <button
-            className="ai-expand-toggle"
-            onClick={() => setIsExpanded(!isExpanded)}
-            aria-label={isExpanded ? "收起" : "展开"}
-          >
-            <i className={`fas fa-chevron-${isExpanded ? "up" : "down"}`}></i>
-          </button>
+          <div className="ai-header-actions">
+            <button 
+              className="ai-header-btn"
+              onClick={toggleHistoryPanel}
+              aria-label="历史记录"
+              title="查看历史记录"
+            >
+              <i className="fas fa-history"></i>
+            </button>
+            <button
+              className="ai-expand-toggle"
+              onClick={() => setIsExpanded(!isExpanded)}
+              aria-label={isExpanded ? "收起" : "展开"}
+            >
+              <i className={`fas fa-chevron-${isExpanded ? "up" : "down"}`}></i>
+            </button>
+          </div>
         </div>
 
         {/* 输入框区域 - 始终显示 */}
@@ -416,11 +551,13 @@ const AiAssistant = ({ userInfo }) => {
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
             ref={messageInputRef}
             className="ai-message-input"
+            disabled={isLoading}
           />
           <button
             className="ai-send-button"
             onClick={handleSendMessage}
             aria-label="发送"
+            disabled={isLoading}
           >
             <i className="fas fa-paper-plane"></i>
           </button>
@@ -438,6 +575,7 @@ const AiAssistant = ({ userInfo }) => {
                 key={topic.id}
                 className="ai-suggestion-chip"
                 onClick={() => handleTopicClick(topic)}
+                disabled={isLoading}
               >
                 {topic.icon && <i className={`fas fa-${topic.icon}`}></i>}
                 {topic.text}
@@ -467,8 +605,6 @@ const AiAssistant = ({ userInfo }) => {
                 </div>
               </div>
             ))}
-
-            
 
             {/* 输入指示器 */}
             {isTyping && (
@@ -558,6 +694,48 @@ const AiAssistant = ({ userInfo }) => {
               )}
               <p>{selectedReadItem.content}</p>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 历史记录面板 */}
+      {showHistoryPanel && (
+        <div className="ai-panel history-panel">
+          <div className="ai-panel-header">
+            <h3>历史记录</h3>
+            <div className="ai-panel-actions">
+              <button onClick={handleClearHistory} className="ai-panel-action-btn" title="清空历史">
+                <i className="fas fa-trash-alt"></i>
+              </button>
+              <button onClick={toggleHistoryPanel} className="ai-panel-close">
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div className="ai-panel-content">
+            {chatHistory.length > 0 ? (
+              <div className="ai-history-list">
+                {chatHistory.map((item, index) => (
+                  <div key={index} className={`ai-history-item ${item.type}`}>
+                    <div className="ai-history-meta">
+                      <span className="ai-history-time">{item.timestamp}</span>
+                      <span className="ai-history-type">
+                        {item.type === "user" ? "我" : "AI"}
+                      </span>
+                    </div>
+                    <div className="ai-history-message">{item.message}</div>
+                  </div>
+                ))}
+                <button className="ai-load-more" onClick={handleLoadMoreHistory}>
+                  加载更多
+                </button>
+              </div>
+            ) : (
+              <div className="ai-empty-state">
+                <i className="fas fa-history"></i>
+                <p>暂无历史记录</p>
+              </div>
+            )}
           </div>
         </div>
       )}
