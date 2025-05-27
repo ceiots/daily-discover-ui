@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import './NavBar.css';
 
-const NavBar = () => {
+const NavBar = ({ className }) => {
   const location = useLocation();
   const path = location.pathname;
   
@@ -15,7 +16,7 @@ const NavBar = () => {
   };
 
   return (
-    <div className="nav-bar-container">
+    <div className={`nav-bar-container ${className || ''}`}>
       <div className="nav-bar">
         <Link to="/daily" className={`nav-item ${isActive('/') || isActive('/daily') ? 'active' : ''}`}>
           <i className="fas fa-calendar-day"></i>
@@ -38,6 +39,10 @@ const NavBar = () => {
       <div className="nav-bar-safe-area"></div>
     </div>
   );
+};
+
+NavBar.propTypes = {
+  className: PropTypes.string
 };
 
 export default NavBar;

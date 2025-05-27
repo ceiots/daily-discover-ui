@@ -26,7 +26,6 @@ const AiAssistant = ({ userInfo }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
-  const [useStreamingChat, setUseStreamingChat] = useState(true);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -254,36 +253,6 @@ const AiAssistant = ({ userInfo }) => {
     ]);
   };
 
-  // 发送消息到服务器并获取响应
-  const sendMessageToServer = async (message) => {
-    try {
-      console.log('userInfo:',userInfo);
-      // 检查用户是否已登录
-      if (!userInfo?.id) {
-        navigate("/login");
-        return;
-      }
-
-      setIsLoading(true);
-      const response = await instance.post("/ai/chat", {
-        prompt: message,
-        sessionId: currentSessionId
-      });
-      
-      if (response.data && response.data.code === 200) {
-        return response.data.data;
-      } else {
-        console.error("AI响应错误:", response.data);
-        return "抱歉，我暂时无法回答这个问题。请稍后再试。";
-      }
-    } catch (error) {
-      console.error("AI聊天请求失败:", error);
-      return "网络错误，无法连接到AI服务。请检查您的网络连接或稍后再试。";
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // 使用SSE流式聊天
   const streamChatWithServer = (message) => {
     console.log('使用流式聊天，userInfo:', userInfo);
@@ -302,28 +271,22 @@ const AiAssistant = ({ userInfo }) => {
       eventSourceRef.current.close();
     }
     
-    // 设置API URL
-    const apiUrl = `/ai/chat/stream`;
+    // 准备请求数据
+    const requestData = {
+      prompt: message,
+      sessionId: currentSessionId
+    };
     
-    // 创建表单数据
-    const formData = new FormData();
-    formData.append('prompt', message);
-    formData.append('sessionId', currentSessionId);
-    
-    // 使用fetch和SSE进行流式通信
-    instance.post(apiUrl, {
-      method: 'POST',
+    // 使用axios实例发送请求
+    instance.post("/ai/chat/stream", requestData, {
+      responseType: 'blob',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': localStorage.getItem('token') || '',
-        'userId': userInfo.id
-      },
-      body: JSON.stringify({
-        prompt: message,
-        sessionId: currentSessionId
-      })
+        'Accept': 'text/event-stream'
+      }
     }).then(response => {
-      const reader = response.body.getReader();
+      // 处理响应数据流
+      const stream = response.data;
+      const reader = new Response(stream).body.getReader();
       const decoder = new TextDecoder();
       
       // 读取流数据
@@ -426,20 +389,8 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    if (useStreamingChat) {
-      // 使用流式聊天
-      streamChatWithServer(currentMessage);
-    } else {
-      // 使用传统聊天
-      const aiResponse = await sendMessageToServer(currentMessage);
-      
-      // 添加AI回复到聊天历史
-      setAiChatHistory((prev) => [
-        ...prev,
-        { type: "ai", message: aiResponse },
-      ]);
-      setIsTyping(false);
-    }
+    // 使用流式聊天
+    streamChatWithServer(currentMessage);
 
     // 更新推荐话题
     updateSuggestedTopics(currentMessage);
@@ -475,19 +426,8 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    if (useStreamingChat) {
-      // 使用流式聊天
-      streamChatWithServer(topic.text);
-    } else {
-      // 使用传统聊天
-      const aiResponse = await sendMessageToServer(topic.text);
-      
-      setAiChatHistory((prev) => [
-        ...prev,
-        { type: "ai", message: aiResponse },
-      ]);
-      setIsTyping(false);
-    }
+    // 使用流式聊天
+    streamChatWithServer(topic.text);
 
     // 更新推荐话题
     updateSuggestedTopics(topic.text);
@@ -684,14 +624,6 @@ const AiAssistant = ({ userInfo }) => {
             <h3>AI智能助手</h3>
           </div>
           <div className="ai-header-actions">
-            <button 
-              className="ai-header-btn"
-              onClick={() => setUseStreamingChat(!useStreamingChat)}
-              aria-label={useStreamingChat ? "关闭流式聊天" : "开启流式聊天"}
-              title={useStreamingChat ? "关闭流式聊天" : "开启流式聊天"}
-            >
-              <i className={`fas fa-${useStreamingChat ? "stop" : "play"}`}></i>
-            </button>
             <button 
               className="ai-header-btn"
               onClick={toggleHistoryPanel}
