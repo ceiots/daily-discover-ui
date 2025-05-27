@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import "./AiAssistant.css";
 import PropTypes from "prop-types";
 import instance from "../utils/axios";
+import { useNavigate } from "react-router-dom";
+
 
 const AiAssistant = ({ userInfo }) => {
+  const navigate = useNavigate();
   const [userMessage, setUserMessage] = useState("");
   const [aiChatHistory, setAiChatHistory] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -241,6 +244,13 @@ const AiAssistant = ({ userInfo }) => {
   // 发送消息到服务器并获取响应
   const sendMessageToServer = async (message) => {
     try {
+      console.log('userInfo:',userInfo);
+      // 检查用户是否已登录
+      if (!userInfo?.isLoggedIn) {
+        navigate("/login");
+        return;
+      }
+
       setIsLoading(true);
       const response = await instance.post("/ai/chat", {
         prompt: message,
@@ -748,6 +758,7 @@ AiAssistant.propTypes = {
   userInfo: PropTypes.shape({
     nickname: PropTypes.string,
     avatar: PropTypes.string,
+    isLoggedIn: PropTypes.bool.isRequired, // 新增此项
     // 其他用户信息属性
   }),
 };
