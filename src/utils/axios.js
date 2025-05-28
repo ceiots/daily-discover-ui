@@ -3,6 +3,7 @@ import { API_BASE_URL } from '../config';
 
 const instance = axios.create({
     baseURL: API_BASE_URL,
+    withCredentials: false, // 不携带凭证，避免CORS预检请求
     headers: {
         'Content-Type': 'application/json'
     }
@@ -15,11 +16,18 @@ instance.interceptors.request.use(
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
-        // 新添加的代码：从本地存储中获取 userId 并添加到请求头
+        // 从本地存储中获取 userId 并添加到请求头
         const userId = localStorage.getItem('userId');
         if (userId) {
             config.headers['userId'] = userId;
         }
+        
+        // 对于get-suggestions接口特殊处理
+        if (config.url && config.url.includes('/get-suggestions')) {
+            // 延长超时时间
+            config.timeout = 5 * 60 * 1000; // 5分钟
+        }
+        
         return config;
     },
     error => {
@@ -50,6 +58,9 @@ instance.interceptors.response.use(
                     break;
                 case 500:
                     console.error('服务器错误');
+                    break;
+                case 504:
+                    console.error('服务器网关超时');
                     break;
                 default:
                     console.error('请求失败:', error.response.data);

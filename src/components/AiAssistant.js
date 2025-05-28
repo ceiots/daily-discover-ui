@@ -129,7 +129,6 @@ const AiAssistant = ({ userInfo }) => {
     if (aiChatHistory.length === 0) {
       // 创建新会话
       createNewSession();
-
     }
 
     setFallbackSuggestedTopics();
@@ -143,8 +142,6 @@ const AiAssistant = ({ userInfo }) => {
     // 连接WebSocket
     connectWebSocket();
     
-    // 获取初始推荐话题（冷启动）
-    updateSuggestedTopics("今日生活热点");
   }, []);
   
   // 组件卸载时关闭EventSource连接
@@ -446,7 +443,7 @@ const AiAssistant = ({ userInfo }) => {
   const loadQuickReads = async () => {
     try {
       // 这里可以替换为实际的API调用，例如从后端获取推荐阅读内容
-      const response = await instance.get("/ai/daily-discovery");
+      const response = await instance.get("/ai/daily");
       if (response.data && response.data.data) {
         // 处理返回的数据
         // 暂时使用现有数据
@@ -613,7 +610,9 @@ const AiAssistant = ({ userInfo }) => {
       console.log("获取推荐话题，输入:", userInput);
       
       // 调用后端API获取推荐话题
-      const response = await instance.post("/ai/get-suggestions", { userInput });
+      const response = await instance.post("/ai/get-suggestions", { userInput }, {
+        timeout: 5 * 60 * 1000, // 5分钟超时（单位：毫秒）
+      });
       
       if (response.data && response.data.code === 200 && response.data.data && response.data.data.length > 0) {
         // 更新推荐话题
