@@ -156,16 +156,121 @@ const AiAssistant = ({ userInfo }) => {
       .ai-markdown-content {
         width: 100%;
         overflow-x: hidden;
+        line-height: 1.5;
+        font-size: 14px;
       }
       .ai-markdown-content pre, .ai-markdown-content code {
         white-space: pre-wrap;
         word-break: break-all;
         overflow-wrap: break-word;
         max-width: 100%;
+        border-radius: 4px;
+      }
+      .ai-markdown-content p {
+        margin-bottom: 10px;
+      }
+      .ai-markdown-content h1,
+      .ai-markdown-content h2,
+      .ai-markdown-content h3,
+      .ai-markdown-content h4,
+      .ai-markdown-content h5,
+      .ai-markdown-content h6 {
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .ai-markdown-content ul,
+      .ai-markdown-content ol {
+        padding-left: 20px;
+        margin-bottom: 10px;
+      }
+      .ai-markdown-content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      .ai-markdown-content th,
+      .ai-markdown-content td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      .ai-markdown-content th {
+        background-color: #f2f2f2;
+      }
+      .ai-markdown-content blockquote {
+        border-left: 4px solid #ddd;
+        padding-left: 10px;
+        color: #666;
+        margin-left: 0;
+        margin-right: 0;
       }
       .ai-chat-message {
         width: 100%;
         max-width: 100%;
+      }
+      .ai-copy-button-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+      .ai-copy-button {
+        background-color: transparent;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+      }
+      .ai-copy-button:hover {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+      .ai-copy-button .fas {
+        font-size: 10px;
+      }
+      .code-block-wrapper {
+        position: relative;
+        margin: 10px 0;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+      }
+      .code-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 12px;
+        background-color: #f5f5f5;
+        border-bottom: 1px solid #ddd;
+      }
+      .code-language {
+        font-size: 12px;
+        color: #666;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .code-copy-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        color: #666;
+        font-size: 14px;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+      .code-copy-button:hover {
+        background-color: #e0e0e0;
+        color: #333;
+      }
+      .ai-message-content-wrapper {
+        position: relative;
+        width: 100%;
       }
     `;
     document.head.appendChild(style);
@@ -394,9 +499,34 @@ const AiAssistant = ({ userInfo }) => {
       // 存储收到的所有文字
       let fullText = "";
       let hasStartedReceiving = false;
+      let lastHeartbeatTime = Date.now();
 
-      // 调试日志：分析SSE流式接收机制
-      console.log("调试: 前端创建了SSE连接，等待数据流...");
+      // 设置心跳检测定时器
+      const heartbeatCheckInterval = setInterval(() => {
+        const now = Date.now();
+        if (now - lastHeartbeatTime > 15000) {
+          console.warn("心跳超时，重新连接");
+          
+          // 关闭当前连接
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+          
+          clearInterval(heartbeatCheckInterval);
+          
+          // 如果已经收到了一些内容，添加到聊天历史
+          if (fullText && fullText.length > 0) {
+            setAiChatHistory((prev) => [...prev, { type: "ai", message: fullText }]);
+            setCurrentStreamingMessage("");
+          } else {
+            setCurrentStreamingMessage("连接超时，请重试");
+          }
+          
+          setIsTyping(false);
+          setIsLoading(false);
+        }
+      }, 5000);
 
       // 监听info事件，获取会话信息
       eventSourceRef.current.addEventListener("info", (event) => {
@@ -412,15 +542,24 @@ const AiAssistant = ({ userInfo }) => {
           // 显示连接状态
           setCurrentStreamingMessage("AI思考中...");
 
-          // 调试日志
-          console.log("调试: 收到info事件，建立了会话连接");
+          // 更新心跳时间
+          lastHeartbeatTime = Date.now();
         } catch (e) {
           console.error("解析会话信息失败:", e);
         }
       });
 
+      // 监听心跳事件，保持连接活跃
+      eventSourceRef.current.addEventListener("heartbeat", (event) => {
+        console.log("收到心跳信号，连接保持活跃");
+        lastHeartbeatTime = Date.now();
+      });
+
       // 监听消息事件 - 优化流式接收显示
-      eventSourceRef.current.onmessage = (event) => {
+      eventSourceRef.current.addEventListener("message", (event) => {
+        // 更新心跳时间
+        lastHeartbeatTime = Date.now();
+        
         // 调试日志：记录每次接收到的数据
         console.log("调试: SSE数据块已接收，立即渲染到UI");
 
@@ -441,8 +580,7 @@ const AiAssistant = ({ userInfo }) => {
             if (parsedData.error) {
               console.error("AI服务错误:", parsedData.error);
               setCurrentStreamingMessage(
-                (prev) =>
-                  prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
+                (prev) => prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
               );
               return;
             }
@@ -459,9 +597,6 @@ const AiAssistant = ({ userInfo }) => {
 
               // 立即渲染到UI：每当接收到数据块就立即更新UI
               setCurrentStreamingMessage((prev) => prev + cleanData);
-
-              // 调试日志
-              console.log("调试: 处理JSON数据并更新UI");
             }
           } catch (e) {
             // JSON解析失败，尝试作为纯文本处理
@@ -475,21 +610,16 @@ const AiAssistant = ({ userInfo }) => {
 
             // 直接显示新收到的文本
             setCurrentStreamingMessage((prev) => prev + cleanData);
-
-            // 调试日志
-            console.log("调试: 处理纯文本数据并更新UI");
           }
         }
-      };
-      
-      // 监听心跳事件，保持连接活跃
-      eventSourceRef.current.addEventListener("heartbeat", (event) => {
-        console.log("收到心跳信号，连接保持活跃");
       });
 
       // 监听错误
       eventSourceRef.current.onerror = (error) => {
         console.error("SSE连接错误:", error);
+        
+        // 清除心跳检测定时器
+        clearInterval(heartbeatCheckInterval);
 
         // 关闭连接
         eventSourceRef.current.close();
@@ -497,9 +627,6 @@ const AiAssistant = ({ userInfo }) => {
 
         setIsTyping(false);
         setIsLoading(false);
-
-        // 调试日志
-        console.log("调试: SSE连接出错或关闭");
 
         // 处理错误情况
         if (!fullText) {
@@ -523,22 +650,13 @@ const AiAssistant = ({ userInfo }) => {
         }
       };
 
-      // 监听连接打开
-      eventSourceRef.current.onopen = () => {
-        console.log("SSE连接已打开");
-        setCurrentStreamingMessage("AI思考中...");
-
-        // 调试日志
-        console.log("调试: SSE连接已打开，等待数据流");
-      };
-
-      // 监听连接关闭或完成
+      // 监听连接完成
       const checkComplete = (e) => {
         if (e.type === "complete" || e.data === "[DONE]") {
           console.log("SSE连接已完成");
-
-          // 调试日志
-          console.log("调试: 接收到完成事件，全部内容已接收完毕");
+          
+          // 清除心跳检测定时器
+          clearInterval(heartbeatCheckInterval);
 
           // 关闭连接
           eventSourceRef.current.close();
@@ -737,12 +855,12 @@ const AiAssistant = ({ userInfo }) => {
             <button 
               className="ai-copy-button"
               onClick={() => copyToClipboard(cleanedMessage, index)}
-              title="复制"
+              title="复制全部内容"
             >
               {copiedMessageIndex === index ? (
                 <><i className="fas fa-check"></i> 已复制</>
               ) : (
-                <><i className="fas fa-copy"></i> 复制</>
+                <><i className="fas fa-copy"></i> 复制全部</>
               )}
             </button>
           </div>

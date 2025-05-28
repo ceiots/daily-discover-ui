@@ -726,17 +726,15 @@
   border: 1px solid var(--border-color);
 }
 
-.ai-message-input {
+
+.ai-assistant-container .ai-input-area .ai-message-input {
   flex: 1;
   background: transparent;
   border: none;
   padding: 8px 12px;
   outline: none;
   color: var(--text-primary);
-}
-
-.ai-assistant-container .ai-input-area .ai-message-input {
-  font-size: 0.85rem;
+  font-size: 0.80rem;  
 }
 
 .ai-message-input::placeholder {
@@ -1419,6 +1417,7 @@
   border-radius: 3px;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
+
 
 .ai-markdown-content pre > code {
   padding: 0.5em;
