@@ -3,9 +3,9 @@ import "./AiAssistant.css";
 import PropTypes from "prop-types";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import { API_BASE_URL } from '../config';
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import { API_BASE_URL } from "../config";
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -32,24 +32,26 @@ const AiAssistant = ({ userInfo }) => {
   const messageInputRef = useRef(null);
   const recommendationTimerRef = useRef(null);
   const eventSourceRef = useRef(null);
-  
+
   // 处理响应数据的辅助函数 - 移动到组件级别
   const processResponseData = (data) => {
-    if (!data) return '';
-    
+    if (!data) return "";
+
     let cleanData = data;
-    
+
     // 移除event:message前缀
     if (cleanData.includes("event:message")) {
       cleanData = cleanData.replace(/event:message\w*/g, "");
     }
-    
+
     // 处理<think>标签 - 不再移除，而是转换为特殊样式的元素
-    cleanData = cleanData.replace(/<think>([\s\S]*?)<\/think>/g, '<div class="ai-think-content">$1</div>');
-    
+    cleanData = cleanData.replace(
+      /<think>([\s\S]*?)<\/think>/g,
+      '<div class="ai-think-content">$1</div>'
+    );
+
     return cleanData;
   };
-
 
   // 推荐内容自动关闭定时器
   useEffect(() => {
@@ -72,7 +74,7 @@ const AiAssistant = ({ userInfo }) => {
     if (aiChatHistory.length === 0) {
       // 创建新会话
       createNewSession();
-      
+
       // 加载快速问题
       loadQuickQuestions();
     }
@@ -82,16 +84,15 @@ const AiAssistant = ({ userInfo }) => {
 
     // 设置快速阅读内容
     loadQuickReads();
-    
+
     // 加载聊天历史
     loadChatHistory();
-    
   }, []);
 
   // 组件卸载时关闭EventSource连接
   useEffect(() => {
     // 添加CSS样式来防止水平滚动
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.innerHTML = `
       .ai-chat-text {
         word-wrap: break-word;
@@ -130,7 +131,9 @@ const AiAssistant = ({ userInfo }) => {
 
   // 创建新会话
   const createNewSession = () => {
-    const sessionId = `session_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const sessionId = `session_${Date.now()}_${Math.floor(
+      Math.random() * 1000
+    )}`;
     setCurrentSessionId(sessionId);
     return sessionId;
   };
@@ -143,7 +146,7 @@ const AiAssistant = ({ userInfo }) => {
         const questionTopics = response.data.data.map((question, index) => ({
           id: `q-${index}`,
           text: question,
-          icon: getIconForQuestion(question)
+          icon: getIconForQuestion(question),
         }));
         setAiTopics(questionTopics);
         setSuggestedTopics(questionTopics.slice(0, 4));
@@ -288,252 +291,249 @@ const AiAssistant = ({ userInfo }) => {
 
   // 使用SSE流式聊天
   const streamChatWithServer = (message) => {
-    console.log('使用流式聊天，userInfo:', userInfo);
-    
+    console.log("使用流式聊天，userInfo:", userInfo);
+
     // 检查用户是否已登录
     if (!userInfo?.id) {
       navigate("/login");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     // 关闭之前的连接
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
-    
+
     // 准备请求数据
     const requestData = {
       prompt: message,
-      sessionId: currentSessionId
+      sessionId: currentSessionId,
     };
-    
+
     // 显示打字指示器
     setIsTyping(true);
-    
+
     // 使用EventSource建立SSE连接进行真正的流式接收
     try {
       // 创建查询参数
       const params = new URLSearchParams();
-      params.append('prompt', message);
-      
+      params.append("prompt", message);
+
       // 如果有会话ID，添加到请求中
       if (currentSessionId) {
-        params.append('sessionId', currentSessionId);
+        params.append("sessionId", currentSessionId);
       }
-      
+
       // 如果用户已登录，添加用户ID
       if (userInfo?.id) {
-        params.append('userId', userInfo.id.toString());
+        params.append("userId", userInfo.id.toString());
       }
-      
+
       // 创建EventSource连接
       const baseUrl = `${API_BASE_URL}/ai/chat/stream/sse`;
       const url = `${baseUrl}?${params.toString()}`;
-      console.log('连接SSE:', url);
-      
+      console.log("连接SSE:", url);
+
       // 显示连接中的提示
       setCurrentStreamingMessage("正在连接...");
-      
+
       // 保存连接引用以便清理
       eventSourceRef.current = new EventSource(url);
-    
+
       // 存储收到的所有文字
-      let fullText = '';
+      let fullText = "";
       let hasStartedReceiving = false;
-      
+
       // 调试日志：分析SSE流式接收机制
-      console.log('调试: 前端创建了SSE连接，等待数据流...');
-    
+      console.log("调试: 前端创建了SSE连接，等待数据流...");
+
       // 监听info事件，获取会话信息
-      eventSourceRef.current.addEventListener('info', (event) => {
+      eventSourceRef.current.addEventListener("info", (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log('收到会话信息:', data);
-          
+          console.log("收到会话信息:", data);
+
           // 更新会话ID
           if (data.sessionId) {
             setCurrentSessionId(data.sessionId);
           }
-          
+
           // 显示连接状态
           setCurrentStreamingMessage("AI思考中...");
-          
+
           // 调试日志
-          console.log('调试: 收到info事件，建立了会话连接');
+          console.log("调试: 收到info事件，建立了会话连接");
         } catch (e) {
-          console.error('解析会话信息失败:', e);
+          console.error("解析会话信息失败:", e);
         }
       });
-    
+
       // 监听消息事件
       eventSourceRef.current.onmessage = (event) => {
         // 调试日志：记录每次接收到的数据
-        console.log('调试: SSE数据块已接收，立即渲染到UI');
-        console.log('调试: 数据块内容:', event.data);
-        
+        console.log("调试: SSE数据块已接收，立即渲染到UI");
+        console.log("调试: 数据块内容:", event.data);
+
         const data = event.data;
-        
+
         // 清除连接中的提示
         if (!hasStartedReceiving) {
           hasStartedReceiving = true;
           setCurrentStreamingMessage("");
         }
-        
+
         if (data) {
           try {
             // 尝试解析JSON
             const parsedData = JSON.parse(data);
-            
+
             // 处理错误消息
             if (parsedData.error) {
-              console.error('AI服务错误:', parsedData.error);
-              setCurrentStreamingMessage(prev => 
-                prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
+              console.error("AI服务错误:", parsedData.error);
+              setCurrentStreamingMessage(
+                (prev) =>
+                  prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
               );
               return;
             }
-            
+
             if (parsedData.data) {
               // 移除event:message前缀和<think>标签
               let cleanData = parsedData.data;
-              
+
               // 处理清理数据
               cleanData = processResponseData(cleanData);
-              
+
               // 添加到完整文本
               fullText += cleanData;
-              
+
               // 立即渲染到UI：每当接收到数据块就立即更新UI
-              setCurrentStreamingMessage(prev => prev + cleanData);
-              
+              setCurrentStreamingMessage((prev) => prev + cleanData);
+
               // 调试日志
-              console.log('调试: 处理JSON数据并更新UI');
+              console.log("调试: 处理JSON数据并更新UI");
             }
           } catch (e) {
             // JSON解析失败，尝试作为纯文本处理
-            console.log('以纯文本处理响应数据');
-            
+            console.log("以纯文本处理响应数据");
+
             // 处理清理数据
             let cleanData = processResponseData(data);
-            
+
             // 添加到完整文本
             fullText += cleanData;
-            
+
             // 直接显示新收到的文本
-            setCurrentStreamingMessage(prev => prev + cleanData);
-            
+            setCurrentStreamingMessage((prev) => prev + cleanData);
+
             // 调试日志
-            console.log('调试: 处理纯文本数据并更新UI');
+            console.log("调试: 处理纯文本数据并更新UI");
           }
         }
       };
-      
+
       // 监听错误
       eventSourceRef.current.onerror = (error) => {
-        console.error('SSE连接错误:', error);
-        
+        console.error("SSE连接错误:", error);
+
         // 关闭连接
         eventSourceRef.current.close();
         eventSourceRef.current = null;
-        
+
         setIsTyping(false);
         setIsLoading(false);
-        
+
         // 调试日志
-        console.log('调试: SSE连接出错或关闭');
-        
+        console.log("调试: SSE连接出错或关闭");
+
         // 处理错误情况
         if (!fullText) {
           // 如果没有收到任何文本，显示错误消息
           const errorMsg = "⚠️ 无法连接到AI服务，请检查网络连接或稍后再试。";
           setCurrentStreamingMessage(errorMsg);
-          
+
           // 将错误消息添加到聊天历史
-          setAiChatHistory(prev => [
+          setAiChatHistory((prev) => [
             ...prev,
-            { type: "ai", message: errorMsg }
+            { type: "ai", message: errorMsg },
           ]);
           setCurrentStreamingMessage("");
         } else {
           // 如果已经有部分文本，则显示已接收的内容
-          setAiChatHistory(prev => [
+          setAiChatHistory((prev) => [
             ...prev,
-            { type: "ai", message: fullText }
+            { type: "ai", message: fullText },
           ]);
           setCurrentStreamingMessage("");
         }
       };
-      
+
       // 监听连接打开
       eventSourceRef.current.onopen = () => {
-        console.log('SSE连接已打开');
+        console.log("SSE连接已打开");
         setCurrentStreamingMessage("AI思考中...");
-        
+
         // 调试日志
-        console.log('调试: SSE连接已打开，等待数据流');
+        console.log("调试: SSE连接已打开，等待数据流");
       };
-      
+
       // 监听连接关闭或完成
       const checkComplete = (e) => {
-        if (e.type === 'complete' || e.data === '[DONE]') {
-          console.log('SSE连接已完成');
-          
+        if (e.type === "complete" || e.data === "[DONE]") {
+          console.log("SSE连接已完成");
+
           // 调试日志
-          console.log('调试: 接收到完成事件，全部内容已接收完毕');
-          
+          console.log("调试: 接收到完成事件，全部内容已接收完毕");
+
           // 关闭连接
           eventSourceRef.current.close();
           eventSourceRef.current = null;
-          
+
           setIsTyping(false);
           setIsLoading(false);
-          
+
           // 处理完成逻辑
           if (fullText && fullText.length > 0) {
             // 确保显示完整内容
             setCurrentStreamingMessage(fullText);
-            
+
             // 短暂延迟后将内容添加到聊天历史，并清空当前流式消息
             setTimeout(() => {
-              setAiChatHistory(prev => [
+              setAiChatHistory((prev) => [
                 ...prev,
-                { type: "ai", message: fullText }
+                { type: "ai", message: fullText },
               ]);
               setCurrentStreamingMessage("");
             }, 100);
           } else {
             // 如果没有收到任何内容，显示错误信息
             const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
-            setAiChatHistory(prev => [
+            setAiChatHistory((prev) => [
               ...prev,
-              { type: "ai", message: errorMsg }
+              { type: "ai", message: errorMsg },
             ]);
             setCurrentStreamingMessage("");
           }
         }
       };
-      
+
       // 监听自定义complete事件
-      eventSourceRef.current.addEventListener('complete', checkComplete);
-      eventSourceRef.current.addEventListener('message', (e) => {
-        if (e.data === '[DONE]') {
+      eventSourceRef.current.addEventListener("complete", checkComplete);
+      eventSourceRef.current.addEventListener("message", (e) => {
+        if (e.data === "[DONE]") {
           checkComplete(e);
         }
       });
-      
     } catch (error) {
-      console.error('创建SSE连接失败:', error);
+      console.error("创建SSE连接失败:", error);
       setIsTyping(false);
       setIsLoading(false);
-      
+
       // 处理连接错误
       const errorMsg = `⚠️ 创建AI连接失败: ${error.message}`;
-      setAiChatHistory(prev => [
-        ...prev,
-        { type: "ai", message: errorMsg }
-      ]);
+      setAiChatHistory((prev) => [...prev, { type: "ai", message: errorMsg }]);
     }
   };
 
@@ -623,67 +623,16 @@ const AiAssistant = ({ userInfo }) => {
     });
   };
 
-  // 渲染消息内容，支持Markdown
   const renderMessageContent = (message) => {
     if (!message) return '';
-    
-    // 处理特殊标签和前缀
+  
     let cleanedMessage = processResponseData(message);
     console.log('处理前的消息:', cleanedMessage);
-    
-    // Markdown转HTML预处理
-    
-    // 1. 标题处理
-    cleanedMessage = cleanedMessage.replace(/^(#+)\s+(.+)$/gm, (match, hashes, content) => {
-      const level = Math.min(hashes.length, 6);
-      return `<h${level}>${content}</h${level}>`;
-    });
-    
-    // 2. 列表处理
-    
-    // 有序列表：处理"1. 文本"格式
-    cleanedMessage = cleanedMessage.replace(/^(\s*)(\d+)\.?\s+(.+)$/gm, '<li>$3</li>');
-    
-    // 无序列表：处理"* 文本"、"- 文本"格式
-    cleanedMessage = cleanedMessage.replace(/^(\s*)[*\-+]\s+(.+)$/gm, '<li>$2</li>');
-    
-    // 将连续的<li>标签包装在<ul>或<ol>中
-    cleanedMessage = cleanedMessage.replace(/(<li>.*?<\/li>)(?:\s*\n\s*<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
-    
-    // 3. 强调语法处理
-    
-    // 粗体：**文本** 转为 <strong>文本</strong>
-    cleanedMessage = cleanedMessage.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    
-    // 斜体：*文本* 转为 <em>文本</em>
-    cleanedMessage = cleanedMessage.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
-    
-    // 4. 代码块处理
-    
-    // 行内代码：`代码` 转为 <code>代码</code>
-    cleanedMessage = cleanedMessage.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
-    // 多行代码块：```语言 代码``` 转为 <pre><code>代码</code></pre>
-    cleanedMessage = cleanedMessage.replace(/```(?:\w*)\n([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-    
-    // 5. 引用处理：> 文本 转为 <blockquote>文本</blockquote>
-    cleanedMessage = cleanedMessage.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
-    
-    // 6. 特殊处理：**文本**: 格式
-    cleanedMessage = cleanedMessage.replace(/\*\*([^:*]+)\*\*\s*[:：]\s*(.+)/g, '<div><strong>$1:</strong> $2</div>');
-    
-    // 7. 处理段落：确保非标签文本被<p>包裹
-    // 这一步较复杂，简化处理
-    cleanedMessage = cleanedMessage.replace(/^([^<\s].+)$/gm, '<p>$1</p>');
-    
-    // 8. 修复重复标签和嵌套错误
-    cleanedMessage = cleanedMessage.replace(/<\/p><p>/g, '</p>\n<p>');
-    cleanedMessage = cleanedMessage.replace(/<p><(h\d|ul|ol|blockquote)>/g, '<$1>');
-    cleanedMessage = cleanedMessage.replace(/<\/(h\d|ul|ol|blockquote)><\/p>/g, '</$1>');
-    
+  
+   
+  
     console.log('处理后的消息:', cleanedMessage);
-    
-    // 使用dangerouslySetInnerHTML直接渲染HTML
+  
     return (
       <div 
         className="ai-markdown-content" 
@@ -795,8 +744,8 @@ const AiAssistant = ({ userInfo }) => {
       const response = await instance.get("/ai/chat-history", {
         params: {
           pageNum: page,
-          pageSize: pageSize
-        }
+          pageSize: pageSize,
+        },
       });
       if (response.data && response.data.code === 200 && response.data.data) {
         setChatHistory(response.data.data);
@@ -805,19 +754,18 @@ const AiAssistant = ({ userInfo }) => {
       console.error("加载聊天历史失败:", error);
     }
   };
-  
 
   // 处理历史记录加载更多
   const handleLoadMoreHistory = () => {
-    setPage(prevPage => prevPage + 1);
+    setPage((prevPage) => prevPage + 1);
     loadChatHistory();
   };
-  
+
   // 清空聊天历史
   const handleClearHistory = async () => {
     try {
       const response = await instance.post("/ai/clear-chat-history");
-      
+
       if (response.data && response.data.code === 200) {
         // 清空本地聊天历史
         setChatHistory([]);
@@ -828,7 +776,7 @@ const AiAssistant = ({ userInfo }) => {
       console.error("清空聊天历史失败:", error);
     }
   };
-  
+
   // 切换历史面板显示
   const toggleHistoryPanel = () => {
     setShowHistoryPanel(!showHistoryPanel);
@@ -836,7 +784,6 @@ const AiAssistant = ({ userInfo }) => {
       setShowFavoritesPanel(false);
     }
   };
-  
 
   return (
     <div className="ai-assistant-container">
@@ -916,7 +863,7 @@ const AiAssistant = ({ userInfo }) => {
               <div
                 key={index}
                 className={`ai-chat-message ${chat.type}-message`}
-              > 
+              >
                 <div className="ai-chat-bubble">
                   {/* {chat.type === "ai" && (
                     <i className="fas fa-robot ai-icon"></i>
@@ -925,10 +872,9 @@ const AiAssistant = ({ userInfo }) => {
                     <i className="fas fa-user ai-icon"></i>
                   )} */}
                   <div className="ai-chat-text">
-                    {chat.type === "ai" 
+                    {chat.type === "ai"
                       ? renderMessageContent(chat.message)
-                      : chat.message
-                    }
+                      : chat.message}
                   </div>
                 </div>
               </div>
@@ -960,11 +906,8 @@ const AiAssistant = ({ userInfo }) => {
                 </div>
               </div>
             )}
-           
           </div>
         )}
-
-        
       </div>
 
       {/* 当前推荐内容 - 插入在聊天历史区域后面 */}
@@ -1048,7 +991,11 @@ const AiAssistant = ({ userInfo }) => {
           <div className="ai-panel-header">
             <h3>历史记录</h3>
             <div className="ai-panel-actions">
-              <button onClick={handleClearHistory} className="ai-panel-action-btn" title="清空历史">
+              <button
+                onClick={handleClearHistory}
+                className="ai-panel-action-btn"
+                title="清空历史"
+              >
                 <i className="fas fa-trash-alt"></i>
               </button>
               <button onClick={toggleHistoryPanel} className="ai-panel-close">
@@ -1070,7 +1017,10 @@ const AiAssistant = ({ userInfo }) => {
                     <div className="ai-history-message">{item.message}</div>
                   </div>
                 ))}
-                <button className="ai-load-more" onClick={handleLoadMoreHistory}>
+                <button
+                  className="ai-load-more"
+                  onClick={handleLoadMoreHistory}
+                >
                   加载更多
                 </button>
               </div>
