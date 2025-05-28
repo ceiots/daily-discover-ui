@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { API_BASE_URL } from '../config';
 
 const AiAssistant = ({ userInfo }) => {
@@ -43,10 +44,8 @@ const AiAssistant = ({ userInfo }) => {
       cleanData = cleanData.replace(/event:message\w*/g, "");
     }
     
-    // 移除<think>标签
-    if (cleanData.includes("<think>")) {
-      cleanData = cleanData.replace(/<think>[\s\S]*?<\/think>/g, "");
-    }
+    // 处理<think>标签 - 不再移除，而是转换为特殊样式的元素
+    cleanData = cleanData.replace(/<think>([\s\S]*?)<\/think>/g, '<div class="ai-think-content">$1</div>');
     
     return cleanData;
   };
@@ -343,6 +342,9 @@ const AiAssistant = ({ userInfo }) => {
       // 存储收到的所有文字
       let fullText = '';
       let hasStartedReceiving = false;
+      
+      // 调试日志：分析SSE流式接收机制
+      console.log('调试: 前端创建了SSE连接，等待数据流...');
     
       // 监听info事件，获取会话信息
       eventSourceRef.current.addEventListener('info', (event) => {
@@ -357,6 +359,9 @@ const AiAssistant = ({ userInfo }) => {
           
           // 显示连接状态
           setCurrentStreamingMessage("AI思考中...");
+          
+          // 调试日志
+          console.log('调试: 收到info事件，建立了会话连接');
         } catch (e) {
           console.error('解析会话信息失败:', e);
         }
@@ -364,8 +369,11 @@ const AiAssistant = ({ userInfo }) => {
     
       // 监听消息事件
       eventSourceRef.current.onmessage = (event) => {
+        // 调试日志：记录每次接收到的数据
+        console.log('调试: SSE数据块已接收，立即渲染到UI');
+        console.log('调试: 数据块内容:', event.data);
+        
         const data = event.data;
-        console.log('SSE收到消息:', data);
         
         // 清除连接中的提示
         if (!hasStartedReceiving) {
@@ -396,8 +404,12 @@ const AiAssistant = ({ userInfo }) => {
               
               // 添加到完整文本
               fullText += cleanData;
-              // 直接显示新收到的文本
+              
+              // 立即渲染到UI：每当接收到数据块就立即更新UI
               setCurrentStreamingMessage(prev => prev + cleanData);
+              
+              // 调试日志
+              console.log('调试: 处理JSON数据并更新UI');
             }
           } catch (e) {
             // JSON解析失败，尝试作为纯文本处理
@@ -411,6 +423,9 @@ const AiAssistant = ({ userInfo }) => {
             
             // 直接显示新收到的文本
             setCurrentStreamingMessage(prev => prev + cleanData);
+            
+            // 调试日志
+            console.log('调试: 处理纯文本数据并更新UI');
           }
         }
       };
@@ -425,6 +440,9 @@ const AiAssistant = ({ userInfo }) => {
         
         setIsTyping(false);
         setIsLoading(false);
+        
+        // 调试日志
+        console.log('调试: SSE连接出错或关闭');
         
         // 处理错误情况
         if (!fullText) {
@@ -452,12 +470,18 @@ const AiAssistant = ({ userInfo }) => {
       eventSourceRef.current.onopen = () => {
         console.log('SSE连接已打开');
         setCurrentStreamingMessage("AI思考中...");
+        
+        // 调试日志
+        console.log('调试: SSE连接已打开，等待数据流');
       };
       
       // 监听连接关闭或完成
       const checkComplete = (e) => {
         if (e.type === 'complete' || e.data === '[DONE]') {
           console.log('SSE连接已完成');
+          
+          // 调试日志
+          console.log('调试: 接收到完成事件，全部内容已接收完毕');
           
           // 关闭连接
           eventSourceRef.current.close();
@@ -605,21 +629,66 @@ const AiAssistant = ({ userInfo }) => {
     
     // 处理特殊标签和前缀
     let cleanedMessage = processResponseData(message);
+    console.log('处理前的消息:', cleanedMessage);
     
-    // 优化空格处理
-    // 1. 移除多余的空行（2个以上的连续换行符替换为1个）
-    cleanedMessage = cleanedMessage.replace(/\n{2,}/g, '\n');
+    // Markdown转HTML预处理
     
-    // 2. 处理列表项的缩进，确保列表正确渲染
-    cleanedMessage = cleanedMessage.replace(/^(\s*)[*-](\s)/gm, '$1* ');
+    // 1. 标题处理
+    cleanedMessage = cleanedMessage.replace(/^(#+)\s+(.+)$/gm, (match, hashes, content) => {
+      const level = Math.min(hashes.length, 6);
+      return `<h${level}>${content}</h${level}>`;
+    });
     
-    // 3. 处理标题格式，确保#后有空格
-    cleanedMessage = cleanedMessage.replace(/^(#+)([^\s#])/gm, '$1 $2');
+    // 2. 列表处理
     
+    // 有序列表：处理"1. 文本"格式
+    cleanedMessage = cleanedMessage.replace(/^(\s*)(\d+)\.?\s+(.+)$/gm, '<li>$3</li>');
+    
+    // 无序列表：处理"* 文本"、"- 文本"格式
+    cleanedMessage = cleanedMessage.replace(/^(\s*)[*\-+]\s+(.+)$/gm, '<li>$2</li>');
+    
+    // 将连续的<li>标签包装在<ul>或<ol>中
+    cleanedMessage = cleanedMessage.replace(/(<li>.*?<\/li>)(?:\s*\n\s*<li>.*?<\/li>)+/gs, '<ul>$&</ul>');
+    
+    // 3. 强调语法处理
+    
+    // 粗体：**文本** 转为 <strong>文本</strong>
+    cleanedMessage = cleanedMessage.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    
+    // 斜体：*文本* 转为 <em>文本</em>
+    cleanedMessage = cleanedMessage.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+    
+    // 4. 代码块处理
+    
+    // 行内代码：`代码` 转为 <code>代码</code>
+    cleanedMessage = cleanedMessage.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // 多行代码块：```语言 代码``` 转为 <pre><code>代码</code></pre>
+    cleanedMessage = cleanedMessage.replace(/```(?:\w*)\n([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    
+    // 5. 引用处理：> 文本 转为 <blockquote>文本</blockquote>
+    cleanedMessage = cleanedMessage.replace(/^>\s+(.+)$/gm, '<blockquote>$1</blockquote>');
+    
+    // 6. 特殊处理：**文本**: 格式
+    cleanedMessage = cleanedMessage.replace(/\*\*([^:*]+)\*\*\s*[:：]\s*(.+)/g, '<div><strong>$1:</strong> $2</div>');
+    
+    // 7. 处理段落：确保非标签文本被<p>包裹
+    // 这一步较复杂，简化处理
+    cleanedMessage = cleanedMessage.replace(/^([^<\s].+)$/gm, '<p>$1</p>');
+    
+    // 8. 修复重复标签和嵌套错误
+    cleanedMessage = cleanedMessage.replace(/<\/p><p>/g, '</p>\n<p>');
+    cleanedMessage = cleanedMessage.replace(/<p><(h\d|ul|ol|blockquote)>/g, '<$1>');
+    cleanedMessage = cleanedMessage.replace(/<\/(h\d|ul|ol|blockquote)><\/p>/g, '</$1>');
+    
+    console.log('处理后的消息:', cleanedMessage);
+    
+    // 使用dangerouslySetInnerHTML直接渲染HTML
     return (
-      <ReactMarkdown className="ai-markdown-content">
-        {cleanedMessage}
-      </ReactMarkdown>
+      <div 
+        className="ai-markdown-content" 
+        dangerouslySetInnerHTML={{ __html: cleanedMessage }}
+      />
     );
   };
 
