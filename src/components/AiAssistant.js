@@ -11,6 +11,9 @@ import remarkGfm from 'remark-gfm';
 // 导入语法高亮
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+// 导入WebSocket相关库
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -34,6 +37,9 @@ const AiAssistant = ({ userInfo }) => {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
   // 添加复制状态
   const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
+  // WebSocket状态
+  const [wsConnected, setWsConnected] = useState(false);
+  const [stompClient, setStompClient] = useState(null);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -136,8 +142,11 @@ const AiAssistant = ({ userInfo }) => {
 
     // 加载聊天历史
     loadChatHistory();
+    
+    // 连接WebSocket
+    connectWebSocket();
   }, []);
-
+  
   // 组件卸载时关闭EventSource连接
   useEffect(() => {
     // 添加CSS样式来防止水平滚动
@@ -159,7 +168,8 @@ const AiAssistant = ({ userInfo }) => {
         line-height: 1.5;
         font-size: 14px;
       }
-      .ai-markdown-content pre, .ai-markdown-content code {
+      .ai-markdown-content pre, 
+      .ai-markdown-content code {
         white-space: pre-wrap;
         word-break: break-all;
         overflow-wrap: break-word;
@@ -175,14 +185,14 @@ const AiAssistant = ({ userInfo }) => {
       .ai-markdown-content h4,
       .ai-markdown-content h5,
       .ai-markdown-content h6 {
-        margin-top: 16px;
-        margin-bottom: 8px;
+        margin-top: 3px;
+        margin-bottom: 3px;
         font-weight: 600;
       }
       .ai-markdown-content ul,
       .ai-markdown-content ol {
-        padding-left: 20px;
-        margin-bottom: 10px;
+        padding-left: 2px;
+        margin-bottom: 2px;
       }
       .ai-markdown-content table {
         border-collapse: collapse;
@@ -280,8 +290,126 @@ const AiAssistant = ({ userInfo }) => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
+      disconnectWebSocket();
     };
   }, []);
+
+  // 连接WebSocket
+  const connectWebSocket = () => {
+    if (stompClient) {
+      console.log("WebSocket已连接，无需重新连接");
+      return;
+    }
+    
+    try {
+      console.log('尝试连接WebSocket');
+      
+      // 创建SockJS实例，明确禁用withCredentials
+      const sockjsOptions = {
+        server: 'jsdelivr', // 使用jsdelivr CDN
+        transports: ['websocket', 'xhr-streaming', 'xhr-polling']
+      };
+      
+      // 尝试连接
+      let socket;
+      
+      // 根据环境选择连接方式
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (isLocalhost) {
+        // 开发环境使用完整URL
+        socket = new SockJS(`${API_BASE_URL}/ai/chat-ws`, null, sockjsOptions);
+        console.log('开发环境使用完整URL连接:', `${API_BASE_URL}/ai/chat-ws`);
+      } else {
+        // 生产环境使用相对路径
+        socket = new SockJS('/ai/chat-ws', null, sockjsOptions);
+        console.log('生产环境使用相对路径连接');
+      }
+      
+      // 使用工厂函数创建STOMP客户端
+      const client = Stomp.over(() => socket);
+      
+      // 禁用调试日志
+      client.debug = () => {};
+      
+      // 配置连接选项
+      const connectOptions = {};
+      
+      client.connect(connectOptions, frame => {
+        setWsConnected(true);
+        console.log('WebSocket连接已建立');
+        
+        // 从URL中提取会话ID
+        const sessionId = socket._transport.url.split('/').pop();
+        console.log('WebSocket会话ID:', sessionId);
+        setCurrentSessionId(sessionId);
+        
+        // 订阅个人消息通道
+        client.subscribe(`/topic/messages/${sessionId}`, message => {
+          try {
+            const response = JSON.parse(message.body);
+            console.log('收到WebSocket消息:', response);
+            
+            if (response.type === 'AI') {
+              // 立即显示收到的文本块
+              setCurrentStreamingMessage(prev => prev + response.content);
+            } else if (response.type === 'ERROR') {
+              console.error('AI服务错误:', response.content);
+              setCurrentStreamingMessage(prev => 
+                prev + "\n\n⚠️ 连接AI服务出现问题: " + response.content
+              );
+            } else if (response.type === 'COMPLETE') {
+              // 处理完成逻辑
+              console.log('WebSocket聊天完成');
+              const fullText = currentStreamingMessage;
+              setIsTyping(false);
+              setIsLoading(false);
+              
+              // 添加到聊天历史
+              if (fullText && fullText.trim() !== '') {
+                setTimeout(() => {
+                  setAiChatHistory(prev => [...prev, { type: "ai", message: fullText }]);
+                  setCurrentStreamingMessage("");
+                }, 100);
+              } else {
+                const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
+                setAiChatHistory(prev => [...prev, { type: "ai", message: errorMsg }]);
+                setCurrentStreamingMessage("");
+              }
+            }
+          } catch (error) {
+            console.error('处理WebSocket消息失败:', error, message.body);
+          }
+        });
+        
+        setStompClient(client);
+      }, error => {
+        console.error('WebSocket连接失败:', error);
+        setWsConnected(false);
+        setStompClient(null);
+        
+        // 显示错误消息
+        setAiChatHistory(prev => [
+          ...prev,
+          { type: "ai", message: "⚠️ WebSocket连接失败，请刷新页面重试" }
+        ]);
+      });
+    } catch (error) {
+      console.error('创建WebSocket连接失败:', error);
+      setWsConnected(false);
+      setStompClient(null);
+    }
+  };
+  
+  // 断开WebSocket连接
+  const disconnectWebSocket = () => {
+    if (stompClient && stompClient.connected) {
+      stompClient.disconnect();
+      console.log('WebSocket连接已断开');
+    }
+    setStompClient(null);
+    setWsConnected(false);
+  };
 
   // 创建新会话
   const createNewSession = () => {
@@ -443,270 +571,87 @@ const AiAssistant = ({ userInfo }) => {
     ]);
   };
 
-  // 使用SSE流式聊天
-  const streamChatWithServer = (message) => {
-    console.log("使用流式聊天，userInfo:", userInfo);
-
-    // 检查用户是否已登录
-    if (!userInfo?.id) {
-      navigate("/login");
+  // 使用WebSocket发送消息
+  const sendMessageViaWebSocket = (message) => {
+    if (!stompClient || !stompClient.connected) {
+      console.error('WebSocket未连接，尝试重新连接');
+      
+      // 清除之前的客户端
+      if (stompClient) {
+        try {
+          stompClient.disconnect();
+        } catch (e) {
+          console.error('断开旧连接失败:', e);
+        }
+        setStompClient(null);
+      }
+      
+      // 重新连接
+      connectWebSocket();
+      
+      // 延迟后再次尝试发送
+      setTimeout(() => {
+        if (stompClient && stompClient.connected) {
+          console.log('重连成功，重新发送消息');
+          sendMessageViaWebSocket(message);
+        } else {
+          // 显示错误消息
+          setAiChatHistory(prev => [
+            ...prev,
+            { type: "ai", message: "⚠️ WebSocket连接失败，请刷新页面重试" }
+          ]);
+          
+          setIsTyping(false);
+          setIsLoading(false);
+        }
+      }, 2000);
       return;
     }
-
-    setIsLoading(true);
-
-    // 关闭之前的连接
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-
-    // 准备请求数据
-    const requestData = {
-      prompt: message,
-      sessionId: currentSessionId,
-    };
-
-    // 显示打字指示器
-    setIsTyping(true);
-
-    // 使用EventSource建立SSE连接进行真正的流式接收
+    
+    // 清空当前流式消息
+    setCurrentStreamingMessage("");
+    
+    // 发送消息到服务器
     try {
-      // 创建查询参数
-      const params = new URLSearchParams();
-      params.append("prompt", message);
-
-      // 如果有会话ID，添加到请求中
-      if (currentSessionId) {
-        params.append("sessionId", currentSessionId);
-      }
-
-      // 如果用户已登录，添加用户ID
-      if (userInfo?.id) {
-        params.append("userId", userInfo.id.toString());
-      }
-
-      // 创建EventSource连接
-      const baseUrl = `${API_BASE_URL}/ai/chat/stream/sse`;
-      const url = `${baseUrl}?${params.toString()}`;
-      console.log("连接SSE:", url);
-
-      // 显示连接中的提示
-      setCurrentStreamingMessage("正在连接...");
-
-      // 保存连接引用以便清理
-      eventSourceRef.current = new EventSource(url);
-
-      // 存储收到的所有文字
-      let fullText = "";
-      let hasStartedReceiving = false;
-      let lastHeartbeatTime = Date.now();
-
-      // 设置心跳检测定时器
-      const heartbeatCheckInterval = setInterval(() => {
-        const now = Date.now();
-        if (now - lastHeartbeatTime > 15000) {
-          console.warn("心跳超时，重新连接");
-          
-          // 关闭当前连接
-          if (eventSourceRef.current) {
-            eventSourceRef.current.close();
-            eventSourceRef.current = null;
-          }
-          
-          clearInterval(heartbeatCheckInterval);
-          
-          // 如果已经收到了一些内容，添加到聊天历史
-          if (fullText && fullText.length > 0) {
-            setAiChatHistory((prev) => [...prev, { type: "ai", message: fullText }]);
-            setCurrentStreamingMessage("");
-          } else {
-            setCurrentStreamingMessage("连接超时，请重试");
-          }
-          
-          setIsTyping(false);
-          setIsLoading(false);
-        }
-      }, 5000);
-
-      // 监听info事件，获取会话信息
-      eventSourceRef.current.addEventListener("info", (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          console.log("收到会话信息:", data);
-
-          // 更新会话ID
-          if (data.sessionId) {
-            setCurrentSessionId(data.sessionId);
-          }
-
-          // 显示连接状态
-          setCurrentStreamingMessage("AI思考中...");
-
-          // 更新心跳时间
-          lastHeartbeatTime = Date.now();
-        } catch (e) {
-          console.error("解析会话信息失败:", e);
-        }
-      });
-
-      // 监听心跳事件，保持连接活跃
-      eventSourceRef.current.addEventListener("heartbeat", (event) => {
-        console.log("收到心跳信号，连接保持活跃");
-        lastHeartbeatTime = Date.now();
-      });
-
-      // 监听消息事件 - 优化流式接收显示
-      eventSourceRef.current.addEventListener("message", (event) => {
-        // 更新心跳时间
-        lastHeartbeatTime = Date.now();
-        
-        // 调试日志：记录每次接收到的数据
-        console.log("调试: SSE数据块已接收，立即渲染到UI");
-
-        const data = event.data;
-
-        // 清除连接中的提示
-        if (!hasStartedReceiving) {
-          hasStartedReceiving = true;
-          setCurrentStreamingMessage("");
-        }
-
-        if (data) {
-          try {
-            // 尝试解析JSON
-            const parsedData = JSON.parse(data);
-
-            // 处理错误消息
-            if (parsedData.error) {
-              console.error("AI服务错误:", parsedData.error);
-              setCurrentStreamingMessage(
-                (prev) => prev + "\n\n⚠️ 连接AI服务出现问题: " + parsedData.error
-              );
-              return;
-            }
-
-            if (parsedData.data) {
-              // 移除event:message前缀和<think>标签
-              let cleanData = parsedData.data;
-
-              // 处理清理数据
-              cleanData = processResponseData(cleanData);
-
-              // 添加到完整文本
-              fullText += cleanData;
-
-              // 立即渲染到UI：每当接收到数据块就立即更新UI
-              setCurrentStreamingMessage((prev) => prev + cleanData);
-            }
-          } catch (e) {
-            // JSON解析失败，尝试作为纯文本处理
-            console.log("以纯文本处理响应数据");
-
-            // 处理清理数据
-            let cleanData = processResponseData(data);
-
-            // 添加到完整文本
-            fullText += cleanData;
-
-            // 直接显示新收到的文本
-            setCurrentStreamingMessage((prev) => prev + cleanData);
-          }
-        }
-      });
-
-      // 监听错误
-      eventSourceRef.current.onerror = (error) => {
-        console.error("SSE连接错误:", error);
-        
-        // 清除心跳检测定时器
-        clearInterval(heartbeatCheckInterval);
-
-        // 关闭连接
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-
-        setIsTyping(false);
-        setIsLoading(false);
-
-        // 处理错误情况
-        if (!fullText) {
-          // 如果没有收到任何文本，显示错误消息
-          const errorMsg = "⚠️ 无法连接到AI服务，请检查网络连接或稍后再试。";
-          setCurrentStreamingMessage(errorMsg);
-
-          // 将错误消息添加到聊天历史
-          setAiChatHistory((prev) => [
-            ...prev,
-            { type: "ai", message: errorMsg },
-          ]);
-          setCurrentStreamingMessage("");
-        } else {
-          // 如果已经有部分文本，则显示已接收的内容
-          setAiChatHistory((prev) => [
-            ...prev,
-            { type: "ai", message: fullText },
-          ]);
-          setCurrentStreamingMessage("");
-        }
-      };
-
-      // 监听连接完成
-      const checkComplete = (e) => {
-        if (e.type === "complete" || e.data === "[DONE]") {
-          console.log("SSE连接已完成");
-          
-          // 清除心跳检测定时器
-          clearInterval(heartbeatCheckInterval);
-
-          // 关闭连接
-          eventSourceRef.current.close();
-          eventSourceRef.current = null;
-
-          setIsTyping(false);
-          setIsLoading(false);
-
-          // 处理完成逻辑
-          if (fullText && fullText.length > 0) {
-            // 确保显示完整内容
-            setCurrentStreamingMessage(fullText);
-
-            // 短暂延迟后将内容添加到聊天历史，并清空当前流式消息
-            setTimeout(() => {
-              setAiChatHistory((prev) => [
-                ...prev,
-                { type: "ai", message: fullText },
-              ]);
-              setCurrentStreamingMessage("");
-            }, 100);
-          } else {
-            // 如果没有收到任何内容，显示错误信息
-            const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
-            setAiChatHistory((prev) => [
-              ...prev,
-              { type: "ai", message: errorMsg },
-            ]);
-            setCurrentStreamingMessage("");
-          }
-        }
-      };
-
-      // 监听自定义complete事件
-      eventSourceRef.current.addEventListener("complete", checkComplete);
-      eventSourceRef.current.addEventListener("message", (e) => {
-        if (e.data === "[DONE]") {
-          checkComplete(e);
-        }
-      });
+      console.log('发送WebSocket消息:', message);
+      stompClient.send("/app/chat-ws", {}, JSON.stringify({
+        content: message,
+        type: "user",
+        timestamp: new Date(),
+        sessionId: currentSessionId
+      }));
     } catch (error) {
-      console.error("创建SSE连接失败:", error);
+      console.error('发送WebSocket消息失败:', error);
+      setAiChatHistory(prev => [
+        ...prev,
+        { type: "ai", message: "⚠️ 发送消息失败: " + error.message }
+      ]);
+      
       setIsTyping(false);
       setIsLoading(false);
-
-      // 处理连接错误
-      const errorMsg = `⚠️ 创建AI连接失败: ${error.message}`;
-      setAiChatHistory((prev) => [...prev, { type: "ai", message: errorMsg }]);
+      
+      // 尝试重新连接
+      setTimeout(() => {
+        connectWebSocket();
+      }, 1000);
     }
   };
+
+  const updateSuggestedTopics = async (userInput) => {
+    try {
+        const response = await instance.post("/ai/get-suggestions", { userInput });
+        if (response.data && response.data.code === 200 && response.data.data) {
+            const newSuggestions = response.data.data.map((suggestion, index) => ({
+                id: `suggestion-${index}`,
+                text: suggestion.text,
+                icon: suggestion.icon,
+            }));
+            setSuggestedTopics(newSuggestions.slice(0, 4));
+        }
+    } catch (error) {
+        console.error("获取推荐词失败:", error);
+    }
+};
 
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
@@ -725,14 +670,15 @@ const AiAssistant = ({ userInfo }) => {
 
     // 显示AI正在输入的状态
     setIsTyping(true);
+    setIsLoading(true);
 
     // 随机选择一条推荐内容显示
     const randomRecommendation =
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 使用流式聊天
-    streamChatWithServer(currentMessage);
+    // 使用WebSocket发送消息
+    sendMessageViaWebSocket(currentMessage);
 
     // 更新推荐话题
     updateSuggestedTopics(currentMessage);
@@ -762,14 +708,15 @@ const AiAssistant = ({ userInfo }) => {
       { type: "user", message: topic.text },
     ]);
     setIsTyping(true);
+    setIsLoading(true);
 
     // 随机选择一条推荐内容显示
     const randomRecommendation =
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 使用流式聊天
-    streamChatWithServer(topic.text);
+    // 使用WebSocket发送消息
+    sendMessageViaWebSocket(topic.text);
 
     // 更新推荐话题
     updateSuggestedTopics(topic.text);
@@ -869,84 +816,7 @@ const AiAssistant = ({ userInfo }) => {
     );
   };
 
-  // 根据用户输入更新推荐话题
-  const updateSuggestedTopics = (userInput) => {
-    // 这里可以接入真实AI接口进行兴趣预测
-    // 简化版：根据关键词匹配
-    const userInputLower = userInput.toLowerCase();
-    let newSuggestions = [];
-
-    // 健康相关
-    if (
-      userInputLower.includes("健康") ||
-      userInputLower.includes("饮食") ||
-      userInputLower.includes("营养")
-    ) {
-      newSuggestions.push(
-        { id: 101, text: "地中海饮食的好处", icon: "utensils" },
-        { id: 102, text: "每日营养摄入指南", icon: "apple-alt" },
-        { id: 103, text: "减少加工食品的方法", icon: "carrot" }
-      );
-    }
-
-    // 心理健康相关
-    else if (
-      userInputLower.includes("压力") ||
-      userInputLower.includes("焦虑") ||
-      userInputLower.includes("冥想")
-    ) {
-      newSuggestions.push(
-        { id: 201, text: "压力管理的5个步骤", icon: "spa" },
-        { id: 202, text: "冥想如何改变大脑", icon: "brain" },
-        { id: 203, text: "工作日减压小习惯", icon: "heart" }
-      );
-    }
-
-    // 工作效率相关
-    else if (
-      userInputLower.includes("效率") ||
-      userInputLower.includes("工作") ||
-      userInputLower.includes("专注")
-    ) {
-      newSuggestions.push(
-        { id: 301, text: "番茄工作法详解", icon: "clock" },
-        { id: 302, text: "如何减少工作干扰", icon: "ban" },
-        { id: 303, text: "提高专注力的食物", icon: "apple-alt" }
-      );
-    }
-
-    // 科技相关
-    else if (
-      userInputLower.includes("手机") ||
-      userInputLower.includes("数字") ||
-      userInputLower.includes("科技")
-    ) {
-      newSuggestions.push(
-        { id: 401, text: "健康使用手机的方法", icon: "mobile-alt" },
-        { id: 402, text: "数字断舍离实践指南", icon: "trash-alt" },
-        { id: 403, text: "如何设置手机减少干扰", icon: "sliders-h" }
-      );
-    }
-
-    // 如果没有特定匹配，随机生成一些相关话题
-    if (newSuggestions.length === 0) {
-      const randomTopics = aiTopics.sort(() => 0.5 - Math.random()).slice(0, 3);
-
-      newSuggestions = randomTopics;
-
-      // 添加一个与当前输入相关的话题
-      if (userInputLower.length > 2) {
-        newSuggestions.unshift({
-          id: Math.floor(Math.random() * 1000) + 500,
-          text: `深入了解${userInput}的方法`,
-          icon: "search",
-        });
-      }
-    }
-
-    // 更新推荐话题
-    setSuggestedTopics(newSuggestions.slice(0, 4));
-  };
+  
 
   // 处理推荐内容点击
   const handleRecommendationClick = (recommendation) => {

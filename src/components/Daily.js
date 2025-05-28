@@ -647,7 +647,7 @@ const Daily = () => {
       {/* 使用AiAssistant组件替代原有的AI功能 */}
       <AiAssistant userInfo={userInfo} />
       {renderTodayFocus()}
-      {renderHistoryEvents()}
+      {/* {renderHistoryEvents()} */}
       {renderRecommendations()}
       {/* 其他内容... */}
       <NavBar />
