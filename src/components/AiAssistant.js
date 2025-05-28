@@ -130,12 +130,9 @@ const AiAssistant = ({ userInfo }) => {
       // 创建新会话
       createNewSession();
 
-      // 加载快速问题
-      loadQuickQuestions();
     }
 
-    // 加载热门话题
-    loadTopics();
+    setFallbackSuggestedTopics();
 
     // 设置快速阅读内容
     loadQuickReads();
@@ -145,6 +142,9 @@ const AiAssistant = ({ userInfo }) => {
     
     // 连接WebSocket
     connectWebSocket();
+    
+    // 获取初始推荐话题（冷启动）
+    updateSuggestedTopics("今日生活热点");
   }, []);
   
   // 组件卸载时关闭EventSource连接
@@ -466,17 +466,6 @@ const AiAssistant = ({ userInfo }) => {
     setSuggestedTopics(initialTopics.slice(0, 4));
   };
 
-  // 加载话题数据
-  const loadTopics = async () => {
-    try {
-      // 这里可以替换为实际的API调用
-      loadFallbackTopics(); // 暂时使用备用数据
-    } catch (error) {
-      console.error("加载话题失败:", error);
-      loadFallbackTopics();
-    }
-  };
-
   // 加载快速阅读内容
   const loadQuickReads = async () => {
     try {
@@ -637,21 +626,37 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
+  // 根据用户输入更新推荐话题
   const updateSuggestedTopics = async (userInput) => {
     try {
-        const response = await instance.post("/ai/get-suggestions", { userInput });
-        if (response.data && response.data.code === 200 && response.data.data) {
-            const newSuggestions = response.data.data.map((suggestion, index) => ({
-                id: `suggestion-${index}`,
-                text: suggestion.text,
-                icon: suggestion.icon,
-            }));
-            setSuggestedTopics(newSuggestions.slice(0, 4));
-        }
+      console.log("获取推荐话题，输入:", userInput);
+      
+      // 调用后端API获取推荐话题
+      const response = await instance.post("/ai/get-suggestions", { userInput });
+      
+      if (response.data && response.data.code === 200 && response.data.data && response.data.data.length > 0) {
+        // 更新推荐话题
+        setSuggestedTopics(response.data.data);
+        console.log("获取AI推荐话题成功:", response.data.data);
+      } 
     } catch (error) {
-        console.error("获取推荐词失败:", error);
+      console.error("获取AI推荐话题出错:", error);
+      // 使用备用话题
+      setFallbackSuggestedTopics();
     }
-};
+  };
+  
+  // 设置备用推荐话题
+  const setFallbackSuggestedTopics = () => {
+    const fallbackTopics = [
+      { id: "fb-1", text: "今日热点新闻", icon: "newspaper" },
+      { id: "fb-2", text: "健康生活指南", icon: "heartbeat" },
+      { id: "fb-3", text: "美食推荐", icon: "utensils" },
+      { id: "fb-4", text: "数字生活技巧", icon: "mobile-alt" }
+    ];
+    
+    setSuggestedTopics(fallbackTopics);
+  };
 
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
