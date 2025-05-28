@@ -6,6 +6,11 @@ import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import { API_BASE_URL } from "../config";
+// 导入 GitHub 风格 Markdown 支持
+import remarkGfm from 'remark-gfm';
+// 导入语法高亮
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -27,11 +32,15 @@ const AiAssistant = ({ userInfo }) => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
+  // 添加复制状态
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const recommendationTimerRef = useRef(null);
   const eventSourceRef = useRef(null);
+  // 添加复制状态定时器引用
+  const copyTimerRef = useRef(null);
 
   // 处理响应数据的辅助函数 - 移动到组件级别
   const processResponseData = (data) => {
@@ -51,6 +60,46 @@ const AiAssistant = ({ userInfo }) => {
     );
 
     return cleanData;
+  };
+
+  // 添加复制功能
+  const copyToClipboard = (message, index) => {
+    // 清除之前的复制状态定时器
+    if (copyTimerRef.current) {
+      clearTimeout(copyTimerRef.current);
+    }
+    
+    // 创建临时文本区域
+    const textArea = document.createElement("textarea");
+    
+    // 提取纯文本内容，移除HTML标签
+    let plainText = message;
+    // 如果是HTML内容，移除标签
+    if (message.includes("<") && message.includes(">")) {
+      plainText = message.replace(/<[^>]*>?/gm, '');
+    }
+    
+    textArea.value = plainText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+      // 执行复制命令
+      document.execCommand("copy");
+      // 设置复制成功状态
+      setCopiedMessageIndex(index);
+      
+      // 2秒后重置复制状态
+      copyTimerRef.current = setTimeout(() => {
+        setCopiedMessageIndex(null);
+      }, 2000);
+      
+    } catch (err) {
+      console.error("复制失败:", err);
+    }
+    
+    // 移除临时文本区域
+    document.body.removeChild(textArea);
   };
 
   // 推荐内容自动关闭定时器
@@ -370,11 +419,10 @@ const AiAssistant = ({ userInfo }) => {
         }
       });
 
-      // 监听消息事件
+      // 监听消息事件 - 优化流式接收显示
       eventSourceRef.current.onmessage = (event) => {
         // 调试日志：记录每次接收到的数据
         console.log("调试: SSE数据块已接收，立即渲染到UI");
-        console.log("调试: 数据块内容:", event.data);
 
         const data = event.data;
 
@@ -433,6 +481,11 @@ const AiAssistant = ({ userInfo }) => {
           }
         }
       };
+      
+      // 监听心跳事件，保持连接活跃
+      eventSourceRef.current.addEventListener("heartbeat", (event) => {
+        console.log("收到心跳信号，连接保持活跃");
+      });
 
       // 监听错误
       eventSourceRef.current.onerror = (error) => {
@@ -623,21 +676,78 @@ const AiAssistant = ({ userInfo }) => {
     });
   };
 
-  const renderMessageContent = (message) => {
-    if (!message) return '';
+  // 使用 ReactMarkdown 渲染消息内容
+  const renderMessageContent = (message, index) => {
+    if (!message || message.trim() === '') return null;
   
+    // 处理消息内容
     let cleanedMessage = processResponseData(message);
-    console.log('处理前的消息:', cleanedMessage);
-  
-   
-  
-    console.log('处理后的消息:', cleanedMessage);
-  
+    
     return (
-      <div 
-        className="ai-markdown-content" 
-        dangerouslySetInnerHTML={{ __html: cleanedMessage }}
-      />
+      <div className="ai-message-content-wrapper">
+        <ReactMarkdown
+          className="ai-markdown-content"
+          rehypePlugins={[rehypeRaw]}
+          remarkPlugins={[remarkGfm]}
+          components={{
+            code({node, inline, className, children, ...props}) {
+              const match = /language-(\w+)/.exec(className || '')
+              return !inline && match ? (
+                <div className="code-block-wrapper">
+                  <div className="code-header">
+                    <span className="code-language">{match[1]}</span>
+                    <button 
+                      className="code-copy-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        copyToClipboard(String(children).replace(/\n$/, ''), `code-${index}`);
+                      }}
+                      title="复制代码"
+                    >
+                      {copiedMessageIndex === `code-${index}` ? (
+                        <i className="fas fa-check"></i>
+                      ) : (
+                        <i className="fas fa-copy"></i>
+                      )}
+                    </button>
+                  </div>
+                  <SyntaxHighlighter
+                    style={tomorrow}
+                    language={match[1]}
+                    PreTag="div"
+                    {...props}
+                  >
+                    {String(children).replace(/\n$/, '')}
+                  </SyntaxHighlighter>
+                </div>
+              ) : (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              )
+            }
+          }}
+        >
+          {cleanedMessage}
+        </ReactMarkdown>
+        
+        {/* 复制按钮 - 仅对非空AI消息显示，且在消息完成后显示在内容后面 */}
+        {cleanedMessage && cleanedMessage.trim() !== '' && index !== 'streaming' && (
+          <div className="ai-copy-button-container">
+            <button 
+              className="ai-copy-button"
+              onClick={() => copyToClipboard(cleanedMessage, index)}
+              title="复制"
+            >
+              {copiedMessageIndex === index ? (
+                <><i className="fas fa-check"></i> 已复制</>
+              ) : (
+                <><i className="fas fa-copy"></i> 复制</>
+              )}
+            </button>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -873,7 +983,7 @@ const AiAssistant = ({ userInfo }) => {
                   )} */}
                   <div className="ai-chat-text">
                     {chat.type === "ai"
-                      ? renderMessageContent(chat.message)
+                      ? renderMessageContent(chat.message, index)
                       : chat.message}
                   </div>
                 </div>
@@ -884,11 +994,11 @@ const AiAssistant = ({ userInfo }) => {
             <div ref={chatEndRef}></div>
 
             {/* 正在流式生成的消息 */}
-            {currentStreamingMessage && (
+            {currentStreamingMessage && currentStreamingMessage.trim() !== '' && (
               <div className="ai-chat-message ai-message">
                 <div className="ai-chat-bubble">
                   <div className="ai-chat-text">
-                    {renderMessageContent(currentStreamingMessage)}
+                    {renderMessageContent(currentStreamingMessage, 'streaming')}
                   </div>
                 </div>
               </div>

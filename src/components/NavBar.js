@@ -25,7 +25,7 @@ const NavBar = ({ className }) => {
         </Link>
         
         <div className="nav-center-button-container">
-          <Link to="/scan" className="nav-center-button">
+          <Link to="" className="nav-center-button">
             <i className="fas fa-qrcode"></i>
           </Link>
         </div>

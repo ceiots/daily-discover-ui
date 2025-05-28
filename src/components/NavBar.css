@@ -337,12 +337,12 @@ nav a:nth-child(6) i, nav a:nth-child(6) span { animation-delay: 0.4s; }
   justify-content: center;
   width: 70px;
   height: 70px;
-  margin-top: -40px;
+  margin-bottom: -15px;
 }
 
 .nav-center-button {
-  width: 56px;
-  height: 56px;
+  width: 49px;
+  height: 49px;
   border-radius: 50%;
   background: linear-gradient(135deg, #7c3aed, #8b5cf6);
   display: flex;
