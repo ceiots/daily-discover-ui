@@ -595,10 +595,10 @@ const Daily = () => {
             <p className="date-compact">{formattedDate} {weekday} · {lunarDateInfo.month}{lunarDateInfo.day}</p>
           </div>
           <div className="header-icons">
-            <div className="cart-icon">
+            <div className="cart-icon" onClick={() => navigate("/cart")}>
               <i className="fas fa-shopping-cart"></i>
             </div>
-            <div className="user-icon">
+            <div className="user-icon" onClick={() => navigate("/profile")}>
               <img 
                 src={userInfo?.avatar || DEFAULT_AVATAR} 
                   alt="用户头像"

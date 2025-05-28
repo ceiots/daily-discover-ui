@@ -58,7 +58,7 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.0",
     "slick-carousel": "^1.8.1",
-    "sockjs-client": "^1.6.1",
+    "sockjs-client": "^1.4.0",
     "styled-components": "^6.1.13",
     "three": "^0.170.0",
     "url": "^0.11.4",
