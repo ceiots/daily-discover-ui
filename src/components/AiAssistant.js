@@ -11,10 +11,8 @@ import remarkGfm from 'remark-gfm';
 // 导入语法高亮
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-// 导入SockJS
-import SockJS from 'sockjs-client';
-// 移除STOMP相关导入
-// import { Stomp } from '@stomp/stompjs';
+// 移除SockJS相关导入
+// import SockJS from 'sockjs-client';
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -38,9 +36,9 @@ const AiAssistant = ({ userInfo }) => {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
   // 添加复制状态
   const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
-  // WebSocket状态
-  const [wsConnected, setWsConnected] = useState(false);
-  const [wsInstance, setWsInstance] = useState(null);
+  // 移除WebSocket状态
+  // const [wsConnected, setWsConnected] = useState(false);
+  // const [wsInstance, setWsInstance] = useState(null);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -48,10 +46,12 @@ const AiAssistant = ({ userInfo }) => {
   const eventSourceRef = useRef(null);
   // 添加复制状态定时器引用
   const copyTimerRef = useRef(null);
-  // WebSocket重连定时器
-  const reconnectTimerRef = useRef(null);
-  // WebSocket ping/pong保活
-  const wsKeepAliveRef = useRef(null);
+  // 移除WebSocket相关引用
+  // const reconnectTimerRef = useRef(null);
+  // const wsKeepAliveRef = useRef(null);
+  
+  // 添加流式响应控制器引用
+  const abortControllerRef = useRef(null);
 
   // 处理响应数据的辅助函数 - 移动到组件级别
   const processResponseData = (data) => {
@@ -147,20 +147,14 @@ const AiAssistant = ({ userInfo }) => {
     // 加载聊天历史
     loadChatHistory();
     
-    
     // 组件卸载时清理
     return () => {
-      
-      if (reconnectTimerRef.current) {
-        clearTimeout(reconnectTimerRef.current);
-      }
-      
-      if (wsKeepAliveRef.current) {
-        clearInterval(wsKeepAliveRef.current);
-      }
-      
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
+      }
+      
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     };
   }, []);
@@ -448,6 +442,126 @@ const AiAssistant = ({ userInfo }) => {
     setSuggestedTopics(fallbackTopics);
   };
 
+  // 实现Ollama流式请求
+  const fetchStreamResponse = async (message) => {
+    try {
+      // 取消任何正在进行的请求
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      
+      // 创建新的AbortController
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+      
+      // 准备发送到Ollama的数据
+      const requestData = {
+        model: "Qwen3:4b", // 或其他可用模型
+        prompt: message,
+        stream: true
+      };
+
+      // 向Ollama API发送请求
+      const response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+        signal: signal
+      });
+
+      if (!response.ok) {
+        throw new Error(`API请求失败: ${response.status}`);
+      }
+
+      // 获取响应的reader来处理流数据
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let streamedResponse = "";
+
+      // 重置流式消息状态
+      setCurrentStreamingMessage("");
+      
+      let done = false;
+      while (!done) {
+        const result = await reader.read();
+        done = result.done;
+        if (done) break;
+        
+        // 解码并处理返回的块
+        const chunk = decoder.decode(result.value, { stream: true });
+        try {
+          // 处理流式JSON响应
+          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          
+          for (const line of lines) {
+            const data = JSON.parse(line);
+            if (data.response) {
+              streamedResponse += data.response;
+              setCurrentStreamingMessage(streamedResponse);
+            }
+          }
+        } catch (e) {
+          console.error("解析流式响应出错:", e);
+          // 如果不是有效JSON，直接添加到响应中
+          streamedResponse += chunk;
+          setCurrentStreamingMessage(streamedResponse);
+        }
+      }
+
+      // 流式响应完成，将完整响应添加到聊天历史
+      setAiChatHistory(prev => [
+        ...prev,
+        { type: "ai", message: streamedResponse }
+      ]);
+      
+      // 清除流式消息
+      setCurrentStreamingMessage("");
+      
+      return streamedResponse;
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error("流式响应出错:", error);
+        
+        // 在聊天中显示错误消息
+        setAiChatHistory(prev => [
+          ...prev,
+          { type: "ai", message: "抱歉，我遇到了一些问题。请稍后再试。" }
+        ]);
+        
+        // 添加备用响应逻辑
+        const fallbackResponses = {
+          "推荐": "我为您精选了今日好物，您可以在\"每日发现\"区域查看更多推荐商品。这些商品都是根据最新趋势和品质精选的。",
+          "天气": "今天天气晴朗，气温在18-25°C之间，非常适合户外活动。建议您适当增减衣物，注意防晒。",
+          "健康": "建议您保持均衡饮食，多摄入蔬果，每天喝足够的水，保持适度运动，这对身体健康非常有益。",
+          "效率": "提高工作效率可以尝试番茄工作法，设定明确目标，减少干扰，定期休息，确保充足睡眠。"
+        };
+        
+        // 检查用户消息是否包含某些关键词
+        const userMessageLower = message.toLowerCase();
+        let fallbackMessage = "感谢您的提问。我们的服务暂时遇到了一些问题，但我们会尽快修复。您可以稍后再试。";
+        
+        for (const [keyword, response] of Object.entries(fallbackResponses)) {
+          if (userMessageLower.includes(keyword)) {
+            fallbackMessage = response;
+            break;
+          }
+        }
+        
+        // 显示备用响应
+        setAiChatHistory(prev => [
+          ...prev,
+          { type: "ai", message: fallbackMessage }
+        ]);
+      }
+      return null;
+    } finally {
+      setIsTyping(false);
+      setIsLoading(false);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
@@ -472,7 +586,6 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-
     // 更新推荐话题
     updateSuggestedTopics(currentMessage);
 
@@ -483,6 +596,9 @@ const AiAssistant = ({ userInfo }) => {
 
     // 自动展开聊天区域
     setIsExpanded(true);
+
+    // 调用Ollama API获取流式响应
+    await fetchStreamResponse(currentMessage);
 
     // 聚焦输入框，方便继续输入
     if (messageInputRef.current) {
@@ -518,6 +634,9 @@ const AiAssistant = ({ userInfo }) => {
 
     // 自动展开聊天区域
     setIsExpanded(true);
+
+    // 调用Ollama API获取流式响应
+    await fetchStreamResponse(topic.text);
 
     // 添加视觉反馈
     const topicElements = document.querySelectorAll(".ai-suggestion-chip");
