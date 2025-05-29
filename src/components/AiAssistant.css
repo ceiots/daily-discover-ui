@@ -121,26 +121,26 @@
 .ai-suggestions-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px; /* 统一每个项之间的间距 */
+  padding: 0; /* 移除默认内边距 */
 }
 
 .ai-suggestion-chip {
   background: var(--hover-color);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 3px 8px;
-  font-size: 0.6rem; /* 更小的标签字体 */
+  font-size: 0.10rem; /* 更小的标签字体 */
   display: flex;
   align-items: center;
   color: var(--text-primary);
-  cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  cursor: pointer; /* 鼠标指针样式 */
 }
 
 .ai-suggestion-chip i {
   margin-right: 4px;
-  font-size: 0.55rem; /* 更小的图标 */
+  font-size: 0.75rem; /* 更小的图标 */
   color: var(--primary-color);
 }
 
@@ -726,6 +726,37 @@
   border: 1px solid var(--border-color);
 }
 
+.ai-suggestions .slick-slide {
+  padding: 0;
+  border-radius: 8px; /* 边框圆角 */
+  margin: 0 10px; /* 幻灯片之间的间距 */
+  background-color: #f9f9f9; /* 背景颜色 */
+  transition: all 0.3s ease; /* 平滑过渡效果 */
+}
+
+.ai-suggestions .slick-slide button {
+  /* 根据需要调整按钮样式 */
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  color: #333;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.ai-suggestions .slick-slide button:hover {
+  background-color: #e0e0e0;
+}
+
+.ai-suggestions .slick-list {
+  overflow: hidden;
+  margin: 0 -10px; /* 调整内边距以适应 margin */
+}
+
+.ai-suggestions .slick-track {
+  display: flex;
+  align-items: center;
+}
 
 .ai-assistant-container .ai-input-area .ai-message-input {
   flex: 1;

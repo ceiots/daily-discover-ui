@@ -11,8 +11,9 @@ import remarkGfm from 'remark-gfm';
 // 导入语法高亮
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-// 移除SockJS相关导入
-// import SockJS from 'sockjs-client';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -52,6 +53,39 @@ const AiAssistant = ({ userInfo }) => {
   
   // 添加流式响应控制器引用
   const abortControllerRef = useRef(null);
+
+  const settings = {
+    className: "center",
+    centerMode: true,
+    infinite: true,
+    centerPadding: "10px",
+    slidesToShow: 3,
+    speed: 500,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    arrows: false,
+    dots: false,
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+          centerMode: true,
+          centerPadding: "10px",
+          slidesToShow: 3
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          arrows: false,
+          centerMode: true,
+          centerPadding: "10px",
+          slidesToShow: 3
+        }
+      }
+    ]
+  };
 
   // 处理响应数据的辅助函数 - 移动到组件级别
   const processResponseData = (data) => {
@@ -529,31 +563,6 @@ const AiAssistant = ({ userInfo }) => {
           ...prev,
           { type: "ai", message: "抱歉，我遇到了一些问题。请稍后再试。" }
         ]);
-        
-        // 添加备用响应逻辑
-        const fallbackResponses = {
-          "推荐": "我为您精选了今日好物，您可以在\"每日发现\"区域查看更多推荐商品。这些商品都是根据最新趋势和品质精选的。",
-          "天气": "今天天气晴朗，气温在18-25°C之间，非常适合户外活动。建议您适当增减衣物，注意防晒。",
-          "健康": "建议您保持均衡饮食，多摄入蔬果，每天喝足够的水，保持适度运动，这对身体健康非常有益。",
-          "效率": "提高工作效率可以尝试番茄工作法，设定明确目标，减少干扰，定期休息，确保充足睡眠。"
-        };
-        
-        // 检查用户消息是否包含某些关键词
-        const userMessageLower = message.toLowerCase();
-        let fallbackMessage = "感谢您的提问。我们的服务暂时遇到了一些问题，但我们会尽快修复。您可以稍后再试。";
-        
-        for (const [keyword, response] of Object.entries(fallbackResponses)) {
-          if (userMessageLower.includes(keyword)) {
-            fallbackMessage = response;
-            break;
-          }
-        }
-        
-        // 显示备用响应
-        setAiChatHistory(prev => [
-          ...prev,
-          { type: "ai", message: fallbackMessage }
-        ]);
       }
       return null;
     } finally {
@@ -851,7 +860,7 @@ const AiAssistant = ({ userInfo }) => {
             <i className="fas fa-lightbulb"></i>
             <span>猜你想了解</span>
           </div>
-          <div className="ai-suggestions-list">
+          <Slider {...settings}>
             {suggestedTopics.map((topic) => (
               <button
                 key={topic.id}
@@ -863,7 +872,7 @@ const AiAssistant = ({ userInfo }) => {
                 {topic.text}
               </button>
             ))}
-          </div>
+          </Slider>
         </div>
 
         {/* 聊天历史区域 - 可折叠 */}
