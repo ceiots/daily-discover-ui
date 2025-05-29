@@ -11,9 +11,10 @@ import remarkGfm from 'remark-gfm';
 // 导入语法高亮
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-// 导入WebSocket相关库
+// 导入SockJS
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+// 移除STOMP相关导入
+// import { Stomp } from '@stomp/stompjs';
 
 const AiAssistant = ({ userInfo }) => {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ const AiAssistant = ({ userInfo }) => {
   const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
   // WebSocket状态
   const [wsConnected, setWsConnected] = useState(false);
-  const [stompClient, setStompClient] = useState(null);
+  const [wsInstance, setWsInstance] = useState(null);
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -47,6 +48,10 @@ const AiAssistant = ({ userInfo }) => {
   const eventSourceRef = useRef(null);
   // 添加复制状态定时器引用
   const copyTimerRef = useRef(null);
+  // WebSocket重连定时器
+  const reconnectTimerRef = useRef(null);
+  // WebSocket ping/pong保活
+  const wsKeepAliveRef = useRef(null);
 
   // 处理响应数据的辅助函数 - 移动到组件级别
   const processResponseData = (data) => {
@@ -123,12 +128,15 @@ const AiAssistant = ({ userInfo }) => {
     };
   }, [currentRecommendation]);
 
+
   // 加载初始数据
   useEffect(() => {
+
     // 添加默认欢迎消息
     if (aiChatHistory.length === 0) {
       // 创建新会话
       createNewSession();
+
     }
 
     setFallbackSuggestedTopics();
@@ -139,12 +147,25 @@ const AiAssistant = ({ userInfo }) => {
     // 加载聊天历史
     loadChatHistory();
     
-    // 连接WebSocket
-    connectWebSocket();
     
+    // 组件卸载时清理
+    return () => {
+      
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
+      
+      if (wsKeepAliveRef.current) {
+        clearInterval(wsKeepAliveRef.current);
+      }
+      
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
   }, []);
   
-  // 组件卸载时关闭EventSource连接
+  // 组件卸载时关闭WebSocket连接
   useEffect(() => {
     // 添加CSS样式来防止水平滚动
     const style = document.createElement("style");
@@ -284,151 +305,10 @@ const AiAssistant = ({ userInfo }) => {
 
     return () => {
       document.head.removeChild(style);
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-      disconnectWebSocket();
+      
     };
   }, []);
 
-  // 连接WebSocket
-  const connectWebSocket = () => {
-    if (stompClient) {
-      console.log("WebSocket已连接，无需重新连接");
-      return;
-    }
-    
-    try {
-      console.log('尝试连接WebSocket');
-      
-      // 确定WebSocket URL
-      let wsUrl = API_BASE_URL.replace('http:', 'ws:').replace('https:', 'wss:') + '/ai/chat-ws';
-      
-      console.log('WebSocket连接URL:', wsUrl);
-      
-      // 定义处理STOMP消息的函数
-      const handleStompMessage = (message) => {
-        try {
-          const response = JSON.parse(message.body);
-          console.log('收到消息:', response);
-          
-          if (response.type === 'AI') {
-            // 立即显示收到的文本块
-            setCurrentStreamingMessage(prev => prev + response.content);
-          } else if (response.type === 'ERROR') {
-            console.error('AI服务错误:', response.content);
-            setCurrentStreamingMessage(prev => 
-              prev + "\n\n⚠️ 连接AI服务出现问题: " + response.content
-            );
-          } else if (response.type === 'COMPLETE') {
-            // 处理完成逻辑
-            console.log('聊天完成');
-            const fullText = currentStreamingMessage;
-            setIsTyping(false);
-            setIsLoading(false);
-            
-            // 添加到聊天历史
-            if (fullText && fullText.trim() !== '') {
-              setTimeout(() => {
-                setAiChatHistory(prev => [...prev, { type: "ai", message: fullText }]);
-                setCurrentStreamingMessage("");
-              }, 100);
-            } else {
-              const errorMsg = "⚠️ AI服务没有返回任何内容，请稍后再试。";
-              setAiChatHistory(prev => [...prev, { type: "ai", message: errorMsg }]);
-              setCurrentStreamingMessage("");
-            }
-          }
-        } catch (error) {
-          console.error('处理消息失败:', error, message.body);
-        }
-      };
-      
-      try {
-        console.log('尝试原生WebSocket连接:', wsUrl);
-        
-        // 创建原生WebSocket连接
-        const socket = new WebSocket(wsUrl);
-        
-        // 使用原生WebSocket创建STOMP客户端
-        let stompInstance = Stomp.over(socket);
-        stompInstance.debug = (msg) => console.debug('STOMP:', msg);
-        
-        // 连接STOMP
-        stompInstance.connect({}, frame => {
-          setWsConnected(true);
-          console.log('WebSocket STOMP连接已建立');
-          
-          // 生成一个唯一的会话ID
-          const sessionId = `session_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-          console.log('WebSocket会话ID:', sessionId);
-          setCurrentSessionId(sessionId);
-          
-          // 订阅个人消息通道
-          stompInstance.subscribe(`/topic/messages/${sessionId}`, handleStompMessage);
-          
-          setStompClient(stompInstance);
-        }, error => {
-          console.error('WebSocket STOMP连接失败:', error);
-          setWsConnected(false);
-          setStompClient(null);
-          
-          // 显示错误消息
-          setAiChatHistory(prev => [
-            ...prev,
-            { type: "ai", message: "⚠️ 连接失败，请刷新页面重试" }
-          ]);
-        });
-        
-        // 添加额外的错误处理
-        socket.onerror = (error) => {
-          console.error('WebSocket错误:', error);
-          setWsConnected(false);
-          setStompClient(null);
-        };
-        
-        socket.onclose = (event) => {
-          console.log('WebSocket连接关闭:', event);
-          if (!event.wasClean) {
-            console.error('WebSocket连接异常关闭');
-            setWsConnected(false);
-            setStompClient(null);
-          }
-        };
-      } catch (error) {
-        console.error('创建WebSocket连接失败:', error);
-        setWsConnected(false);
-        setStompClient(null);
-        
-        // 显示错误消息
-        setAiChatHistory(prev => [
-          ...prev,
-          { type: "ai", message: "⚠️ 连接服务器失败，请检查网络连接" }
-        ]);
-      }
-    } catch (error) {
-      console.error('创建WebSocket连接失败:', error);
-      setWsConnected(false);
-      setStompClient(null);
-      
-      // 显示错误消息
-      setAiChatHistory(prev => [
-        ...prev,
-        { type: "ai", message: "⚠️ WebSocket连接初始化失败" }
-      ]);
-    }
-  };
-  
-  // 断开WebSocket连接
-  const disconnectWebSocket = () => {
-    if (stompClient && stompClient.connected) {
-      stompClient.disconnect();
-      console.log('WebSocket连接已断开');
-    }
-    
-    setStompClient(null);
-    setWsConnected(false);
-  };
 
   // 创建新会话
   const createNewSession = () => {
@@ -533,76 +413,6 @@ const AiAssistant = ({ userInfo }) => {
     ]);
   };
 
-  // 使用WebSocket发送消息
-  const sendMessageViaWebSocket = (message) => {
-    if (!stompClient || !stompClient.connected) {
-      console.error('未连接，尝试重新连接');
-      
-      // 显示连接中消息
-      setCurrentStreamingMessage("正在连接服务器，请稍候...");
-      
-      // 清除之前的客户端
-      if (stompClient) {
-        try {
-          stompClient.disconnect();
-        } catch (e) {
-          console.error('断开旧连接失败:', e);
-        }
-        setStompClient(null);
-      }
-      
-      // 重新连接
-      connectWebSocket();
-      
-      // 延迟后再次尝试发送
-      setTimeout(() => {
-        if (stompClient && stompClient.connected) {
-          console.log('重连成功，重新发送消息');
-          // 清除连接中消息
-          setCurrentStreamingMessage("");
-          sendMessageViaWebSocket(message);
-        } else {
-          // 显示错误消息
-          setAiChatHistory(prev => [
-            ...prev,
-            { type: "ai", message: "⚠️ 无法连接到服务器，请检查网络连接或尝试刷新页面" }
-          ]);
-          
-          setIsTyping(false);
-          setIsLoading(false);
-        }
-      }, 3000);
-      return;
-    }
-    
-    // 清空当前流式消息
-    setCurrentStreamingMessage("");
-    
-    // 发送消息到服务器
-    try {
-      console.log('发送消息:', message);
-      stompClient.send("/app/chat", {}, JSON.stringify({
-        content: message,
-        type: "user",
-        timestamp: new Date(),
-        sessionId: currentSessionId
-      }));
-    } catch (error) {
-      console.error('发送消息失败:', error);
-      setAiChatHistory(prev => [
-        ...prev,
-        { type: "ai", message: "⚠️ 发送消息失败: " + error.message }
-      ]);
-      
-      setIsTyping(false);
-      setIsLoading(false);
-      
-      // 尝试重新连接
-      setTimeout(() => {
-        connectWebSocket();
-      }, 1000);
-    }
-  };
 
   // 根据用户输入更新推荐话题
   const updateSuggestedTopics = async (userInput) => {
@@ -662,8 +472,6 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 使用WebSocket发送消息
-    sendMessageViaWebSocket(currentMessage);
 
     // 更新推荐话题
     updateSuggestedTopics(currentMessage);
@@ -699,9 +507,6 @@ const AiAssistant = ({ userInfo }) => {
     const randomRecommendation =
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
-
-    // 使用WebSocket发送消息
-    sendMessageViaWebSocket(topic.text);
 
     // 更新推荐话题
     updateSuggestedTopics(topic.text);
@@ -868,10 +673,13 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
+
   return (
     <div className="ai-assistant-container">
       {/* 主要AI卡片区域 */}
       <div className="ai-card blue-theme">
+       
+
         {/* <div className="ai-card-header">
           <div className="ai-header-left">
             <i className="fas fa-robot"></i>
