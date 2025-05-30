@@ -39,6 +39,8 @@ const AiAssistant = ({ userInfo }) => {
   const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
   // 添加调试模式开关
   const DEBUG_MODE = false; // 设置为true开启详细日志
+  // 添加设备标识符，用于跟踪用户会话
+  const [deviceId, setDeviceId] = useState("");
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -121,78 +123,111 @@ const AiAssistant = ({ userInfo }) => {
     code: PropTypes.string.isRequired
   };
 
-  // 预处理内容，将特殊标签转换为Markdown可识别的格式
+  // 预处理内容，将特殊标签转换为HTML
   const preprocessContent = (content) => {
-    if (!content) return "";
+    try {
+      if (!content) return "";
+      if (typeof content !== 'string') {
+        console.warn("preprocessContent: 内容不是字符串类型", content);
+        return String(content || "");
+      }
 
-    // 移除event:message前缀
-    if (content.includes("event:message")) {
-      content = content.replace(/event:message\w*/g, "");
+      // 移除event:message前缀
+      if (content.includes("event:message")) {
+        content = content.replace(/event:message\w*/g, "");
+      }
+
+      // 处理已关闭的思考标签对
+      content = content.replace(
+        /<think>([\s\S]*?)<\/think>/g,
+        '<div class="ai-think-content"><div class="ai-think-body">$1</div></div>'
+      );
+
+      // 处理尚未关闭的思考标签（流式响应中的情况）
+      const openThinkTagIndex = content.lastIndexOf('<think>');
+      if (openThinkTagIndex !== -1 && content.indexOf('</think>', openThinkTagIndex) === -1) {
+        const beforeThink = content.substring(0, openThinkTagIndex);
+        const thinkContent = content.substring(openThinkTagIndex + 7); // 7 是 <think> 的长度
+        
+        content = beforeThink + 
+                  '<div class="ai-think-content"><div class="ai-think-body">' + 
+                  thinkContent + 
+                  '</div></div>';
+      }
+
+      return content;
+    } catch (error) {
+      console.error("预处理内容出错:", error);
+      return content;
     }
-
-    // 处理思考标签，转换为HTML
-    content = content.replace(
-      /<think>([\s\S]*?)<\/think>/g,
-      '<div class="ai-think-content"><div class="ai-think-body">$1</div></div>'
-    );
-
-    return content;
   };
 
   // 使用 ReactMarkdown 渲染消息内容
   const renderMessageContent = (message, index) => {
     if (!message || message.trim() === '') return null;
     
-    // 预处理内容
-    const preprocessed = preprocessContent(message);
-    
-    return (
-      <div className="ai-message-content-wrapper">
-        <ReactMarkdown
-          className="ai-markdown-content"
-          rehypePlugins={[rehypeRaw]}
-          remarkPlugins={[remarkGfm]}
-          components={{
-            code({node, inline, className, children, ...props}) {
-              const match = /language-(\w+)/.exec(className || '');
-              return !inline && match ? (
-                <CodeBlock 
-                  language={match[1]} 
-                  code={String(children).replace(/\n$/, '')}
-                />
-              ) : (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              );
-            },
-            // 自定义处理器用于思考内容
-            p({node, children, ...props}) {
-              const content = children.toString();
-              // 不再需要检测:::think格式，直接渲染段落
-              return <p {...props}>{children}</p>;
-            }
-          }}
-        >
-          {preprocessed}
-        </ReactMarkdown>
-        
-        {/* 复制按钮 */}
-        <div className="ai-copy-button-container">
-          <button 
-            className="ai-copy-button"
-            onClick={() => copyToClipboard(message.replace(/<think>([\s\S]*?)<\/think>/g, '思考过程：$1'), index)}
-            title="复制全部内容"
+    try {
+      // 预处理内容
+      const preprocessed = preprocessContent(message);
+      
+      return (
+        <div className="ai-message-content-wrapper">
+          <ReactMarkdown
+            className="ai-markdown-content"
+            rehypePlugins={[rehypeRaw]}
+            remarkPlugins={[remarkGfm]}
+            components={{
+              code({node, inline, className, children, ...props}) {
+                if (!children) return <code className={className} {...props}></code>;
+                const match = /language-(\w+)/.exec(className || '');
+                return !inline && match ? (
+                  <CodeBlock 
+                    language={match[1]} 
+                    code={String(children || "").replace(/\n$/, '')}
+                  />
+                ) : (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              // 自定义处理器用于思考内容
+              p({node, children, ...props}) {
+                // 检查children是否存在并且有toString方法
+                if (!children || typeof children.toString !== 'function') {
+                  return <p {...props}>{children || ""}</p>;
+                }
+                
+                const content = children.toString();
+                // 不再需要检测:::think格式，直接渲染段落
+                return <p {...props}>{children}</p>;
+              }
+            }}
           >
-            {copiedMessageIndex === index ? (
-              <><i className="fas fa-check"></i> 已复制</>
-            ) : (
-              <><i className="fas fa-copy"></i> 复制全部</>
-            )}
-          </button>
+            {preprocessed}
+          </ReactMarkdown>
+          
+          {/* 复制按钮 */}
+          <div className="ai-copy-button-container">
+            <button 
+              className="ai-copy-button"
+              onClick={() => copyToClipboard(message.replace(/<think>([\s\S]*?)<\/think>/g, '思考过程：$1'), index)}
+              title="复制全部内容"
+            >
+              {copiedMessageIndex === index ? (
+                <><i className="fas fa-check"></i> 已复制</>
+              ) : (
+                <><i className="fas fa-copy"></i> 复制全部</>
+              )}
+            </button>
+          </div>
         </div>
-      </div>
-    );
+      );
+    } catch (error) {
+      console.error("渲染消息内容出错:", error);
+      // 发生错误时返回原始文本
+      return <div className="ai-message-content-wrapper">{message}</div>;
+    }
   };
 
   // 添加复制功能
@@ -253,12 +288,13 @@ const AiAssistant = ({ userInfo }) => {
 
   // 加载初始数据
   useEffect(() => {
+    // 生成或获取设备ID
+    initDeviceId();
 
     // 添加默认欢迎消息
     if (aiChatHistory.length === 0) {
       // 创建新会话
       createNewSession();
-
     }
 
     setFallbackSuggestedTopics();
@@ -269,6 +305,21 @@ const AiAssistant = ({ userInfo }) => {
     // 加载聊天历史
     loadChatHistory();
     
+    // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
+    const handleBeforeUnload = () => {
+      console.log("页面即将刷新或关闭，取消所有请求");
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      // 标记当前会话ID为过期
+      if (currentSessionId) {
+        markSessionExpired(currentSessionId);
+      }
+    };
+
+    // 注册页面卸载事件监听器
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
     // 组件卸载时清理
     return () => {
       if (copyTimerRef.current) {
@@ -278,39 +329,38 @@ const AiAssistant = ({ userInfo }) => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
-    };
-  }, []);
-  
-  // 组件卸载时关闭WebSocket连接
-  useEffect(() => {
-    // 添加CSS样式来防止水平滚动
-    const style = document.createElement("style");
-    style.innerHTML = ``;
-    document.head.appendChild(style);
-
-    // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
-    const handleBeforeUnload = () => {
-      console.log("页面即将刷新或关闭，取消所有请求");
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-
-    // 注册页面卸载事件监听器
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      document.head.removeChild(style);
       
       // 移除事件监听器
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      
-      // 确保中止所有请求
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
     };
   }, []);
+  
+  // 初始化设备ID - 用于标识用户设备
+  const initDeviceId = () => {
+    let deviceIdFromStorage = localStorage.getItem('daily_discover_device_id');
+    
+    if (!deviceIdFromStorage) {
+      // 生成新的设备ID
+      deviceIdFromStorage = 'device_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('daily_discover_device_id', deviceIdFromStorage);
+    }
+    
+    setDeviceId(deviceIdFromStorage);
+  };
+  
+  // 标记会话为过期
+  const markSessionExpired = (sessionId) => {
+    try {
+      // 保存到本地存储，表示该会话已过期
+      const expiredSessions = JSON.parse(localStorage.getItem('expired_sessions') || '[]');
+      if (!expiredSessions.includes(sessionId)) {
+        expiredSessions.push(sessionId);
+        localStorage.setItem('expired_sessions', JSON.stringify(expiredSessions));
+      }
+    } catch (error) {
+      console.error("标记会话过期失败:", error);
+    }
+  };
 
   // 组件挂载后添加代码块复制功能
   useEffect(() => {
@@ -339,11 +389,56 @@ const AiAssistant = ({ userInfo }) => {
 
   // 创建新会话
   const createNewSession = () => {
-    const sessionId = `session_${Date.now()}_${Math.floor(
-      Math.random() * 1000
-    )}`;
+    // 清理过期会话
+    cleanupExpiredSessions();
+    
+    // 生成新的会话ID，包含设备ID前缀
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    // 格式: deviceId_timestamp_random
+    const sessionId = `${deviceId}_${timestamp}_${random}`;
+    
     setCurrentSessionId(sessionId);
+    
+    // 在本地存储中标记为活跃会话
+    try {
+      const activeSessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
+      if (!activeSessions.includes(sessionId)) {
+        // 限制最大保存的活跃会话数
+        if (activeSessions.length > 5) {
+          activeSessions.shift(); // 移除最老的会话
+        }
+        activeSessions.push(sessionId);
+        localStorage.setItem('active_sessions', JSON.stringify(activeSessions));
+      }
+    } catch (error) {
+      console.error("保存活跃会话失败:", error);
+    }
+    
     return sessionId;
+  };
+  
+  // 清理过期会话
+  const cleanupExpiredSessions = () => {
+    try {
+      // 从活跃会话中移除过期会话
+      const expiredSessions = JSON.parse(localStorage.getItem('expired_sessions') || '[]');
+      const activeSessions = JSON.parse(localStorage.getItem('active_sessions') || '[]');
+      
+      const newActiveSessions = activeSessions.filter(
+        sessionId => !expiredSessions.includes(sessionId)
+      );
+      
+      localStorage.setItem('active_sessions', JSON.stringify(newActiveSessions));
+      
+      // 最多保留20个过期会话记录
+      if (expiredSessions.length > 20) {
+        const trimmedExpiredSessions = expiredSessions.slice(-20);
+        localStorage.setItem('expired_sessions', JSON.stringify(trimmedExpiredSessions));
+      }
+    } catch (error) {
+      console.error("清理过期会话失败:", error);
+    }
   };
 
   // 加载快速阅读内容
@@ -484,13 +579,24 @@ const AiAssistant = ({ userInfo }) => {
       abortControllerRef.current = new AbortController();
       const signal = abortControllerRef.current.signal;
       
+      // 检查会话是否已过期
+      const isSessionExpired = checkSessionExpired(currentSessionId);
+      if (isSessionExpired) {
+        console.log("当前会话已过期，创建新会话");
+        createNewSession();
+      }
+      
       // 准备发送到Ollama的数据
       const requestData = {
         model: "Qwen3:4b", // 或其他可用模型
         prompt: message,
-        stream: true
+        stream: true,
+        sessionId: currentSessionId, // 添加会话ID
+        deviceId: deviceId           // 添加设备ID
       };
 
+      console.log(`发送请求: sessionId=${currentSessionId}, deviceId=${deviceId}`);
+      
       // 向Ollama API发送请求
       console.log("发送请求时间: " + new Date().toLocaleTimeString());
       const response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
@@ -499,7 +605,10 @@ const AiAssistant = ({ userInfo }) => {
           'Content-Type': 'application/json',
           // 添加防缓存头
           'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          // 添加会话和设备标识头
+          'X-Session-ID': currentSessionId,
+          'X-Device-ID': deviceId
         },
         body: JSON.stringify(requestData),
         signal: signal
@@ -534,7 +643,17 @@ const AiAssistant = ({ userInfo }) => {
        
         const chunk = decoder.decode(value, { stream: true });
         
+        // 检查会话是否已被标记为过期
+        if (checkSessionExpired(currentSessionId)) {
+          console.log("会话已在其他页面中被标记为过期，中断流式接收");
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+          }
+          break;
+        }
+        
         // 直接添加到响应文本，后端已经处理好了文本内容
+        console.log("流式响应内容: " + chunk);  
         streamedResponse += chunk;
         // 更新UI显示
         setCurrentStreamingMessage(streamedResponse);
@@ -542,6 +661,7 @@ const AiAssistant = ({ userInfo }) => {
       
       // 流式响应完成，将完整响应添加到聊天历史
       if (streamedResponse) {
+        console.log("完整响应内容: ", streamedResponse.substring(0, 100) + "...");
         setAiChatHistory(prev => [
           ...prev,
           { type: "ai", message: streamedResponse }
@@ -567,6 +687,19 @@ const AiAssistant = ({ userInfo }) => {
       
       // 清理资源
       setCurrentStreamingMessage("");
+    }
+  };
+  
+  // 检查会话是否已过期
+  const checkSessionExpired = (sessionId) => {
+    try {
+      if (!sessionId) return true;
+      
+      const expiredSessions = JSON.parse(localStorage.getItem('expired_sessions') || '[]');
+      return expiredSessions.includes(sessionId);
+    } catch (error) {
+      console.error("检查会话状态失败:", error);
+      return false;
     }
   };
 
@@ -596,17 +729,19 @@ const AiAssistant = ({ userInfo }) => {
 
     // 滚动到最新消息位置
     if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
 
     // 自动展开聊天区域
     setIsExpanded(true);
 
     // 调用Ollama API获取流式响应
-    await fetchStreamResponse(currentMessage);
+    const response = await fetchStreamResponse(currentMessage);
     
-    // 先获取AI回复，然后再获取推荐话题，这样可以优先处理用户的主要需求
-    updateSuggestedTopics(currentMessage);
+    // 只有在获取完流式响应后，才更新推荐话题
+    if (response) {
+      updateSuggestedTopics(currentMessage);
+    }
 
     // 聚焦输入框，方便继续输入
     if (messageInputRef.current) {
@@ -632,21 +767,22 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-   
 
     // 滚动到最新消息位置
     if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
 
     // 自动展开聊天区域
     setIsExpanded(true);
 
     // 调用Ollama API获取流式响应
-    await fetchStreamResponse(topic.text);
+    const response = await fetchStreamResponse(topic.text);
     
-    // 先获取AI回复，然后再获取推荐话题，这样可以优先处理用户的主要需求
-    updateSuggestedTopics(topic.text);
+    // 只有在获取完流式响应后，才更新推荐话题
+    if (response) {
+      updateSuggestedTopics(topic.text);
+    }
 
     // 添加视觉反馈
     const topicElements = document.querySelectorAll(".ai-suggestion-chip");
@@ -831,7 +967,14 @@ const AiAssistant = ({ userInfo }) => {
               <div className="ai-chat-message ai-message">
                 <div className="ai-chat-bubble">
                   <div className="ai-chat-text">
-                    {renderMessageContent(currentStreamingMessage, 'streaming')}
+                    {(() => {
+                      try {
+                        return renderMessageContent(currentStreamingMessage, 'streaming');
+                      } catch (error) {
+                        console.error("渲染流式消息出错:", error);
+                        return <div>{currentStreamingMessage}</div>;
+                      }
+                    })()}
                   </div>
                 </div>
               </div>
