@@ -48,9 +48,10 @@ const AiAssistant = ({ userInfo }) => {
   const eventSourceRef = useRef(null);
   // 添加复制状态定时器引用
   const copyTimerRef = useRef(null);
-  
   // 添加流式响应控制器引用
   const abortControllerRef = useRef(null);
+  // 添加轮播组件引用
+  const sliderRef = useRef(null);
 
   const settings = {
     className: "center",
@@ -60,9 +61,13 @@ const AiAssistant = ({ userInfo }) => {
     slidesToShow: 3,
     speed: 500,
     autoplay: true,
-    autoplaySpeed: 2000,
+    autoplaySpeed: 3000,
+    pauseOnHover: true,
+    swipeToSlide: true,
     arrows: false,
     dots: false,
+    focusOnSelect: true, // 点击选中
+    waitForAnimate: false, // 不等待动画完成就响应用户操作
     responsive: [
       {
         breakpoint: 768,
@@ -82,7 +87,15 @@ const AiAssistant = ({ userInfo }) => {
           slidesToShow: 3
         }
       }
-    ]
+    ],
+    // 轮播初始化完成后的回调函数
+    onInit: () => {
+      console.log("轮播初始化完成");
+    },
+    // 轮播内容变化后的回调函数
+    afterChange: (current) => {
+      console.log("当前滚动到索引:", current);
+    }
   };
 
   // 调试日志函数
@@ -132,14 +145,14 @@ const AiAssistant = ({ userInfo }) => {
         return String(content || "");
       }
 
-      // 移除event:message前缀
+    // 移除event:message前缀
       if (content.includes("event:message")) {
         content = content.replace(/event:message\w*/g, "");
-      }
+    }
 
       // 处理已关闭的思考标签对
       content = content.replace(
-        /<think>([\s\S]*?)<\/think>/g,
+      /<think>([\s\S]*?)<\/think>/g,
         '<div class="ai-think-content"><div class="ai-think-body">$1</div></div>'
       );
 
@@ -270,36 +283,20 @@ const AiAssistant = ({ userInfo }) => {
     document.body.removeChild(textArea);
   };
 
-  // 推荐内容自动关闭定时器
-  useEffect(() => {
-    if (currentRecommendation) {
-      recommendationTimerRef.current = setTimeout(() => {
-        setCurrentRecommendation(null);
-      }, 60000);
-    }
-
-    return () => {
-      if (recommendationTimerRef.current) {
-        clearTimeout(recommendationTimerRef.current);
-      }
-    };
-  }, [currentRecommendation]);
-
-
-  // 加载初始数据
+  // 主要useEffect - 整合多个初始化和监听逻辑
   useEffect(() => {
     // 生成或获取设备ID
     initDeviceId();
 
-    // 添加默认欢迎消息
+    // 初始化
     if (aiChatHistory.length === 0) {
-      // 创建新会话
       createNewSession();
     }
 
+    // 设置默认推荐话题
     setFallbackSuggestedTopics();
 
-    // 设置快速阅读内容
+    // 加载快速阅读内容
     loadQuickReads();
 
     // 加载聊天历史
@@ -316,25 +313,131 @@ const AiAssistant = ({ userInfo }) => {
         markSessionExpired(currentSessionId);
       }
     };
+  
+    // 添加CSS样式来防止水平滚动
+    const style = document.createElement("style");
+    style.innerHTML = ``;
+    document.head.appendChild(style);
 
     // 注册页面卸载事件监听器
     window.addEventListener('beforeunload', handleBeforeUnload);
     
-    // 组件卸载时清理
+    // 添加事件委托，处理代码块复制按钮点击
+    const handleCodeCopyClick = (e) => {
+      // 检查点击的是否是代码复制按钮
+      if (e.target.closest('.code-copy-button')) {
+        const codeBlock = e.target.closest('.code-block');
+        if (codeBlock) {
+          const codeElement = codeBlock.querySelector('code');
+          if (codeElement) {
+            copyToClipboard(codeElement.textContent, 'code-block');
+          }
+        }
+      }
+    };
+
+    // 添加事件监听
+    document.addEventListener('click', handleCodeCopyClick);
+    
+    // 清理函数
     return () => {
       if (copyTimerRef.current) {
         clearTimeout(copyTimerRef.current);
+      }
+      
+      if (recommendationTimerRef.current) {
+        clearTimeout(recommendationTimerRef.current);
       }
       
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
       
-      // 移除事件监听器
+      document.head.removeChild(style);
+      document.removeEventListener('click', handleCodeCopyClick);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, []);  // 空依赖数组，只在组件挂载时执行一次
   
+  // 监听当前推荐内容变化，设置自动关闭定时器
+  useEffect(() => {
+    if (currentRecommendation) {
+      recommendationTimerRef.current = setTimeout(() => {
+        setCurrentRecommendation(null);
+      }, 60000);
+    }
+  }, [currentRecommendation]);
+  
+  // 使用MutationObserver监控聊天内容变化并自动滚动
+  useEffect(() => {
+    // 如果没有聊天历史区域的引用，则返回
+    if (!chatEndRef.current) return;
+    
+    // 创建MutationObserver实例
+    const observer = new MutationObserver(() => {
+      // 当内容变化时，滚动到底部
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    });
+    
+    // 获取聊天历史容器
+    const chatHistoryContainer = document.querySelector('.ai-chat-history');
+    if (chatHistoryContainer) {
+      // 配置观察选项
+      const config = { childList: true, subtree: true, characterData: true };
+      // 开始观察
+      observer.observe(chatHistoryContainer, config);
+    }
+    
+    // 清理函数
+    return () => {
+      observer.disconnect();
+    };
+  }, [isExpanded, currentStreamingMessage]); // 当展开状态或流式消息变化时重新设置
+  
+  // 监听suggestedTopics变化，初始化和更新后重新初始化轮播
+  useEffect(() => {
+    if (suggestedTopics.length > 0) {
+      // 确保DOM元素已经渲染
+      setTimeout(() => {
+        // 优先使用ref访问轮播组件
+        if (sliderRef.current) {
+          try {
+            console.log("使用ref刷新suggestedTopics变化后的轮播");
+            // 重新播放轮播
+            sliderRef.current.slickPlay();
+            // 回到第一个话题
+            sliderRef.current.slickGoTo(0);
+            return;
+          } catch (error) {
+            console.error("使用ref刷新轮播失败:", error);
+          }
+        }
+        
+        // 备用方式：通过DOM查找轮播组件
+        const slider = document.querySelector('.slick-slider');
+        if (slider) {
+          // 获取所有轮播项
+          const items = slider.querySelectorAll('.slick-slide');
+          if (items.length > 0) {
+            // 重新初始化轮播组件
+            try {
+              // 如果使用的是react-slick库提供的刷新方法
+              if (slider.slick) {
+                slider.slick.refresh();
+                slider.slick.slickGoTo(0);
+              }
+              console.log("话题轮播已重新初始化");
+            } catch (error) {
+              console.error("重新初始化话题轮播失败:", error);
+            }
+          }
+        }
+      }, 100); // 短暂延迟，确保DOM已更新
+    }
+  }, [suggestedTopics]);
+
   // 初始化设备ID - 用于标识用户设备
   const initDeviceId = () => {
     let deviceIdFromStorage = localStorage.getItem('daily_discover_device_id');
@@ -361,31 +464,6 @@ const AiAssistant = ({ userInfo }) => {
       console.error("标记会话过期失败:", error);
     }
   };
-
-  // 组件挂载后添加代码块复制功能
-  useEffect(() => {
-    // 添加事件委托，处理代码块复制按钮点击
-    const handleCodeCopyClick = (e) => {
-      // 检查点击的是否是代码复制按钮
-      if (e.target.closest('.code-copy-button')) {
-        const codeBlock = e.target.closest('.code-block');
-        if (codeBlock) {
-          const codeElement = codeBlock.querySelector('code');
-          if (codeElement) {
-            copyToClipboard(codeElement.textContent, 'code-block');
-          }
-        }
-      }
-    };
-
-    // 添加事件监听
-    document.addEventListener('click', handleCodeCopyClick);
-
-    // 清理函数
-    return () => {
-      document.removeEventListener('click', handleCodeCopyClick);
-    };
-  }, []);
 
   // 创建新会话
   const createNewSession = () => {
@@ -550,12 +628,47 @@ const AiAssistant = ({ userInfo }) => {
         // 更新推荐话题
         setSuggestedTopics(response.data.data);
         console.log("获取AI推荐话题成功:", response.data.data);
+        
+        // 重新初始化轮播组件
+        initializeSlider();
       } 
     } catch (error) {
       console.error("获取AI推荐话题出错:", error);
       // 使用备用话题
       setFallbackSuggestedTopics();
     }
+  };
+  
+  // 初始化轮播组件
+  const initializeSlider = () => {
+    // 使用setTimeout确保DOM已经更新
+    setTimeout(() => {
+      try {
+        // 首先尝试使用ref引用
+        if (sliderRef.current) {
+          // 使用ref直接访问slick方法
+          console.log("使用ref刷新轮播");
+          sliderRef.current.slickGoTo(0);
+          sliderRef.current.slickPlay();
+          return;
+        }
+        
+        // 备用方法：获取轮播容器
+        const sliderElement = document.querySelector('.slick-slider');
+        if (sliderElement && typeof sliderElement.slick !== 'undefined') {
+          // 重新初始化轮播
+          sliderElement.slick.refresh();
+          console.log("话题轮播已手动刷新");
+          
+          // 滚动到第一个话题
+          sliderElement.slick.slickGoTo(0);
+        } else {
+          console.log("轮播组件未找到或未初始化");
+        }
+      } catch (error) {
+        console.error("手动刷新轮播失败:", error);
+      }
+    }, 300);  // 给DOM更新留出足够的时间
   };
   
   // 设置备用推荐话题
@@ -568,6 +681,9 @@ const AiAssistant = ({ userInfo }) => {
     ];
     
     setSuggestedTopics(fallbackTopics);
+    
+    // 初始化轮播
+    initializeSlider();
   };
 
   // 实现Ollama流式请求
@@ -596,7 +712,7 @@ const AiAssistant = ({ userInfo }) => {
       };
 
       console.log(`发送请求: sessionId=${currentSessionId}, deviceId=${deviceId}`);
-      
+
       // 向Ollama API发送请求
       console.log("发送请求时间: " + new Date().toLocaleTimeString());
       const response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
@@ -626,7 +742,7 @@ const AiAssistant = ({ userInfo }) => {
       // 用于存储完整的响应
       let streamedResponse = "";
       let startTime = Date.now();
-      
+
       // 重置流式消息状态
       setCurrentStreamingMessage("");
       
@@ -636,11 +752,11 @@ const AiAssistant = ({ userInfo }) => {
         const { value, done: doneReading } = await reader.read();
         done = doneReading;
         
-        if (done) {
+            if (done) {
           console.log(`流式响应完成，耗时 ${Date.now() - startTime}ms`);
-          break;
-        }
-       
+              break;
+            }
+            
         const chunk = decoder.decode(value, { stream: true });
         
         // 检查会话是否已被标记为过期
@@ -649,9 +765,9 @@ const AiAssistant = ({ userInfo }) => {
           if (abortControllerRef.current) {
             abortControllerRef.current.abort();
           }
-          break;
-        }
-        
+              break;
+            }
+            
         // 直接添加到响应文本，后端已经处理好了文本内容
         console.log("流式响应内容: " + chunk);  
         streamedResponse += chunk;
@@ -673,13 +789,13 @@ const AiAssistant = ({ userInfo }) => {
       
       return streamedResponse;
     } catch (error) {
-      console.error("流式响应出错:", error);
-      
-      // 显示友好的错误消息
-      setAiChatHistory(prev => [
-        ...prev,
-        { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
-      ]);
+        console.error("流式响应出错:", error);
+        
+        // 显示友好的错误消息
+        setAiChatHistory(prev => [
+          ...prev,
+          { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
+        ]);
       return null;
     } finally {
       setIsTyping(false);
@@ -920,7 +1036,7 @@ const AiAssistant = ({ userInfo }) => {
             <i className="fas fa-lightbulb"></i>
             <span>猜你想了解</span>
           </div>
-          <Slider {...settings}>
+          <Slider {...settings} ref={sliderRef}>
             {suggestedTopics.map((topic) => (
               <button
                 key={topic.id}
