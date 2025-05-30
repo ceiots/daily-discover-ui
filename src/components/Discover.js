@@ -477,7 +477,7 @@ const DiscoverPage = () => {
         </div>
         
         {/* 4. 游戏挑战模块 */}
-        <div className="content-module-container game-challenge-container">
+        {/* <div className="content-module-container game-challenge-container">
           <div className="content-module-header">
             <div className="module-title">
               <i className="fas fa-trophy"></i> 游戏挑战
@@ -503,7 +503,6 @@ const DiscoverPage = () => {
                     <div><span className="detail-label">参与:</span> <span className="detail-value">{challenge.participantsCount}</span></div>
                     <div><span className="detail-label">截止:</span> <span className="detail-value">{challenge.endTime}</span></div>
                   </div>
-                  {/* 添加AI提示元素 */}
                   <div className="ai-tip-container">
                     <i className="fas fa-lightbulb"></i> {challenge.aiTip}
                   </div>
@@ -512,7 +511,7 @@ const DiscoverPage = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
         
         {/* 5. 热门视频模块 */}
         <div className="content-module-container trending-videos-container">
@@ -556,7 +555,7 @@ const DiscoverPage = () => {
         </div>
         
         {/* 6. 互动话题模块 */}
-        <div className="content-module-container interactive-topics-container">
+        {/* <div className="content-module-container interactive-topics-container">
           <div className="content-module-header">
             <div className="module-title">
               <i className="fas fa-comments"></i> 互动话题
@@ -583,7 +582,6 @@ const DiscoverPage = () => {
                     </div>
                   )}
                 </div>
-                {/* 添加AI洞察元素 */}
                 <div className="ai-topic-insight">
                   <i className="fas fa-brain"></i> {topic.aiInsight}
                 </div>
@@ -591,7 +589,7 @@ const DiscoverPage = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
         
         {/* 返回顶部按钮 */}
         {showBackToTop && (

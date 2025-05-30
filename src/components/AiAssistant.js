@@ -22,7 +22,7 @@ const AiAssistant = ({ userInfo }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [aiTopics, setAiTopics] = useState([]);
   const [suggestedTopics, setSuggestedTopics] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [currentRecommendation, setCurrentRecommendation] = useState(null);
   const [quickReads, setQuickReads] = useState([]);
   const [selectedReadItem, setSelectedReadItem] = useState(null);
@@ -305,13 +305,28 @@ const AiAssistant = ({ userInfo }) => {
     // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
     const handleBeforeUnload = () => {
       console.log("页面即将刷新或关闭，取消所有请求");
+      
+      // 确保中止所有正在进行的请求
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        try {
+          abortControllerRef.current.abort();
+        } catch (e) {
+          console.error("中止请求时出错:", e);
+        }
       }
+      
       // 标记当前会话ID为过期
       if (currentSessionId) {
-        markSessionExpired(currentSessionId);
+        try {
+          // 使用同步方式标记会话过期，确保在页面关闭前完成
+          markSessionExpired(currentSessionId);
+        } catch (e) {
+          console.error("标记会话过期时出错:", e);
+        }
       }
+      
+      // 返回undefined，不阻止页面关闭/刷新
+      return undefined;
     };
   
     // 添加CSS样式来防止水平滚动
@@ -454,11 +469,42 @@ const AiAssistant = ({ userInfo }) => {
   // 标记会话为过期
   const markSessionExpired = (sessionId) => {
     try {
+      if (!sessionId) return;
+      
+      console.log("标记会话为过期:", sessionId);
+      
       // 保存到本地存储，表示该会话已过期
       const expiredSessions = JSON.parse(localStorage.getItem('expired_sessions') || '[]');
       if (!expiredSessions.includes(sessionId)) {
         expiredSessions.push(sessionId);
         localStorage.setItem('expired_sessions', JSON.stringify(expiredSessions));
+        
+        // 尝试通过API通知后端会话已过期
+        try {
+          // 使用sendBeacon API发送会话过期通知，这在页面关闭时更可靠
+          if (navigator.sendBeacon) {
+            const data = JSON.stringify({ sessionId: sessionId, deviceId });
+            navigator.sendBeacon(
+              `${API_BASE_URL}/ai/mark-session-expired`, 
+              new Blob([data], { type: 'application/json' })
+            );
+            console.log("使用sendBeacon发送会话过期通知");
+          } else {
+            // 备用方法：使用fetch的keepalive选项
+            fetch(`${API_BASE_URL}/ai/mark-session-expired`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Session-ID': sessionId,
+                'X-Device-ID': deviceId
+              },
+              body: JSON.stringify({ sessionId }),
+              keepalive: true
+            }).catch(e => console.log("发送会话过期通知时出错 (可忽略):", e));
+          }
+        } catch (apiError) {
+          console.log("尝试通知后端会话过期时出错 (可忽略):", apiError);
+        }
       }
     } catch (error) {
       console.error("标记会话过期失败:", error);
@@ -699,7 +745,9 @@ const AiAssistant = ({ userInfo }) => {
       const isSessionExpired = checkSessionExpired(currentSessionId);
       if (isSessionExpired) {
         console.log("当前会话已过期，创建新会话");
-        createNewSession();
+        const newSessionId = createNewSession();
+        // 等待一小段时间确保会话创建完成
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
       
       // 准备发送到Ollama的数据
@@ -715,28 +763,44 @@ const AiAssistant = ({ userInfo }) => {
 
       // 向Ollama API发送请求
       console.log("发送请求时间: " + new Date().toLocaleTimeString());
-      const response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // 添加防缓存头
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          // 添加会话和设备标识头
-          'X-Session-ID': currentSessionId,
-          'X-Device-ID': deviceId
-        },
-        body: JSON.stringify(requestData),
-        signal: signal
-      });
+      
+      // 使用clone()方法避免流被锁定
+      let response;
+      try {
+        response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // 添加防缓存头
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            // 添加会话和设备标识头
+            'X-Session-ID': currentSessionId,
+            'X-Device-ID': deviceId
+          },
+          body: JSON.stringify(requestData),
+          signal: signal
+        });
+      } catch (fetchError) {
+        // 处理网络错误
+        if (fetchError.name === 'AbortError') {
+          console.log("请求被中止");
+          return null;
+        }
+        throw fetchError;
+      }
+      
       console.log("收到首次响应时间: " + new Date().toLocaleTimeString());
 
       if (!response.ok) {
         throw new Error(`API请求失败: ${response.status}`);
       }
 
+      // 克隆响应以避免"Cannot pipe a locked stream"错误
+      const responseClone = response.clone();
+
       // 简化流处理逻辑
-      const reader = response.body.getReader();
+      const reader = responseClone.body.getReader();
       const decoder = new TextDecoder();
       
       // 用于存储完整的响应
@@ -749,13 +813,33 @@ const AiAssistant = ({ userInfo }) => {
       // 读取流
       let done = false;
       while (!done) {
-        const { value, done: doneReading } = await reader.read();
+        // 每次读取前检查会话是否仍然有效
+        if (checkSessionExpired(currentSessionId)) {
+          console.log("检测到会话已过期，中断流式接收");
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+          }
+          break;
+        }
+        
+        let readResult;
+        try {
+          readResult = await reader.read();
+        } catch (readError) {
+          if (readError.name === 'AbortError') {
+            console.log("读取流被中止");
+            break;
+          }
+          throw readError;
+        }
+        
+        const { value, done: doneReading } = readResult;
         done = doneReading;
         
-            if (done) {
+        if (done) {
           console.log(`流式响应完成，耗时 ${Date.now() - startTime}ms`);
-              break;
-            }
+          break;
+        }
             
         const chunk = decoder.decode(value, { stream: true });
         
@@ -765,11 +849,11 @@ const AiAssistant = ({ userInfo }) => {
           if (abortControllerRef.current) {
             abortControllerRef.current.abort();
           }
-              break;
-            }
+          break;
+        }
             
         // 直接添加到响应文本，后端已经处理好了文本内容
-        console.log("流式响应内容: " + chunk);  
+        debugLog("流式响应内容: " + chunk);  
         streamedResponse += chunk;
         // 更新UI显示
         setCurrentStreamingMessage(streamedResponse);
@@ -786,6 +870,9 @@ const AiAssistant = ({ userInfo }) => {
       
       // 清除流式消息
       setCurrentStreamingMessage("");
+      
+      // 确保AbortController被清理
+      abortControllerRef.current = null;
       
       return streamedResponse;
     } catch (error) {
@@ -983,8 +1070,8 @@ const AiAssistant = ({ userInfo }) => {
       {/* 主要AI卡片区域 */}
       <div className="ai-card blue-theme">
        
-
-        {/* <div className="ai-card-header">
+        {/* 卡片头部 */}
+        <div className="ai-card-header">
           <div className="ai-header-left">
             <i className="fas fa-robot"></i>
             <h3>AI智能助手</h3>
@@ -1006,7 +1093,7 @@ const AiAssistant = ({ userInfo }) => {
               <i className={`fas fa-chevron-${isExpanded ? "up" : "down"}`}></i>
             </button>
           </div>
-        </div> */}
+        </div>
 
         {/* 输入框区域 - 始终显示 */}
         <div className="ai-input-area">
