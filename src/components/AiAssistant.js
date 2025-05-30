@@ -502,7 +502,6 @@ const AiAssistant = ({ userInfo }) => {
     try {
       console.log("开始请求时间: " + new Date().toLocaleTimeString());
       
-      
       // 创建新的AbortController
       abortControllerRef.current = new AbortController();
       const signal = abortControllerRef.current.signal;
@@ -533,38 +532,35 @@ const AiAssistant = ({ userInfo }) => {
         throw new Error(`API请求失败: ${response.status}`);
       }
 
-      const responseForTransform = response.clone();
-
-      // 获取响应的reader来处理流数据
-      let streamedResponse = "";
+      // 简化流处理逻辑
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
       
-      // 性能计数器
-      let chunkCount = 0;
+      // 用于存储完整的响应
+      let streamedResponse = "";
       let startTime = Date.now();
-
+      
       // 重置流式消息状态
       setCurrentStreamingMessage("");
       
-      // 使用更高效的流处理方式
-      const textDecoder = new TextDecoderStream();
-      const textStream = responseForTransform.body.pipeThrough(textDecoder);
-      const textReader = textStream.getReader();
-      
-      let shouldContinue = true;
-      
-      while (shouldContinue) {
-        const { value, done } = await textReader.read();
+      // 读取流
+      let done = false;
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        
         if (done) {
-          shouldContinue = false;
+          console.log(`流式响应完成，耗时 ${Date.now() - startTime}ms`);
           break;
         }
+       
+        const chunk = decoder.decode(value, { stream: true });
         
-        // 处理收到的文本块
-        chunkCount++;
-        console.log(`收到流数据块#${chunkCount}: ${value}`);
-        
+        // 直接添加到响应文本，后端已经处理好了文本内容
+        streamedResponse += chunk;
+        // 更新UI显示
+        setCurrentStreamingMessage(streamedResponse);
       }
-        
       
       // 流式响应完成，将完整响应添加到聊天历史
       if (streamedResponse) {
@@ -579,13 +575,13 @@ const AiAssistant = ({ userInfo }) => {
       
       return streamedResponse;
     } catch (error) {
-        console.error("流式响应出错:", error);
-        
-        // 显示友好的错误消息
-        setAiChatHistory(prev => [
-          ...prev,
-          { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
-        ]);
+      console.error("流式响应出错:", error);
+      
+      // 显示友好的错误消息
+      setAiChatHistory(prev => [
+        ...prev,
+        { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
+      ]);
       return null;
     } finally {
       setIsTyping(false);
@@ -620,9 +616,6 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 更新推荐话题
-    updateSuggestedTopics(currentMessage);
-
     // 滚动到最新消息位置
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -633,6 +626,9 @@ const AiAssistant = ({ userInfo }) => {
 
     // 调用Ollama API获取流式响应
     await fetchStreamResponse(currentMessage);
+    
+    // 先获取AI回复，然后再获取推荐话题，这样可以优先处理用户的主要需求
+    updateSuggestedTopics(currentMessage);
 
     // 聚焦输入框，方便继续输入
     if (messageInputRef.current) {
@@ -658,8 +654,7 @@ const AiAssistant = ({ userInfo }) => {
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
 
-    // 更新推荐话题
-    updateSuggestedTopics(topic.text);
+   
 
     // 滚动到最新消息位置
     if (chatEndRef.current) {
@@ -671,6 +666,9 @@ const AiAssistant = ({ userInfo }) => {
 
     // 调用Ollama API获取流式响应
     await fetchStreamResponse(topic.text);
+    
+    // 先获取AI回复，然后再获取推荐话题，这样可以优先处理用户的主要需求
+    updateSuggestedTopics(topic.text);
 
     // 添加视觉反馈
     const topicElements = document.querySelectorAll(".ai-suggestion-chip");
