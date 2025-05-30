@@ -37,9 +37,8 @@ const AiAssistant = ({ userInfo }) => {
   const [currentStreamingMessage, setCurrentStreamingMessage] = useState("");
   // 添加复制状态
   const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
-  // 移除WebSocket状态
-  // const [wsConnected, setWsConnected] = useState(false);
-  // const [wsInstance, setWsInstance] = useState(null);
+  // 添加调试模式开关
+  const DEBUG_MODE = false; // 设置为true开启详细日志
 
   const chatEndRef = useRef(null);
   const messageInputRef = useRef(null);
@@ -47,9 +46,6 @@ const AiAssistant = ({ userInfo }) => {
   const eventSourceRef = useRef(null);
   // 添加复制状态定时器引用
   const copyTimerRef = useRef(null);
-  // 移除WebSocket相关引用
-  // const reconnectTimerRef = useRef(null);
-  // const wsKeepAliveRef = useRef(null);
   
   // 添加流式响应控制器引用
   const abortControllerRef = useRef(null);
@@ -85,6 +81,13 @@ const AiAssistant = ({ userInfo }) => {
         }
       }
     ]
+  };
+
+  // 调试日志函数
+  const debugLog = (...args) => {
+    if (DEBUG_MODE) {
+      console.log(...args);
+    }
   };
 
   // 处理响应数据的辅助函数 - 移动到组件级别
@@ -331,9 +334,27 @@ const AiAssistant = ({ userInfo }) => {
     `;
     document.head.appendChild(style);
 
+    // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
+    const handleBeforeUnload = () => {
+      console.log("页面即将刷新或关闭，取消所有请求");
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+
+    // 注册页面卸载事件监听器
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
       document.head.removeChild(style);
       
+      // 移除事件监听器
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      
+      // 确保中止所有请求
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
   }, []);
 
@@ -479,10 +500,8 @@ const AiAssistant = ({ userInfo }) => {
   // 实现Ollama流式请求
   const fetchStreamResponse = async (message) => {
     try {
-      // 取消任何正在进行的请求
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
+      console.log("开始请求时间: " + new Date().toLocaleTimeString());
+      
       
       // 创建新的AbortController
       abortControllerRef.current = new AbortController();
@@ -496,78 +515,84 @@ const AiAssistant = ({ userInfo }) => {
       };
 
       // 向Ollama API发送请求
+      console.log("发送请求时间: " + new Date().toLocaleTimeString());
       const response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // 添加防缓存头
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
         },
         body: JSON.stringify(requestData),
         signal: signal
       });
+      console.log("收到首次响应时间: " + new Date().toLocaleTimeString());
 
       if (!response.ok) {
         throw new Error(`API请求失败: ${response.status}`);
       }
 
+      const responseForTransform = response.clone();
+
       // 获取响应的reader来处理流数据
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
       let streamedResponse = "";
+      
+      // 性能计数器
+      let chunkCount = 0;
+      let startTime = Date.now();
 
       // 重置流式消息状态
       setCurrentStreamingMessage("");
       
-      let done = false;
-      while (!done) {
-        const result = await reader.read();
-        done = result.done;
-        if (done) break;
-        
-        // 解码并处理返回的块
-        const chunk = decoder.decode(result.value, { stream: true });
-        try {
-          // 处理流式JSON响应
-          const lines = chunk.split('\n').filter(line => line.trim() !== '');
-          
-          for (const line of lines) {
-            const data = JSON.parse(line);
-            if (data.response) {
-              streamedResponse += data.response;
-              setCurrentStreamingMessage(streamedResponse);
-            }
-          }
-        } catch (e) {
-          console.error("解析流式响应出错:", e);
-          // 如果不是有效JSON，直接添加到响应中
-          streamedResponse += chunk;
-          setCurrentStreamingMessage(streamedResponse);
+      // 使用更高效的流处理方式
+      const textDecoder = new TextDecoderStream();
+      const textStream = responseForTransform.body.pipeThrough(textDecoder);
+      const textReader = textStream.getReader();
+      
+      let shouldContinue = true;
+      
+      while (shouldContinue) {
+        const { value, done } = await textReader.read();
+        if (done) {
+          shouldContinue = false;
+          break;
         }
+        
+        // 处理收到的文本块
+        chunkCount++;
+        console.log(`收到流数据块#${chunkCount}: ${value}`);
+        
       }
-
+        
+      
       // 流式响应完成，将完整响应添加到聊天历史
-      setAiChatHistory(prev => [
-        ...prev,
-        { type: "ai", message: streamedResponse }
-      ]);
+      if (streamedResponse) {
+        setAiChatHistory(prev => [
+          ...prev,
+          { type: "ai", message: streamedResponse }
+        ]);
+      }
       
       // 清除流式消息
       setCurrentStreamingMessage("");
       
       return streamedResponse;
     } catch (error) {
-      if (error.name !== 'AbortError') {
         console.error("流式响应出错:", error);
         
-        // 在聊天中显示错误消息
+        // 显示友好的错误消息
         setAiChatHistory(prev => [
           ...prev,
-          { type: "ai", message: "抱歉，我遇到了一些问题。请稍后再试。" }
+          { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
         ]);
-      }
       return null;
     } finally {
       setIsTyping(false);
       setIsLoading(false);
+      
+      // 清理资源
+      setCurrentStreamingMessage("");
     }
   };
 
