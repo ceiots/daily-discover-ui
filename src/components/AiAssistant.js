@@ -90,104 +90,109 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
-  // 处理响应数据的辅助函数 - 移动到组件级别
-  const processResponseData = (data) => {
-    if (!data) return "";
+  // 创建代码块组件
+  const CodeBlock = ({ language, code }) => {
+    const [copied, setCopied] = useState(false);
+    
+    const handleCopy = () => {
+      navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    };
+    
+    return (
+      <div className="code-block-wrapper">
+        <div className="code-header">
+          <span className="code-language">{language || 'text'}</span>
+          <button className="code-copy-button" onClick={handleCopy}>
+            {copied ? <i className="fas fa-check" /> : <i className="fas fa-copy" />}
+          </button>
+        </div>
+        <SyntaxHighlighter language={language || 'text'} style={tomorrow}>
+          {code}
+        </SyntaxHighlighter>
+      </div>
+    );
+  };
 
-    let cleanData = data;
+  // 添加PropTypes验证
+  CodeBlock.propTypes = {
+    language: PropTypes.string,
+    code: PropTypes.string.isRequired
+  };
+
+  // 预处理内容，将特殊标签转换为Markdown可识别的格式
+  const preprocessContent = (content) => {
+    if (!content) return "";
 
     // 移除event:message前缀
-    if (cleanData.includes("event:message")) {
-      cleanData = cleanData.replace(/event:message\w*/g, "");
+    if (content.includes("event:message")) {
+      content = content.replace(/event:message\w*/g, "");
     }
 
-    // 处理<think>标签 - 转换为特殊样式的元素
-    cleanData = cleanData.replace(
+    // 处理思考标签，转换为HTML
+    content = content.replace(
       /<think>([\s\S]*?)<\/think>/g,
-      '<div class="ai-think-content">$1</div>'
+      '<div class="ai-think-content"><div class="ai-think-body">$1</div></div>'
     );
 
-    // 处理代码块，添加语法高亮的标记
-    cleanData = cleanData.replace(
-      /```(\w*)([\s\S]*?)```/g, 
-      '<pre class="code-block" data-language="$1"><div class="code-header"><span class="code-language">$1</span><button class="code-copy-button"><i class="fas fa-copy"></i></button></div><code>$2</code></pre>'
-    );
-    
-    // 处理行内代码
-    cleanData = cleanData.replace(
-      /`([^`]+)`/g,
-      '<code class="inline-code">$1</code>'
-    );
-    
-    // 处理标题 (h1-h6)
-    cleanData = cleanData.replace(
-      /^(#{1,6})\s+(.+)$/gm,
-      (match, hashes, text) => {
-        const level = hashes.length;
-        return `<h${level} class="ai-heading ai-h${level}">${text}</h${level}>`;
-      }
-    );
-    
-    // 处理无序列表
-    cleanData = cleanData.replace(
-      /^([ \t]*)([-*+])\s+(.+)$/gm,
-      (match, indent, bullet, text) => {
-        const padding = indent.length;
-        return `<div class="ai-list-item" style="padding-left:${padding}px"><span class="ai-bullet">${bullet}</span> ${text}</div>`;
-      }
-    );
-    
-    // 处理有序列表
-    cleanData = cleanData.replace(
-      /^([ \t]*)(\d+)\.\s+(.+)$/gm,
-      (match, indent, number, text) => {
-        const padding = indent.length;
-        return `<div class="ai-list-item" style="padding-left:${padding}px"><span class="ai-number">${number}.</span> ${text}</div>`;
-      }
-    );
-    
-    // 处理引用块
-    cleanData = cleanData.replace(
-      /^>\s+(.+)$/gm,
-      '<blockquote class="ai-blockquote">$1</blockquote>'
-    );
-    
-    // 处理链接
-    cleanData = cleanData.replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" target="_blank" rel="noopener noreferrer" class="ai-link">$1</a>'
-    );
-    
-    // 处理强调 (粗体)
-    cleanData = cleanData.replace(
-      /\*\*([^*]+)\*\*/g,
-      '<strong class="ai-bold">$1</strong>'
-    );
-    
-    // 处理强调 (斜体)
-    cleanData = cleanData.replace(
-      /\*([^*]+)\*/g,
-      '<em class="ai-italic">$1</em>'
-    );
-    
-    // 处理分隔线
-    cleanData = cleanData.replace(
-      /^---+$/gm,
-      '<hr class="ai-divider">'
-    );
-    
-    // 处理普通段落 (确保有换行的地方能够正确渲染)
-    cleanData = cleanData.replace(
-      /\n\n+/g,
-      '</p><p class="ai-paragraph">'
-    );
-    
-    // 包装整个内容
-    if (!cleanData.startsWith('<')) {
-      cleanData = `<p class="ai-paragraph">${cleanData}</p>`;
-    }
+    return content;
+  };
 
-    return cleanData;
+  // 使用 ReactMarkdown 渲染消息内容
+  const renderMessageContent = (message, index) => {
+    if (!message || message.trim() === '') return null;
+    
+    // 预处理内容
+    const preprocessed = preprocessContent(message);
+    
+    return (
+      <div className="ai-message-content-wrapper">
+        <ReactMarkdown
+          className="ai-markdown-content"
+          rehypePlugins={[rehypeRaw]}
+          remarkPlugins={[remarkGfm]}
+          components={{
+            code({node, inline, className, children, ...props}) {
+              const match = /language-(\w+)/.exec(className || '');
+              return !inline && match ? (
+                <CodeBlock 
+                  language={match[1]} 
+                  code={String(children).replace(/\n$/, '')}
+                />
+              ) : (
+                <code className={className} {...props}>
+                  {children}
+                </code>
+              );
+            },
+            // 自定义处理器用于思考内容
+            p({node, children, ...props}) {
+              const content = children.toString();
+              // 不再需要检测:::think格式，直接渲染段落
+              return <p {...props}>{children}</p>;
+            }
+          }}
+        >
+          {preprocessed}
+        </ReactMarkdown>
+        
+        {/* 复制按钮 */}
+        <div className="ai-copy-button-container">
+          <button 
+            className="ai-copy-button"
+            onClick={() => copyToClipboard(message.replace(/<think>([\s\S]*?)<\/think>/g, '思考过程：$1'), index)}
+            title="复制全部内容"
+          >
+            {copiedMessageIndex === index ? (
+              <><i className="fas fa-check"></i> 已复制</>
+            ) : (
+              <><i className="fas fa-copy"></i> 复制全部</>
+            )}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   // 添加复制功能
@@ -280,275 +285,7 @@ const AiAssistant = ({ userInfo }) => {
   useEffect(() => {
     // 添加CSS样式来防止水平滚动
     const style = document.createElement("style");
-    style.innerHTML = `
-      .ai-chat-text {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        white-space: pre-wrap;
-        max-width: 100%;
-      }
-      .ai-chat-bubble {
-        max-width: 100%;
-        overflow: hidden;
-      }
-      .ai-markdown-content {
-        width: 100%;
-        overflow-x: hidden;
-        line-height: 1.5;
-        font-size: 14px;
-      }
-      .ai-markdown-content pre, 
-      .ai-markdown-content code {
-        white-space: pre-wrap;
-        word-break: break-all;
-        overflow-wrap: break-word;
-        max-width: 100%;
-        border-radius: 4px;
-      }
-      .ai-markdown-content p {
-        margin-bottom: 10px;
-      }
-      .ai-markdown-content h1,
-      .ai-markdown-content h2,
-      .ai-markdown-content h3,
-      .ai-markdown-content h4,
-      .ai-markdown-content h5,
-      .ai-markdown-content h6 {
-        margin-top: 3px;
-        margin-bottom: 3px;
-        font-weight: 600;
-      }
-      .ai-markdown-content ul,
-      .ai-markdown-content ol {
-        padding-left: 2px;
-        margin-bottom: 2px;
-      }
-      .ai-markdown-content table {
-        border-collapse: collapse;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      .ai-markdown-content th,
-      .ai-markdown-content td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      .ai-markdown-content th {
-        background-color: #f2f2f2;
-      }
-      .ai-markdown-content blockquote {
-        border-left: 4px solid #ddd;
-        padding-left: 10px;
-        color: #666;
-        margin-left: 0;
-        margin-right: 0;
-      }
-      
-      /* HTML内容样式 */
-      .ai-html-content {
-        width: 100%;
-        overflow-x: hidden;
-        line-height: 1.5;
-        font-size: 14px;
-      }
-      .ai-html-content p, 
-      .ai-paragraph {
-        margin-bottom: 10px;
-      }
-      .ai-heading,
-      .ai-html-content h1,
-      .ai-html-content h2,
-      .ai-html-content h3,
-      .ai-html-content h4,
-      .ai-html-content h5,
-      .ai-html-content h6 {
-        margin-top: 16px;
-        margin-bottom: 8px;
-        font-weight: 600;
-        line-height: 1.25;
-      }
-      .ai-h1, .ai-html-content h1 { font-size: 1.5em; color: #333; }
-      .ai-h2, .ai-html-content h2 { font-size: 1.3em; color: #444; }
-      .ai-h3, .ai-html-content h3 { font-size: 1.2em; color: #555; }
-      .ai-h4, .ai-html-content h4 { font-size: 1.1em; color: #666; }
-      .ai-h5, .ai-html-content h5 { font-size: 1em; color: #777; }
-      .ai-h6, .ai-html-content h6 { font-size: 0.9em; color: #888; }
-      
-      .ai-html-content ul,
-      .ai-html-content ol {
-        padding-left: 20px;
-        margin-bottom: 10px;
-      }
-      .ai-html-content li,
-      .ai-list-item {
-        margin-bottom: 5px;
-        line-height: 1.5;
-        position: relative;
-      }
-      .ai-bullet, .ai-number {
-        margin-right: 5px;
-        color: #6c5ce7;
-        font-weight: bold;
-      }
-      
-      .ai-blockquote {
-        border-left: 4px solid #6c5ce7;
-        padding: 10px 15px;
-        margin: 10px 0;
-        background-color: #f8f9fa;
-        color: #666;
-        font-style: italic;
-      }
-      
-      .ai-link {
-        color: #6c5ce7;
-        text-decoration: none;
-        border-bottom: 1px dashed #6c5ce7;
-        transition: all 0.2s ease;
-      }
-      .ai-link:hover {
-        color: #5649c0;
-        border-bottom: 1px solid #5649c0;
-      }
-      
-      .ai-divider {
-        height: 1px;
-        background-color: #eee;
-        border: none;
-        margin: 15px 0;
-      }
-      
-      .ai-bold {
-        font-weight: bold;
-        color: #333;
-      }
-      
-      .ai-italic {
-        font-style: italic;
-        color: #555;
-      }
-      
-      .inline-code {
-        background-color: #f5f5f5;
-        padding: 2px 4px;
-        border-radius: 3px;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 0.9em;
-        color: #e83e8c;
-        border: 1px solid #eee;
-      }
-      
-      /* Think标签样式 */
-      .ai-think-content {
-        background-color: #f8f9fa;
-        border-left: 3px solid #6c5ce7;
-        padding: 10px;
-        margin: 10px 0;
-        font-style: italic;
-        color: #666;
-        border-radius: 0 4px 4px 0;
-        position: relative;
-        transition: all 0.3s ease;
-      }
-      .ai-think-content::before {
-        content: "思考过程";
-        display: block;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #6c5ce7;
-        font-size: 12px;
-      }
-      
-      /* 代码块样式 */
-      .code-block {
-        position: relative;
-        margin: 10px 0;
-        border-radius: 6px;
-        overflow: hidden;
-        background-color: #282c34;
-        color: #abb2bf;
-        font-family: 'Courier New', Courier, monospace;
-        border: 1px solid #3e4451;
-      }
-      .code-block code {
-        display: block;
-        padding: 12px;
-        white-space: pre-wrap;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        font-size: 13px;
-        line-height: 1.5;
-      }
-      .code-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 6px 12px;
-        background-color: #21252b;
-        border-bottom: 1px solid #3e4451;
-      }
-      .code-language {
-        font-size: 12px;
-        color: #abb2bf;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-      .code-copy-button {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        color: #abb2bf;
-        font-size: 14px;
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-      .code-copy-button:hover {
-        background-color: #3e4451;
-        color: #fff;
-      }
-      
-      .ai-chat-message {
-        width: 100%;
-        max-width: 100%;
-      }
-      .ai-copy-button-container {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 8px;
-      }
-      .ai-copy-button {
-        background-color: transparent;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 4px 8px;
-        font-size: 12px;
-        color: #666;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.2s ease;
-      }
-      .ai-copy-button:hover {
-        background-color: #f5f5f5;
-        color: #333;
-      }
-      .ai-copy-button .fas {
-        font-size: 10px;
-      }
-      .code-block-wrapper {
-        position: relative;
-        margin: 10px 0;
-        border-radius: 6px;
-        overflow: hidden;
-        border: 1px solid #ddd;
-      }
-      .ai-message-content-wrapper {
-        position: relative;
-        width: 100%;
-      }
-    `;
+    style.innerHTML = ``;
     document.head.appendChild(style);
 
     // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
@@ -922,114 +659,6 @@ const AiAssistant = ({ userInfo }) => {
       }
     });
   };
-
-  // 使用 ReactMarkdown 渲染消息内容
-  const renderMessageContent = (message, index) => {
-    if (!message || message.trim() === '') return null;
-  
-    // 处理消息内容
-    let cleanedMessage = processResponseData(message);
-    
-    // 使用HTML渲染而非Markdown
-    const useHtmlRendering = true;
-    
-    if (useHtmlRendering) {
-      return (
-        <div className="ai-message-content-wrapper">
-          <div 
-            className="ai-html-content"
-            dangerouslySetInnerHTML={{ __html: cleanedMessage }}
-          />
-          
-          {/* 复制按钮 - 仅对非空AI消息显示，且在消息完成后显示在内容后面 */}
-          {cleanedMessage && cleanedMessage.trim() !== '' && index !== 'streaming' && (
-            <div className="ai-copy-button-container">
-              <button 
-                className="ai-copy-button"
-                onClick={() => copyToClipboard(cleanedMessage, index)}
-                title="复制全部内容"
-              >
-                {copiedMessageIndex === index ? (
-                  <><i className="fas fa-check"></i> 已复制</>
-                ) : (
-                  <><i className="fas fa-copy"></i> 复制全部</>
-                )}
-              </button>
-            </div>
-          )}
-        </div>
-      );
-    }
-    
-    return (
-      <div className="ai-message-content-wrapper">
-        <ReactMarkdown
-          className="ai-markdown-content"
-          rehypePlugins={[rehypeRaw]}
-          remarkPlugins={[remarkGfm]}
-          components={{
-            code({node, inline, className, children, ...props}) {
-              const match = /language-(\w+)/.exec(className || '')
-              return !inline && match ? (
-                <div className="code-block-wrapper">
-                  <div className="code-header">
-                    <span className="code-language">{match[1]}</span>
-                    <button 
-                      className="code-copy-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(String(children).replace(/\n$/, ''), `code-${index}`);
-                      }}
-                      title="复制代码"
-                    >
-                      {copiedMessageIndex === `code-${index}` ? (
-                        <i className="fas fa-check"></i>
-                      ) : (
-                        <i className="fas fa-copy"></i>
-                      )}
-                    </button>
-                  </div>
-                  <SyntaxHighlighter
-                    style={tomorrow}
-                    language={match[1]}
-                    PreTag="div"
-                    {...props}
-                  >
-                    {String(children).replace(/\n$/, '')}
-                  </SyntaxHighlighter>
-                </div>
-              ) : (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              )
-            }
-          }}
-        >
-          {cleanedMessage}
-        </ReactMarkdown>
-        
-        {/* 复制按钮 - 仅对非空AI消息显示，且在消息完成后显示在内容后面 */}
-        {cleanedMessage && cleanedMessage.trim() !== '' && index !== 'streaming' && (
-          <div className="ai-copy-button-container">
-            <button 
-              className="ai-copy-button"
-              onClick={() => copyToClipboard(cleanedMessage, index)}
-              title="复制全部内容"
-            >
-              {copiedMessageIndex === index ? (
-                <><i className="fas fa-check"></i> 已复制</>
-              ) : (
-                <><i className="fas fa-copy"></i> 复制全部</>
-              )}
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  
 
   // 处理推荐内容点击
   const handleRecommendationClick = (recommendation) => {
