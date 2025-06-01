@@ -303,13 +303,14 @@ const AiAssistant = ({ userInfo }) => {
     loadChatHistory();
     
     // 添加页面刷新/关闭时的事件监听，取消所有正在进行的请求
-    const handleBeforeUnload = () => {
+    const handleBeforeUnload = (event) => {
       console.log("页面即将刷新或关闭，取消所有请求");
       
       // 确保中止所有正在进行的请求
       if (abortControllerRef.current) {
         try {
           abortControllerRef.current.abort();
+          console.log("已中止当前请求");
         } catch (e) {
           console.error("中止请求时出错:", e);
         }
@@ -320,6 +321,16 @@ const AiAssistant = ({ userInfo }) => {
         try {
           // 使用同步方式标记会话过期，确保在页面关闭前完成
           markSessionExpired(currentSessionId);
+          console.log("已标记会话为过期:", currentSessionId);
+          
+          // 使用同步XMLHttpRequest发送会话过期通知
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", `${API_BASE_URL}/ai/mark-session-expired`, false); // 同步请求
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.setRequestHeader("X-Session-ID", currentSessionId);
+          xhr.setRequestHeader("X-Device-ID", deviceId);
+          xhr.send(JSON.stringify({ sessionId: currentSessionId }));
+          console.log("已同步发送会话过期通知");
         } catch (e) {
           console.error("标记会话过期时出错:", e);
         }
@@ -481,27 +492,29 @@ const AiAssistant = ({ userInfo }) => {
         
         // 尝试通过API通知后端会话已过期
         try {
-          // 使用sendBeacon API发送会话过期通知，这在页面关闭时更可靠
-          if (navigator.sendBeacon) {
-            const data = JSON.stringify({ sessionId: sessionId, deviceId });
-            navigator.sendBeacon(
-              `${API_BASE_URL}/ai/mark-session-expired`, 
-              new Blob([data], { type: 'application/json' })
-            );
-            console.log("使用sendBeacon发送会话过期通知");
-          } else {
-            // 备用方法：使用fetch的keepalive选项
-            fetch(`${API_BASE_URL}/ai/mark-session-expired`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-Session-ID': sessionId,
-                'X-Device-ID': deviceId
-              },
-              body: JSON.stringify({ sessionId }),
-              keepalive: true
-            }).catch(e => console.log("发送会话过期通知时出错 (可忽略):", e));
-          }
+          // 使用fetch的keepalive选项，确保请求在页面关闭后仍能完成
+          fetch(`${API_BASE_URL}/ai/mark-session-expired`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Session-ID': sessionId,
+              'X-Device-ID': deviceId
+            },
+            body: JSON.stringify({ sessionId, deviceId }),
+            keepalive: true
+          }).catch(e => {
+            console.log("发送会话过期通知时出错 (可忽略):", e);
+            
+            // 备用方案：使用sendBeacon
+            if (navigator.sendBeacon) {
+              const data = JSON.stringify({ sessionId, deviceId });
+              const success = navigator.sendBeacon(
+                `${API_BASE_URL}/ai/mark-session-expired`, 
+                new Blob([data], { type: 'application/json' })
+              );
+              console.log("使用sendBeacon发送会话过期通知:", success ? "成功" : "失败");
+            }
+          });
         } catch (apiError) {
           console.log("尝试通知后端会话过期时出错 (可忽略):", apiError);
         }
@@ -764,7 +777,7 @@ const AiAssistant = ({ userInfo }) => {
       // 向Ollama API发送请求
       console.log("发送请求时间: " + new Date().toLocaleTimeString());
       
-      // 使用clone()方法避免流被锁定
+      // 使用try-catch包装fetch请求
       let response;
       try {
         response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
@@ -822,6 +835,7 @@ const AiAssistant = ({ userInfo }) => {
           break;
         }
         
+        // 使用try-catch包装reader.read()
         let readResult;
         try {
           readResult = await reader.read();
@@ -842,18 +856,9 @@ const AiAssistant = ({ userInfo }) => {
         }
             
         const chunk = decoder.decode(value, { stream: true });
-        
-        // 检查会话是否已被标记为过期
-        if (checkSessionExpired(currentSessionId)) {
-          console.log("会话已在其他页面中被标记为过期，中断流式接收");
-          if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-          }
-          break;
-        }
             
         // 直接添加到响应文本，后端已经处理好了文本内容
-        debugLog("流式响应内容: " + chunk);  
+        console.log("流式响应内容: " + chunk);  
         streamedResponse += chunk;
         // 更新UI显示
         setCurrentStreamingMessage(streamedResponse);
@@ -890,6 +895,11 @@ const AiAssistant = ({ userInfo }) => {
       
       // 清理资源
       setCurrentStreamingMessage("");
+      
+      // 确保AbortController被清理
+      if (abortControllerRef.current) {
+        abortControllerRef.current = null;
+      }
     }
   };
   

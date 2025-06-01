@@ -3,12 +3,20 @@ import './Discover.css';
 import { useAuth } from '../App';
 import { Link, useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
+// 引入游戏组件
+import MatchThree from './games/MatchThree/MatchThree';
+import TetrisGame from './games/TetrisGame/TetrisGame';
+import SnakeGame from './games/SnakeGame/SnakeGame';
+// 引入视频组件
+import VideoList from './videos/VideoList/VideoList';
 
 const DEFAULT_AVATAR = '/default-avatar.png';
 const DEFAULT_IMAGE = '/default-image.png';
 const DEFAULT_PRODUCT1 = '/default-product1.png'; // Example: for banners or product showcases
 const DEFAULT_PRODUCT2 = '/default-product2.png';
-const DEFAULT_THEME = '/default-theme.png'; // Example: for featured content
+
+// API基础URL
+const API_BASE_URL = 'https://api.example.com'; // 替换为实际的API地址
 
 export const getImage = (imageName) => {
   // 使用更高质量、主题更匹配的Unsplash图片
@@ -25,6 +33,9 @@ export const getImage = (imageName) => {
     'game': 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
     'video': 'https://images.unsplash.com/photo-1536240478700-b869070f9279?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
     'challenge': 'https://images.unsplash.com/photo-1528543606781-2f6e6857f318?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'plants': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'science': 'https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+    'snake': 'https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
   };
   return unsplashImages[imageName] || DEFAULT_IMAGE;
 };
@@ -68,38 +79,38 @@ const mockDiscoverData = {
     },
   ],
   
-  // 2. 休闲一刻
+  // 2. 休闲一刻 - 模拟服务器返回数据
   casualGames: [
     { 
-      id: 'cg1', 
-      name: '消除星球', 
-      icon: getImage('game'), 
+      id: 'match-three', 
+      name: '萌果乐消消', 
+      icon: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80', 
       description: '轻松休闲的三消游戏', 
       category: '休闲', 
-      popularity: '热门',
-      playerCount: '1.2M',
-      aiRecommend: '匹配度92%：基于您的游戏偏好推荐' // 添加AI推荐
+      popularity: '爆款',
+      playerCount: '3.8M',
+      aiRecommend: '匹配度98%：提升专注力和观察力'
     },
     { 
-      id: 'cg2', 
-      name: '数独挑战', 
-      icon: getImage('education'), 
-      description: '锻炼大脑的数字游戏', 
-      category: '益智', 
-      popularity: '推荐',
-      playerCount: '845K',
-      aiRecommend: '匹配度88%：有助于提升逻辑思维能力' // 添加AI推荐
-    },
-    { 
-      id: 'cg3', 
-      name: '涂鸦跳跃', 
+      id: 'tetris', 
+      name: '俄罗斯方块', 
       icon: getImage('game'), 
-      description: '考验反应力的休闲游戏', 
-      category: '动作', 
-      popularity: '新品',
-      playerCount: '560K',
-      aiRecommend: '匹配度85%：适合短时间放松的最佳选择' // 添加AI推荐
+      description: '经典的方块消除游戏', 
+      category: '益智', 
+      popularity: '热门',
+      playerCount: '3.5M',
+      aiRecommend: '匹配度92%：锻炼空间思维能力'
     },
+    {
+      id: 'snake', 
+      name: '贪吃蛇', 
+      icon: getImage('snake'), 
+      description: '经典的贪吃蛇游戏，简单但上瘾', 
+      category: '休闲', 
+      popularity: '新品',
+      playerCount: '1.7M',
+      aiRecommend: '匹配度91%：训练反应速度和决策能力'
+    }
   ],
   
   // 3. 热门商品
@@ -249,15 +260,15 @@ const DiscoverPage = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  // 添加游戏状态
+  const [activeGame, setActiveGame] = useState(null);
 
   // 水平滚动引用
   const horizontalScrollRefs = {
     recommendedContent: useRef(null),
     casualGames: useRef(null),
     popularProducts: useRef(null),
-    gameChallenges: useRef(null),
-    hotVideos: useRef(null),
-    interactiveTopics: useRef(null)
+    gameChallenges: useRef(null)
   };
 
   // 数据状态
@@ -265,8 +276,6 @@ const DiscoverPage = () => {
   const [casualGames, setCasualGames] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
   const [gameChallenges, setGameChallenges] = useState([]);
-  const [hotVideos, setHotVideos] = useState([]);
-  const [interactiveTopics, setInteractiveTopics] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleScroll = useCallback(() => {
@@ -288,18 +297,49 @@ const DiscoverPage = () => {
     }
   };
 
+  // 从服务器获取游戏数据
+  const fetchCasualGames = async () => {
+    try {
+      // 在实际应用中，这里应该调用真实的API
+      // const response = await fetch(`${API_BASE_URL}/api/games`);
+      // if (!response.ok) throw new Error('网络错误');
+      // const data = await response.json();
+      // return data;
+      
+      // 模拟API调用
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return mockDiscoverData.casualGames;
+    } catch (error) {
+      console.error('获取游戏数据失败:', error);
+      return mockDiscoverData.casualGames; // 失败时使用模拟数据
+    }
+  };
+
   useEffect(() => {
     const loadDiscoverData = async () => {
       setIsLoading(true);
-      // 模拟API调用加载数据
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setRecommendedContent(mockDiscoverData.recommendedContent);
-      setCasualGames(mockDiscoverData.casualGames);
-      setPopularProducts(mockDiscoverData.popularProducts);
-      setGameChallenges(mockDiscoverData.gameChallenges);
-      setHotVideos(mockDiscoverData.hotVideos);
-      setInteractiveTopics(mockDiscoverData.interactiveTopics);
-      setIsLoading(false);
+      try {
+        // 模拟API调用加载数据
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // 从服务器获取游戏数据
+        const gamesData = await fetchCasualGames();
+        setCasualGames(gamesData);
+        
+        // 设置其他模拟数据
+        setRecommendedContent(mockDiscoverData.recommendedContent);
+        setPopularProducts(mockDiscoverData.popularProducts);
+        setGameChallenges(mockDiscoverData.gameChallenges);
+      } catch (error) {
+        console.error('加载数据失败:', error);
+        // 出错时使用模拟数据
+        setCasualGames(mockDiscoverData.casualGames);
+        setRecommendedContent(mockDiscoverData.recommendedContent);
+        setPopularProducts(mockDiscoverData.popularProducts);
+        setGameChallenges(mockDiscoverData.gameChallenges);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadDiscoverData();
@@ -334,6 +374,31 @@ const DiscoverPage = () => {
     navigate(`/discover/search?q=${encodeURIComponent(searchTerm)}`);
   };
   
+  // 处理游戏启动
+  const handleGameStart = (gameType) => {
+    setActiveGame(gameType);
+  };
+
+  // 处理游戏退出
+  const handleGameExit = () => {
+    setActiveGame(null);
+  };
+
+  // 修改游戏渲染逻辑，添加吃豆人游戏
+  const renderGameContent = () => {
+    // 根据 gameId 渲染不同的游戏
+    switch (activeGame) {
+      case 'match-three':
+        return <MatchThree onExit={handleGameExit} />;
+      case 'tetris':
+        return <TetrisGame onExit={handleGameExit} />;
+      case 'snake':
+        return <SnakeGame onExit={handleGameExit} />;
+      default:
+        return <div className="game-placeholder">游戏加载中...</div>;
+    }
+  };
+
   // 加载状态展示
   if (isLoading) {
     return (
@@ -341,6 +406,18 @@ const DiscoverPage = () => {
         <div className="discover-spinner"></div>
         <p>正在加载发现内容...</p>
         <NavBar /> 
+      </div>
+    );
+  }
+  
+  // 显示游戏界面
+  if (activeGame) {
+    return (
+      <div className={`discover-game-container ${isDarkMode ? 'dark' : ''}`}>
+        {renderGameContent()}
+        <div className="game-exit-btn" onClick={handleGameExit}>
+          <i className="fas fa-arrow-left"></i> 返回
+        </div>
       </div>
     );
   }
@@ -407,7 +484,7 @@ const DiscoverPage = () => {
               </button>
               <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.casualGames, 'right')}>
                 <i className="fas fa-chevron-right"></i>
-            </button>
+              </button>
             </div>
           </div>
           <div className="horizontal-scroll-container" ref={horizontalScrollRefs.casualGames}>
@@ -424,11 +501,12 @@ const DiscoverPage = () => {
                   <div>{game.popularity}</div>
                   <div>{game.playerCount}人在玩</div>
                 </div>
-                {/* 添加AI推荐元素 */}
                 <div className="ai-recommend-badge">
                   <i className="fas fa-brain"></i> {game.aiRecommend}
                 </div>
-                <button className="play-game-btn">开始游戏</button>
+                <button className="play-game-btn" onClick={() => handleGameStart(game.id)}>
+                  开始游戏
+                </button>
               </div>
             ))}
           </div>
@@ -514,45 +592,7 @@ const DiscoverPage = () => {
         </div> */}
         
         {/* 5. 热门视频模块 */}
-        <div className="content-module-container trending-videos-container">
-          <div className="content-module-header">
-            <div className="module-title">
-              <i className="fas fa-video"></i> 热门视频
-            </div>
-              <div className="scroll-controls">
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'left')}>
-                  <i className="fas fa-chevron-left"></i>
-                </button>
-              <button className="scroll-control-btn" onClick={() => scrollHorizontally(horizontalScrollRefs.hotVideos, 'right')}>
-                  <i className="fas fa-chevron-right"></i>
-            </button>
-            </div>
-          </div>
-          <div className="horizontal-scroll-container" ref={horizontalScrollRefs.hotVideos}>
-            {hotVideos.map(video => (
-              <div key={video.id} className="video-card">
-                <div className="video-card-cover-container">
-                  <img src={video.cover} alt={video.title} className="video-card-cover" />
-                  <div className="video-duration">{video.duration}</div>
-                  <div className="video-play-button">
-                    <i className="fas fa-play"></i>
-                  </div>
-                </div>
-                <div className="video-card-info">
-                  <h4 className="video-card-title">{video.title}</h4>
-                  <div className="video-card-creator">{video.creator}</div>
-                  <div className="video-card-views">
-                    <i className="fas fa-eye"></i> {video.viewCount}
-                  </div>
-                  {/* 添加AI摘要元素 */}
-                  <div className="ai-video-summary">
-                    <i className="fas fa-magic"></i> {video.aiSummary}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <VideoList />
         
         {/* 6. 互动话题模块 */}
         {/* <div className="content-module-container interactive-topics-container">
@@ -590,6 +630,7 @@ const DiscoverPage = () => {
             ))}
           </div>
         </div> */}
+        
         
         {/* 返回顶部按钮 */}
         {showBackToTop && (
