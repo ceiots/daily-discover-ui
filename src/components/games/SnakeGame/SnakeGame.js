@@ -158,6 +158,39 @@ const SnakeGame = ({ onExit = () => {} }) => {
     }
   }, [direction]);
 
+  // 添加键盘控制
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!gameRunning || gameOver) return;
+      
+      switch (e.key) {
+        case 'ArrowUp':
+          handleDirectionChange({ x: 0, y: -1 });
+          break;
+        case 'ArrowDown':
+          handleDirectionChange({ x: 0, y: 1 });
+          break;
+        case 'ArrowLeft':
+          handleDirectionChange({ x: -1, y: 0 });
+          break;
+        case 'ArrowRight':
+          handleDirectionChange({ x: 1, y: 0 });
+          break;
+        case ' ':
+          toggleGame();
+          break;
+        default:
+          break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleDirectionChange, gameRunning, gameOver, toggleGame]);
+
   // 更改难度
   const changeDifficulty = useCallback((level) => {
     setDifficulty(level);
@@ -184,13 +217,13 @@ const SnakeGame = ({ onExit = () => {} }) => {
       isGameRunning={gameRunning}
     >
       <div className="snake-game-wrapper">
-      {/* 装饰性背景 */}
+        {/* 装饰性背景 */}
         <div className="decorative-bg">
           <div className="bg-circle bg-circle-1"></div>
           <div className="bg-circle bg-circle-2"></div>
           <div className="bg-circle bg-circle-3"></div>
           <div className="bg-circle bg-circle-4"></div>
-      </div>
+        </div>
 
         <div className="game-wrapper">
           {/* 头部信息 */}
@@ -201,9 +234,9 @@ const SnakeGame = ({ onExit = () => {} }) => {
                   difficulty === 'easy' ? 'difficulty-easy' : 
                   difficulty === 'hard' ? 'difficulty-hard' : 
                   'difficulty-normal'
-            }`}>
-              {difficulty === 'easy' ? '简单' : difficulty === 'hard' ? '困难' : '普通'}
-            </span>
+                }`}>
+                  {difficulty === 'easy' ? '简单' : difficulty === 'hard' ? '困难' : '普通'}
+                </span>
               </div>
               <div className="score-container">
                 <div className="score-label">分数</div>
@@ -222,11 +255,11 @@ const SnakeGame = ({ onExit = () => {} }) => {
               >
                 <Settings size={20} />
               </button>
+            </div>
           </div>
-        </div>
 
-        {/* 设置面板 */}
-        {showSettings && (
+          {/* 设置面板 */}
+          {showSettings && (
             <div className="settings-panel">
               <h3 className="settings-title">游戏设置</h3>
               <div className="settings-group">
@@ -247,84 +280,79 @@ const SnakeGame = ({ onExit = () => {} }) => {
                   ))}
                 </div>
               </div>
-              <button
-                onClick={() => setShowControls(!showControls)}
-                className="controls-toggle-btn"
-              >
-                {showControls ? '隐藏' : '显示'}虚拟按键
-              </button>
-          </div>
-        )}
+              <div className="settings-tip">
+                <p>提示: 使用键盘方向键或屏幕下方的方向按钮控制蛇的移动</p>
+              </div>
+            </div>
+          )}
 
-        {/* 游戏区域 */}
+          {/* 游戏区域 */}
           <div className="game-area">
-          <div 
+            <div 
               className="game-board"
               ref={gameBoardRef}
-            style={{ touchAction: 'none' }}
-          >
-            {/* 网格背景 */}
+              style={{ touchAction: 'none' }}
+            >
+              {/* 网格背景 */}
               <div className="grid-background">
-              {Array.from({ length: GRID_SIZE }).map((_, row) =>
-                Array.from({ length: GRID_SIZE }).map((_, col) => (
-                  <div
-                    key={`${row}-${col}`}
+                {Array.from({ length: GRID_SIZE }).map((_, row) =>
+                  Array.from({ length: GRID_SIZE }).map((_, col) => (
+                    <div
+                      key={`${row}-${col}`}
                       className="grid-cell"
-                    style={{
-                      left: `${(col / GRID_SIZE) * 100}%`,
-                      top: `${(row / GRID_SIZE) * 100}%`,
-                      width: `${100 / GRID_SIZE}%`,
-                      height: `${100 / GRID_SIZE}%`,
-                    }}
-                  />
-                ))
-              )}
-            </div>
+                      style={{
+                        left: `${(col / GRID_SIZE) * 100}%`,
+                        top: `${(row / GRID_SIZE) * 100}%`,
+                        width: `${100 / GRID_SIZE}%`,
+                        height: `${100 / GRID_SIZE}%`,
+                      }}
+                    />
+                  ))
+                )}
+              </div>
 
-            {/* 贪吃蛇 */}
-            {snake.map((segment, index) => (
-              <div
-                key={index}
+              {/* 贪吃蛇 */}
+              {snake.map((segment, index) => (
+                <div
+                  key={index}
                   className={`snake-segment ${index === 0 ? 'snake-head' : 'snake-body'}`}
+                  style={{
+                    left: `${(segment.x / GRID_SIZE) * 100}%`,
+                    top: `${(segment.y / GRID_SIZE) * 100}%`,
+                    width: `${100 / GRID_SIZE}%`,
+                    height: `${100 / GRID_SIZE}%`,
+                  }}
+                />
+              ))}
+
+              {/* 食物 */}
+              <div
+                className="food"
                 style={{
-                  left: `${(segment.x / GRID_SIZE) * 100}%`,
-                  top: `${(segment.y / GRID_SIZE) * 100}%`,
+                  left: `${(food.x / GRID_SIZE) * 100}%`,
+                  top: `${(food.y / GRID_SIZE) * 100}%`,
                   width: `${100 / GRID_SIZE}%`,
                   height: `${100 / GRID_SIZE}%`,
                 }}
               />
-            ))}
 
-            {/* 食物 */}
-            <div
-                className="food"
-              style={{
-                left: `${(food.x / GRID_SIZE) * 100}%`,
-                top: `${(food.y / GRID_SIZE) * 100}%`,
-                width: `${100 / GRID_SIZE}%`,
-                height: `${100 / GRID_SIZE}%`,
-              }}
-            />
-
-            {/* 游戏结束遮罩 */}
-            {gameOver && (
+              {/* 游戏结束遮罩 */}
+              {gameOver && (
                 <div className="game-over-overlay">
                   <div className="game-over-content">
                     <div className="game-over-title">游戏结束</div>
                     <div className="final-score">最终得分: {score}</div>
-                  {score === highScore && score > 0 && (
+                    {score === highScore && score > 0 && (
                       <div className="new-record">
-                      <Trophy size={16} />
-                      新纪录！
-                    </div>
-                  )}
+                        <Trophy size={16} />
+                        新纪录！
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-
+              )}
+            </div>
           </div>
-          </div>
-          
         </div>
       </div>
     </GameContainer>

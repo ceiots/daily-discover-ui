@@ -294,63 +294,74 @@
 }
 
 .snake-head {
-  background: linear-gradient(to bottom right, #4ade80, #16a34a);
-  box-shadow: 0 10px 15px -3px rgba(74, 222, 128, 0.5);
-  z-index: 10;
-  transform: scale(1.1);
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border-radius: 30%;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+  z-index: 2;
 }
 
 .snake-body {
-  background: linear-gradient(to bottom right, #86efac, #22c55e);
-  transform: scale(0.95);
+  background-color: #4ade80;
+  border-radius: 20%;
+  box-shadow: 0 0 4px rgba(74, 222, 128, 0.4);
+  z-index: 1;
 }
 
 .food {
-  position: absolute;
-  background: linear-gradient(to bottom right, #f87171, #dc2626);
+  background: radial-gradient(#f87171, #ef4444);
   border-radius: 50%;
-  box-shadow: 0 10px 15px -3px rgba(248, 113, 113, 0.5);
-  animation: pulse 2s infinite;
-  z-index: 20;
-  transform: scale(0.8);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+  animation: pulse 1s infinite;
 }
 
 .game-over-overlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 30;
+  align-items: center;
+  z-index: 100;
 }
 
 .game-over-content {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
   text-align: center;
-  padding: 1.5rem;
+  max-width: 80%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .game-over-title {
-  color: white;
-  font-size: 1.5rem;
+  color: #ef4444;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .final-score {
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 1rem;
+  color: white;
+  font-size: 20px;
+  margin-bottom: 16px;
 }
 
 .new-record {
-  color: #facc15;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 8px;
+  color: #facc15;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  animation: pulse 1s infinite;
 }
 
 .pause-overlay {
@@ -815,5 +826,186 @@
   
   .ios-safe-area {
     height: 15px;
+  }
+}
+
+.settings-tip {
+  margin-top: 12px;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid rgba(74, 222, 128, 0.6);
+}
+
+.settings-tip p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+/* 游戏暂停遮罩 */
+.paused-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.paused-content {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  max-width: 80%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.paused-title {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.resume-button, .restart-button {
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 10px;
+}
+
+.resume-button:hover, .restart-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.resume-button:active, .restart-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 自定义控制区域 */
+.custom-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  gap: 15px;
+}
+
+/* 方向按钮区域 */
+.direction-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.direction-middle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.direction-center {
+  width: 50px;
+  height: 50px;
+}
+
+/* 方向按钮样式 */
+.direction-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(74, 222, 128, 0.3);
+  border: 2px solid rgba(74, 222, 128, 0.6);
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.direction-btn:active {
+  transform: scale(0.95);
+  background: rgba(74, 222, 128, 0.5);
+}
+
+.direction-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 游戏控制按钮 */
+.game-buttons {
+  margin-top: 10px;
+}
+
+.game-control-btn {
+  padding: 10px 20px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #4ade80, #22c55e);
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.game-control-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 移动设备适配 */
+@media (max-width: 768px) {
+  .direction-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+  
+  .direction-center {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .direction-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+  }
+  
+  .direction-center {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .game-control-btn {
+    padding: 8px 16px;
+    font-size: 14px;
   }
 }

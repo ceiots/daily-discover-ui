@@ -152,16 +152,6 @@ const TetrisGame = ({ onExit = () => {} }) => {
   const gameLoopRef = useRef(null);
   const requestRef = useRef(null);
   
-  // 音频引用
-  const audioRefs = {
-    rotate: useRef(null),
-    clear: useRef(null),
-    move: useRef(null),
-    drop: useRef(null),
-    gameOver: useRef(null)
-  };
-  const [muted, setMuted] = useState(false);
-
   // 初始化游戏
   useEffect(() => {
     // 直接开始游戏，不显示准备界面
@@ -574,12 +564,18 @@ const TetrisGame = ({ onExit = () => {} }) => {
   
   // 处理方向变化
   const handleDirectionChange = (dir) => {
-    if (dir.x !== 0) {
-      movePlayer(dir.x);
+    // 如果游戏不在运行状态，不处理方向输入
+    if (gameState !== GAME_STATES.PLAYING) return;
+    
+    // 检查方向输入并执行相应动作
+    if (dir.x < 0) {
+      movePlayer(-1); // 左移
+    } else if (dir.x > 0) {
+      movePlayer(1);  // 右移
     } else if (dir.y > 0) {
-      dropPlayer();
+      dropPlayer();   // 下落
     } else if (dir.y < 0) {
-      rotatePlayer(1);
+      rotatePlayer(1); // 上键旋转
     }
   };
   
@@ -633,10 +629,6 @@ const TetrisGame = ({ onExit = () => {} }) => {
         
         <div className="tetris-game-controls">
         </div>
-        
-        <button className="tetris-sound-toggle" onClick={() => setMuted(!muted)}>
-          <i className={`fas ${muted ? 'fa-volume-mute' : 'fa-volume-up'}`}></i>
-        </button>
       </div>
     </GameContainer>
   );

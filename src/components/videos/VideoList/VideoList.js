@@ -63,10 +63,14 @@ const VideoList = () => {
   
   // 视频预加载处理 - 优化视频播放问题
   const handleVideoPreload = (videoId) => {
-    // 为视频元素添加预加载属性
-    const videoElement = document.getElementById(`video-preview-${videoId}`);
-    if (videoElement) {
-      videoElement.preload = 'metadata';
+    // 安全地设置视频预加载
+    try {
+      const videoElement = document.getElementById(`video-preview-${videoId}`);
+      if (videoElement) {
+        videoElement.preload = 'metadata';
+      }
+    } catch (err) {
+      console.error('视频预加载失败:', err);
     }
   };
   
@@ -106,17 +110,6 @@ const VideoList = () => {
           </div>
         </div>
         
-        <div className="video-categories-list" ref={categoriesScrollRef}>
-          {categories.map(category => (
-            <button
-              key={category}
-              className={`video-category-btn ${category === currentCategory ? 'active' : ''}`}
-              onClick={() => setCurrentCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-      </div>
       
         {/* 视频水平滚动列表 */}
         <div className="horizontal-scroll-container video-scroll-container" ref={videosScrollRef}>
@@ -128,16 +121,17 @@ const VideoList = () => {
               <div className="video-play-button">
                 <i className="fas fa-play"></i>
               </div>
-                {/* 隐藏的视频预加载元素 */}
-                <video 
-                  id={`video-preview-${video.id}`}
-                  className="video-preload"
-                  src={video.videoUrl}
-                  preload="none"
-                  muted
-                  playsInline
-                  crossOrigin="anonymous"
-                />
+              {/* 使用key确保视频元素正确渲染和更新 */}
+              <video 
+                key={`video-preview-${video.id}`}
+                id={`video-preview-${video.id}`}
+                className="video-preload"
+                src={video.videoUrl}
+                preload="none"
+                muted={true}
+                playsInline={true}
+                crossOrigin="anonymous"
+              />
             </div>
             <div className="video-card-info">
               <h4 className="video-card-title">{video.title}</h4>
