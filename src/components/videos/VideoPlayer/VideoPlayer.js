@@ -90,11 +90,11 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
   // 全屏切换
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-      if (playerRef.current.requestFullscreen) {
+      if (playerRef.current && playerRef.current.requestFullscreen) {
         playerRef.current.requestFullscreen();
-      } else if (playerRef.current.webkitRequestFullscreen) {
+      } else if (playerRef.current && playerRef.current.webkitRequestFullscreen) {
         playerRef.current.webkitRequestFullscreen();
-      } else if (playerRef.current.msRequestFullscreen) {
+      } else if (playerRef.current && playerRef.current.msRequestFullscreen) {
         playerRef.current.msRequestFullscreen();
       }
       setIsFullScreen(true);
@@ -192,6 +192,7 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
       setIsHls(isHlsSource);
       
       if (isHlsSource && Hls.isSupported()) {
+        console.log('使用HLS播放器播放:', videoSrc);
         const hls = new Hls({
           maxBufferLength: 30,
           maxMaxBufferLength: 60,
@@ -246,21 +247,47 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
         });
       } else if (isHlsSource && videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
         // 原生支持HLS (Safari)
+        console.log('使用原生HLS支持播放:', videoSrc);
         videoRef.current.src = videoSrc;
       } else {
-        // 尝试直接播放
+        // 普通视频
+        console.log('使用标准视频播放器播放:', videoSrc);
         videoRef.current.src = videoSrc;
+        // 尝试自动播放
+        try {
+          const playPromise = videoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              setIsPlaying(true);
+            }).catch(err => {
+              console.error('自动播放失败:', err);
+              setIsPlaying(false);
+            });
+          }
+        } catch (error) {
+          console.error('播放出错:', error);
+        }
       }
     }
     
+    // 清理函数
     return () => {
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        try {
+          hlsRef.current.destroy();
+        } catch (error) {
+          console.error('HLS销毁错误:', error);
+        }
+        hlsRef.current = null;
+      }
+      
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
       }
     };
   }, [videoSrc]);
   
-  // 监听全屏状态变化
+  // 监听全屏变化
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
@@ -279,116 +306,136 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
     };
   }, []);
   
-  // 清理
-  useEffect(() => {
-    return () => {
-      if (controlsTimerRef.current) {
-        clearTimeout(controlsTimerRef.current);
+  // 安全关闭播放器
+  const handleSafeClose = () => {
+    // 停止视频播放
+    if (videoRef.current) {
+      try {
+        videoRef.current.pause();
+        videoRef.current.src = '';
+        videoRef.current.load();
+      } catch (error) {
+        console.error('停止视频播放错误:', error);
       }
-      
-      if (hlsRef.current) {
+    }
+    
+    // 销毁HLS实例
+    if (hlsRef.current) {
+      try {
         hlsRef.current.destroy();
+        hlsRef.current = null;
+      } catch (error) {
+        console.error('HLS销毁错误:', error);
       }
-    };
-  }, []);
+    }
+    
+    // 调用关闭回调
+    if (onClose) {
+      onClose();
+    }
+  };
   
   return (
-    <div className="video-player-overlay">
-      <div className="video-player-container" ref={playerRef} onMouseMove={handleMouseMove}>
-        <video
-          ref={videoRef}
-          className="video-player"
-          onClick={togglePlay}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onError={handleVideoError}
-          onWaiting={handleWaiting}
-          onCanPlay={handleCanPlay}
-          onEnded={handleEnded}
-          playsInline
-          preload="auto"
-          crossOrigin="anonymous"
-          // HLS不在此设置src
-          {...(!isHls && { src: videoSrc })}
-        />
-        
-        <button className="video-close-btn" onClick={onClose}>
-          <span>×</span>
-        </button>
-        
-        {/* 加载状态 */}
-        {isLoading && (
-          <div className="video-loading">
-            <div className="video-loading-spinner"></div>
-            <p>视频加载中...</p>
-          </div>
-        )}
-        
-        {/* 错误状态 */}
-        {loadError && (
-          <div className="video-error">
-            <i className="fas fa-exclamation-circle"></i>
-            <p>{loadError}</p>
-            <button onClick={() => window.location.reload()}>重试</button>
-          </div>
-        )}
-        
-        {/* 大播放按钮 */}
-        {!isPlaying && !isLoading && !loadError && (
-          <div className="video-play-overlay" onClick={togglePlay}>
-            <button className="video-play-big">▶</button>
-          </div>
-        )}
-        
-        <div className={`video-info ${showControls ? '' : 'hidden'}`}>
-          <h2 className="video-title">{title}</h2>
-          <p className="video-creator">by {creator}</p>
+    <div className="video-player-overlay" onClick={handleSafeClose}>
+      <div 
+        className="video-player-container" 
+        ref={playerRef}
+        onClick={e => e.stopPropagation()}
+        onMouseMove={handleMouseMove}
+      >
+        <div className="video-player-header">
+          <div className="video-player-title">{title}</div>
+          <button className="video-player-close" onClick={handleSafeClose}>×</button>
         </div>
         
-        <div className={`video-controls ${showControls ? '' : 'hidden'}`}>
-          <button className="video-control-btn play-pause" onClick={togglePlay}>
-            {isPlaying ? '❚❚' : '▶'}
-          </button>
+        <div className="video-player-wrapper">
+          <video
+            ref={videoRef}
+            className="video-element"
+            onClick={togglePlay}
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onError={handleVideoError}
+            onWaiting={handleWaiting}
+            onCanPlay={handleCanPlay}
+            onEnded={handleEnded}
+            playsInline
+            crossOrigin="anonymous"
+          />
           
-          <div className="video-progress-container">
-            <span className="video-time">{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              className="video-progress"
-              min="0"
-              max={duration || 0}
-              value={currentTime}
-              onChange={handleProgressChange}
-              style={{
-                background: `linear-gradient(to right, #3498db ${(currentTime / duration) * 100}%, rgba(255, 255, 255, 0.3) ${(currentTime / duration) * 100}%)`
-              }}
-            />
-            <span className="video-time">{formatTime(duration)}</span>
-          </div>
+          {isLoading && (
+            <div className="video-loading">
+              <div className="video-loading-spinner"></div>
+              <div className="video-loading-text">加载中...</div>
+            </div>
+          )}
           
-          <div className="video-right-controls">
-            <div className="video-volume-container">
-              <button className="video-control-btn volume" onClick={toggleMute}>
-                {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
-              </button>
-              <input
+          {loadError && (
+            <div className="video-error">
+              <div className="video-error-icon">⚠️</div>
+              <div className="video-error-text">{loadError}</div>
+              <button className="video-error-retry" onClick={() => window.location.reload()}>重试</button>
+            </div>
+          )}
+          
+          {!isPlaying && !isLoading && !loadError && (
+            <div className="video-play-overlay" onClick={togglePlay}>
+              <div className="video-big-play-button">
+                <i className="fas fa-play"></i>
+              </div>
+            </div>
+          )}
+          
+          <div className={`video-controls ${showControls ? 'show' : ''}`}>
+            <div className="video-progress">
+              <input 
                 type="range"
-                className="video-volume"
+                className="video-progress-bar"
+                value={currentTime}
                 min="0"
-                max="1"
+                max={duration || 0}
                 step="0.1"
-                value={volume}
-                onChange={handleVolumeChange}
-                style={{
-                  background: `linear-gradient(to right, #3498db ${volume * 100}%, rgba(255, 255, 255, 0.3) ${volume * 100}%)`
-                }}
+                onChange={handleProgressChange}
               />
             </div>
             
-            <button className="video-control-btn fullscreen" onClick={toggleFullScreen}>
-              {isFullScreen ? '⤓' : '⤢'}
-            </button>
+            <div className="video-controls-bottom">
+              <div className="video-controls-left">
+                <button className="video-control-button" onClick={togglePlay}>
+                  {isPlaying ? <i className="fas fa-pause"></i> : <i className="fas fa-play"></i>}
+                </button>
+                
+                <div className="video-volume-control">
+                  <button className="video-control-button" onClick={toggleMute}>
+                    {volume === 0 ? <i className="fas fa-volume-mute"></i> : <i className="fas fa-volume-up"></i>}
+                  </button>
+                  <input 
+                    type="range"
+                    className="video-volume-slider"
+                    value={volume}
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    onChange={handleVolumeChange}
+                  />
+                </div>
+                
+                <div className="video-time-display">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </div>
+              </div>
+              
+              <div className="video-controls-right">
+                <button className="video-control-button" onClick={toggleFullScreen}>
+                  {isFullScreen ? <i className="fas fa-compress"></i> : <i className="fas fa-expand"></i>}
+                </button>
+              </div>
+            </div>
           </div>
+        </div>
+        
+        <div className="video-info">
+          <div className="video-creator">{creator}</div>
         </div>
       </div>
     </div>
@@ -398,8 +445,8 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
 VideoPlayer.propTypes = {
   videoSrc: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  creator: PropTypes.string,
-  onClose: PropTypes.func.isRequired
+  onClose: PropTypes.func.isRequired,
+  creator: PropTypes.string
 };
 
 export default VideoPlayer; 

@@ -21,58 +21,64 @@
   border-radius: 8px;
   background-color: #000;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
-.video-player {
+.video-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+
+.video-player-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+  flex: 1;
+}
+
+.video-player-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.video-player-close:hover {
+  color: #e74c3c;
+}
+
+.video-player-wrapper {
+  position: relative;
+  width: 100%;
+  background-color: #000;
+  overflow: hidden;
+}
+
+.video-element {
   width: 100%;
   height: auto;
   display: block;
-}
-
-/* 关闭按钮 */
-.video-close-btn {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 32px;
-  height: 32px;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: none;
-  border-radius: 50%;
-  color: white;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: background-color 0.2s;
-}
-
-.video-close-btn:hover {
-  background-color: rgba(255, 0, 0, 0.7);
+  background-color: #000;
 }
 
 /* 视频信息 */
 .video-info {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 15px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
-  transition: opacity 0.3s;
-}
-
-.video-title {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: bold;
 }
 
 .video-creator {
-  margin: 5px 0 0;
+  margin: 0;
   font-size: 0.9rem;
   opacity: 0.8;
 }
@@ -83,20 +89,70 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 10px 15px;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  opacity: 0;
   transition: opacity 0.3s;
 }
 
-.hidden {
-  opacity: 0;
-  pointer-events: none;
+.video-controls.show {
+  opacity: 1;
 }
 
-.video-control-btn {
+.video-progress {
+  width: 100%;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.video-progress-bar {
+  width: 100%;
+  height: 5px;
+  -webkit-appearance: none;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 10px 0;
+}
+
+.video-progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background-color: #3498db;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.video-progress-bar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background-color: #3498db;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.video-controls-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px 10px;
+}
+
+.video-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.video-controls-right {
+  display: flex;
+  align-items: center;
+}
+
+.video-control-button {
   background: none;
   border: none;
   color: white;
@@ -106,69 +162,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color 0.2s;
 }
 
-.video-control-btn:hover {
+.video-control-button:hover {
   color: #3498db;
 }
 
-/* 进度条 */
-.video-progress-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.video-progress {
-  flex: 1;
-  height: 5px;
-  -webkit-appearance: none;
-  background-color: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.video-progress::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background-color: #3498db;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-.video-progress::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  background-color: #3498db;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
-
-.video-time {
-  color: white;
-  font-size: 0.8rem;
-  min-width: 40px;
-}
-
-/* 右侧控制按钮 */
-.video-right-controls {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.video-volume-container {
+.video-volume-control {
   display: flex;
   align-items: center;
   gap: 5px;
 }
 
-.video-volume {
+.video-volume-slider {
   width: 60px;
   height: 5px;
   -webkit-appearance: none;
@@ -178,7 +185,7 @@
   cursor: pointer;
 }
 
-.video-volume::-webkit-slider-thumb {
+.video-volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 10px;
   height: 10px;
@@ -187,12 +194,18 @@
   cursor: pointer;
 }
 
-.video-volume::-moz-range-thumb {
+.video-volume-slider::-moz-range-thumb {
   width: 10px;
   height: 10px;
   background-color: #3498db;
   border-radius: 50%;
   cursor: pointer;
+}
+
+.video-time-display {
+  color: white;
+  font-size: 0.9rem;
+  min-width: 80px;
 }
 
 /* 加载中状态 */
@@ -208,6 +221,7 @@
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
+  z-index: 5;
 }
 
 .video-loading-spinner {
@@ -218,6 +232,11 @@
   border-radius: 50%;
   animation: spin 1s infinite linear;
   margin-bottom: 10px;
+}
+
+.video-loading-text {
+  font-size: 1rem;
+  color: white;
 }
 
 @keyframes spin {
@@ -240,35 +259,35 @@
   color: white;
   text-align: center;
   padding: 20px;
+  z-index: 5;
 }
 
-.video-error i {
+.video-error-icon {
   font-size: 3rem;
-  color: #e74c3c;
   margin-bottom: 15px;
 }
 
-.video-error p {
-  font-size: 1.2rem;
+.video-error-text {
+  font-size: 1.1rem;
   margin-bottom: 20px;
 }
 
-.video-error button {
-  padding: 8px 20px;
+.video-error-retry {
+  padding: 8px 16px;
   background-color: #3498db;
   color: white;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
   font-size: 1rem;
+  cursor: pointer;
   transition: background-color 0.2s;
 }
 
-.video-error button:hover {
+.video-error-retry:hover {
   background-color: #2980b9;
 }
 
-/* 大播放按钮覆盖层 */
+/* 播放覆盖层 */
 .video-play-overlay {
   position: absolute;
   top: 0;
@@ -280,69 +299,76 @@
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.3);
   cursor: pointer;
+  z-index: 4;
 }
 
-.video-play-big {
-  width: 70px;
-  height: 70px;
+.video-big-play-button {
+  width: 80px;
+  height: 80px;
   background-color: rgba(52, 152, 219, 0.8);
-  border: none;
   border-radius: 50%;
-  color: white;
-  font-size: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: transform 0.2s, background-color 0.2s;
 }
 
-.video-play-big:hover {
+.video-big-play-button i {
+  font-size: 2rem;
+  color: white;
+  margin-left: 5px; /* 稍微调整使图标在视觉上居中 */
+}
+
+.video-play-overlay:hover .video-big-play-button {
   transform: scale(1.1);
-  background-color: rgba(52, 152, 219, 1);
+  background-color: rgba(41, 128, 185, 0.9);
 }
 
 /* 响应式样式 */
 @media (max-width: 768px) {
-  .video-info {
-    padding: 10px;
+  .video-player-container {
+    width: 95%;
+    max-width: 100%;
   }
   
-  .video-title {
+  .video-player-title {
     font-size: 1rem;
   }
   
-  .video-creator {
-    font-size: 0.8rem;
+  .video-controls-bottom {
+    padding: 0 10px 8px;
   }
   
-  .video-controls {
-    padding: 8px 10px;
+  .video-controls-left {
+    gap: 10px;
   }
   
-  .video-control-btn {
-    font-size: 1rem;
+  .video-volume-control {
+    display: none; /* 在移动设备上隐藏音量滑块 */
   }
   
-  .video-volume-container {
-    display: none; /* 在小屏幕上隐藏音量控制 */
-  }
-  
-  .video-play-big {
+  .video-big-play-button {
     width: 60px;
     height: 60px;
-    font-size: 24px;
+  }
+  
+  .video-big-play-button i {
+    font-size: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .video-time {
-    display: none; /* 在更小的屏幕上隐藏时间 */
+  .video-time-display {
+    font-size: 0.8rem;
+    min-width: 70px;
   }
   
-  .video-play-big {
+  .video-big-play-button {
     width: 50px;
     height: 50px;
-    font-size: 20px;
+  }
+  
+  .video-big-play-button i {
+    font-size: 1.2rem;
   }
 } 

@@ -631,13 +631,6 @@ const DiscoverPage = () => {
           </div>
         </div> */}
         
-        
-        {/* 返回顶部按钮 */}
-        {showBackToTop && (
-          <div className="discover-back-to-top" onClick={scrollToTop}>
-            <i className="fas fa-arrow-up"></i>
-          </div>
-        )}
       </div>
       <NavBar />
     </div>

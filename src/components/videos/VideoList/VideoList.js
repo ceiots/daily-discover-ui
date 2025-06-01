@@ -42,11 +42,13 @@ const VideoList = () => {
   
   // 处理视频点击，打开视频播放器
   const handleVideoClick = (video) => {
+    console.log('选择播放视频:', video.title, video.videoUrl);
     setSelectedVideo(video);
   };
   
   // 关闭视频播放器
   const handleCloseVideo = () => {
+    console.log('关闭视频播放器');
     setSelectedVideo(null);
   };
   
@@ -100,38 +102,19 @@ const VideoList = () => {
           <div className="module-title">
             <i className="fas fa-video"></i> 热门视频
           </div>
-          <div className="scroll-controls">
-            <button className="scroll-control-btn" onClick={() => scrollHorizontally(categoriesScrollRef, 'left')}>
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <button className="scroll-control-btn" onClick={() => scrollHorizontally(categoriesScrollRef, 'right')}>
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
         </div>
         
       
         {/* 视频水平滚动列表 */}
         <div className="horizontal-scroll-container video-scroll-container" ref={videosScrollRef}>
         {filteredVideos.map(video => (
-            <div key={video.id} className="video-card" onClick={() => handleVideoClick(video)} onMouseEnter={() => handleVideoPreload(video.id)}>
+            <div key={video.id} className="video-card" onClick={() => handleVideoClick(video)}>
             <div className="video-card-cover-container">
               <img src={video.cover} alt={video.title} className="video-card-cover" />
               <div className="video-duration">{video.duration}</div>
               <div className="video-play-button">
                 <i className="fas fa-play"></i>
               </div>
-              {/* 使用key确保视频元素正确渲染和更新 */}
-              <video 
-                key={`video-preview-${video.id}`}
-                id={`video-preview-${video.id}`}
-                className="video-preload"
-                src={video.videoUrl}
-                preload="none"
-                muted={true}
-                playsInline={true}
-                crossOrigin="anonymous"
-              />
             </div>
             <div className="video-card-info">
               <h4 className="video-card-title">{video.title}</h4>
@@ -146,16 +129,6 @@ const VideoList = () => {
           </div>
         ))}
         </div>
-        
-        {/* 视频滚动控制 */}
-        <div className="video-scroll-controls">
-          <button className="video-scroll-btn left" onClick={() => scrollHorizontally(videosScrollRef, 'left')}>
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button className="video-scroll-btn right" onClick={() => scrollHorizontally(videosScrollRef, 'right')}>
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
       </div>
       
       {/* 无视频提示 */}
@@ -168,6 +141,7 @@ const VideoList = () => {
       {/* 视频播放器 */}
       {selectedVideo && (
         <VideoPlayer
+          key={selectedVideo.id}
           videoSrc={selectedVideo.videoUrl}
           title={selectedVideo.title}
           creator={selectedVideo.creator}

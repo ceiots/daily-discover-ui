@@ -43,19 +43,6 @@ const mockVideosData = [
     category: '健康'
   },
   {
-    id: 'v4',
-    title: 'AI绘画入门教程：5分钟上手',
-    description: '从零开始学习AI绘画，详解Midjourney和Stable Diffusion的基础提示词编写，让你快速掌握AI创作的关键技巧。',
-    creator: '数字艺术家',
-    viewCount: '12.7万',
-    duration: '06:15',
-    cover: 'https://images.unsplash.com/photo-1684162440204-887a562ddc6d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    videoUrl: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
-    aiSummary: 'AI摘要：提示词结构是成功的关键，注重细节描述',
-    tags: ['AI', '数字艺术', '教程'],
-    category: '创意'
-  },
-  {
     id: 'v5',
     title: '3种简单美味的快手早餐',
     description: '忙碌生活中的健康早餐解决方案，3种只需10分钟就能完成的营养均衡早餐，既美味又能提供持久能量。',

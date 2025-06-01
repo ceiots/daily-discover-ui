@@ -132,7 +132,10 @@ const SnakeGame = ({ onExit = () => {} }) => {
   }, [gameRunning, gameOver, gameLoop, speed]);
 
   // 处理方向变化
-  const handleDirectionChange = useCallback((newDirection) => {
+  const handleDirectionChange = useCallback((dir) => {
+    // 如果游戏未运行或已结束，不处理方向输入
+    if (!gameRunning || gameOver) return;
+    
     const now = Date.now();
     
     // 防止方向变化过快
@@ -140,23 +143,22 @@ const SnakeGame = ({ onExit = () => {} }) => {
       return;
     }
     
+    // 简化方向控制逻辑，直接使用GameContainer传来的方向对象
     // 防止180度转向
     if (
-      (direction.x === 0 && newDirection.x === 0) ||
-      (direction.y === 0 && newDirection.y === 0)
+      (direction.x === 1 && dir.x === -1) ||
+      (direction.x === -1 && dir.x === 1) ||
+      (direction.y === 1 && dir.y === -1) ||
+      (direction.y === -1 && dir.y === 1)
     ) {
-      setDirection(newDirection);
-      lastDirectionChangeRef.current = now;
-    } else if (
-      !(direction.x === 1 && newDirection.x === -1) &&
-      !(direction.x === -1 && newDirection.x === 1) &&
-      !(direction.y === 1 && newDirection.y === -1) &&
-      !(direction.y === -1 && newDirection.y === 1)
-    ) {
-      setDirection(newDirection);
-      lastDirectionChangeRef.current = now;
+      // 如果是180度转向，忽略这次输入
+      return;
     }
-  }, [direction]);
+    
+    // 设置新方向
+    setDirection(dir);
+    lastDirectionChangeRef.current = now;
+  }, [direction, gameRunning, gameOver]);
 
   // 添加键盘控制
   useEffect(() => {
@@ -348,6 +350,12 @@ const SnakeGame = ({ onExit = () => {} }) => {
                         新纪录！
                       </div>
                     )}
+                    <button 
+                      className="restart-button"
+                      onClick={toggleGame}
+                    >
+                      重新开始
+                    </button>
                   </div>
                 </div>
               )}

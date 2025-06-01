@@ -8,9 +8,7 @@
 /* 视频模块容器 */
 .content-module-container.video-module-container {
   margin-bottom: 20px;
-  background-color: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 15px;
   position: relative;
 }
