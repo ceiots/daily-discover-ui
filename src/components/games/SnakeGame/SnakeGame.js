@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Trophy, Settings } from 'lucide-react';
+import { Trophy, Settings, Pause, Play, RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import GameContainer from '../GameContainer';
 import './SnakeGame.css';
 
@@ -14,14 +14,16 @@ const SnakeGame = ({ onExit = () => {} }) => {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
   const [food, setFood] = useState(INITIAL_FOOD);
-  const [gameRunning, setGameRunning] = useState(true); // 默认游戏直接开始
+  const [gameRunning, setGameRunning] = useState(false); // 默认不开始，需要点击开始
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [showStartScreen, setShowStartScreen] = useState(true);
   
   const [speed, setSpeed] = useState(150);
   const [showSettings, setShowSettings] = useState(false);
   const [difficulty, setDifficulty] = useState('normal');
   const [highScore, setHighScore] = useState(0);
+  const [foodEaten, setFoodEaten] = useState(0);
   
   const gameLoopRef = useRef();
   const lastDirectionChangeRef = useRef(Date.now());
@@ -30,6 +32,12 @@ const SnakeGame = ({ onExit = () => {} }) => {
   
   // 游戏控制按钮
   const toggleGame = useCallback(() => {
+    if (showStartScreen) {
+      setShowStartScreen(false);
+      setGameRunning(true);
+      return;
+    }
+    
     if (gameOver) {
       // 重置游戏
       setSnake(INITIAL_SNAKE);
@@ -37,13 +45,14 @@ const SnakeGame = ({ onExit = () => {} }) => {
       setFood(INITIAL_FOOD);
       setGameOver(false);
       setScore(0);
+      setFoodEaten(0);
       setSpeed(difficulty === 'easy' ? 200 : difficulty === 'hard' ? 100 : 150);
       setGameRunning(true);
     } else {
       // 暂停/继续游戏
       setGameRunning(prev => !prev);
     }
-  }, [gameOver, difficulty]);
+  }, [gameOver, difficulty, showStartScreen]);
 
   // 加载保存的游戏数据
   useEffect(() => {
@@ -108,6 +117,7 @@ const SnakeGame = ({ onExit = () => {} }) => {
           }
           return newScore;
         });
+        setFoodEaten(prev => prev + 1);
         setFood(generateFood(newSnake));
         
         // 增加速度（但不超过最大速度）
@@ -179,6 +189,12 @@ const SnakeGame = ({ onExit = () => {} }) => {
   // 添加键盘控制
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (showStartScreen && e.key === ' ') {
+        setShowStartScreen(false);
+        setGameRunning(true);
+        return;
+      }
+      
       if (!gameRunning && !gameOver && e.key === ' ') {
         toggleGame();
         return;
@@ -210,7 +226,7 @@ const SnakeGame = ({ onExit = () => {} }) => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleDirectionChange, gameRunning, gameOver, toggleGame]);
+  }, [handleDirectionChange, gameRunning, gameOver, toggleGame, showStartScreen]);
 
   // 添加触摸控制
   useEffect(() => {
@@ -415,32 +431,56 @@ const SnakeGame = ({ onExit = () => {} }) => {
               />
 
               {/* 游戏控制提示 */}
-              {!gameOver && !showSettings && (
+              {!gameOver && !showSettings && !showStartScreen && (
                 <div className="swipe-hint">
                   <div className="swipe-hint-text">
                     在此区域滑动控制蛇移动方向
                   </div>
                 </div>
               )}
-              
+
+              {/* 开始游戏界面 */}
+              {showStartScreen && (
+                <div className="start-overlay">
+                  <div className="start-content">
+                    <h2 className="start-title">贪吃蛇</h2>
+                    <p className="start-desc">控制蛇吃到更多的食物，但不要撞到墙壁或自己的身体！</p>
+                    <div className="start-stats">
+                      <div className="start-stat">
+                        <Trophy size={20} />
+                        <span>历史最高分: {highScore}</span>
+                      </div>
+                    </div>
+                    <button 
+                      className="start-button"
+                      onClick={toggleGame}
+                    >
+                      开始游戏
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* 游戏结束遮罩 */}
               {gameOver && (
                 <div className="game-over-overlay">
                   <div className="game-over-content">
                     <div className="game-over-title">游戏结束</div>
                     <div className="final-score">最终得分: {score}</div>
+                    <div className="game-stats">
+                      <div className="game-stat">
+                        <span>食物: {foodEaten}</span>
+                      </div>
+                      <div className="game-stat">
+                        <span>蛇长度: {snake.length}</span>
+                      </div>
+                    </div>
                     {score === highScore && score > 0 && (
                       <div className="new-record">
-                        <Trophy size={16} />
+                        <Trophy size={20} />
                         新纪录！
                       </div>
                     )}
-                    <button 
-                      className="restart-button"
-                      onClick={toggleGame}
-                    >
-                      重新开始
-                    </button>
                   </div>
                 </div>
               )}

@@ -107,6 +107,17 @@ const GameContainer = ({
   // 检测是否为iOS设备
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+  // 处理方向控制
+  const handleDirectionChange = useCallback((direction) => {
+    if (onDirectionChange) {
+      if (typeof direction === 'string') {
+        onDirectionChange(direction);
+      } else {
+        onDirectionChange(direction);
+      }
+    }
+  }, [onDirectionChange]);
+
   return (
     <div 
       ref={containerRef}
@@ -157,34 +168,34 @@ const GameContainer = ({
           <div className="game-direction-controls">
             <button
               className="game-direction-btn up-btn"
-              onClick={() => onDirectionChange({ x: 0, y: -1 })}
+              onClick={() => handleDirectionChange('up')}
               aria-label="向上"
             >
-              <ArrowUp size={20} />
+              <ArrowUp size={28} />
             </button>
             <div className="game-direction-middle-row">
               <button
                 className="game-direction-btn left-btn"
-                onClick={() => onDirectionChange({ x: -1, y: 0 })}
+                onClick={() => handleDirectionChange('left')}
                 aria-label="向左"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={28} />
               </button>
               <div className="game-direction-center"></div>
               <button
                 className="game-direction-btn right-btn"
-                onClick={() => onDirectionChange({ x: 1, y: 0 })}
+                onClick={() => handleDirectionChange('right')}
                 aria-label="向右"
               >
-                <ArrowRight size={20} />
+                <ArrowRight size={28} />
               </button>
             </div>
             <button
               className="game-direction-btn down-btn"
-              onClick={() => onDirectionChange({ x: 0, y: 1 })}
+              onClick={() => handleDirectionChange('down')}
               aria-label="向下"
             >
-              <ArrowDown size={20} />
+              <ArrowDown size={28} />
             </button>
           </div>
         </div>

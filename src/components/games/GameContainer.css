@@ -69,16 +69,16 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  padding-bottom: 110px; /* 这里的110px可根据按钮区实际高度微调 */
 }
 
 .game-controls-bar {
-  position: absolute;
-  bottom: 20px;
+  position: fixed;
+  bottom: 0;
   left: 0;
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 10px;
   z-index: 5;
 }
 
@@ -91,8 +91,10 @@
   flex-direction: column;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 15px;
-  margin: 10px 10px -20px 10px;
+  border-radius: 20px;
+  padding: 10px 10px 8px 10px;
+  margin: 6px 6px 0 6px;
+  gap: 8px;
 }
 
 .game-direction-middle-row {
@@ -100,17 +102,18 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin: 5px 0;
+  margin: 6px 0;
+  gap: 8px;
 }
 
 .game-direction-center {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
 }
 
 .game-direction-btn {
-  width: 50px;
-  height: 50px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   border: none;
   background-color: rgba(255, 255, 255, 0.8);
@@ -119,8 +122,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  margin: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  margin: 4px;
+  font-size: 1.1rem;
 }
 
 .game-direction-btn:active {
@@ -186,15 +190,40 @@
   }
   
   .game-direction-btn {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .game-direction-center {
     width: 45px;
     height: 45px;
+  }
+  
+  .game-content {
+    padding-bottom: 140px;
   }
 }
 
 @media (max-width: 480px) {
   .game-direction-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
+    margin: 3px;
+  }
+  .game-direction-middle-row {
+    gap: 6px;
+  }
+  .game-direction-controls {
+    gap: 6px;
+  }
+  .game-content {
+    padding-bottom: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-content {
+    padding-bottom: 130px;
   }
 }
 
@@ -218,13 +247,10 @@
 
 /* 移动设备适配 */
 @media (max-width: 768px) {
-  .game-controls-bar {
-    padding: 8px 10px;
-  }
   
   .game-control-btn {
-    padding: 6px 12px;
-    font-size: 13px;
+    padding: 8px 16px;
+    font-size: 14px;
   }
   
   .bottom-safe-area {
@@ -238,64 +264,32 @@
     padding: 5px;
   }
   
-  .game-controls-bar {
-    padding: 5px 10px;
-  }
-  
   .bottom-safe-area {
     height: 2px;
   }
-}
-
-
-.game-direction-middle-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.game-direction-center {
-  width: 36px;
-  height: 36px;
-}
-
-.game-direction-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.game-direction-btn:active {
-  transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.25);
-}
-
-/* 移动设备适配方向控制按钮 */
-@media (max-width: 768px) {
-  .game-controls-bar {
-    justify-content: space-around;
-  }
-  
-  .game-direction-controls {
-    gap: 2px;
-  }
   
   .game-direction-btn {
-    width: 32px;
-    height: 32px;
+    width: 50px;
+    height: 50px;
   }
   
   .game-direction-center {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
   }
+  
+  .game-content {
+    padding-bottom: 100px;
+  }
+}
+
+/* 触摸反馈效果 */
+.game-direction-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.tetris-game-area {
+  padding-bottom: 22px; /* 这里的110px可根据按钮区实际高度微调 */
 } 
