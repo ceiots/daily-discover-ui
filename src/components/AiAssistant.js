@@ -94,7 +94,7 @@ const AiAssistant = ({ userInfo }) => {
     },
     // 轮播内容变化后的回调函数
     afterChange: (current) => {
-      console.log("当前滚动到索引:", current);
+      //console.log("当前滚动到索引:", current);
     }
   };
 

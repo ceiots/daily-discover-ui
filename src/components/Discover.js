@@ -286,8 +286,6 @@ const DiscoverPage = () => {
   const [recommendedContent, setRecommendedContent] = useState([]);
   const [casualGames, setCasualGames] = useState([]);
   const [popularProducts, setPopularProducts] = useState([]);
-  const [gameChallenges, setGameChallenges] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   const handleScroll = useCallback(() => {
     if (!mainRef.current) return;
@@ -328,7 +326,6 @@ const DiscoverPage = () => {
 
   useEffect(() => {
     const loadDiscoverData = async () => {
-      setIsLoading(true);
       try {
         // 模拟API调用加载数据
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -340,17 +337,13 @@ const DiscoverPage = () => {
         // 设置其他模拟数据
         setRecommendedContent(mockDiscoverData.recommendedContent);
         setPopularProducts(mockDiscoverData.popularProducts);
-        setGameChallenges(mockDiscoverData.gameChallenges);
       } catch (error) {
         console.error('加载数据失败:', error);
         // 出错时使用模拟数据
         setCasualGames(mockDiscoverData.casualGames);
         setRecommendedContent(mockDiscoverData.recommendedContent);
         setPopularProducts(mockDiscoverData.popularProducts);
-        setGameChallenges(mockDiscoverData.gameChallenges);
-      } finally {
-        setIsLoading(false);
-      }
+      } 
     };
 
     loadDiscoverData();
@@ -410,16 +403,6 @@ const DiscoverPage = () => {
     }
   };
 
-  // 加载状态展示
-  if (isLoading) {
-    return (
-      <div className="discover-loading-container">
-        <div className="discover-spinner"></div>
-        <p>正在加载发现内容...</p>
-        <NavBar /> 
-      </div>
-    );
-  }
   
   // 显示游戏界面
   if (activeGame) {
