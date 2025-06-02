@@ -25,11 +25,11 @@ import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
 import Settings from './components/settings/Settings';
-import PaymentPassword from './components/settings/PaymentPassword';
+import PaymentPassword from './components/PaymentPassword';
 import PaymentPasswordSetting from './components/settings/PaymentPasswordSetting'; // 导入支付密码设置页面
-import CreationPage from './components/CreationPage'; // 创作中心页面
+import CreationPage from './components/Creation/CreationPage'; // 创作中心页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
-import EcommerceCreationPage from './components/EcommerceCreationPage'; // 电商创建页面
+import EcommerceCreationPage from './components/Creation/EcommerceCreationPage'; // 电商创建页面
 import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
 import MyShopPage from './components/MyShopPage'; // 我的店铺内容页面
 import ProductManagePage from './components/ProductManagePage'; // 商品管理页面
@@ -40,6 +40,7 @@ import ShopEditPage from './components/ShopEditPage'; // 店铺编辑页面
 import Discover from './components/Discover'; 
 import { ThemeProvider } from './theme';
 import ExamplePage from './ExamplePage';
+import ProfileEdit from './components/settings/ProfileEdit';
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -242,6 +243,7 @@ const App = () => {
               <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
               <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
               <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
+              <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
             </Routes>
           </Router>
         </div>

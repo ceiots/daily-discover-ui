@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../App";
-import instance from "../utils/axios";
+import instance from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { BasePage } from "../../theme";
 
@@ -97,30 +97,13 @@ const Settings = () => {
       title="设置"
       showHeader={true}
       headerLeft={
-        <button
-          onClick={() => navigate("/profile")}
-          className="flex items-center text-gray-600 hover:text-gray-800"
-        >
-          <i className="ri-arrow-left-s-line text-xl mr-2"></i>
-          <span>返回</span>
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
         </button>
       }
       headerTitle="设置"
     >
       <div className="p-4 bg-gray-50 min-h-screen">
-        {/* 顶部导航 */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-          <div className="flex items-center mb-2">
-            <button
-              onClick={() => navigate("/profile")}
-              className="flex items-center text-gray-600 hover:text-gray-800"
-            >
-              <i className="ri-arrow-left-s-line text-xl mr-2"></i>
-              <span>返回</span>
-            </button>
-          </div>
-        </div>
-
         {/* 账户设置卡片 */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
           <div className="mb-4">
@@ -192,7 +175,7 @@ const Settings = () => {
           <div>
             <div
               className="flex items-center justify-between cursor-pointer py-2"
-              onClick={() => navigate("/settings/profile")}
+              onClick={() => navigate("/profile-edit")}
             >
               <div className="flex items-center">
                 <i className="ri-user-3-line text-gray-500 mr-3"></i>

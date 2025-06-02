@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import instance from '../../utils/axios';
+import { BasePage } from '../../theme';
 
 const PaymentPasswordSetting = () => {
   const navigate = useNavigate();
@@ -329,22 +330,17 @@ const PaymentPasswordSetting = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
-      {/* 顶部导航 */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-        <div className="flex items-center mb-2">
-          <button 
-            onClick={() => navigate('/settings')}
-            className="flex items-center text-gray-600 hover:text-gray-800"
-          >
-            <i className="ri-arrow-left-s-line text-xl mr-2"></i>
-            <span>返回</span>
-          </button>
-        </div>
-        <h2 className="text-lg font-medium">支付密码</h2>
-      </div>
-      
-      {/* 主要内容 */}
+    <BasePage
+      title="支付密码"
+      showHeader={true}
+      headerLeft={
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      }
+      headerTitle="支付密码"
+      backgroundColor="default"
+    >
       <div className="bg-white rounded-lg shadow-sm p-6">
         {error && (
           <div className="bg-red-50 text-red-500 p-3 rounded-lg mb-4">
@@ -360,7 +356,7 @@ const PaymentPasswordSetting = () => {
         
         {renderStepContent()}
       </div>
-    </div>
+    </BasePage>
   );
 };
 
