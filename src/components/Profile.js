@@ -336,9 +336,9 @@ const Profile = () => {
 
       {/* 功能菜单 */}
       {FEATURE_MENUS.map((menu, index) => (
-        <div key={index} className="bg-white rounded-lg p-3 mt-2 h-auto min-h-0">
+        <div key={index} className="bg-white rounded-lg p-3 mt-2 h-[120px]">
           <div className="text-base font-medium mb-3">{menu.title}</div>
-          <div className="grid grid-cols-3 gap-3 items-start">
+          <div className="grid grid-cols-3 gap-3 items-center h-[60px]">
             {menu.items.map((item, idx) => (
               <div
                 key={idx}
@@ -368,7 +368,7 @@ const Profile = () => {
           </div>
         
         {hasShop ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 items-start">
           <div 
               className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
               onClick={() => navigate(`/shop-edit/${shopId}`)}

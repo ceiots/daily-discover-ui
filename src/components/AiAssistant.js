@@ -713,161 +713,136 @@ const AiAssistant = ({ userInfo }) => {
   };
 
   // 实现Ollama流式请求
-  const fetchStreamResponse = async (message) => {
-    try {
-      console.log("开始请求时间: " + new Date().toLocaleTimeString());
-      
-      // 创建新的AbortController
-      abortControllerRef.current = new AbortController();
-      const signal = abortControllerRef.current.signal;
-      
-      // 检查会话是否已过期
-      const isSessionExpired = checkSessionExpired(currentSessionId);
-      if (isSessionExpired) {
-        console.log("当前会话已过期，创建新会话");
-        const newSessionId = createNewSession();
-        // 等待一小段时间确保会话创建完成
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      
-      // 准备发送到Ollama的数据
-      const requestData = {
-        model: "Qwen3:4b", // 或其他可用模型
-        prompt: message,
-        stream: true,
-        sessionId: currentSessionId, // 添加会话ID
-        deviceId: deviceId           // 添加设备ID
-      };
-
-      console.log(`发送请求: sessionId=${currentSessionId}, deviceId=${deviceId}`);
-
-      // 向Ollama API发送请求
-      console.log("发送请求时间: " + new Date().toLocaleTimeString());
-      
-      // 使用try-catch包装fetch请求
-      let response;
-      try {
-        response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            // 添加防缓存头
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-            // 添加会话和设备标识头
-            'X-Session-ID': currentSessionId,
-            'X-Device-ID': deviceId
-          },
-          body: JSON.stringify(requestData),
-          signal: signal
-        });
-      } catch (fetchError) {
-        // 处理网络错误
-        if (fetchError.name === 'AbortError') {
-          console.log("请求被中止");
-          return null;
-        }
-        throw fetchError;
-      }
-      
-      console.log("收到首次响应时间: " + new Date().toLocaleTimeString());
-
-      if (!response.ok) {
-        throw new Error(`API请求失败: ${response.status}`);
-      }
-
-      // 克隆响应以避免"Cannot pipe a locked stream"错误
-      const responseClone = response.clone();
-
-      // 简化流处理逻辑
-      const reader = responseClone.body.getReader();
-      const decoder = new TextDecoder();
-      
-      // 用于存储完整的响应
-      let streamedResponse = "";
-      let startTime = Date.now();
-
-      // 重置流式消息状态
-      setCurrentStreamingMessage("");
-      
-      // 读取流
-      let done = false;
-      while (!done) {
-        // 每次读取前检查会话是否仍然有效
-        if (checkSessionExpired(currentSessionId)) {
-          console.log("检测到会话已过期，中断流式接收");
-          if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-          }
-          break;
-        }
-        
-        // 使用try-catch包装reader.read()
-        let readResult;
-        try {
-          readResult = await reader.read();
-        } catch (readError) {
-          if (readError.name === 'AbortError') {
-            console.log("读取流被中止");
-            break;
-          }
-          throw readError;
-        }
-        
-        const { value, done: doneReading } = readResult;
-        done = doneReading;
-        
-        if (done) {
-          console.log(`流式响应完成，耗时 ${Date.now() - startTime}ms`);
-          break;
-        }
-            
-        const chunk = decoder.decode(value, { stream: true });
-            
-        // 直接添加到响应文本，后端已经处理好了文本内容
-        console.log("流式响应内容: " + chunk);  
-        streamedResponse += chunk;
-        // 更新UI显示
-        setCurrentStreamingMessage(streamedResponse);
-      }
-      
-      // 流式响应完成，将完整响应添加到聊天历史
-      if (streamedResponse) {
-        console.log("完整响应内容: ", streamedResponse.substring(0, 100) + "...");
-        setAiChatHistory(prev => [
-          ...prev,
-          { type: "ai", message: streamedResponse }
-        ]);
-      }
-      
-      // 清除流式消息
-      setCurrentStreamingMessage("");
-      
-      // 确保AbortController被清理
-      abortControllerRef.current = null;
-      
-      return streamedResponse;
-    } catch (error) {
-        console.error("流式响应出错:", error);
-        
-        // 显示友好的错误消息
-        setAiChatHistory(prev => [
-          ...prev,
-          { type: "ai", message: `抱歉，出现了错误: ${error.message}` }
-        ]);
-      return null;
-    } finally {
-      setIsTyping(false);
-      setIsLoading(false);
-      
-      // 清理资源
-      setCurrentStreamingMessage("");
-      
-      // 确保AbortController被清理
-      if (abortControllerRef.current) {
-        abortControllerRef.current = null;
-      }
+  const fetchStreamResponse = async (message, sessionId) => {
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+    
+    // 检查会话是否已过期
+    const isSessionExpired = checkSessionExpired(sessionId);
+    if (isSessionExpired) {
+      console.log("当前会话已过期，创建新会话");
+      const newSessionId = createNewSession();
+      // 等待一小段时间确保会话创建完成
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
+    
+    // 准备发送到Ollama的数据
+    const requestData = {
+      model: "Qwen3:4b", // 或其他可用模型
+      prompt: message,
+      stream: true,
+      sessionId: sessionId, // 添加会话ID
+      deviceId: deviceId           // 添加设备ID
+    };
+
+    console.log(`发送请求: sessionId=${sessionId}, deviceId=${deviceId}`);
+
+    // 向Ollama API发送请求
+    console.log("发送请求时间: " + new Date().toLocaleTimeString());
+    
+    // 使用try-catch包装fetch请求
+    let response;
+    try {
+      response = await fetch(`${API_BASE_URL}/ai/ollama/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // 添加防缓存头
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          // 添加会话和设备标识头
+          'X-Session-ID': sessionId,
+          'X-Device-ID': deviceId
+        },
+        body: JSON.stringify(requestData),
+        signal: signal
+      });
+    } catch (fetchError) {
+      // 处理网络错误
+      if (fetchError.name === 'AbortError') {
+        console.log("请求被中止");
+        return null;
+      }
+      throw fetchError;
+    }
+    
+    console.log("收到首次响应时间: " + new Date().toLocaleTimeString());
+
+    if (!response.ok) {
+      throw new Error(`API请求失败: ${response.status}`);
+    }
+
+    // 克隆响应以避免"Cannot pipe a locked stream"错误
+    const responseClone = response.clone();
+
+    // 简化流处理逻辑
+    const reader = responseClone.body.getReader();
+    const decoder = new TextDecoder();
+    
+    // 用于存储完整的响应
+    let streamedResponse = "";
+    let startTime = Date.now();
+
+    // 重置流式消息状态
+    setCurrentStreamingMessage("");
+    
+    // 读取流
+    let done = false;
+    while (!done) {
+      // 每次读取前检查会话是否仍然有效
+      if (checkSessionExpired(sessionId)) {
+        console.log("检测到会话已过期，中断流式接收");
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        break;
+      }
+      
+      // 使用try-catch包装reader.read()
+      let readResult;
+      try {
+        readResult = await reader.read();
+      } catch (readError) {
+        if (readError.name === 'AbortError') {
+          console.log("读取流被中止");
+          break;
+        }
+        throw readError;
+      }
+      
+      const { value, done: doneReading } = readResult;
+      done = doneReading;
+      
+      if (done) {
+        console.log(`流式响应完成，耗时 ${Date.now() - startTime}ms`);
+        break;
+      }
+          
+      const chunk = decoder.decode(value, { stream: true });
+          
+      // 直接添加到响应文本，后端已经处理好了文本内容
+      console.log("流式响应内容: " + chunk);  
+      streamedResponse += chunk;
+      // 更新UI显示
+      setCurrentStreamingMessage(streamedResponse);
+    }
+    
+    // 流式响应完成，将完整响应添加到聊天历史
+    if (streamedResponse) {
+      console.log("完整响应内容: ", streamedResponse.substring(0, 100) + "...");
+      setAiChatHistory(prev => [
+        ...prev,
+        { type: "ai", message: streamedResponse }
+      ]);
+    }
+    
+    // 清除流式消息
+    setCurrentStreamingMessage("");
+    
+    // 确保AbortController被清理
+    abortControllerRef.current = null;
+    
+    return streamedResponse;
   };
   
   // 检查会话是否已过期
@@ -884,50 +859,33 @@ const AiAssistant = ({ userInfo }) => {
   };
 
   const handleSendMessage = async () => {
-    if (!userMessage.trim()) return;
-
-    // 添加用户消息到聊天历史
-    setAiChatHistory((prev) => [
-      ...prev,
-      { type: "user", message: userMessage },
-    ]);
-
-    // 保存当前用户消息
-    const currentMessage = userMessage;
-
-    // 清空输入框
-    setUserMessage("");
-
-    // 显示AI正在输入的状态
-    setIsTyping(true);
-    setIsLoading(true);
-
-    // 随机选择一条推荐内容显示
-    const randomRecommendation =
-      quickReads[Math.floor(Math.random() * quickReads.length)];
-    setCurrentRecommendation(randomRecommendation);
-
-    // 滚动到最新消息位置
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    // 1. 终止上一个流
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      markSessionExpired(currentSessionId);
     }
-
-    // 自动展开聊天区域
-    setIsExpanded(true);
-
-    // 调用Ollama API获取流式响应
-    const response = await fetchStreamResponse(currentMessage);
-    
-    // 只有在获取完流式响应后，才更新推荐话题
-    if (response) {
-      updateSuggestedTopics(currentMessage);
-    }
-
-    // 聚焦输入框，方便继续输入
-    if (messageInputRef.current) {
-      messageInputRef.current.focus();
-    }
+    // 2. 生成新sessionId
+    const newSessionId = createNewSession();
+    setCurrentSessionId(newSessionId);
+    // 3. 发起新流式请求
+    fetchStreamResponse(userMessage, newSessionId);
   };
+
+  const handleCancelStreaming = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      markSessionExpired(currentSessionId);
+    }
+    setIsTyping(false);
+    setIsLoading(false);
+    setCurrentStreamingMessage("");
+  };
+
+  window.addEventListener('beforeunload', () => {
+    handleCancelStreaming();
+  });
 
   // 处理话题点击 - 直接发送到AI
   const handleTopicClick = async (topic) => {
@@ -957,7 +915,7 @@ const AiAssistant = ({ userInfo }) => {
     setIsExpanded(true);
 
     // 调用Ollama API获取流式响应
-    const response = await fetchStreamResponse(topic.text);
+    const response = await fetchStreamResponse(topic.text, currentSessionId);
     
     // 只有在获取完流式响应后，才更新推荐话题
     if (response) {
@@ -1039,16 +997,6 @@ const AiAssistant = ({ userInfo }) => {
     if (showFavoritesPanel) {
       setShowFavoritesPanel(false);
     }
-  };
-
-  const handleCancelStreaming = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    setIsTyping(false);
-    setIsLoading(false);
-    setCurrentStreamingMessage("");
   };
 
   return (
