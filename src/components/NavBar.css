@@ -288,7 +288,7 @@ nav a:nth-child(6) i, nav a:nth-child(6) span { animation-delay: 0.4s; }
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(to right, #7c3aed, #8b5cf6);
+  background: #fff;
 }
 
 .nav-item {

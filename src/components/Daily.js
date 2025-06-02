@@ -572,13 +572,13 @@ const Daily = () => {
             <div className="cart-icon" onClick={() => navigate("/cart")}>
               <i className="fas fa-shopping-cart"></i>
             </div>
-            <div className="user-icon" onClick={() => navigate("/profile")}>
+            {/* <div className="user-icon" onClick={() => navigate("/profile")}>
               <img 
                 src={userInfo?.avatar || DEFAULT_AVATAR} 
                   alt="用户头像"
                 onError={handleAvatarError}
               />
-            </div>
+            </div> */}
           </div>
         </div>
         
