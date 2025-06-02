@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../App";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
+import { BasePage } from "../theme";
 
 const Profile = () => {
   const { userInfo, refreshUserInfo, isLoggedIn } = useAuth();
@@ -144,21 +145,6 @@ const Profile = () => {
     }
   };
 
-  // 添加退出登录处理函数
-  const handleLogout = async () => {
-    try {
-      await instance.post("/user/logout");
-      // 清除本地存储
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      // 重置用户状态
-      refreshUserInfo();
-      // 跳转到登录页
-      navigate("/login");
-    } catch (error) {
-      console.error("退出登录失败:", error);
-    }
-  };
 
   // 在页面加载时检查
   useEffect(() => {
@@ -185,11 +171,6 @@ const Profile = () => {
           text: "收货地址", 
           onClick: () => navigate('/edit-address') 
         },
-        { 
-          icon: "ri-user-3-line", 
-          text: "个人信息", 
-          onClick: () => navigate('/settings/profile') 
-        },
       ]
     },
     {
@@ -215,11 +196,11 @@ const Profile = () => {
   ];
 
   return (
-    <div className="w-full h-auto mx-auto bg-gray-50 pb-[60px] profile-no-scroll" style={{ overflow: 'hidden' }}>
-      {/* 用户信息卡片 */}
-      <div className="bg-primary rounded-lg p-3 text-white">
-        <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative">
+    <BasePage
+      title="个人中心"
+      showHeader={true}
+      headerLeft={
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative" style={{ marginLeft: '30px' }}>
             <img
               src={
                 profileInfo?.avatar ||
@@ -236,24 +217,24 @@ const Profile = () => {
               title="点击更换头像"
             />
           </div>
-          <div className="flex-1">
-            <div className="font-medium text-lg">
-              {profileInfo?.nickname || "测试者"}
-            </div>
-            <div className="text-sm opacity-80">
-              会员等级：{profileInfo?.memberLevel || "普通会员"}
-            </div>
-          </div>
-          {/* 添加设置按钮 */}
-          <div 
-            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer"
-            onClick={() => navigate('/settings')}
-          >
-            <i className="ri-settings-3-line text-xl"></i>
-          </div>
+      }
+      headerTitle={<div className="flex-1" style={{ marginLeft: '30px' }}>
+        <div className="font-medium text-lg">
+          {profileInfo?.nickname || "测试者"}
         </div>
-      </div>
-
+        <div className="text-sm opacity-80">
+          会员等级：{profileInfo?.memberLevel || "普通会员"}
+        </div>
+      </div>}
+      headerRight={
+         <div className="cursor-pointer" style={{ marginRight: '10px' }}
+         onClick={() => navigate('/settings')}
+       >
+         <i className="ri-settings-3-line text-xl" style={{ color: '#fff' }}></i>
+       </div>
+      }
+    >
+    <div className="w-full h-auto mx-auto bg-gray-50 pb-[60px] profile-no-scroll" style={{ overflow: 'hidden' }}>
       {/* 订单管理 */}
       {false && (
       <div className="bg-white rounded-lg p-3">
@@ -391,6 +372,7 @@ const Profile = () => {
         )}
       </div>
     </div>
+    </BasePage>
   );
 };
 

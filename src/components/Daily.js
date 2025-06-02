@@ -693,46 +693,6 @@ const Daily = () => {
   // 修复DEFAULT_AVATAR引用
   const DEFAULT_AVATAR = "/default-avatar.png"; // 添加默认头像常量
 
-  // 修改顶部区域组件函数以修复引用错误
-  const renderHeader = () => {
-    return (
-      <div className="daily-header-compact">
-        <div className="header-top-row">
-          <div className="greeting-compact">
-            <h2>
-              {greeting}好，{userInfo?.nickname || "测试者"}！
-            </h2>
-            <p className="date-compact">
-              {formattedDate} {weekday} · {lunarDateInfo.month}
-              {lunarDateInfo.day}
-            </p>
-          </div>
-          <div className="header-icons">
-            <div className="cart-icon" onClick={() => navigate("/cart")}>
-              <i className="fas fa-shopping-cart"></i>
-            </div>
-            {/* <div className="user-icon" onClick={() => navigate("/profile")}>
-              <img 
-                src={userInfo?.avatar || DEFAULT_AVATAR} 
-                  alt="用户头像"
-                onError={handleAvatarError}
-              />
-            </div> */}
-          </div>
-        </div>
-
-        {/* <div className="weather-ai-row">
-          {weatherInfo && (
-            <div className="weather-compact">
-              <i className={`fas fa-${weatherInfo.icon} weather-icon`}></i>
-              <span>{weatherInfo.temperature}°C {weatherInfo.condition}</span>
-              <span className="weather-city"> {weatherInfo.city}</span>
-            </div>
-          )}
-        </div> */}
-      </div>
-    );
-  };
 
   // 添加滚动引用和处理函数
   const scrollRefs = {
@@ -756,17 +716,23 @@ const Daily = () => {
   // 调整主页面渲染，使用AiAssistant组件替换原有的AI相关部分
   return (
     <BasePage
-      title="设置"
       showHeader={true}
       headerLeft={
-        <button className="btn" onClick={() => navigate("/profile")}>
-          <i className="fas fa-arrow-left"></i>
-        </button>
+        <div style={{ marginLeft: '30px', fontSize: '13px' }}>
+            <h2>
+              {greeting}好，{userInfo?.nickname || "测试者"}！
+            </h2>
+            <p className="date-compact">
+              {formattedDate} {weekday} · {lunarDateInfo.month}
+              {lunarDateInfo.day}
+            </p>
+          </div>
       }
-      headerTitle="设置"
+      headerRight={<div style={{ marginRight: '10px' }} onClick={() => navigate("/cart")}>
+      <i className="fas fa-shopping-cart"></i>
+    </div>}
     >
       <div className="daily-page-container">
-        {renderHeader()}
         {/* 使用AiAssistant组件替代原有的AI功能 */}
         <AiAssistant userInfo={userInfo} />
         {renderTodayFocus()}

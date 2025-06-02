@@ -542,7 +542,8 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  height: 56px;
+  min-height: 70px;
+  height: auto;
   color: #fff;
   background: #6B4EFF; /* 主紫色 */
   position: relative;

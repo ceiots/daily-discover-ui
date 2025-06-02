@@ -42,7 +42,7 @@ const BasePage = ({
       <header className="page-header bg-gradient-primary shadow-sm">
         {headerLeft && <div className="page-header-left">{headerLeft}</div>}
         <h1 className="page-header-title">{headerTitle || title}</h1>
-        {headerRight && <div className="page-header-right"></div>}
+        {headerRight && <div className="page-header-right">{headerRight}</div>}
       </header>
     );
   };

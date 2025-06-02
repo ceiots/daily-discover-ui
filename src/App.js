@@ -27,7 +27,6 @@ import PropTypes from 'prop-types';
 import Settings from './components/settings/Settings';
 import PaymentPassword from './components/PaymentPassword';
 import PaymentPasswordSetting from './components/settings/PaymentPasswordSetting'; // 导入支付密码设置页面
-import CreationPage from './components/Creation/CreationPage'; // 创作中心页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
 import EcommerceCreationPage from './components/Creation/EcommerceCreationPage'; // 电商创建页面
 import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
@@ -230,7 +229,6 @@ const App = () => {
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/payment-password" element={<PaymentPassword />} />
               <Route path="/payment-password-setting" element={<ProtectedRoute><PaymentPasswordSetting /></ProtectedRoute>} />
-              <Route path="/creation" element={<ProtectedRoute><CreationPage /></ProtectedRoute>} />
               <Route path="/content-creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
               <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
               <Route path="/category-manage" element={<ProtectedRoute><CategoryManagePage /></ProtectedRoute>} />

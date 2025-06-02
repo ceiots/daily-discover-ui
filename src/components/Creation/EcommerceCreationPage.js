@@ -79,16 +79,32 @@ const EcommerceCreationPage = () => {
     });
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
+  const handleImageUpload = (input) => {
+    let files = [];
+    // 本地文件上传
+    if (input && input.target && input.target.files) {
+      files = Array.from(input.target.files);
+    } else if (Array.isArray(input)) {
+      // URL上传
+      files = input;
+    }
     if (files.length > 0) {
-      // 检查文件大小
-      const maxSizeInMB = 10; // 10MB限制
+      // 如果是URL字符串
+      if (typeof files[0] === 'string') {
+        const newImages = files.map((url, index) => ({
+          id: Date.now() + index,
+          url: url
+        }));
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          images: [...prevFormData.images, ...newImages],
+        }));
+        return;
+      }
+      // 本地文件上传逻辑
+      const maxSizeInMB = 10;
       const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-
-      // 过滤出过大的文件
       const oversizedFiles = files.filter((file) => file.size > maxSizeInBytes);
-
       if (oversizedFiles.length > 0) {
         alert(
           `以下文件超过${maxSizeInMB}MB大小限制，请压缩后再上传：\n${oversizedFiles
@@ -97,50 +113,36 @@ const EcommerceCreationPage = () => {
         );
         return;
       }
-
-      // 显示上传中状态
       setLoading(true);
-
-      // 创建FormData对象用于文件上传
-      const formData = new FormData();
+      const formDataObj = new FormData();
       files.forEach((file) => {
-        formData.append("file", file);
+        formDataObj.append("file", file);
       });
-
-      // 调用上传接口
       instance({
         method: "post",
         url: "/product/upload",
-        data: formData,
+        data: formDataObj,
         headers: {
-          "Content-Type": undefined, // 让浏览器自动设置正确的Content-Type和boundary
+          "Content-Type": undefined,
         },
       })
         .then((response) => {
           if (response.data && response.data.code === 200) {
             const responseData = response.data.data;
-            // 检查后端返回的数据结构
             let imageUrls = [];
-
             if (responseData.urls && Array.isArray(responseData.urls)) {
-              // 如果返回了urls数组，使用它
               imageUrls = responseData.urls;
             } else if (responseData.url) {
-              // 如果只返回了单个url，转换为数组
               imageUrls = [responseData.url];
             } else {
-              // 如果数据结构不符合预期，提示错误
               console.error("图片上传响应格式不正确:", responseData);
               alert("图片上传响应格式不正确，请稍后重试");
               return;
             }
-
-            // 将返回的URL添加到表单状态中
             const newImages = imageUrls.map((url, index) => ({
               id: Date.now() + index,
               url: url,
             }));
-
             setFormData((prevFormData) => ({
               ...prevFormData,
               images: [...prevFormData.images, ...newImages],
@@ -880,17 +882,7 @@ const EcommerceCreationPage = () => {
                       onClick={() => {
                         const url = prompt("请输入图片URL");
                         if (url && url.trim()) {
-                          // 添加URL图片到表单
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            images: [
-                              ...prevFormData.images,
-                              {
-                                id: Date.now(),
-                                url: url.trim(),
-                              },
-                            ],
-                          }));
+                          handleImageUpload([url.trim()]);
                         }
                       }}
                       className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
@@ -937,17 +929,7 @@ const EcommerceCreationPage = () => {
                       onClick={() => {
                         const url = prompt("请输入图片URL");
                         if (url && url.trim()) {
-                          // 添加URL图片到表单
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            images: [
-                              ...prevFormData.images,
-                              {
-                                id: Date.now(),
-                                url: url.trim(),
-                              },
-                            ],
-                          }));
+                          handleImageUpload([url.trim()]);
                         }
                       }}
                       className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
