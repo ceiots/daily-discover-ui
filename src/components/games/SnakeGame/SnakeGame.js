@@ -8,8 +8,7 @@ const GRID_SIZE = 20;
 const INITIAL_SNAKE = [{ x: 10, y: 10 }];
 const INITIAL_DIRECTION = { x: 0, y: -1 };
 const INITIAL_FOOD = { x: 15, y: 15 };
-const SWIPE_THRESHOLD = 20; // 降低滑动阈值，提高灵敏度
-
+const DIRECTION_CHANGE_THRESHOLD = 100; // 毫秒
 
 const SnakeGame = ({ onExit = () => {} }) => {
   const [snake, setSnake] = useState(INITIAL_SNAKE);
@@ -23,13 +22,11 @@ const SnakeGame = ({ onExit = () => {} }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [difficulty, setDifficulty] = useState('normal');
   const [highScore, setHighScore] = useState(0);
-  const [showControls, setShowControls] = useState(true);
   
   const gameLoopRef = useRef();
-  const touchStartRef = useRef({ x: 0, y: 0 });
-  const lastDirectionChangeRef = useRef(Date.now()); // 用于防止方向变化过快
-  const directionChangeThreshold = 100; // 毫秒
+  const lastDirectionChangeRef = useRef(Date.now());
   const gameBoardRef = useRef(null);
+  const touchStartRef = useRef({ x: 0, y: 0 });
   
   // 游戏控制按钮
   const toggleGame = useCallback(() => {
@@ -113,7 +110,7 @@ const SnakeGame = ({ onExit = () => {} }) => {
         });
         setFood(generateFood(newSnake));
         
-        // 增加速度
+        // 增加速度（但不超过最大速度）
         setSpeed(prev => Math.max(80, prev - 2));
       } else {
         newSnake.pop();
@@ -139,31 +136,53 @@ const SnakeGame = ({ onExit = () => {} }) => {
     const now = Date.now();
     
     // 防止方向变化过快
-    if (now - lastDirectionChangeRef.current < directionChangeThreshold) {
+    if (now - lastDirectionChangeRef.current < DIRECTION_CHANGE_THRESHOLD) {
       return;
     }
     
-    // 简化方向控制逻辑，直接使用GameContainer传来的方向对象
+    // 处理虚拟按钮的方向
+    let newDir = dir;
+    if (typeof dir === 'string') {
+      switch (dir) {
+        case 'up':
+          newDir = { x: 0, y: -1 };
+          break;
+        case 'down':
+          newDir = { x: 0, y: 1 };
+          break;
+        case 'left':
+          newDir = { x: -1, y: 0 };
+          break;
+        case 'right':
+          newDir = { x: 1, y: 0 };
+          break;
+        default:
+          return; // 忽略无效输入
+      }
+    }
+    
     // 防止180度转向
     if (
-      (direction.x === 1 && dir.x === -1) ||
-      (direction.x === -1 && dir.x === 1) ||
-      (direction.y === 1 && dir.y === -1) ||
-      (direction.y === -1 && dir.y === 1)
+      (direction.x === 1 && newDir.x === -1) ||
+      (direction.x === -1 && newDir.x === 1) ||
+      (direction.y === 1 && newDir.y === -1) ||
+      (direction.y === -1 && newDir.y === 1)
     ) {
-      // 如果是180度转向，忽略这次输入
       return;
     }
     
     // 设置新方向
-    setDirection(dir);
+    setDirection(newDir);
     lastDirectionChangeRef.current = now;
   }, [direction, gameRunning, gameOver]);
 
   // 添加键盘控制
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!gameRunning || gameOver) return;
+      if (!gameRunning && !gameOver && e.key === ' ') {
+        toggleGame();
+        return;
+      }
       
       switch (e.key) {
         case 'ArrowUp':
@@ -192,6 +211,57 @@ const SnakeGame = ({ onExit = () => {} }) => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleDirectionChange, gameRunning, gameOver, toggleGame]);
+
+  // 添加触摸控制
+  useEffect(() => {
+    const gameBoard = gameBoardRef.current;
+    if (!gameBoard) return;
+    
+    const handleTouchStart = (e) => {
+      const touch = e.touches[0];
+      touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    };
+    
+    const handleTouchMove = (e) => {
+      if (!gameRunning || gameOver) return;
+      e.preventDefault(); // 阻止页面滚动
+      
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - touchStartRef.current.x;
+      const deltaY = touch.clientY - touchStartRef.current.y;
+      
+      // 需要一定的滑动距离才触发方向变化
+      const minSwipe = 20;
+      
+      if (Math.abs(deltaX) > minSwipe || Math.abs(deltaY) > minSwipe) {
+        // 确定主要方向（水平或垂直）
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          // 水平移动
+          handleDirectionChange({
+            x: deltaX > 0 ? 1 : -1,
+            y: 0
+          });
+        } else {
+          // 垂直移动
+          handleDirectionChange({
+            x: 0,
+            y: deltaY > 0 ? 1 : -1
+          });
+        }
+        
+        // 更新起始点，使连续滑动更流畅
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+      }
+    };
+    
+    gameBoard.addEventListener('touchstart', handleTouchStart);
+    gameBoard.addEventListener('touchmove', handleTouchMove, { passive: false });
+    
+    return () => {
+      gameBoard.removeEventListener('touchstart', handleTouchStart);
+      gameBoard.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [gameRunning, gameOver, handleDirectionChange]);
 
   // 更改难度
   const changeDifficulty = useCallback((level) => {
@@ -283,7 +353,7 @@ const SnakeGame = ({ onExit = () => {} }) => {
                 </div>
               </div>
               <div className="settings-tip">
-                <p>提示: 使用键盘方向键或屏幕下方的方向按钮控制蛇的移动</p>
+                <p>提示: 使用键盘方向键、屏幕下方的方向按钮或在游戏区域滑动来控制蛇的移动</p>
               </div>
             </div>
           )}
@@ -323,6 +393,12 @@ const SnakeGame = ({ onExit = () => {} }) => {
                     top: `${(segment.y / GRID_SIZE) * 100}%`,
                     width: `${100 / GRID_SIZE}%`,
                     height: `${100 / GRID_SIZE}%`,
+                    transform: index === 0 ? `rotate(${
+                      direction.x === 1 ? '0deg' : 
+                      direction.x === -1 ? '180deg' : 
+                      direction.y === 1 ? '90deg' : 
+                      '-90deg'
+                    })` : 'none',
                   }}
                 />
               ))}
@@ -338,6 +414,15 @@ const SnakeGame = ({ onExit = () => {} }) => {
                 }}
               />
 
+              {/* 游戏控制提示 */}
+              {!gameOver && !showSettings && (
+                <div className="swipe-hint">
+                  <div className="swipe-hint-text">
+                    在此区域滑动控制蛇移动方向
+                  </div>
+                </div>
+              )}
+              
               {/* 游戏结束遮罩 */}
               {gameOver && (
                 <div className="game-over-overlay">

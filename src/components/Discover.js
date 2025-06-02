@@ -45,6 +45,17 @@ const mockDiscoverData = {
   // 1. 推荐创作
   recommendedContent: [
     { 
+      id: 'rc0',
+      title: '数字游民的高效远程办公指南',
+      author: { name: '远程达人', avatar: DEFAULT_AVATAR },
+      summary: '掌握远程协作工具与自律方法，提升数字游民的工作效率与生活质量',
+      category: '生活',
+      image: 'https://picsum.photos/seed/remote-work/800/500',
+      readCount: '2.1K',
+      likeCount: '178',
+      aiInsight: 'AI总结：善用时间管理App与视频会议工具，远程办公效率提升30%' // 添加AI总结
+    },
+    { 
       id: 'rc1', 
       title: '如何利用AI提升工作效率', 
       author: { name: '科技先锋', avatar: DEFAULT_AVATAR },

@@ -39,7 +39,6 @@
   align-items: center;
 }
 
-
 .decorative-bg {
   position: absolute;
   inset: 0;
@@ -294,24 +293,35 @@
 }
 
 .snake-head {
-  background: linear-gradient(135deg, #4ade80, #22c55e);
-  border-radius: 30%;
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+  border-radius: 40%;
+  background-color: #4caf50;
+  border: 2px solid #388e3c;
+  position: absolute;
+  transition: all 0.1s linear;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .snake-body {
-  background-color: #4ade80;
-  border-radius: 20%;
-  box-shadow: 0 0 4px rgba(74, 222, 128, 0.4);
+  border-radius: 40%;
+  background-color: #81c784;
+  border: 1px solid #4caf50;
+  position: absolute;
+  transition: all 0.1s linear;
   z-index: 1;
+  box-sizing: border-box;
 }
 
 .food {
-  background: radial-gradient(#f87171, #ef4444);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
-  animation: pulse 1s infinite;
+  background-color: #f44336;
+  border: 2px solid #d32f2f;
+  position: absolute;
+  transition: all 0.1s linear;
+  z-index: 1;
+  box-sizing: border-box;
+  box-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+  animation: pulse 1s infinite alternate;
 }
 
 .game-over-overlay {
@@ -1007,5 +1017,49 @@
   .game-control-btn {
     padding: 8px 16px;
     font-size: 14px;
+  }
+}
+
+/* 添加或更新CSS以支持蛇头旋转和触摸提示 */
+
+@keyframes pulse {
+  from {
+    transform: scale(0.8);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.swipe-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  opacity: 0.7;
+  animation: fadeOut 3s forwards;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.swipe-hint-text {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  font-size: 14px;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
   }
 }

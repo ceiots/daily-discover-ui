@@ -30,19 +30,6 @@ const mockVideosData = [
     category: '科技'
   },
   {
-    id: 'v3',
-    title: '15分钟居家健身全套动作',
-    description: '专业健身教练设计的15分钟高效居家锻炼方案，无需器械，针对全身主要肌群，帮助你在家也能保持良好身材。',
-    creator: '健康生活',
-    viewCount: '32.6万',
-    duration: '15:20',
-    cover: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
-    videoUrl: 'https://cdn.jwplayer.com/manifests/pZxWPRg4.m3u8',
-    aiSummary: 'AI摘要：无需器械，燃脂效果优于60%同类视频',
-    tags: ['健身', '健康', '运动'],
-    category: '健康'
-  },
-  {
     id: 'v5',
     title: '3种简单美味的快手早餐',
     description: '忙碌生活中的健康早餐解决方案，3种只需10分钟就能完成的营养均衡早餐，既美味又能提供持久能量。',

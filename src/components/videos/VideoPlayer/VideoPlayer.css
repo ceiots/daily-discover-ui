@@ -371,4 +371,58 @@
   .video-big-play-button i {
     font-size: 1.2rem;
   }
+}
+
+/* 添加视频质量控制相关样式 */
+.video-quality-control {
+  position: relative;
+  margin-right: 10px;
+}
+
+.video-quality-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.quality-label {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+.video-quality-menu {
+  position: absolute;
+  bottom: 40px;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  padding: 5px 0;
+  min-width: 100px;
+  display: none;
+  z-index: 10;
+}
+
+.video-quality-control:hover .video-quality-menu {
+  display: block;
+}
+
+.video-quality-option {
+  padding: 8px 15px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.video-quality-option:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.video-quality-option.active {
+  color: #1890ff;
+  font-weight: bold;
 } 
