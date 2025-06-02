@@ -98,12 +98,6 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
-  // 调试日志函数
-  const debugLog = (...args) => {
-    if (DEBUG_MODE) {
-      console.log(...args);
-    }
-  };
 
   // 创建代码块组件
   const CodeBlock = ({ language, code }) => {
@@ -394,33 +388,6 @@ const AiAssistant = ({ userInfo }) => {
     }
   }, [currentRecommendation]);
   
-  // 使用MutationObserver监控聊天内容变化并自动滚动
-  useEffect(() => {
-    // 如果没有聊天历史区域的引用，则返回
-    if (!chatEndRef.current) return;
-    
-    // 创建MutationObserver实例
-    const observer = new MutationObserver(() => {
-      // 当内容变化时，滚动到底部
-      if (chatEndRef.current) {
-        chatEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      }
-    });
-    
-    // 获取聊天历史容器
-    const chatHistoryContainer = document.querySelector('.ai-chat-history');
-    if (chatHistoryContainer) {
-      // 配置观察选项
-      const config = { childList: true, subtree: true, characterData: true };
-      // 开始观察
-      observer.observe(chatHistoryContainer, config);
-    }
-    
-    // 清理函数
-    return () => {
-      observer.disconnect();
-    };
-  }, [isExpanded, currentStreamingMessage]); // 当展开状态或流式消息变化时重新设置
   
   // 监听suggestedTopics变化，初始化和更新后重新初始化轮播
   useEffect(() => {
@@ -1074,6 +1041,15 @@ const AiAssistant = ({ userInfo }) => {
     }
   };
 
+  const handleCancelStreaming = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setIsTyping(false);
+    setIsLoading(false);
+    setCurrentStreamingMessage("");
+  };
 
   return (
     <div className="ai-assistant-container">
@@ -1125,6 +1101,16 @@ const AiAssistant = ({ userInfo }) => {
           >
             <i className="fas fa-paper-plane"></i>
           </button>
+          {(isLoading || isTyping || (currentStreamingMessage && currentStreamingMessage.trim() !== '')) && (
+            <button
+              className="ai-cancel-button"
+              onClick={handleCancelStreaming}
+              aria-label="取消"
+              style={{ marginLeft: 8 }}
+            >
+              <i className="fas fa-times"></i> 取消
+            </button>
+          )}
         </div>
 
         {/* 猜你想了解 - 始终显示 */}

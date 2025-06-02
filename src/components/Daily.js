@@ -556,32 +556,6 @@ const Daily = () => {
     );
   };
 
-  // 渲染热门文章卡片
-  const renderHotArticleCard = (article) => {
-    // 确保使用unsplash图片
-    const imageUrl = article.image.includes('unsplash.com') 
-      ? article.image 
-      : `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000) + 1500000000}-${Math.random().toString(36).substring(2, 8)}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80`;
-    
-    return (
-      <div key={article.id} className="hot-article-card">
-        <div className="article-image-container">
-          <img src={imageUrl} alt={article.title} className="article-image" />
-          <div className="article-tag">{article.tag}</div>
-        </div>
-        <div className="article-content">
-          <h4 className="article-title">{article.title}</h4>
-          <div className="article-meta">
-            <span className="article-time">{article.publishTime}</span>
-            <span className="article-views">
-              <i className="fas fa-eye"></i> {article.views}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // 修复DEFAULT_AVATAR引用
   const DEFAULT_AVATAR = "/default-avatar.png"; // 添加默认头像常量
 

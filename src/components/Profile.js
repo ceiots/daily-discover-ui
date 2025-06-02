@@ -237,7 +237,7 @@ const Profile = () => {
   return (
     <div className="w-full min-h-screen mx-auto bg-gray-50 pb-[60px]">
       {/* 用户信息卡片 */}
-      <div className="bg-primary rounded-lg p-4 text-white">
+      <div className="bg-primary rounded-lg p-3 text-white">
         <div className="flex items-center space-x-4">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative">
             <img
@@ -274,7 +274,7 @@ const Profile = () => {
 
       {/* 订单管理 */}
       {false && (
-      <div className="bg-white rounded-lg p-4">
+      <div className="bg-white rounded-lg p-3">
         <div className="flex items-center justify-between mb-3">
           <div className="text-base font-medium">我的订单</div>
             <div
@@ -336,17 +336,17 @@ const Profile = () => {
 
       {/* 功能菜单 */}
       {FEATURE_MENUS.map((menu, index) => (
-        <div key={index} className="bg-white rounded-lg p-4 mt-3">
+        <div key={index} className="bg-white rounded-lg p-3 mt-2 h-auto min-h-0">
           <div className="text-base font-medium mb-3">{menu.title}</div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 items-start">
             {menu.items.map((item, idx) => (
               <div
                 key={idx}
-                className="flex flex-col items-center py-3 cursor-pointer"
+                className="flex flex-col items-center py-2 cursor-pointer"
                 onClick={item.onClick}
               >
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
-                  <i className={`${item.icon} text-primary text-xl`}></i>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                  <i className={`${item.icon} text-primary text-lg`}></i>
                 </div>
                 <div className="text-xs">{item.text}</div>
             </div>
@@ -356,7 +356,7 @@ const Profile = () => {
       ))}
 
       {/* 店铺信息卡片 */}
-      <div className="bg-white rounded-lg p-4 mt-3">
+      <div className="bg-white rounded-lg p-3 mt-2">
         <div className="flex items-center justify-between mb-3">
           <div className="text-base font-medium">我的店铺</div>
           <div
@@ -370,32 +370,32 @@ const Profile = () => {
         {hasShop ? (
         <div className="grid grid-cols-2 gap-3">
           <div 
-              className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
+              className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
               onClick={() => navigate(`/shop-edit/${shopId}`)}
           >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
-                <i className="ri-store-2-line text-primary text-xl"></i>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-store-2-line text-primary text-lg"></i>
               </div>
               <div className="text-xs mt-1">店铺设置</div>
           </div>
           
           <div 
-              className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer"
+              className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
             onClick={() => navigate('/product-manage')}
           >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-1">
-                <i className="ri-shopping-basket-2-line text-primary text-xl"></i>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-shopping-basket-2-line text-primary text-lg"></i>
               </div>
               <div className="text-xs mt-1">商品管理</div>
             </div>
           </div>
         ) : (
           <div 
-            className="flex flex-col items-center justify-center py-5 bg-gray-50 rounded-lg cursor-pointer"
+            className="flex flex-col items-center justify-center py-3 bg-gray-50 rounded-lg cursor-pointer"
             onClick={() => navigate('/create-shop')}
           >
-            <i className="ri-store-2-line text-primary text-3xl mb-2"></i>
-            <div className="text-sm text-gray-600 mb-2">您还没有创建店铺</div>
+            <i className="ri-store-2-line text-primary text-2xl mb-1"></i>
+            <div className="text-sm text-gray-600 mb-1">您还没有创建店铺</div>
             <button 
               className="px-4 py-1.5 bg-primary text-white text-xs rounded-full"
               onClick={(e) => {

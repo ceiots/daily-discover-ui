@@ -303,8 +303,8 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
             name: `${level.height}p`
           })));
           
-          // 准备好后尝试播放
-          try {
+            // 准备好后尝试播放
+            try {
             const playPromise = videoRef.current.play();
             if (playPromise !== undefined) {
               playPromise.then(() => {
@@ -399,7 +399,7 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
     return () => {
       if (hlsRef.current) {
         try {
-          hlsRef.current.destroy();
+        hlsRef.current.destroy();
         } catch (error) {
           console.error('HLS销毁错误:', error);
         }
@@ -450,7 +450,7 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
     }
     
     // 销毁HLS实例
-    if (hlsRef.current) {
+      if (hlsRef.current) {
       try {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -485,56 +485,56 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
         </div>
         
         <div className="video-player-wrapper">
-          <video
-            ref={videoRef}
+        <video
+          ref={videoRef}
             className="video-element"
-            onClick={togglePlay}
-            onTimeUpdate={handleTimeUpdate}
-            onLoadedMetadata={handleLoadedMetadata}
-            onError={handleVideoError}
-            onWaiting={handleWaiting}
-            onCanPlay={handleCanPlay}
-            onEnded={handleEnded}
-            playsInline
-            crossOrigin="anonymous"
-          />
-          
-          {isLoading && (
-            <div className="video-loading">
-              <div className="video-loading-spinner"></div>
+          onClick={togglePlay}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onError={handleVideoError}
+          onWaiting={handleWaiting}
+          onCanPlay={handleCanPlay}
+          onEnded={handleEnded}
+          playsInline
+          crossOrigin="anonymous"
+        />
+        
+        {isLoading && (
+          <div className="video-loading">
+            <div className="video-loading-spinner"></div>
               <div className="video-loading-text">加载中...</div>
-            </div>
-          )}
-          
-          {loadError && (
-            <div className="video-error">
+          </div>
+        )}
+        
+        {loadError && (
+          <div className="video-error">
               <div className="video-error-icon">⚠️</div>
               <div className="video-error-text">{loadError}</div>
               <button className="video-error-retry" onClick={() => window.location.reload()}>重试</button>
-            </div>
-          )}
-          
-          {!isPlaying && !isLoading && !loadError && (
-            <div className="video-play-overlay" onClick={togglePlay}>
+          </div>
+        )}
+        
+        {!isPlaying && !isLoading && !loadError && (
+          <div className="video-play-overlay" onClick={togglePlay}>
               <div className="video-big-play-button">
                 <i className="fas fa-play"></i>
               </div>
-            </div>
-          )}
-          
+          </div>
+        )}
+        
           <div className={`video-controls ${showControls ? 'show' : ''}`}>
             <div className="video-progress">
-              <input 
-                type="range"
+            <input
+              type="range"
                 className="video-progress-bar"
                 value={currentTime}
-                min="0"
-                max={duration || 0}
+              min="0"
+              max={duration || 0}
                 step="0.1"
-                onChange={handleProgressChange}
-              />
-            </div>
-            
+              onChange={handleProgressChange}
+            />
+          </div>
+          
             <div className="video-controls-bottom">
               <div className="video-controls-left">
                 <button className="video-control-button" onClick={togglePlay}>
@@ -544,18 +544,18 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
                 <div className="video-volume-control">
                   <button className="video-control-button" onClick={toggleMute}>
                     {volume === 0 ? <i className="fas fa-volume-mute"></i> : <i className="fas fa-volume-up"></i>}
-                  </button>
-                  <input 
-                    type="range"
+              </button>
+              <input
+                type="range"
                     className="video-volume-slider"
                     value={volume}
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    onChange={handleVolumeChange}
-                  />
-                </div>
-                
+                min="0"
+                max="1"
+                step="0.1"
+                onChange={handleVolumeChange}
+              />
+            </div>
+            
                 <div className="video-time-display">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </div>
@@ -589,7 +589,7 @@ const VideoPlayer = ({ videoSrc, title, onClose, creator = '未知创作者' }) 
                 )}
                 <button className="video-control-button" onClick={toggleFullScreen}>
                   {isFullScreen ? <i className="fas fa-compress"></i> : <i className="fas fa-expand"></i>}
-                </button>
+            </button>
               </div>
             </div>
           </div>

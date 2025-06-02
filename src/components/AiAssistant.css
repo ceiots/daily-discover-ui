@@ -1748,3 +1748,36 @@
   width: 100%;
 }
 
+.ai-cancel-button {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 3 12px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+}
+
+.ai-cancel-button:hover {
+  background: rgba(239, 68, 68, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 7px rgba(239, 68, 68, 0.4);
+}
+
+.ai-cancel-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
+}
+
+.ai-cancel-button i {
+  font-size: 0.65rem;
+}
+
