@@ -626,7 +626,6 @@ const DiscoverPage = () => {
         </div> */}
         
       </div>
-      <NavBar />
     </div>
   );
 };

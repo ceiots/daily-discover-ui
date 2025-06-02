@@ -182,7 +182,7 @@ const App = () => {
     // 获取当前路径
     const currentPath = window.location.pathname;
     // 这些路径已经在自己的页面中引入了NavBar，不需要全局显示
-    const pathsWithoutNavBar = ['/login', '/register', '/forgot-password'];
+    const pathsWithoutNavBar = ['/login', '/register', '/forgot-password', '/ecommerce-creation'];
     return !pathsWithoutNavBar.includes(currentPath);
   };
 

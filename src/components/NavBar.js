@@ -36,7 +36,6 @@ const NavBar = ({ className }) => {
           {isActive('/discover') && <div className="nav-indicator"></div>}
         </Link>
       </div>
-      <div className="nav-bar-safe-area"></div>
     </div>
   );
 };

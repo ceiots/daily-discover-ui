@@ -95,20 +95,6 @@
   font-size: var(--register-font-size-xxs);
 }
 
-/* 底部导航栏样式 */
-.bottom-nav {
-  height: 3rem;
-}
-
-.bottom-nav-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.bottom-nav-add {
-  width: 2.5rem;
-  height: 2.5rem;
-}
 
 /* Toast 样式 */
 .toast {

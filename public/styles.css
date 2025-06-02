@@ -14,10 +14,6 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* 底部导航栏适配底部安全区域 */
-.bottom-nav {
-  padding-bottom: var(--sab, 0);
-}
 
 /* 顶部导航栏适配刘海屏 */
 .top-nav {

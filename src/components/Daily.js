@@ -624,7 +624,6 @@ const Daily = () => {
       {/* {renderHistoryEvents()} */}
       {renderRecommendations()}
       {/* 其他内容... */}
-      <NavBar />
   </div>
 );
 };

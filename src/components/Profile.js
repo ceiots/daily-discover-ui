@@ -235,7 +235,7 @@ const Profile = () => {
   ];
 
   return (
-    <div className="w-full min-h-screen mx-auto bg-gray-50 pb-[60px]">
+    <div className="w-full h-auto mx-auto bg-gray-50 pb-[60px] profile-no-scroll" style={{ overflow: 'hidden' }}>
       {/* 用户信息卡片 */}
       <div className="bg-primary rounded-lg p-3 text-white">
         <div className="flex items-center space-x-4">
@@ -356,7 +356,7 @@ const Profile = () => {
       ))}
 
       {/* 店铺信息卡片 */}
-      <div className="bg-white rounded-lg p-3 mt-2">
+      <div className="bg-white rounded-lg p-3 mt-2 h-[100px]">
         <div className="flex items-center justify-between mb-3">
           <div className="text-base font-medium">我的店铺</div>
           <div

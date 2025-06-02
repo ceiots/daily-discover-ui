@@ -100,11 +100,6 @@ input::-webkit-inner-spin-button {
     line-height: 1.2;
 }
 
-/* 底部导航栏样式 */
-.bottom-nav {
-    height: 56px;
-    backdrop-filter: blur(8px);
-}
 
 /* 图标样式 */
 .icon-container {

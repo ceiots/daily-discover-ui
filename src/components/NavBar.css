@@ -269,9 +269,6 @@ nav a:nth-child(6) i, nav a:nth-child(6) span { animation-delay: 0.4s; }
   background-color: transparent;
 }
 
-.bottom-nav {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
 
 .nav-bar {
   display: flex;
@@ -360,20 +357,10 @@ nav a:nth-child(6) i, nav a:nth-child(6) span { animation-delay: 0.4s; }
   box-shadow: 0 2px 5px rgba(124, 58, 237, 0.3);
 }
 
-.nav-bar-safe-area {
-  height: env(safe-area-inset-bottom, 0px);
-  background-color: white;
-  width: 100%;
-}
 
 /* 确保顶部导航栏适配刘海屏 */
 .top-nav .nav-bar {
   padding-top: env(safe-area-inset-top, 0px);
-}
-
-/* 确保底部导航栏适配底部安全区域 */
-.bottom-nav .nav-bar-safe-area {
-  height: env(safe-area-inset-bottom, 0px);
 }
 
 /* 适配不同设备 */
@@ -386,30 +373,6 @@ nav a:nth-child(6) i, nav a:nth-child(6) span { animation-delay: 0.4s; }
 @media (min-width: 390px) {
   .nav-item {
     padding: 5px 25px;
-  }
-}
-
-/* 暗色模式支持 */
-@media (prefers-color-scheme: dark) {
-  .nav-bar {
-    background: #1f2937;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-  }
-  
-  .nav-item {
-    color: #94a3b8;
-  }
-  
-  .nav-item.active {
-    color: #a78bfa;
-  }
-  
-  .nav-indicator {
-    background-color: #a78bfa;
-  }
-  
-  .nav-bar-safe-area {
-    background-color: #1f2937;
   }
 }
 
