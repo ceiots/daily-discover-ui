@@ -211,26 +211,6 @@ const Profile = () => {
           onClick: () => navigate('/my-content') 
         }
       ]
-    },
-    {
-      title: "设置",
-      items: [
-        { 
-          icon: "ri-settings-3-line", 
-          text: "账户设置", 
-          onClick: () => navigate('/settings') 
-        },
-        { 
-          icon: "ri-lock-password-line", 
-          text: "支付密码", 
-          onClick: () => navigate('/payment-password') 
-        },
-        { 
-          icon: "ri-logout-box-r-line", 
-          text: "退出登录", 
-          onClick: handleLogout 
-        }
-      ]
     }
   ];
 
@@ -251,21 +231,23 @@ const Profile = () => {
             <input
               type="file"
               accept="image/*"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               onChange={handleAvatarUpload}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              title="点击更换头像"
             />
           </div>
           <div className="flex-1">
-            <div className="text-lg font-medium">
-              {profileInfo?.nickname || "加载中..."}
+            <div className="font-medium text-lg">
+              {profileInfo?.nickname || "测试者"}
             </div>
-            <div className="text-sm opacity-90">
-              会员等级：{profileInfo?.memberLevel || "加载中..."}
+            <div className="text-sm opacity-80">
+              会员等级：{profileInfo?.memberLevel || "普通会员"}
             </div>
           </div>
+          {/* 添加设置按钮 */}
           <div 
-            className="w-8 h-8 flex items-center justify-center"
-            onClick={() => navigate('/settings')} // 添加点击事件
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer"
+            onClick={() => navigate('/settings')}
           >
             <i className="ri-settings-3-line text-xl"></i>
           </div>
@@ -336,9 +318,9 @@ const Profile = () => {
 
       {/* 功能菜单 */}
       {FEATURE_MENUS.map((menu, index) => (
-        <div key={index} className="bg-white rounded-lg p-3 mt-2 h-[120px]">
-          <div className="text-base font-medium mb-3">{menu.title}</div>
-          <div className="grid grid-cols-3 gap-3 items-center h-[60px]">
+        <div key={index} className="bg-white rounded-lg p-3 mt-2 h-auto min-h-0">
+          <div className="text-base font-medium mb-2">{menu.title}</div>
+          <div className="grid grid-cols-3 gap-3 items-start h-[100px]">
             {menu.items.map((item, idx) => (
               <div
                 key={idx}
@@ -349,10 +331,10 @@ const Profile = () => {
                   <i className={`${item.icon} text-primary text-lg`}></i>
                 </div>
                 <div className="text-xs">{item.text}</div>
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
       ))}
 
       {/* 店铺信息卡片 */}

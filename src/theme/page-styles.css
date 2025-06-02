@@ -1,0 +1,423 @@
+/* 基础页面组件样式 - 优化版 */
+
+/* 页面容器 */
+.page-container {
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-light);
+  overflow-x: hidden;
+}
+
+
+/* 页面内容区域 */
+.page-content {
+  flex: 1;
+  padding: var(--spacing-4);
+  position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 页面底部 */
+.page-footer {
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--color-neutral-200);
+  background-color: var(--color-bg-paper);
+}
+
+/* 加载状态 */
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--color-neutral-500);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-neutral-200);
+  border-top-color: var(--color-primary-500);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: var(--spacing-4);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 错误状态 */
+.page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: var(--spacing-8);
+  text-align: center;
+}
+
+.error-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: var(--color-error);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-4);
+}
+
+.error-message {
+  color: var(--color-neutral-600);
+  margin-bottom: var(--spacing-6);
+}
+
+/* 卡片样式 */
+.card {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-4);
+}
+
+.card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  color: var(--color-neutral-900);
+}
+
+.card-content {
+  color: var(--color-neutral-600);
+  position: relative;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+/* 卡片加载状态 */
+.card-loading {
+  pointer-events: none;
+}
+
+.card-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: inherit;
+}
+
+/* 卡片变体 */
+.card.bg-transparent {
+  background-color: transparent;
+}
+
+.card.bg-primary-50 {
+  background-color: var(--color-primary-50);
+}
+
+.card.bg-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-300));
+  color: white;
+}
+
+.card.bg-gradient-primary .card-title,
+.card.bg-gradient-primary .card-content {
+  color: white;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-primary {
+  background-color: var(--color-primary-500);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-600);
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-secondary {
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-800);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-neutral-300);
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-primary-500);
+  color: var(--color-primary-500);
+}
+
+.btn-outline:hover {
+  background-color: var(--color-primary-50);
+  border-color: var(--color-primary-600);
+  color: var(--color-primary-700);
+}
+
+.btn-sm {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.btn-lg {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-lg);
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+.btn-icon {
+  margin-right: var(--spacing-1);
+}
+
+.btn-icon-right {
+  margin-left: var(--spacing-1);
+}
+
+/* 表单元素 */
+.form-group {
+  margin-bottom: var(--spacing-4);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--spacing-2);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--radius-md);
+  background-color: white;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.form-error {
+  color: var(--color-error);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-1);
+}
+
+/* 列表样式 */
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  background-color: white;
+}
+
+.list-item {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-neutral-200);
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item:hover {
+  background-color: var(--color-neutral-50);
+}
+
+.list-item-content {
+  flex: 1;
+}
+
+.list-item-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin: 0 0 var(--spacing-1) 0;
+  color: var(--color-neutral-900);
+}
+
+.list-item-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-neutral-600);
+  margin: 0;
+}
+
+.list-item-action {
+  margin-left: var(--spacing-2);
+}
+
+/* 分割线 */
+.divider {
+  height: 1px;
+  background-color: var(--color-neutral-200);
+  margin: var(--spacing-4) 0;
+}
+
+/* 徽章 */
+.badge {
+  display: inline-block;
+  padding: 2px var(--spacing-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-500);
+  color: white;
+}
+
+.badge-success {
+  background-color: var(--color-success);
+}
+
+.badge-warning {
+  background-color: var(--color-warning);
+}
+
+.badge-error {
+  background-color: var(--color-error);
+}
+
+.badge-info {
+  background-color: var(--color-info);
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: var(--color-neutral-800);
+  }
+  
+  .card.bg-glass {
+    background: rgba(24, 24, 27, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .card-loader {
+    background-color: rgba(24, 24, 27, 0.7);
+  }
+  
+  .form-control {
+    background-color: var(--color-neutral-800);
+    border-color: var(--color-neutral-700);
+    color: var(--color-neutral-100);
+  }
+  
+  .btn-secondary {
+    background-color: var(--color-neutral-700);
+    color: var(--color-neutral-100);
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--color-neutral-600);
+  }
+  
+  .card-title {
+    color: var(--color-neutral-100);
+  }
+  
+  .card-content, 
+  .list-item-subtitle {
+    color: var(--color-neutral-400);
+  }
+  
+  .list-item {
+    border-color: var(--color-neutral-700);
+  }
+  
+  .list {
+    background-color: var(--color-neutral-800);
+  }
+  
+  .list-item:hover {
+    background-color: var(--color-neutral-700);
+  }
+  
+  .divider {
+    background-color: var(--color-neutral-700);
+  }
+} 

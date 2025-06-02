@@ -859,6 +859,7 @@ const AiAssistant = ({ userInfo }) => {
   };
 
   const handleSendMessage = async () => {
+    if (!userMessage.trim()) return;
     // 1. 终止上一个流
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -868,8 +869,33 @@ const AiAssistant = ({ userInfo }) => {
     // 2. 生成新sessionId
     const newSessionId = createNewSession();
     setCurrentSessionId(newSessionId);
-    // 3. 发起新流式请求
-    fetchStreamResponse(userMessage, newSessionId);
+    // 3. 先将用户输入加入聊天历史
+    setAiChatHistory((prev) => [
+      ...prev,
+      { type: "user", message: userMessage }
+    ]);
+    setIsTyping(true);
+    setIsLoading(true);
+    // 4. 随机选择一条推荐内容显示
+    if (quickReads.length > 0) {
+      const randomRecommendation = quickReads[Math.floor(Math.random() * quickReads.length)];
+      setCurrentRecommendation(randomRecommendation);
+    }
+    // 5. 滚动到底部
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+    // 6. 自动展开聊天区域
+    setIsExpanded(true);
+    // 7. 发起新流式请求
+    const response = await fetchStreamResponse(userMessage, newSessionId);
+    // 8. 获取完流式响应后，更新推荐话题
+    if (response) {
+      updateSuggestedTopics(userMessage);
+    }
+    setUserMessage("");
+    setIsTyping(false);
+    setIsLoading(false);
   };
 
   const handleCancelStreaming = () => {

@@ -411,7 +411,6 @@ const TetrisGame = ({ onExit = () => {} }) => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (gameState !== GAME_STATES.PLAYING) return;
-      
       switch (event.key) {
         case 'ArrowLeft':
           movePlayer(-1);
@@ -441,10 +440,9 @@ const TetrisGame = ({ onExit = () => {} }) => {
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    
+    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [gameState, player, stage]);
 
@@ -566,15 +564,34 @@ const TetrisGame = ({ onExit = () => {} }) => {
   const handleDirectionChange = (dir) => {
     // 如果游戏不在运行状态，不处理方向输入
     if (gameState !== GAME_STATES.PLAYING) return;
-    
-    // 检查方向输入并执行相应动作
-    if (dir.x < 0) {
+    let newDir = dir;
+    // 兼容字符串类型的方向输入
+    if (typeof dir === 'string') {
+      switch (dir) {
+        case 'left':
+          movePlayer(-1);
+          return;
+        case 'right':
+          movePlayer(1);
+          return;
+        case 'down':
+          dropPlayer();
+          return;
+        case 'up':
+          rotatePlayer(1);
+          return;
+        default:
+          return;
+      }
+    }
+    // 对象类型兼容原有逻辑
+    if (newDir.x < 0) {
       movePlayer(-1); // 左移
-    } else if (dir.x > 0) {
+    } else if (newDir.x > 0) {
       movePlayer(1);  // 右移
-    } else if (dir.y > 0) {
+    } else if (newDir.y > 0) {
       dropPlayer();   // 下落
-    } else if (dir.y < 0) {
+    } else if (newDir.y < 0) {
       rotatePlayer(1); // 上键旋转
     }
   };
