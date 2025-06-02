@@ -154,7 +154,6 @@ const TetrisGame = ({ onExit = () => {} }) => {
   
   // 初始化游戏
   useEffect(() => {
-    // 直接开始游戏，不显示准备界面
     startGame();
   }, []);
 

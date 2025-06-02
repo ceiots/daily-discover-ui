@@ -9,7 +9,7 @@ const NavBar = ({ className }) => {
   const path = location.pathname;
   
   const { isLoggedIn, userInfo } = useAuth();
-
+  
   // 判断当前路径是否为某个特定路径或其子路径
   const isActive = (route) => {
     if (route === '/') {
@@ -52,7 +52,7 @@ const NavBar = ({ className }) => {
                 }}
               />
             ) : (
-              <i className="fas fa-qrcode"></i>
+            <i className="fas fa-qrcode"></i>
             )}
           </a>
         </div>

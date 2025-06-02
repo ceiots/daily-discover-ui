@@ -189,36 +189,6 @@
     margin-bottom: 10px;
 }
 
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 25px;
-    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    touch-action: manipulation; /* 改进触摸体验 */
-}
-
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.btn.secondary {
-    background: linear-gradient(45deg, #4facfe, #00f2fe);
-}
-
 /* 目标信息 */
 .target-info {
     text-align: center;
@@ -397,10 +367,6 @@
         border-radius: 8px;
     }
     
-    .btn {
-        padding: 8px 16px;
-        font-size: 12px;
-    }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {

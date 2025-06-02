@@ -24,9 +24,9 @@ import EventDetail from "./components/EventDetail"; // 事件详情页面
 import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
-import Settings from './components/Settings';
-import PaymentPassword from './components/PaymentPassword';
-import PaymentPasswordSetting from './components/PaymentPasswordSetting'; // 导入支付密码设置页面
+import Settings from './components/settings/Settings';
+import PaymentPassword from './components/settings/PaymentPassword';
+import PaymentPasswordSetting from './components/settings/PaymentPasswordSetting'; // 导入支付密码设置页面
 import CreationPage from './components/CreationPage'; // 创作中心页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
 import EcommerceCreationPage from './components/EcommerceCreationPage'; // 电商创建页面

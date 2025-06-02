@@ -739,6 +739,13 @@ const AiAssistant = ({ userInfo }) => {
 
     // 向Ollama API发送请求
     console.log("发送请求时间: " + new Date().toLocaleTimeString());
+
+     // 检查流式读取兼容性
+  if (!window.ReadableStream || !Response.prototype.body || !Response.prototype.body.getReader) {
+    alert("当前浏览器/APP不支持AI流式对话，已自动切换为普通模式。建议升级APP或使用最新版浏览器体验更佳。");
+  }else{
+    alert("当前浏览器/APP支持AI流式对话，已自动切换为流式模式。");
+  }
     
     // 使用try-catch包装fetch请求
     let response;

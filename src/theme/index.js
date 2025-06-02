@@ -8,7 +8,6 @@ import * as components from './components';
 
 // 导入样式
 import './theme.css';
-import './page-styles.css';
 
 // 导出所有主题相关组件和工具
 export {

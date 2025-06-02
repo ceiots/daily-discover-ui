@@ -60,6 +60,8 @@ const SnakeGame = ({ onExit = () => {} }) => {
     if (savedHighScore) {
       setHighScore(parseInt(savedHighScore, 10));
     }
+    // 自动开始游戏
+    toggleGame();
   }, []);
 
   // 保存游戏数据
@@ -439,27 +441,6 @@ const SnakeGame = ({ onExit = () => {} }) => {
                 </div>
               )}
 
-              {/* 开始游戏界面 */}
-              {showStartScreen && (
-                <div className="start-overlay">
-                  <div className="start-content">
-                    <h2 className="start-title">贪吃蛇</h2>
-                    <p className="start-desc">控制蛇吃到更多的食物，但不要撞到墙壁或自己的身体！</p>
-                    <div className="start-stats">
-                      <div className="start-stat">
-                        <Trophy size={20} />
-                        <span>历史最高分: {highScore}</span>
-                      </div>
-                    </div>
-                    <button 
-                      className="start-button"
-                      onClick={toggleGame}
-                    >
-                      开始游戏
-                    </button>
-                  </div>
-                </div>
-              )}
 
               {/* 游戏结束遮罩 */}
               {gameOver && (
