@@ -169,7 +169,7 @@ const Profile = () => {
         { 
           icon: "ri-map-pin-line", 
           text: "收货地址", 
-          onClick: () => navigate('/edit-address') 
+          onClick: () => navigate('/address-list') 
         },
         { 
           icon: "ri-shopping-cart-line", 

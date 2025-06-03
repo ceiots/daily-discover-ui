@@ -17,7 +17,7 @@ import RecommendationDetail from "./components/RecommendationDetail"; // 导入�
 import RefundForm from "./components/RefundForm"; // 导入退款表单组件
 import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
-import EditAddress from './components/myService/EditAddress';
+import AddressList from './components/myService/AddressList'; // 导入地址管理列表组件
 import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import EventDetail from "./components/EventDetail"; // 事件详情页面
@@ -184,7 +184,8 @@ function showNavBar(pathname) {
     '/login',
     '/register',
     '/forgot-password',
-    '/ecommerce-creation'
+    '/ecommerce-creation',
+    '/address-list'
   ];
 
   const currentPath = location.pathname;
@@ -228,7 +229,7 @@ const App = () => {
                   </Suspense>
                 }
               />
-              <Route path="/edit-address" element={<EditAddress />} />
+              <Route path="/address-list" element={<ProtectedRoute><AddressList /></ProtectedRoute>} />
               <Route path="/order/:orderNumber" element={<OrderDetail />} />
               <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
               <Route path="/event/:id" element={<EventDetail />} />

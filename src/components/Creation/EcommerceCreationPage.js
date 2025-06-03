@@ -338,8 +338,6 @@ const EcommerceCreationPage = () => {
     });
   };
 
- 
-
   const validateForm = () => {
     const newErrors = {};
     if (!formData.title.trim()) {
@@ -567,18 +565,17 @@ const EcommerceCreationPage = () => {
       headerTitle="电商创建"
       backgroundColor="default"
     >
-      <div
-      >
+      <div style={{ paddingBottom: '80px' }}>
         {/* 店铺检查提示 */}
         {shopChecking ? (
-          <div className="flex flex-col items-center justify-center h-screen">
+          <div className="flex flex-col items-center justify-center" style={{ minHeight: '200px' }}>
             <div className="text-center">
               <i className="fas fa-spinner fa-spin text-primary text-2xl mb-3"></i>
               <p>正在检查店铺信息...</p>
             </div>
           </div>
         ) : !hasShop ? (
-          <div className="flex flex-col items-center justify-center h-screen p-4">
+          <div className="flex flex-col items-center justify-center p-4" style={{ minHeight: '200px' }}>
             <div className="text-center">
               <i className="fas fa-store text-primary text-5xl mb-4"></i>
               <h2 className="text-xl font-medium mb-2">您还没有创建店铺</h2>
@@ -594,7 +591,7 @@ const EcommerceCreationPage = () => {
         ) : (
           <>
             {/* 标签切换 */}
-            <div className="fixed top-20  left-0 right-0 bg-white z-10 max-w-[375px] mx-auto border-b overflow-x-auto">
+            <div className="fixed top-20 left-0 right-0 bg-white z-10 max-w-[375px] mx-auto border-b">
               <div className="flex whitespace-nowrap">
                 <button
                   className={`px-4 py-3 text-center text-sm font-medium ${
@@ -640,7 +637,7 @@ const EcommerceCreationPage = () => {
             </div>
 
             {/* 主内容区域 */}
-            <div className="pt-3 px-4" style={{marginTop: '63px'}}>
+            <div className="pt-3 px-4" style={{marginTop: '63px', paddingBottom: '80px'}}>
               {/* 基本信息 */}
               {activeTab === "basic" && (
                 <div className="basic-info">
