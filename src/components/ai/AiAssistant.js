@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./AiAssistant.css";
 import PropTypes from "prop-types";
-import instance from "../utils/axios";
+import instance from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL } from "../../config";
 // 导入 GitHub 风格 Markdown 支持
 import remarkGfm from 'remark-gfm';
 // 导入语法高亮

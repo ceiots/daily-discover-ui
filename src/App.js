@@ -13,7 +13,7 @@ const OrderList = lazy(() => import('./components/myService/OrderList'));
 import OrderDetail from './components/myService/OrderDetail';
 import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
-import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
+import ProductDetail from "./components/ProductDetail"; // 导入详情页面组件
 import RefundForm from "./components/RefundForm"; // 导入退款表单组件
 import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
@@ -234,7 +234,7 @@ const App = () => {
               <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
               <Route path="/event/:id" element={<EventDetail />} />
               <Route path="/category/:id" element={<CategoryPage />} />
-              <Route path="/product/:id" element={<RecommendationDetail/>} />
+              <Route path="/product/:id" element={<ProductDetail/>} />
               <Route path="/search-results" element={<SearchResultsPage />} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/payment-password" element={<PaymentPassword />} />

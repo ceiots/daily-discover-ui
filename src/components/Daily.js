@@ -5,7 +5,8 @@ import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import NavBar from "./NavBar";
-import AiAssistant from "./AiAssistant"; // 引入AI助手组件
+import AiAssistant from "./ai/AiAssistant"; // 引入AI助手组件
+import Recommendations from "./Recommendations"; // Import the new Recommendations component
 import { BasePage } from "../theme";
 // Helper function to get Lunar Date (simplified)
 const getLunarDate = (date) => {
@@ -117,15 +118,9 @@ const Daily = () => {
   const [historyTodayEvents, setHistoryTodayEvents] = useState([]);
   const [productSummary, setProductSummary] = useState(null);
 
-  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cartItemCount, setCartItemCount] = useState(0);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loadMoreLoading, setLoadMoreLoading] = useState(false);
-  const [originalRecommendations, setOriginalRecommendations] = useState([]);
   const [activeCategory, setActiveCategory] = useState("全部");
   const [searchQuery, setSearchQuery] = useState("");
   const [hotArticles, setHotArticles] = useState([]);
@@ -274,42 +269,8 @@ const Daily = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProductRecommendations = async () => {
-      setLoading(true);
-      try {
-        const recommendationsRes = await instance.get(
-          `/product?page=${page}&size=${size}`
-        );
-        if (recommendationsRes.data && recommendationsRes.data.code === 200) {
-          const recData = recommendationsRes.data.data || {};
-          const newContent = recData.content || [];
-          console.log(newContent);
-          if (page === 0) {
-            setRecommendations(newContent);
-            setOriginalRecommendations(newContent);
-          } else {
-            setRecommendations((prev) => [...prev, ...newContent]);
-            setOriginalRecommendations((prev) => [...prev, ...newContent]);
-          }
-          setTotalPages(recData.totalPages || 0);
-        } else {
-          if (page === 0) {
-            setRecommendations([]);
-            setOriginalRecommendations([]);
-          }
-        }
-      } catch (error) {
-        setError("商品推荐加载失败");
-        console.error("Product recommendations loading error:", error);
-      } finally {
-        setLoading(false);
-        setLoadMoreLoading(false);
-      }
-    };
-
     fetchDailyPageData();
-    fetchProductRecommendations();
-
+    
     if (isLoggedIn) {
       const fetchCartData = async () => {
         try {
@@ -326,27 +287,7 @@ const Daily = () => {
     } else {
       setCartItemCount(0);
     }
-  }, [isLoggedIn, page, size, fetchDailyPageData]);
-
-  const handleRefreshRecommendations = async () => {
-    try {
-      setPage(0); // Reset page for refresh
-      const response = await instance.get(`/product/random`);
-      if (response.data && response.data.length > 0) {
-        setRecommendations(response.data);
-        setOriginalRecommendations(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching random recommendations:", error);
-    }
-  };
-
-  const handleLoadMore = () => {
-    if (page < totalPages - 1 && !loadMoreLoading) {
-      setLoadMoreLoading(true);
-      setPage((prevPage) => prevPage + 1);
-    }
-  };
+  }, [isLoggedIn, fetchDailyPageData]);
 
   const handleTipToggle = (id) => {
     setDailyTips((tips) =>
@@ -570,85 +511,6 @@ const Daily = () => {
     return insights[Math.floor(Math.random() * insights.length)];
   };
 
-  // 优化今日推荐的渲染函数，添加AI总结
-  const renderRecommendations = () => {
-    return (
-      <div className="daily-recommendations-section">
-        <div className="recommendations-header">
-          <h3>
-            <i className="fas fa-thumbs-up"></i> 今日推荐
-          </h3>
-          <div className="scroll-controls">
-            <button
-              className="scroll-control-btn"
-              onClick={() =>
-                scrollRefs.recommendations.current?.scrollBy({
-                  left: -200,
-                  behavior: "smooth",
-                })
-              }
-            >
-              <i className="fas fa-chevron-left"></i>
-            </button>
-            <button
-              className="scroll-control-btn"
-              onClick={() =>
-                scrollRefs.recommendations.current?.scrollBy({
-                  left: 200,
-                  behavior: "smooth",
-                })
-              }
-            >
-              <i className="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-        <div
-          className="recommendations-scroll"
-          ref={scrollRefs.recommendations}
-        >
-          {recommendations.slice(0, 6).map((product, index) => (
-            <div
-              key={product.id || index}
-              className="product-recommendation-card"
-            >
-              <div className="product-image-container">
-                <img
-                  src={
-                    product.imageUrl ||
-                    `https://source.unsplash.com/featured/800x600/?product`
-                  }
-                  data-category={`product-${
-                    product.name?.substring(0, 10) || "generic"
-                  }`}
-                  alt={product.name || product.title || `产品${index + 1}`}
-                  className="product-image"
-                  onError={handleImageError}
-                />
-              </div>
-              <div className="product-info">
-                <div className="product-name">
-                  {product.name || product.title}
-                </div>
-                <div className="product-price">¥{product.price}</div>
-                <div className="product-match">
-                  <i className="fas fa-chart-line"></i>
-                  匹配度{product.matchScore || "90"}%
-                </div>
-
-                {aiInsights[`product${index + 1}`] && (
-                  <div className="product-ai-insight">
-                    {aiInsights[`product${index + 1}`]}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   // 历史的今天 - 左右滑动和两列布局
   const renderHistoryEvents = () => {
     return (
@@ -734,7 +596,7 @@ const Daily = () => {
         <AiAssistant userInfo={userInfo} />
         {renderTodayFocus()}
         {/* {renderHistoryEvents()} */}
-        {renderRecommendations()}
+        <Recommendations /> {/* Use the new Recommendations component */}
         {/* 其他内容... */}
       </div>
     </BasePage>
