@@ -420,7 +420,7 @@ const EcommerceCreationPage = () => {
 
         if (response.data && response.data.code === 200) {
           alert("商品创建成功，等待审核！");
-          navigate("/");
+          navigate("/profile");
         } else {
           alert("商品创建失败：" + (response.data.message || "未知错误"));
         }
@@ -565,7 +565,14 @@ const EcommerceCreationPage = () => {
       headerTitle="电商创建"
       backgroundColor="default"
     >
-      <div style={{ paddingBottom: '80px' }}>
+      <div 
+        style={{ 
+          paddingBottom: '80px',
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(155, 155, 155, 0.5) transparent' 
+        }}
+        className="custom-scrollbar"
+      >
         {/* 店铺检查提示 */}
         {shopChecking ? (
           <div className="flex flex-col items-center justify-center" style={{ minHeight: '200px' }}>
@@ -637,7 +644,11 @@ const EcommerceCreationPage = () => {
             </div>
 
             {/* 主内容区域 */}
-            <div className="pt-3 px-4" style={{marginTop: '63px', paddingBottom: '80px'}}>
+            <div className="pt-3 px-4 custom-scrollbar" style={{
+              marginTop: '63px', 
+              paddingBottom: '80px',
+              scrollBehavior: 'smooth'
+            }}>
               {/* 基本信息 */}
               {activeTab === "basic" && (
                 <div className="basic-info">

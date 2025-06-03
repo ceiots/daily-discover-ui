@@ -1,4 +1,39 @@
+.ecommerce-creation-container {
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  position: relative;
+}
 
+
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px; /* 滚动条宽度 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* 滚动条轨道背景 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5); /* 滚动条颜色 */
+  border-radius: 10px; /* 滚动条圆角 */
+  border: none;
+}
+
+/* 滚动条悬停样式 */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(155, 155, 155, 0.7); /* 悬停时滚动条颜色 */
+}
+
+/* 移除高度限制，让内容自然撑开 */
+.basic-info,
+.product-details,
+.specifications,
+.purchase-notices {
+  height: auto;
+}
 
 textarea {
   resize: none;
