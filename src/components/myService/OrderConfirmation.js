@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import instance from '../utils/axios';
+import instance from '../../utils/axios';
 import { LeftOutlined, CheckOutlined } from '@ant-design/icons'; // 假设使用antd图标，需安装
 
 const OrderConfirmation = () => {

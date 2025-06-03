@@ -5,19 +5,19 @@ import Daily from './components/Daily';
 import NavBar from './components/NavBar';
 import LoginPage from './components/LoginPage';
 import Profile from './components/Profile';
-import Cart from './components/Cart';
+import Cart from './components/myService/Cart';
 import Payment from './components/Payment';
-import OrderConfirmation from './components/OrderConfirmation';
+import OrderConfirmation from './components/myService/OrderConfirmation';
 import { lazy, Suspense } from 'react';
-const OrderList = lazy(() => import('./components/OrderList'));
-import OrderDetail from './components/OrderDetail';
+const OrderList = lazy(() => import('./components/myService/OrderList'));
+import OrderDetail from './components/myService/OrderDetail';
 import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
 import RecommendationDetail from "./components/RecommendationDetail"; // 导入详情页面组件
 import RefundForm from "./components/RefundForm"; // 导入退款表单组件
 import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
-import EditAddress from './components/EditAddress';
+import EditAddress from './components/myService/EditAddress';
 import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import EventDetail from "./components/EventDetail"; // 事件详情页面
@@ -28,7 +28,7 @@ import Settings from './components/settings/Settings';
 import PaymentPassword from './components/PaymentPassword';
 import PaymentPasswordSetting from './components/settings/PaymentPasswordSetting'; // 导入支付密码设置页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
-import EcommerceCreationPage from './components/Creation/EcommerceCreationPage'; // 电商创建页面
+import EcommerceCreationPage from './components/creation/EcommerceCreationPage'; // 电商创建页面
 import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
 import MyShopPage from './components/MyShopPage'; // 我的店铺内容页面
 import ProductManagePage from './components/ProductManagePage'; // 商品管理页面

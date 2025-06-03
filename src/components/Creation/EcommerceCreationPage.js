@@ -338,21 +338,7 @@ const EcommerceCreationPage = () => {
     });
   };
 
-  // 处理标签选择
-  const handleTagToggle = (tagId) => {
-    const updatedTags = selectedTags.includes(tagId)
-      ? selectedTags.filter((id) => id !== tagId)
-      : selectedTags.length < 5
-      ? [...selectedTags, tagId]
-      : selectedTags;
-
-    setSelectedTags(updatedTags);
-
-    setFormData({
-      ...formData,
-      tagIds: updatedTags,
-    });
-  };
+ 
 
   const validateForm = () => {
     const newErrors = {};
@@ -370,14 +356,16 @@ const EcommerceCreationPage = () => {
     if (formData.images.length === 0) {
       newErrors.images = "请上传至少一张商品图片";
     }
-    if (!formData.categoryId) {
-      newErrors.category = "请选择商品分类";
+    
+    // alert内容优化
+    if (Object.keys(newErrors).length > 0) {
+      alert(Object.values(newErrors).join('\n'));
     }
-    setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
+    console.log("formData", formData);
     if (validateForm()) {
       try {
         setLoading(true);
@@ -931,16 +919,31 @@ const EcommerceCreationPage = () => {
                       </button>
                       <button
                         onClick={() => {
-                          const url = prompt("请输入图片URL");
-                          if (url && url.trim()) {
-                            handleImageUpload([url.trim()]);
+                          const detailUrl = prompt("请输入详情图片URL");
+                          if (detailUrl && detailUrl.trim()) {
+                            // 找到第一个未设置content的image类型detail，否则新建一个
+                            let found = false;
+                            setFormData(prev => {
+                              const details = prev.details.map(d => {
+                                if (!found && d.type === 'image' && !d.content) {
+                                  found = true;
+                                  return { ...d, content: detailUrl.trim() };
+                                }
+                                return d;
+                              });
+                              // 如果没有空image detail，则新建
+                              if (!found) {
+                                details.push({ id: Date.now(), type: 'image', content: detailUrl.trim(), sort: details.length });
+                              }
+                              return { ...prev, details };
+                            });
                           }
                         }}
-                        className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
+                        className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
                         disabled={loading}
                       >
-                        <i className="fas fa-link text-gray-400 mb-1"></i>
-                        <span className="text-xs text-gray-500">输入URL</span>
+                        <i className="fas fa-link text-gray-400 mr-1"></i>
+                        输入URL
                       </button>
                     </div>
                   </div>

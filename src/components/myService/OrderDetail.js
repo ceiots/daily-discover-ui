@@ -14,10 +14,10 @@ import {
   FaCheckCircle,
   FaExclamationTriangle
 } from "react-icons/fa";
-import instance from "../utils/axios";
-import { formatSpecifications } from "../utils/orderUtils";
+import instance from "../../utils/axios";
+import { formatSpecifications } from "../../utils/orderUtils";
 // 新增：导入 OrderCountdown 组件
-import OrderCountdown from './OrderCountdown';
+import OrderCountdown from '../OrderCountdown';
 
 const OrderDetail = () => {
   // 使用 useParams 钩子获取 URL 参数

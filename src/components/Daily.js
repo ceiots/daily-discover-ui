@@ -728,9 +728,6 @@ const Daily = () => {
             </p>
           </div>
       }
-      headerRight={<div style={{ marginRight: '10px' }} onClick={() => navigate("/cart")}>
-      <i className="fas fa-shopping-cart"></i>
-    </div>}
     >
       <div className="daily-page-container">
         {/* 使用AiAssistant组件替代原有的AI功能 */}

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaStore } from "react-icons/fa";
-import instance from "../utils/axios";
-import { useAuth } from "../App";
-import { formatSpecifications } from "../utils/orderUtils";
-import OrderCountdown from './OrderCountdown';
+import instance from "../../utils/axios";
+import { useAuth } from "../../App";
+import { formatSpecifications } from "../../utils/orderUtils";
+import OrderCountdown from '../OrderCountdown';
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Cart.css";
-import { useAuth } from "../App"; // 确保正确导入
-import instance from "../utils/axios";
+import { useAuth } from "../../App"; // 确保正确导入
+import instance from "../../utils/axios";
 
 const Cart = () => {
   const { isLoggedIn, userInfo } = useAuth();

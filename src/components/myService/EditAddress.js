@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import instance from "../utils/axios";
+import instance from "../../utils/axios";
 
 const EditAddress = () => {
   const navigate = useNavigate();

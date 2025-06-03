@@ -171,6 +171,11 @@ const Profile = () => {
           text: "收货地址", 
           onClick: () => navigate('/edit-address') 
         },
+        { 
+          icon: "ri-shopping-cart-line", 
+          text: "购物车", 
+          onClick: () => navigate('/cart') 
+        },
       ]
     },
     {
