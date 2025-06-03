@@ -572,33 +572,7 @@
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
 }
 
-.discover-search-bar {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 6px 10px;
-  height: 36px; /* 固定高度以确保对齐 */
-}
 
-.search-bar-icon {
-  color: rgba(255, 255, 255, 0.9);
-  margin-right: 6px;
-}
-
-.discover-search-bar input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  font-size: 0.75rem; /* 从0.65rem增大 */
-  color: white;
-  padding: 0;
-  outline: none;
-  height: 100%;
-}
 
 .discover-search-bar input::placeholder {
   color: rgba(255, 255, 255, 0.8);
@@ -1097,31 +1071,20 @@
   letter-spacing: 0.01em;
 }
 
-/* 顶部搜索栏 - 更明亮的紫色，确保购物车与头像对齐 */
-.discover-search-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 12px 15px;
-  background: var(--primary-color);
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
 
 .discover-search-bar {
   flex: 1;
   display: flex;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.18);
+  background-color: rgba(255, 255, 255, 0.08);
   border-radius: 8px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 6px 10px;
   height: 36px; /* 固定高度以确保对齐 */
+  width: 100%;
+  width: 330px;
+  margin-left: 10px;
 }
 
 .search-bar-icon {
@@ -1140,10 +1103,6 @@
   height: 100%;
 }
 
-.discover-search-bar input::placeholder {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.75rem; /* 增加占位符字体大小 */
-}
 
 /* 购物车和头像容器样式，确保对齐 */
 .header-icons {
