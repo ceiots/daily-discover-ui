@@ -12,12 +12,13 @@ import {
   FaBox,
   FaTruck,
   FaCheckCircle,
-  FaExclamationTriangle
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import instance from "../../utils/axios";
 import { formatSpecifications } from "../../utils/orderUtils";
 // 新增：导入 OrderCountdown 组件
-import OrderCountdown from '../OrderCountdown';
+import OrderCountdown from "../OrderCountdown";
+import { BasePage } from "../../theme";
 
 const OrderDetail = () => {
   // 使用 useParams 钩子获取 URL 参数
@@ -41,12 +42,12 @@ const OrderDetail = () => {
         setLoading(false);
         const countdown = response.data.order.countdown || 30 * 60;
         setRemainingTime(countdown);
-        
+
         // 如果订单状态是已发货或已完成，自动获取物流信息
         if (
-          response.data.order.status === "shipped" || 
+          response.data.order.status === "shipped" ||
           response.data.order.status === 3 ||
-          response.data.order.status === "completed" || 
+          response.data.order.status === "completed" ||
           response.data.order.status === 4
         ) {
           fetchLogisticsInfo(response.data.order.id);
@@ -64,10 +65,12 @@ const OrderDetail = () => {
     try {
       setLogisticsLoading(true);
       setLogisticsError(null);
-      
+
       // 调用实时物流信息API
-      const response = await instance.get(`/logistics/realtime/order/${orderId}`);
-      
+      const response = await instance.get(
+        `/logistics/realtime/order/${orderId}`
+      );
+
       if (response.data && response.data.success) {
         setLogisticsInfo(response.data.data);
       } else {
@@ -100,7 +103,7 @@ const OrderDetail = () => {
   // 复制订单号
   const copyOrderNumber = () => {
     if (!orderDetail || !orderDetail.order.orderNumber) return;
-    
+
     navigator.clipboard
       .writeText(orderDetail.order.orderNumber)
       .then(() => {
@@ -110,11 +113,11 @@ const OrderDetail = () => {
         console.error("复制失败: ", err);
       });
   };
-  
+
   // 复制物流单号
   const copyTrackingNumber = () => {
     if (!logisticsInfo || !logisticsInfo.number) return;
-    
+
     navigator.clipboard
       .writeText(logisticsInfo.number)
       .then(() => {
@@ -145,9 +148,8 @@ const OrderDetail = () => {
 
   // 根据订单状态获取对应的操作按钮
   const getOrderActions = (order) => {
- 
     if (!order) return null;
-  
+
     // 不要在这里使用 hooks！
     const renderPendingActions = () => (
       <div className="flex gap-3">
@@ -159,7 +161,7 @@ const OrderDetail = () => {
         </button>
       </div>
     );
-    
+
     const renderProcessingActions = () => (
       <div className="flex gap-3">
         <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
@@ -170,12 +172,14 @@ const OrderDetail = () => {
         </button>
       </div>
     );
-    
+
     const renderShippedActions = () => (
       <div className="flex gap-3">
-        <button 
+        <button
           className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full"
-          onClick={() => navigate(`/logistics/${orderDetail.order.orderNumber}`)}
+          onClick={() =>
+            navigate(`/logistics/${orderDetail.order.orderNumber}`)
+          }
         >
           查看物流
         </button>
@@ -184,7 +188,7 @@ const OrderDetail = () => {
         </button>
       </div>
     );
-    
+
     const renderCompletedActions = () => (
       <div className="flex gap-3">
         <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
@@ -195,7 +199,7 @@ const OrderDetail = () => {
         </button>
       </div>
     );
-    
+
     const renderCanceledActions = () => (
       <div className="flex gap-3">
         <button className="flex-1 py-2.5 text-xs border border-gray-300 rounded-full">
@@ -206,7 +210,7 @@ const OrderDetail = () => {
         </button>
       </div>
     );
-    
+
     switch (order.status) {
       case "pending":
       case 1:
@@ -280,21 +284,17 @@ const OrderDetail = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-24">
-      {/* 导航栏 */}
-      <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
-        <div className="h-11 flex items-center px-4">
-          <button
-            onClick={handleBack}
-            className="w-8 h-8 flex items-center justify-center"
-          >
-            <FaArrowLeft className="text-gray-800 text-sm" />
-          </button>
-          <span className="text-sm font-medium ml-2">订单详情</span>
-        </div>
-      </nav>
-
-      {/* 订单内容 */}
+    <BasePage
+      showHeader={true}
+      headerLeft={
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      }
+      headerTitle="订单详情"
+      backgroundColor="default"
+    >
+      {/* 主内容 */}
       <main className="mt-[44px] px-4 space-y-3 pb-4">
         {/* 订单状态卡片 */}
         <div
@@ -306,101 +306,109 @@ const OrderDetail = () => {
             <span className="text-sm font-medium">
               {orderDetail.order.statusText || orderDetail.order.statusStr}
             </span>
-            {(orderDetail.order.status === "pending" || orderDetail.order.status === 1) && (
+            {(orderDetail.order.status === "pending" ||
+              orderDetail.order.status === 1) && (
               <span className="text-xs">
-                支付剩余时间：<OrderCountdown initialCountdown={orderDetail.order.countdown || 30 * 60} remainingTime={remainingTime} />
+                支付剩余时间：
+                <OrderCountdown
+                  initialCountdown={orderDetail.order.countdown || 30 * 60}
+                  remainingTime={remainingTime}
+                />
               </span>
             )}
           </div>
 
           {/* 物流信息 - 仅在待收货和已完成状态显示 */}
-          {(orderDetail.order.status === "shipped" || orderDetail.order.status === 3 ||
-            orderDetail.order.status === "completed" || orderDetail.order.status === 4) && (
-              <div
-                className="mt-3 text-xs"
-                onClick={() => {
-                  setShowLogistics(!showLogistics);
-                  if (!showLogistics && !logisticsInfo) {
-                    refreshLogisticsInfo();
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    {logisticsLoading ? (
-                      <p>正在加载物流信息...</p>
-                    ) : logisticsError ? (
-                      <p className="text-red-200">{logisticsError}</p>
-                    ) : logisticsInfo ? (
-                      <div>
-                        <p className="flex items-center gap-1">
-                          {getLogisticsStatusIcon(logisticsInfo.status)}
-                          <span className="ml-1">{logisticsInfo.statusText}</span>
-                        </p>
-                        <p className="mt-1">
-                          {logisticsInfo.company}：{logisticsInfo.number}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyTrackingNumber();
-                            }}
-                            className="ml-2 text-[10px] border border-white border-opacity-50 rounded-full px-1.5 py-0.5"
-                          >
-                            复制
-                          </button>
-                        </p>
-                        <p className="mt-1 opacity-90">{logisticsInfo.detail}</p>
-                        <p className="mt-1 opacity-80">{logisticsInfo.lastUpdate}</p>
-                      </div>
-                    ) : (
-                      <p>暂无物流信息</p>
-                    )}
-                  </div>
-                  <FaChevronRight
-                    className={`transition-transform duration-300 ${
-                      showLogistics ? "transform rotate-90" : ""
-                    }`}
-                  />
+          {(orderDetail.order.status === "shipped" ||
+            orderDetail.order.status === 3 ||
+            orderDetail.order.status === "completed" ||
+            orderDetail.order.status === 4) && (
+            <div
+              className="mt-3 text-xs"
+              onClick={() => {
+                setShowLogistics(!showLogistics);
+                if (!showLogistics && !logisticsInfo) {
+                  refreshLogisticsInfo();
+                }
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  {logisticsLoading ? (
+                    <p>正在加载物流信息...</p>
+                  ) : logisticsError ? (
+                    <p className="text-red-200">{logisticsError}</p>
+                  ) : logisticsInfo ? (
+                    <div>
+                      <p className="flex items-center gap-1">
+                        {getLogisticsStatusIcon(logisticsInfo.status)}
+                        <span className="ml-1">{logisticsInfo.statusText}</span>
+                      </p>
+                      <p className="mt-1">
+                        {logisticsInfo.company}：{logisticsInfo.number}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyTrackingNumber();
+                          }}
+                          className="ml-2 text-[10px] border border-white border-opacity-50 rounded-full px-1.5 py-0.5"
+                        >
+                          复制
+                        </button>
+                      </p>
+                      <p className="mt-1 opacity-90">{logisticsInfo.detail}</p>
+                      <p className="mt-1 opacity-80">
+                        {logisticsInfo.lastUpdate}
+                      </p>
+                    </div>
+                  ) : (
+                    <p>暂无物流信息</p>
+                  )}
                 </div>
-
-                {/* 物流时间线 */}
-                {showLogistics && logisticsInfo && logisticsInfo.timeline && (
-                  <div className="mt-3 border-t border-white border-opacity-20 pt-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-medium">物流跟踪</p>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          refreshLogisticsInfo();
-                        }}
-                        className="text-[10px] border border-white border-opacity-50 rounded-full px-1.5 py-0.5 flex items-center"
-                      >
-                        刷新
-                      </button>
-                    </div>
-                    <div className="space-y-3">
-                      {logisticsInfo.timeline.map((item, index) => (
-                        <div key={index} className="relative pl-4">
-                          {index <
-                            logisticsInfo.timeline.length - 1 && (
-                            <div className="absolute left-1.5 top-2 w-px h-full bg-white bg-opacity-30"></div>
-                          )}
-                          <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-white"></div>
-                          <div>
-                            <p className="font-medium">{item.status}</p>
-                            <p className="opacity-80">{item.location}</p>
-                            <p className="opacity-80">{item.description}</p>
-                            <p className="opacity-60 text-[10px] mt-1">
-                              {item.time}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <FaChevronRight
+                  className={`transition-transform duration-300 ${
+                    showLogistics ? "transform rotate-90" : ""
+                  }`}
+                />
               </div>
-            )}
+
+              {/* 物流时间线 */}
+              {showLogistics && logisticsInfo && logisticsInfo.timeline && (
+                <div className="mt-3 border-t border-white border-opacity-20 pt-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="font-medium">物流跟踪</p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        refreshLogisticsInfo();
+                      }}
+                      className="text-[10px] border border-white border-opacity-50 rounded-full px-1.5 py-0.5 flex items-center"
+                    >
+                      刷新
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {logisticsInfo.timeline.map((item, index) => (
+                      <div key={index} className="relative pl-4">
+                        {index < logisticsInfo.timeline.length - 1 && (
+                          <div className="absolute left-1.5 top-2 w-px h-full bg-white bg-opacity-30"></div>
+                        )}
+                        <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-white"></div>
+                        <div>
+                          <p className="font-medium">{item.status}</p>
+                          <p className="opacity-80">{item.location}</p>
+                          <p className="opacity-80">{item.description}</p>
+                          <p className="opacity-60 text-[10px] mt-1">
+                            {item.time}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 收货地址 */}
@@ -425,7 +433,8 @@ const OrderDetail = () => {
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  {orderDetail.address.province} {orderDetail.address.city} {orderDetail.address.district} {orderDetail.address.address}
+                  {orderDetail.address.province} {orderDetail.address.city}{" "}
+                  {orderDetail.address.district} {orderDetail.address.address}
                 </p>
               </div>
             </div>
@@ -434,46 +443,47 @@ const OrderDetail = () => {
 
         {/* 商品信息 */}
         <div className="bg-white rounded-lg p-4">
-          {orderDetail.order.items && orderDetail.order.items.map((item, index) => (
-            <div key={item.id || index} className="pb-3">
-              {/* 店铺信息 - 移到最上方 */}
-              <div className="flex items-center mb-3">
-                {item.shopAvatarUrl ? (
-                  <img 
-                    src={item.shopAvatarUrl} 
-                    className="w-4 h-4 rounded-full mr-1" 
-                    alt={item.shopName} 
+          {orderDetail.order.items &&
+            orderDetail.order.items.map((item, index) => (
+              <div key={item.id || index} className="pb-3">
+                {/* 店铺信息 - 移到最上方 */}
+                <div className="flex items-center mb-3">
+                  {item.shopAvatarUrl ? (
+                    <img
+                      src={item.shopAvatarUrl}
+                      className="w-4 h-4 rounded-full mr-1"
+                      alt={item.shopName}
+                    />
+                  ) : (
+                    <FaStore className="text-gray-600 text-xs mr-1" />
+                  )}
+                  <span className="text-xs">{item.shopName}</span>
+                </div>
+
+                {/* 商品信息 */}
+                <div className="flex gap-3">
+                  <img
+                    src={item.image || item.imageUrl}
+                    className="w-20 h-20 object-cover rounded"
+                    alt={item.name}
                   />
-                ) : (
-                  <FaStore className="text-gray-600 text-xs mr-1" />
-                )}
-                <span className="text-xs">{item.shopName}</span>
-              </div>
-              
-              {/* 商品信息 */}
-              <div className="flex gap-3">
-                <img
-                  src={item.image || item.imageUrl}
-                  className="w-20 h-20 object-cover rounded"
-                  alt={item.name}
-                />
-                <div className="flex-1">
-                  <h3 className="text-sm mb-1 line-clamp-2">{item.name}</h3>
-                  <p className="text-xs text-gray-500 mb-2">
-                    {formatSpecifications(item.specifications)}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-primary">
-                      ¥{(item.price || 0).toFixed(2)}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      x{item.quantity}
-                    </span>
+                  <div className="flex-1">
+                    <h3 className="text-sm mb-1 line-clamp-2">{item.name}</h3>
+                    <p className="text-xs text-gray-500 mb-2">
+                      {formatSpecifications(item.specifications)}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-primary">
+                        ¥{(item.price || 0).toFixed(2)}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        x{item.quantity}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* 订单信息 */}
@@ -498,14 +508,14 @@ const OrderDetail = () => {
               <FaClock className="text-gray-500 mr-2" />
               <span className="text-gray-600">创建时间</span>
             </div>
-            <span>
-              {orderDetail.order.date}
-            </span>
+            <span>{orderDetail.order.date}</span>
           </div>
 
           {/* 支付方式 - 仅在已支付的订单中显示 */}
-          {orderDetail.order.status !== "pending" && orderDetail.order.status !== 1 &&
-            orderDetail.order.status !== "canceled" && orderDetail.order.status !== 5 && (
+          {orderDetail.order.status !== "pending" &&
+            orderDetail.order.status !== 1 &&
+            orderDetail.order.status !== "canceled" &&
+            orderDetail.order.status !== 5 && (
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center">
                   <FaCreditCard className="text-gray-500 mr-2" />
@@ -516,8 +526,10 @@ const OrderDetail = () => {
             )}
 
           {/* 发票信息 - 仅在已支付的订单中显示 */}
-          {orderDetail.order.status !== "pending" && orderDetail.order.status !== 1 &&
-            orderDetail.order.status !== "canceled" && orderDetail.order.status !== 5 &&
+          {orderDetail.order.status !== "pending" &&
+            orderDetail.order.status !== 1 &&
+            orderDetail.order.status !== "canceled" &&
+            orderDetail.order.status !== 5 &&
             orderDetail.order.invoice && (
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center">
@@ -569,12 +581,11 @@ const OrderDetail = () => {
           </div>
         </div>
       </main>
-
-      {/* 底部操作按钮 - 不同状态显示不同按钮 */}
+      {/* 底部操作按钮 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white p-4 border-t border-gray-100">
         {getOrderActions(orderDetail.order)}
       </div>
-    </div>
+    </BasePage>
   );
 };
 

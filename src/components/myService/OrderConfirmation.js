@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import instance from '../../utils/axios';
 import { LeftOutlined, CheckOutlined } from '@ant-design/icons'; // 假设使用antd图标，需安装
+import { BasePage } from "../../theme";
 
 const OrderConfirmation = () => {
     const navigate = useNavigate();
@@ -64,16 +65,12 @@ const OrderConfirmation = () => {
     }
 
     return (
-        <div className="relative min-h-screen bg-gray-50">
-            {/* 顶部导航栏 */}
-            <div className="fixed top-0 left-0 w-full h-[56px] bg-[#7B66FF] flex items-center px-4 z-50">
-                <button className="text-white" onClick={handleBack}>
-                    <LeftOutlined className="text-xl" />
-                </button>
-                <span className="flex-1 text-center text-white text-lg font-medium">
-                    支付成功
-                </span>
-            </div>
+        <BasePage
+          showHeader={true}
+          headerLeft={<button className="text-white" onClick={handleBack}><LeftOutlined className="text-xl" /></button>}
+          headerTitle="支付成功"
+          backgroundColor="#7B66FF"
+        >
             {/* 主要内容区域 */}
             <div className="pt-[56px] px-4">
                 {/* 支付结果展示 */}
@@ -131,7 +128,7 @@ const OrderConfirmation = () => {
                     返回首页
                 </button>
             </div>
-        </div>
+        </BasePage>
     );
 };
 

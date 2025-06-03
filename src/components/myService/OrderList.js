@@ -4,7 +4,8 @@ import { FaArrowLeft, FaStore } from "react-icons/fa";
 import instance from "../../utils/axios";
 import { useAuth } from "../../App";
 import { formatSpecifications } from "../../utils/orderUtils";
-import OrderCountdown from '../OrderCountdown';
+import OrderCountdown from "../OrderCountdown";
+import { BasePage } from "../../theme";
 
 const OrderList = () => {
   const { status } = useParams(); // 获取 URL 参数
@@ -40,7 +41,7 @@ const OrderList = () => {
       if (response.data && response.data.data) {
         const newOrderData = response.data.data.content || [];
         const newRemainingTimes = {};
-        newOrderData.forEach(order => {
+        newOrderData.forEach((order) => {
           if (order.status === 1) {
             newRemainingTimes[order.id] = order.countdown || 30 * 60;
           }
@@ -73,7 +74,7 @@ const OrderList = () => {
     4: "已完成",
     5: "已取消",
     6: "退款中",
-    7: "已退款"
+    7: "已退款",
   };
 
   // 反向映射表，用于从文字状态获取状态码
@@ -85,7 +86,7 @@ const OrderList = () => {
     已完成: "4",
     已取消: "5",
     退款中: "6",
-    已退款: "7"
+    已退款: "7",
   };
 
   // 根据 URL 参数设置初始状态
@@ -137,18 +138,18 @@ const OrderList = () => {
     console.log(`再次购买: ${orderId}`);
     // 这里可以添加再次购买的逻辑
   };
-  
+
   const handleRefund = (order) => {
     console.log(`申请退款: ${order.id}`);
     navigate(`/refund/apply/${order.id}`, { state: { orderData: order } });
   };
-  
+
   const handleCancel = (orderId) => {
     console.log(`取消订单: ${orderId}`);
     // 这里添加取消订单的逻辑
     // 可以调用取消订单的接口
   };
-  
+
   const handleConfirmReceipt = (orderId) => {
     console.log(`确认收货: ${orderId}`);
     // 这里添加确认收货的逻辑
@@ -178,18 +179,18 @@ const OrderList = () => {
   // 渲染订单操作按钮
   const renderOrderActions = (order) => {
     const { status, id } = order;
-    
-    switch(status) {
+
+    switch (status) {
       case 1: // 待付款
         return (
           <div className="flex justify-end mt-2 space-x-2">
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-gray-300 rounded-full"
               onClick={() => handleCancel(id)}
             >
               取消订单
             </button>
-            <button 
+            <button
               className="px-3 py-1 text-xs bg-primary text-white rounded-full"
               onClick={() => handlePayment(id)}
             >
@@ -200,7 +201,7 @@ const OrderList = () => {
       case 2: // 待发货
         return (
           <div className="flex justify-end mt-2 space-x-2">
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-gray-300 rounded-full"
               onClick={() => handleRefund(order)}
             >
@@ -211,13 +212,13 @@ const OrderList = () => {
       case 3: // 待收货
         return (
           <div className="flex justify-end mt-2 space-x-2">
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-gray-300 rounded-full"
               onClick={() => handleRefund(order)}
             >
               申请退款
             </button>
-            <button 
+            <button
               className="px-3 py-1 text-xs bg-primary text-white rounded-full"
               onClick={() => handleConfirmReceipt(id)}
             >
@@ -228,19 +229,19 @@ const OrderList = () => {
       case 4: // 已完成
         return (
           <div className="flex justify-end mt-2 space-x-2">
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-gray-300 rounded-full"
               onClick={() => handleRebuy(id)}
             >
               再次购买
             </button>
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-primary text-primary rounded-full"
               onClick={() => navigate(`/review/${id}`)}
             >
               评价
             </button>
-            <button 
+            <button
               className="px-3 py-1 text-xs border border-gray-300 rounded-full"
               onClick={() => handleRefund(order)}
             >
@@ -262,22 +263,20 @@ const OrderList = () => {
   } */
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-16">
-      {/* 导航栏 */}
-      <nav className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
-        <div className="h-11 flex items-center px-4">
-          <button
-            onClick={handleBack}
-            className="w-8 h-8 flex items-center justify-center"
-          >
-            <FaArrowLeft className="text-gray-800 text-sm" />
-          </button>
-          <span className="text-sm font-medium ml-2">全部订单</span>
-          {/* <div className="ml-auto">
-            <FaSearch className="text-gray-600 text-sm" />
-          </div> */}
-        </div>
-        <div className="flex justify-between px-4">
+    <BasePage
+      showHeader={true}
+      headerLeft={
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      }
+      headerTitle="全部订单"
+      backgroundColor="default"
+    >
+      {/* 状态栏和主内容 */}
+      <div>
+        {/* 状态切换栏 */}
+        <div className="flex justify-between px-4 border-b border-gray-100 bg-white sticky top-0 z-10">
           <button
             className={`${
               selectedStatus === "全部"
@@ -340,7 +339,8 @@ const OrderList = () => {
             已完成
           </button>
         </div>
-        <div className="flex px-4 border-t border-gray-100">
+        {/* 退款状态栏 */}
+        <div className="flex px-4 border-t border-gray-100 bg-white sticky top-11 z-10">
           <button
             className={`${
               selectedStatus === "退款中"
@@ -366,173 +366,180 @@ const OrderList = () => {
             已退款
           </button>
         </div>
-      </nav>
-
-      {/* 订单列表 */}
-      <main className="mt-[90px] px-4 space-y-3 pb-4">
-        {filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <div className="w-20 h-20 flex items-center justify-center mb-3">
-              <img
-                src="https://public.readdy.ai/ai/img_res/f2c00337702712163a061331aa926f1b.jpg"
-                className="w-full h-full object-cover"
-                alt="暂无订单"
-              />
-            </div>
-            <p className="text-gray-500 text-xs">暂无相关订单</p>
-            <button
-              onClick={() => navigate("/")}
-              className="mt-3 bg-primary text-white px-4 py-1.5 rounded-full text-xs"
-            >
-              去逛逛
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredOrders.map((order) => (
-              <div
-                key={order.id}
-                className="bg-white rounded-lg overflow-hidden shadow-sm"
+        {/* 主内容 */}
+        <main className="mt-[90px] px-4 space-y-3 pb-4">
+          {filteredOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="w-20 h-20 flex items-center justify-center mb-3">
+                <img
+                  src="https://public.readdy.ai/ai/img_res/f2c00337702712163a061331aa926f1b.jpg"
+                  className="w-full h-full object-cover"
+                  alt="暂无订单"
+                />
+              </div>
+              <p className="text-gray-500 text-xs">暂无相关订单</p>
+              <button
+                onClick={() => navigate("/")}
+                className="mt-3 bg-primary text-white px-4 py-1.5 rounded-full text-xs"
               >
-                <div className="p-3">
-                  {/* 遍历每个商品，显示其对应的店铺信息 */}
-                  {order.items.map((item, index) => (
-                    <div key={index}>
-                      {index > 0 && <hr className="my-2 border-gray-200" />}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center">
-                          {item.shopAvatarUrl ? (
-                            <img
-                              src={item.shopAvatarUrl}
-                              className="w-4 h-4 rounded-full mr-1"
-                              alt={item.shopName}
-                            />
-                          ) : (
-                            <FaStore className="text-gray-600 text-xs mr-1" />
-                          )}
-                          <span className="text-xs">
-                            {item.shopName || "未知店铺"}
-                          </span>
-                        </div>
-                        <div
-                          className={`text-xs ${
-                            order.status === 1
-                              ? "text-red-500"
-                              : order.status === 4
-                              ? "text-green-500"
-                              : order.status === 6
-                              ? "text-orange-500"
-                              : order.status === 7
-                              ? "text-blue-500"
-                              : "text-primary"
-                          }`}
-                        >
-                          {getOrderStatus(order.status)}
-                        </div>
-                      </div>
-                      {/* 订单内容 */}
-                      <Link to={`/order/${order.orderNumber}`}>
-                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                          <img
-                            src={item.imageUrl}
-                            className="w-16 h-16 object-cover rounded"
-                            alt={item.name}
-                          />
-                          <div className="flex-1">
-                            <h3 className="text-xs mb-1 line-clamp-2">
-                              {item.name}
-                            </h3>
-                            <p className="text-[10px] text-gray-500 mb-1">
-                              {formatSpecifications(item.specifications)}
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-primary">
-                                ¥{item?.price ? item.price.toFixed(2) : "0.00"}
-                              </span>
-                              <span className="text-[10px] text-gray-500">
-                                x{item.quantity}
-                              </span>
-                            </div>
+                去逛逛
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="bg-white rounded-lg overflow-hidden shadow-sm"
+                >
+                  <div className="p-3">
+                    {/* 遍历每个商品，显示其对应的店铺信息 */}
+                    {order.items.map((item, index) => (
+                      <div key={index}>
+                        {index > 0 && <hr className="my-2 border-gray-200" />}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            {item.shopAvatarUrl ? (
+                              <img
+                                src={item.shopAvatarUrl}
+                                className="w-4 h-4 rounded-full mr-1"
+                                alt={item.shopName}
+                              />
+                            ) : (
+                              <FaStore className="text-gray-600 text-xs mr-1" />
+                            )}
+                            <span className="text-xs">
+                              {item.shopName || "未知店铺"}
+                            </span>
+                          </div>
+                          <div
+                            className={`text-xs ${
+                              order.status === 1
+                                ? "text-red-500"
+                                : order.status === 4
+                                ? "text-green-500"
+                                : order.status === 6
+                                ? "text-orange-500"
+                                : order.status === 7
+                                ? "text-blue-500"
+                                : "text-primary"
+                            }`}
+                          >
+                            {getOrderStatus(order.status)}
                           </div>
                         </div>
-                      </Link>
-                    </div>
-                  ))}
+                        {/* 订单内容 */}
+                        <Link to={`/order/${order.orderNumber}`}>
+                          <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                            <img
+                              src={item.imageUrl}
+                              className="w-16 h-16 object-cover rounded"
+                              alt={item.name}
+                            />
+                            <div className="flex-1">
+                              <h3 className="text-xs mb-1 line-clamp-2">
+                                {item.name}
+                              </h3>
+                              <p className="text-[10px] text-gray-500 mb-1">
+                                {formatSpecifications(item.specifications)}
+                              </p>
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs text-primary">
+                                  ¥
+                                  {item?.price ? item.price.toFixed(2) : "0.00"}
+                                </span>
+                                <span className="text-[10px] text-gray-500">
+                                  x{item.quantity}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    ))}
 
-                  {/* 订单底部信息 */}
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="text-[10px] text-gray-500">
-                      {order.date}
-                    </div>
-                    <div className="text-[10px]">
-                      共{order.items.length}件商品 合计:{" "}
-                      <span className="text-primary">
-                        ¥
-                        {order?.totalAmount
-                          ? order.totalAmount.toFixed(2)
-                          : "0.00"}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 倒计时 - 仅待付款订单显示 */}
-                  {order.status === 1 && (
-                    <div className="flex items-center mt-1">
-                      <div className="text-[10px] text-red-500">
-                        <i className="ri-time-line mr-1"></i>
-                        <span>支付剩余时间：<OrderCountdown initialCountdown={order.countdown || 30 * 60} remainingTime={remainingTimes[order.id]} />
+                    {/* 订单底部信息 */}
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="text-[10px] text-gray-500">
+                        {order.date}
+                      </div>
+                      <div className="text-[10px]">
+                        共{order.items.length}件商品 合计:{" "}
+                        <span className="text-primary">
+                          ¥
+                          {order?.totalAmount
+                            ? order.totalAmount.toFixed(2)
+                            : "0.00"}
                         </span>
                       </div>
                     </div>
-                  )}
-                  
-                  {/* 订单操作按钮 */}
-                  {renderOrderActions(order)}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
 
-        {/* 分页控件 */}
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center mt-4 pb-4">
-            <button
-              onClick={() => setPage(Math.max(0, page - 1))}
-              disabled={page === 0}
-              className={`px-3 py-1 text-xs rounded-l-md ${
-                page === 0
-                  ? "bg-gray-200 text-gray-500"
-                  : "bg-primary text-white"
-              }`}
-            >
-              上一页
-            </button>
-            <span className="px-3 py-1 text-xs bg-gray-100">
-              {page + 1} / {totalPages}
-            </span>
-            <button
-              onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
-              disabled={page >= totalPages - 1}
-              className={`px-3 py-1 text-xs rounded-r-md ${
-                page >= totalPages - 1
-                  ? "bg-gray-200 text-gray-500"
-                  : "bg-primary text-white"
-              }`}
-            >
-              下一页
-            </button>
-          </div>
-        )}
-      </main>
-    </div>
+                    {/* 倒计时 - 仅待付款订单显示 */}
+                    {order.status === 1 && (
+                      <div className="flex items-center mt-1">
+                        <div className="text-[10px] text-red-500">
+                          <i className="ri-time-line mr-1"></i>
+                          <span>
+                            支付剩余时间：
+                            <OrderCountdown
+                              initialCountdown={order.countdown || 30 * 60}
+                              remainingTime={remainingTimes[order.id]}
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 订单操作按钮 */}
+                    {renderOrderActions(order)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 分页控件 */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-4 pb-4">
+              <button
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className={`px-3 py-1 text-xs rounded-l-md ${
+                  page === 0
+                    ? "bg-gray-200 text-gray-500"
+                    : "bg-primary text-white"
+                }`}
+              >
+                上一页
+              </button>
+              <span className="px-3 py-1 text-xs bg-gray-100">
+                {page + 1} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1}
+                className={`px-3 py-1 text-xs rounded-r-md ${
+                  page >= totalPages - 1
+                    ? "bg-gray-200 text-gray-500"
+                    : "bg-primary text-white"
+                }`}
+              >
+                下一页
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+    </BasePage>
   );
 };
 
 const formatTime = (seconds) => {
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+  return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 export default OrderList;

@@ -160,12 +160,6 @@ const ProductManagePage = () => {
                 </div>
                 
                 <div className="flex border-t border-gray-100">
-                  <button 
-                    className="flex-1 py-2 text-xs text-gray-500 flex items-center justify-center"
-                    onClick={() => handleViewProduct(product.id)}
-                  >
-                    <FaEye className="mr-1" /> 查看
-                  </button>
                   <div className="w-px bg-gray-100"></div>
                   <button 
                     className="flex-1 py-2 text-xs text-blue-500 flex items-center justify-center"
