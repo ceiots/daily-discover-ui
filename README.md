@@ -12,7 +12,7 @@ npm run build
 npx cap copy
 
 # 打包apk应用
-cd android
+cd android 
 测试包 ./gradlew.bat assembleDebug
 正式包 ./gradlew.bat assembleRelease
 
