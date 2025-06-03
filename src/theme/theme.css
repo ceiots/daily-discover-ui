@@ -661,3 +661,24 @@
     border-radius: 12px;
   }
 }
+
+body, .page-container {
+  font-size: 12px; /* 全局默认字体大小 */
+  font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+}
+.page-header-title {
+  font-size: 15px;
+  font-weight: bold;
+}
+input, textarea, select, button {
+  font-size: 12px;
+}
+
+.page-container {
+  margin-top: 10px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

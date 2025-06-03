@@ -45,7 +45,7 @@ const AddressList = () => {
       }
 
       try {
-        const response = await instance.get(`/orderAddr/${userInfo.id}`);
+        const response = await instance.get(`/address/getAllByUserId?userId=${userInfo.id}`);
         // 确保addresses始终是数组
         let addrList = response.data.data;
         if (!addrList || !Array.isArray(addrList)) {
@@ -143,7 +143,7 @@ const AddressList = () => {
   const handleDelete = async (addressId) => {
     if (window.confirm("确认删除这个地址吗？")) {
       try {
-        const response = await instance.delete(`/orderAddr/delete/${addressId}`);
+        const response = await instance.delete(`/address/delete/${addressId}`);
         if (response.data.code === 200) {
           setAddresses(addresses.filter(addr => addr.id !== addressId));
         } else {
@@ -159,16 +159,19 @@ const AddressList = () => {
   // 设为默认地址
   const handleSetDefault = async (addressId) => {
     try {
-      const response = await instance.post(`/orderAddr/setDefault`, { 
-        userId: userInfo.id, 
-        addressId 
+      const response = await instance.post(`/address/setDefault`, null, { 
+        params: { userId: userInfo.id, userAddressId: addressId }
       });
       
       if (response.data.code === 200) {
-        setAddresses(addresses.map(addr => ({
-          ...addr,
-          isDefault: addr.id === addressId
-        })));
+        // 重新获取地址列表
+        const refreshResponse = await instance.get(`/address/getAllByUserId?userId=${userInfo.id}`);
+        let addrList = refreshResponse.data.data;
+        if (!addrList || !Array.isArray(addrList)) {
+          addrList = [];
+          console.warn("地址列表数据格式不正确，已转换为空数组");
+        }
+        setAddresses(addrList);
       } else {
         alert("设置默认地址失败: " + response.data.message);
       }
@@ -179,13 +182,8 @@ const AddressList = () => {
   };
 
   // 选择地址
-  const handleSelectAddress = (addressId) => {
-    setSelectedAddressId(addressId);
-    // 如果是从订单页面跳转来的，选择后返回
-    if (location.state && location.state.fromOrder) {
-      const selectedAddress = addresses.find(addr => addr.id === addressId);
-      navigate(-1, { state: { selectedAddress } });
-    }
+  const handleSelectAddress = (id) => {
+    setSelectedAddressId(id);
   };
   
   // 打开地区选择器
@@ -214,6 +212,13 @@ const AddressList = () => {
   const selectProvince = (province) => {
     setSelectedProvince(province);
     setSelectedCity(null);
+    setDistricts([]);
+    setCurrentAddress(prev => ({
+      ...prev,
+      province: province.name,
+      city: "",
+      district: ""
+    }));
     setActiveTab("city");
     handleProvinceChange(province.code);
   };
@@ -221,6 +226,12 @@ const AddressList = () => {
   // 选择城市
   const selectCity = (city) => {
     setSelectedCity(city);
+    setDistricts([]);
+    setCurrentAddress(prev => ({
+      ...prev,
+      city: city.name,
+      district: ""
+    }));
     setActiveTab("district");
     // 获取区县列表
     const fetchDistricts = async () => {
@@ -266,7 +277,7 @@ const AddressList = () => {
     if (!validateForm()) return;
 
     try {
-      const endpoint = currentAddress.id ? "/orderAddr/update" : "/orderAddr/save";
+      const endpoint = currentAddress.id ? "/address/update" : "/address/save";
 
       const addrData = {
         orderAddrId: currentAddress.id,
@@ -283,7 +294,7 @@ const AddressList = () => {
       const response = await instance.post(endpoint, addrData);
       if (response.data.code === 200) {
         // 重新获取地址列表
-        const refreshResponse = await instance.get(`/orderAddr/${userInfo.id}`);
+        const refreshResponse = await instance.get(`/address/getAllByUserId?userId=${userInfo.id}`);
         let addrList = refreshResponse.data.data;
         if (!addrList || !Array.isArray(addrList)) {
           addrList = [];
@@ -305,6 +316,7 @@ const AddressList = () => {
     setCurrentAddress({ ...currentAddress, isDefault: !currentAddress.isDefault });
   };
 
+  
   return (
     <BasePage
       showHeader={true}
@@ -314,10 +326,10 @@ const AddressList = () => {
         </button>
       }
       headerTitle="收货地址"
-      backgroundColor="primary"
+      backgroundColor="default"
     >
       {/* 主内容区 */}
-      <main className="pt-16 pb-24 px-4">
+      <main className="pt-5 pb-5 px-4">
         {loading ? (
           <div className="flex justify-center items-center h-40">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7467f0]"></div>
@@ -417,7 +429,7 @@ const AddressList = () => {
             
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">收货人</label>
+                <label className="block text-gray-500 mb-1">收货人</label>
                 <input
                   type="text"
                   placeholder="请输入姓名"
@@ -425,9 +437,7 @@ const AddressList = () => {
                   onChange={(e) =>
                     setCurrentAddress({ ...currentAddress, name: e.target.value })
                   }
-                  className={`border ${
-                    errors.name ? "border-red-500" : "border-gray-300"
-                  } p-2.5 rounded-lg w-full text-sm`}
+                  className={`border ${errors.name ? "border-red-500" : "border-gray-300"} p-2.5 rounded-lg w-full`}
                 />
                 {errors.name && (
                   <span className="text-red-500 text-xs mt-1">{errors.name}</span>
