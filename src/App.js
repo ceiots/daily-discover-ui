@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate,useLocation } from 'react-router-dom';
 import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './components/NavBar';
@@ -179,23 +179,32 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+function showNavBar(pathname) {
+  const pathsWithoutNavBar = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/ecommerce-creation'
+  ];
+
+  const currentPath = location.pathname;
+  console.log("currentPath", currentPath);
+  // 只要是 /ecommerce-creation 开头的都不显示
+  if (currentPath.startsWith('/ecommerce-creation')) return false;
+  return !pathsWithoutNavBar.includes(currentPath);
+}
+
 const App = () => {
-  // 确定当前路径是否需要显示导航栏
-  const shouldShowNavBar = () => {
-    // 获取当前路径
-    const currentPath = window.location.pathname;
-    // 这些路径已经在自己的页面中引入了NavBar，不需要全局显示
-    const pathsWithoutNavBar = ['/login', '/register', '/forgot-password', '/ecommerce-creation'];
-    return !pathsWithoutNavBar.includes(currentPath);
-  };
+
+  const location = useLocation();
+  const shouldShowNavBar = showNavBar(location.pathname);
 
   return (
     <ThemeProvider>
       <AuthProvider>
         <div className="page-container">
-          <Router>
             <CommonHelmet />
-            {shouldShowNavBar() && <NavBar className="bottom-nav" />}
+            {shouldShowNavBar && <NavBar className="bottom-nav" />}
             <Routes>
               {/* 主题示例页面 */}
               <Route path="/theme-example" element={<ExamplePage />} />
@@ -243,7 +252,6 @@ const App = () => {
               <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
               <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
             </Routes>
-          </Router>
         </div>
       </AuthProvider>
     </ThemeProvider>

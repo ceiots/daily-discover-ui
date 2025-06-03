@@ -549,6 +549,10 @@
   position: relative;
   z-index: 10;
   box-shadow: var(--shadow-md);
+  top: 0;
+  left: 0;
+  right: 0;
+  position: fixed;
 }
 
 .page-header-title {
@@ -570,6 +574,10 @@
   grid-column: 3;
   justify-self: end;
 } 
+
+.page-content{
+  margin-top: 70px;
+}
 
 /* 按钮美化 */
 .btn, .btn-primary, .btn-secondary, .btn-outline {

@@ -117,7 +117,7 @@ BasePage.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
   showHeader: PropTypes.bool,
-  headerTitle: PropTypes.string,
+  headerTitle: PropTypes.node,
   headerLeft: PropTypes.node,
   headerRight: PropTypes.node,
   showFooter: PropTypes.bool,

@@ -11,7 +11,9 @@ const root = createRoot(document.getElementById('root')); // 创建根节点
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <App />
+      <Router>
+        <App />
+      </Router>
     </HelmetProvider>
   </React.StrictMode>
 ); // 使用 render 方法渲染应用

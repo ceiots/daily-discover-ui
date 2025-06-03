@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./EcommerceCreationPage.css";
 import instance from "../../utils/axios";
+import { BasePage } from "../../theme";
 
 const EcommerceCreationPage = () => {
   const navigate = useNavigate();
@@ -90,10 +91,10 @@ const EcommerceCreationPage = () => {
     }
     if (files.length > 0) {
       // 如果是URL字符串
-      if (typeof files[0] === 'string') {
+      if (typeof files[0] === "string") {
         const newImages = files.map((url, index) => ({
           id: Date.now() + index,
-          url: url
+          url: url,
         }));
         setFormData((prevFormData) => ({
           ...prevFormData,
@@ -568,146 +569,147 @@ const EcommerceCreationPage = () => {
   }, [formData.categoryId]);
 
   return (
-    <div className="ecommerce-creation-container pb-16">
-      {/* 顶部导航栏 */}
-      <div className="fixed top-0 left-0 right-0 bg-primary text-white z-10 max-w-[375px] mx-auto">
-        <div className="flex items-center justify-between px-4 py-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-8 h-8 flex items-center justify-center"
-          >
-            <i className="fas fa-arrow-left"></i>
-          </button>
-          <h1 className="text-lg font-medium">电商创建</h1>
-          <div className="w-8"></div>
-        </div>
-      </div>
-
-      {/* 店铺检查提示 */}
-      {shopChecking ? (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <div className="text-center">
-            <i className="fas fa-spinner fa-spin text-primary text-2xl mb-3"></i>
-            <p>正在检查店铺信息...</p>
+    <BasePage
+      showHeader={true}
+      headerLeft={
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      }
+      headerTitle="电商创建"
+      backgroundColor="default"
+    >
+      <div
+      >
+        {/* 店铺检查提示 */}
+        {shopChecking ? (
+          <div className="flex flex-col items-center justify-center h-screen">
+            <div className="text-center">
+              <i className="fas fa-spinner fa-spin text-primary text-2xl mb-3"></i>
+              <p>正在检查店铺信息...</p>
+            </div>
           </div>
-        </div>
-      ) : !hasShop ? (
-        <div className="flex flex-col items-center justify-center h-screen p-4">
-          <div className="text-center">
-            <i className="fas fa-store text-primary text-5xl mb-4"></i>
-            <h2 className="text-xl font-medium mb-2">您还没有创建店铺</h2>
-            <p className="text-gray-500 mb-6">创建商品前，请先创建您的店铺</p>
-            <button
-              onClick={() => navigate("/create-shop")}
-              className="px-6 py-3 bg-primary text-white rounded-lg"
-            >
-              去创建店铺
-            </button>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* 标签切换 */}
-          <div className="fixed top-12 left-0 right-0 bg-white z-10 max-w-[375px] mx-auto border-b overflow-x-auto">
-            <div className="flex whitespace-nowrap">
+        ) : !hasShop ? (
+          <div className="flex flex-col items-center justify-center h-screen p-4">
+            <div className="text-center">
+              <i className="fas fa-store text-primary text-5xl mb-4"></i>
+              <h2 className="text-xl font-medium mb-2">您还没有创建店铺</h2>
+              <p className="text-gray-500 mb-6">创建商品前，请先创建您的店铺</p>
               <button
-                className={`px-4 py-3 text-center text-sm font-medium ${
-                  activeTab === "basic"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-500"
-                }`}
-                onClick={() => setActiveTab("basic")}
+                onClick={() => navigate("/create-shop")}
+                className="px-6 py-3 bg-primary text-white rounded-lg"
               >
-                基本信息
-              </button>
-              <button
-                className={`px-4 py-3 text-center text-sm font-medium ${
-                  activeTab === "details"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-500"
-                }`}
-                onClick={() => setActiveTab("details")}
-              >
-                商品详情
-              </button>
-              <button
-                className={`px-4 py-3 text-center text-sm font-medium ${
-                  activeTab === "specs"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-500"
-                }`}
-                onClick={() => setActiveTab("specs")}
-              >
-                规格参数
-              </button>
-              <button
-                className={`px-4 py-3 text-center text-sm font-medium ${
-                  activeTab === "notices"
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-500"
-                }`}
-                onClick={() => setActiveTab("notices")}
-              >
-                购买须知
+                去创建店铺
               </button>
             </div>
           </div>
+        ) : (
+          <>
+            {/* 标签切换 */}
+            <div className="fixed top-20  left-0 right-0 bg-white z-10 max-w-[375px] mx-auto border-b overflow-x-auto">
+              <div className="flex whitespace-nowrap">
+                <button
+                  className={`px-4 py-3 text-center text-sm font-medium ${
+                    activeTab === "basic"
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("basic")}
+                >
+                  基本信息
+                </button>
+                <button
+                  className={`px-4 py-3 text-center text-sm font-medium ${
+                    activeTab === "details"
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("details")}
+                >
+                  商品详情
+                </button>
+                <button
+                  className={`px-4 py-3 text-center text-sm font-medium ${
+                    activeTab === "specs"
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("specs")}
+                >
+                  规格参数
+                </button>
+                <button
+                  className={`px-4 py-3 text-center text-sm font-medium ${
+                    activeTab === "notices"
+                      ? "text-primary border-b-2 border-primary"
+                      : "text-gray-500"
+                  }`}
+                  onClick={() => setActiveTab("notices")}
+                >
+                  购买须知
+                </button>
+              </div>
+            </div>
 
-          {/* 主内容区域 */}
-          <div className="pt-24 px-4">
-            {/* 基本信息 */}
-            {activeTab === "basic" && (
-              <div className="basic-info">
-                {/* 商品标题 */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    商品标题
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    placeholder="请输入商品标题"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    className={`w-full p-3 border ${
-                      errors.title ? "border-red-500" : "border-gray-200"
-                    } rounded-lg text-sm`}
-                  />
-                  {errors.title && (
-                    <p className="text-red-500 text-xs mt-1">{errors.title}</p>
-                  )}
-                </div>
+            {/* 主内容区域 */}
+            <div className="pt-3 px-4" style={{marginTop: '63px'}}>
+              {/* 基本信息 */}
+              {activeTab === "basic" && (
+                <div className="basic-info">
+                  {/* 商品标题 */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      商品标题
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      placeholder="请输入商品标题"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      className={`w-full p-3 border ${
+                        errors.title ? "border-red-500" : "border-gray-200"
+                      } rounded-lg text-sm`}
+                    />
+                    {errors.title && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.title}
+                      </p>
+                    )}
+                  </div>
 
-                {/* 商品价格 */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    商品价格
-                  </label>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
-                          ¥
-                        </span>
-                        <input
-                          type="text"
-                          name="price"
-                          placeholder="0.00"
-                          value={formData.price}
-                          onChange={handleInputChange}
-                          className={`w-full p-3 pl-8 border ${
-                            errors.price ? "border-red-500" : "border-gray-200"
-                          } rounded-lg text-sm`}
-                        />
+                  {/* 商品价格 */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      商品价格
+                    </label>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            ¥
+                          </span>
+                          <input
+                            type="text"
+                            name="price"
+                            placeholder="0.00"
+                            value={formData.price}
+                            onChange={handleInputChange}
+                            className={`w-full p-3 pl-8 border ${
+                              errors.price
+                                ? "border-red-500"
+                                : "border-gray-200"
+                            } rounded-lg text-sm`}
+                          />
+                        </div>
+                        {errors.price && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.price}
+                          </p>
+                        )}
                       </div>
-                      {errors.price && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.price}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      {/* <div className="relative">
+                      <div className="flex-1">
+                        {/* <div className="relative">
                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
                         <input
                           type="text"
@@ -718,33 +720,33 @@ const EcommerceCreationPage = () => {
                           className="w-full p-3 pl-8 border border-gray-200 rounded-lg text-sm"
                         />
                       </div> */}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 商品库存 */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    商品库存
-                  </label>
-                  <div className="flex gap-3">
-                    <div className="flex-1">
-                      <input
-                        type="number"
-                        name="stock"
-                        placeholder="请输入库存数量"
-                        value={formData.stock}
-                        onChange={handleInputChange}
-                        min="0"
-                        className="w-full p-3 border border-gray-200 rounded-lg text-sm"
-                      />
+                  {/* 商品库存 */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      商品库存
+                    </label>
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <input
+                          type="number"
+                          name="stock"
+                          placeholder="请输入库存数量"
+                          value={formData.stock}
+                          onChange={handleInputChange}
+                          min="0"
+                          className="w-full p-3 border border-gray-200 rounded-lg text-sm"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* 商品分类 */}
-                <div className="mb-4">
-                  {/* <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {/* 商品分类 */}
+                  <div className="mb-4">
+                    {/* <label className="block text-sm font-medium text-gray-700 mb-1">
                     商品分类
                     <Link 
                       to="/category-manage" 
@@ -753,64 +755,64 @@ const EcommerceCreationPage = () => {
                       管理分类
                     </Link>
                   </label> */}
-                  <div className="space-y-2">
-                    {/* 一级分类 */}
-                    <select
-                      value={selectedCategoryId || ""}
-                      onChange={handleCategoryChange}
-                      className={`w-full p-3 border ${
-                        errors.category ? "border-red-500" : "border-gray-200"
-                      } rounded-lg text-sm bg-white`}
-                    >
-                      <option value="">请选择一级分类</option>
-                      {categories.map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* 二级分类 */}
-                    {subCategories.length > 0 && (
+                    <div className="space-y-2">
+                      {/* 一级分类 */}
                       <select
-                        value={selectedSubCategoryId || ""}
-                        onChange={handleSubCategoryChange}
-                        className="w-full p-3 border border-gray-200 rounded-lg text-sm bg-white"
+                        value={selectedCategoryId || ""}
+                        onChange={handleCategoryChange}
+                        className={`w-full p-3 border ${
+                          errors.category ? "border-red-500" : "border-gray-200"
+                        } rounded-lg text-sm bg-white`}
                       >
-                        <option value="">请选择二级分类</option>
-                        {subCategories.map((category) => (
+                        <option value="">请选择一级分类</option>
+                        {categories.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.name}
                           </option>
                         ))}
                       </select>
-                    )}
 
-                    {/* 三级分类 */}
-                    {thirdCategories.length > 0 && (
-                      <select
-                        value={formData.categoryId || ""}
-                        onChange={handleThirdCategoryChange}
-                        className="w-full p-3 border border-gray-200 rounded-lg text-sm bg-white"
-                      >
-                        <option value="">请选择三级分类</option>
-                        {thirdCategories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
+                      {/* 二级分类 */}
+                      {subCategories.length > 0 && (
+                        <select
+                          value={selectedSubCategoryId || ""}
+                          onChange={handleSubCategoryChange}
+                          className="w-full p-3 border border-gray-200 rounded-lg text-sm bg-white"
+                        >
+                          <option value="">请选择二级分类</option>
+                          {subCategories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      {/* 三级分类 */}
+                      {thirdCategories.length > 0 && (
+                        <select
+                          value={formData.categoryId || ""}
+                          onChange={handleThirdCategoryChange}
+                          className="w-full p-3 border border-gray-200 rounded-lg text-sm bg-white"
+                        >
+                          <option value="">请选择三级分类</option>
+                          {thirdCategories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    {errors.category && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.category}
+                      </p>
                     )}
                   </div>
-                  {errors.category && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.category}
-                    </p>
-                  )}
-                </div>
 
-                {/* 商品标签 */}
-                {/* <div className="mb-4">
+                  {/* 商品标签 */}
+                  {/* <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">商品标签 (最多选择5个)</label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {tags.map(tag => (
@@ -835,451 +837,461 @@ const EcommerceCreationPage = () => {
                   </div>
                 </div> */}
 
-                {/* 商品图片 */}
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    商品图片
-                  </label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {formData.images.map((image) => (
-                      <div key={image.id} className="relative w-24 h-24">
-                        <img
-                          src={image.url}
-                          alt=""
-                          className="w-full h-full object-cover rounded"
-                        />
-                        <button
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                          onClick={() => removeImage(image.id)}
-                        >
-                          <i className="fas fa-times text-xs"></i>
-                        </button>
-                      </div>
-                    ))}
-                    <label
-                      className={`w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50 ${
-                        loading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {loading ? (
-                        <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
-                      ) : (
-                        <i className="fas fa-plus text-gray-400 mb-1"></i>
-                      )}
-                      <span className="text-xs text-gray-500">
-                        {loading ? "上传中..." : "添加图片"}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="hidden"
-                        onChange={handleImageUpload}
-                        disabled={loading}
-                      />
+                  {/* 商品图片 */}
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      商品图片
                     </label>
-                    <button
-                      onClick={() => {
-                        const url = prompt("请输入图片URL");
-                        if (url && url.trim()) {
-                          handleImageUpload([url.trim()]);
-                        }
-                      }}
-                      className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
-                      disabled={loading}
-                    >
-                      <i className="fas fa-link text-gray-400 mb-1"></i>
-                      <span className="text-xs text-gray-500">输入URL</span>
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    建议上传尺寸800x800像素以上、大小不超过10MB的图片
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    如果图片过大，请使用图片压缩工具处理后再上传
-                  </p>
-                  {errors.images && (
-                    <p className="text-red-500 text-xs mt-1">{errors.images}</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* 商品详情 */}
-            {activeTab === "details" && (
-              <div className="product-details">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-medium">商品详情</h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => addDetail("text")}
-                      className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
-                    >
-                      <i className="fas fa-font text-xs mr-1"></i>
-                      添加文字
-                    </button>
-                    <button
-                      onClick={() => addDetail("image")}
-                      className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
-                    >
-                      <i className="fas fa-image text-xs mr-1"></i>
-                      添加图片
-                    </button>
-                    <button
-                      onClick={() => {
-                        const url = prompt("请输入图片URL");
-                        if (url && url.trim()) {
-                          handleImageUpload([url.trim()]);
-                        }
-                      }}
-                      className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
-                      disabled={loading}
-                    >
-                      <i className="fas fa-link text-gray-400 mb-1"></i>
-                      <span className="text-xs text-gray-500">输入URL</span>
-                    </button>
-                  </div>
-                </div>
-
-                {formData.details.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <p className="text-gray-500 text-sm">
-                      点击上方按钮添加商品详情
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {formData.details.map((detail, index) => (
-                      <div
-                        key={detail.id}
-                        className="p-3 bg-gray-50 rounded-lg relative"
-                      >
-                        <button
-                          className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
-                          onClick={() => removeDetail(detail.id)}
-                        >
-                          <i className="fas fa-trash-alt text-xs"></i>
-                        </button>
-
-                        {detail.type === "text" ? (
-                          <textarea
-                            placeholder="请输入详情文字描述"
-                            value={detail.content || ""}
-                            onChange={(e) =>
-                              updateDetail(detail.id, e.target.value)
-                            }
-                            className="w-full p-2 border border-gray-200 rounded text-sm min-h-[80px]"
-                          ></textarea>
-                        ) : (
-                          <div>
-                            {detail.content ? (
-                              <div className="relative">
-                                <img
-                                  src={detail.content}
-                                  alt=""
-                                  className="w-full rounded"
-                                />
-                                <button
-                                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                                  onClick={() => updateDetail(detail.id, null)}
-                                >
-                                  <i className="fas fa-times text-xs"></i>
-                                </button>
-                              </div>
-                            ) : (
-                              <label
-                                className={`block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white ${
-                                  loading ? "opacity-50 cursor-not-allowed" : ""
-                                }`}
-                              >
-                                {loading ? (
-                                  <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
-                                ) : (
-                                  <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
-                                )}
-                                <span className="text-xs text-gray-500">
-                                  {loading ? "上传中..." : "上传详情图片"}
-                                </span>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="hidden"
-                                  disabled={loading}
-                                  onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                      const file = e.target.files[0];
-
-                                      // 检查文件大小
-                                      const maxSizeInMB = 10; // 10MB限制
-                                      const maxSizeInBytes =
-                                        maxSizeInMB * 1024 * 1024;
-
-                                      if (file.size > maxSizeInBytes) {
-                                        alert(
-                                          `图片 ${file.name} 超过${maxSizeInMB}MB大小限制，请压缩后再上传`
-                                        );
-                                        return;
-                                      }
-
-                                      // 显示上传中状态
-                                      setLoading(true);
-
-                                      // 创建FormData对象用于文件上传
-                                      const formData = new FormData();
-                                      formData.append("file", file);
-
-                                      // 调用上传接口
-                                      instance({
-                                        method: "post",
-                                        url: "/product/upload",
-                                        data: formData,
-                                        headers: {
-                                          "Content-Type": undefined, // 让浏览器自动设置正确的Content-Type和boundary
-                                        },
-                                      })
-                                        .then((response) => {
-                                          if (
-                                            response.data &&
-                                            response.data.code === 200
-                                          ) {
-                                            const responseData =
-                                              response.data.data;
-                                            // 检查后端返回的数据结构
-                                            let imageUrl;
-
-                                            if (responseData.url) {
-                                              // 如果返回了单个url
-                                              imageUrl = responseData.url;
-                                            } else if (
-                                              responseData.urls &&
-                                              Array.isArray(
-                                                responseData.urls
-                                              ) &&
-                                              responseData.urls.length > 0
-                                            ) {
-                                              // 如果返回了urls数组，使用第一个
-                                              imageUrl = responseData.urls[0];
-                                            } else {
-                                              // 如果数据结构不符合预期，提示错误
-                                              console.error(
-                                                "图片上传响应格式不正确:",
-                                                responseData
-                                              );
-                                              alert(
-                                                "图片上传响应格式不正确，请稍后重试"
-                                              );
-                                              return;
-                                            }
-
-                                            // 更新详情
-                                            updateDetail(detail.id, imageUrl);
-                                          } else {
-                                            alert(
-                                              "图片上传失败：" +
-                                                (response.data.message ||
-                                                  "未知错误")
-                                            );
-                                          }
-                                        })
-                                        .catch((error) => {
-                                          console.error(
-                                            "上传详情图片时发生错误：",
-                                            error
-                                          );
-                                          alert("图片上传失败，请稍后重试");
-                                        })
-                                        .finally(() => {
-                                          setLoading(false);
-                                        });
-                                    }
-                                  }}
-                                />
-                              </label>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 规格参数 */}
-            {activeTab === "specs" && (
-              <div className="specifications">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-medium">规格参数</h3>
-                  <button
-                    onClick={addSpecification}
-                    className="px-3 py-1 bg-primary/10 rounded text-xs text-primary flex items-center"
-                  >
-                    <i className="fas fa-plus text-xs mr-1"></i>
-                    添加规格
-                  </button>
-                </div>
-
-                {formData.specifications.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <p className="text-gray-500 text-sm">
-                      点击上方按钮添加商品规格
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {formData.specifications.map((spec, index) => (
-                      <div key={spec.id} className="p-3 bg-gray-50 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <input
-                            type="text"
-                            placeholder="规格名称，如颜色、尺寸等"
-                            value={spec.name}
-                            onChange={(e) =>
-                              updateSpecName(spec.id, e.target.value)
-                            }
-                            className="flex-1 p-2 border border-gray-200 rounded text-sm"
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {formData.images.map((image) => (
+                        <div key={image.id} className="relative w-24 h-24">
+                          <img
+                            src={image.url}
+                            alt=""
+                            className="w-full h-full object-cover rounded"
                           />
                           <button
-                            className="ml-2 text-gray-400 hover:text-red-500"
-                            onClick={() => removeSpecification(spec.id)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                            onClick={() => removeImage(image.id)}
+                          >
+                            <i className="fas fa-times text-xs"></i>
+                          </button>
+                        </div>
+                      ))}
+                      <label
+                        className={`w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50 ${
+                          loading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {loading ? (
+                          <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                        ) : (
+                          <i className="fas fa-plus text-gray-400 mb-1"></i>
+                        )}
+                        <span className="text-xs text-gray-500">
+                          {loading ? "上传中..." : "添加图片"}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          disabled={loading}
+                        />
+                      </label>
+                      <button
+                        onClick={() => {
+                          const url = prompt("请输入图片URL");
+                          if (url && url.trim()) {
+                            handleImageUpload([url.trim()]);
+                          }
+                        }}
+                        className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
+                        disabled={loading}
+                      >
+                        <i className="fas fa-link text-gray-400 mb-1"></i>
+                        <span className="text-xs text-gray-500">输入URL</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      建议上传尺寸800x800像素以上、大小不超过10MB的图片
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      如果图片过大，请使用图片压缩工具处理后再上传
+                    </p>
+                    {errors.images && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.images}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 商品详情 */}
+              {activeTab === "details" && (
+                <div className="product-details">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-base font-medium">商品详情</h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => addDetail("text")}
+                        className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
+                      >
+                        <i className="fas fa-font text-xs mr-1"></i>
+                        添加文字
+                      </button>
+                      <button
+                        onClick={() => addDetail("image")}
+                        className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
+                      >
+                        <i className="fas fa-image text-xs mr-1"></i>
+                        添加图片
+                      </button>
+                      <button
+                        onClick={() => {
+                          const url = prompt("请输入图片URL");
+                          if (url && url.trim()) {
+                            handleImageUpload([url.trim()]);
+                          }
+                        }}
+                        className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
+                        disabled={loading}
+                      >
+                        <i className="fas fa-link text-gray-400 mb-1"></i>
+                        <span className="text-xs text-gray-500">输入URL</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {formData.details.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <p className="text-gray-500 text-sm">
+                        点击上方按钮添加商品详情
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.details.map((detail, index) => (
+                        <div
+                          key={detail.id}
+                          className="p-3 bg-gray-50 rounded-lg relative"
+                        >
+                          <button
+                            className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+                            onClick={() => removeDetail(detail.id)}
                           >
                             <i className="fas fa-trash-alt text-xs"></i>
                           </button>
-                        </div>
 
-                        <div className="space-y-2 mt-2">
-                          {spec.values.map((option, optIndex) => (
-                            <div key={optIndex} className="flex items-center">
-                              <input
-                                type="text"
-                                placeholder={`选项${optIndex + 1}`}
-                                value={option}
-                                onChange={(e) =>
-                                  updateSpecOption(
-                                    spec.id,
-                                    optIndex,
-                                    e.target.value
-                                  )
-                                }
-                                className="flex-1 p-2 border border-gray-200 rounded text-sm"
-                              />
-                              {spec.values.length > 1 && (
-                                <button
-                                  className="ml-2 text-gray-400 hover:text-red-500"
-                                  onClick={() =>
-                                    removeSpecOption(spec.id, optIndex)
-                                  }
+                          {detail.type === "text" ? (
+                            <textarea
+                              placeholder="请输入详情文字描述"
+                              value={detail.content || ""}
+                              onChange={(e) =>
+                                updateDetail(detail.id, e.target.value)
+                              }
+                              className="w-full p-2 border border-gray-200 rounded text-sm min-h-[80px]"
+                            ></textarea>
+                          ) : (
+                            <div>
+                              {detail.content ? (
+                                <div className="relative">
+                                  <img
+                                    src={detail.content}
+                                    alt=""
+                                    className="w-full rounded"
+                                  />
+                                  <button
+                                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                    onClick={() =>
+                                      updateDetail(detail.id, null)
+                                    }
+                                  >
+                                    <i className="fas fa-times text-xs"></i>
+                                  </button>
+                                </div>
+                              ) : (
+                                <label
+                                  className={`block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white ${
+                                    loading
+                                      ? "opacity-50 cursor-not-allowed"
+                                      : ""
+                                  }`}
                                 >
-                                  <i className="fas fa-times text-xs"></i>
-                                </button>
+                                  {loading ? (
+                                    <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                                  ) : (
+                                    <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
+                                  )}
+                                  <span className="text-xs text-gray-500">
+                                    {loading ? "上传中..." : "上传详情图片"}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    disabled={loading}
+                                    onChange={(e) => {
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+
+                                        // 检查文件大小
+                                        const maxSizeInMB = 10; // 10MB限制
+                                        const maxSizeInBytes =
+                                          maxSizeInMB * 1024 * 1024;
+
+                                        if (file.size > maxSizeInBytes) {
+                                          alert(
+                                            `图片 ${file.name} 超过${maxSizeInMB}MB大小限制，请压缩后再上传`
+                                          );
+                                          return;
+                                        }
+
+                                        // 显示上传中状态
+                                        setLoading(true);
+
+                                        // 创建FormData对象用于文件上传
+                                        const formData = new FormData();
+                                        formData.append("file", file);
+
+                                        // 调用上传接口
+                                        instance({
+                                          method: "post",
+                                          url: "/product/upload",
+                                          data: formData,
+                                          headers: {
+                                            "Content-Type": undefined, // 让浏览器自动设置正确的Content-Type和boundary
+                                          },
+                                        })
+                                          .then((response) => {
+                                            if (
+                                              response.data &&
+                                              response.data.code === 200
+                                            ) {
+                                              const responseData =
+                                                response.data.data;
+                                              // 检查后端返回的数据结构
+                                              let imageUrl;
+
+                                              if (responseData.url) {
+                                                // 如果返回了单个url
+                                                imageUrl = responseData.url;
+                                              } else if (
+                                                responseData.urls &&
+                                                Array.isArray(
+                                                  responseData.urls
+                                                ) &&
+                                                responseData.urls.length > 0
+                                              ) {
+                                                // 如果返回了urls数组，使用第一个
+                                                imageUrl = responseData.urls[0];
+                                              } else {
+                                                // 如果数据结构不符合预期，提示错误
+                                                console.error(
+                                                  "图片上传响应格式不正确:",
+                                                  responseData
+                                                );
+                                                alert(
+                                                  "图片上传响应格式不正确，请稍后重试"
+                                                );
+                                                return;
+                                              }
+
+                                              // 更新详情
+                                              updateDetail(detail.id, imageUrl);
+                                            } else {
+                                              alert(
+                                                "图片上传失败：" +
+                                                  (response.data.message ||
+                                                    "未知错误")
+                                              );
+                                            }
+                                          })
+                                          .catch((error) => {
+                                            console.error(
+                                              "上传详情图片时发生错误：",
+                                              error
+                                            );
+                                            alert("图片上传失败，请稍后重试");
+                                          })
+                                          .finally(() => {
+                                            setLoading(false);
+                                          });
+                                      }
+                                    }}
+                                  />
+                                </label>
                               )}
                             </div>
-                          ))}
+                          )}
                         </div>
-
-                        <button
-                          onClick={() => addSpecOption(spec.id)}
-                          className="mt-2 px-3 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
-                        >
-                          <i className="fas fa-plus text-xs mr-1"></i>
-                          添加选项
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 购买须知 */}
-            {activeTab === "notices" && (
-              <div className="purchase-notices">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-medium">购买须知</h3>
-                  <button
-                    onClick={addPurchaseNotice}
-                    className="px-3 py-1 bg-primary/10 rounded text-xs text-primary flex items-center"
-                  >
-                    <i className="fas fa-plus text-xs mr-1"></i>
-                    添加须知
-                  </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
+              )}
 
-                {formData.purchaseNotices.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                    <p className="text-gray-500 text-sm">
-                      点击上方按钮添加购买须知
-                    </p>
+              {/* 规格参数 */}
+              {activeTab === "specs" && (
+                <div className="specifications">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-base font-medium">规格参数</h3>
+                    <button
+                      onClick={addSpecification}
+                      className="px-3 py-1 bg-primary/10 rounded text-xs text-primary flex items-center"
+                    >
+                      <i className="fas fa-plus text-xs mr-1"></i>
+                      添加规格
+                    </button>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {formData.purchaseNotices.map((notice, index) => (
-                      <div
-                        key={notice.id}
-                        className="p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="flex justify-between items-center mb-2">
-                          <input
-                            type="text"
-                            placeholder="须知标题，如退换政策、发货说明等"
-                            value={notice.title}
+
+                  {formData.specifications.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <p className="text-gray-500 text-sm">
+                        点击上方按钮添加商品规格
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {formData.specifications.map((spec, index) => (
+                        <div
+                          key={spec.id}
+                          className="p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <input
+                              type="text"
+                              placeholder="规格名称，如颜色、尺寸等"
+                              value={spec.name}
+                              onChange={(e) =>
+                                updateSpecName(spec.id, e.target.value)
+                              }
+                              className="flex-1 p-2 border border-gray-200 rounded text-sm"
+                            />
+                            <button
+                              className="ml-2 text-gray-400 hover:text-red-500"
+                              onClick={() => removeSpecification(spec.id)}
+                            >
+                              <i className="fas fa-trash-alt text-xs"></i>
+                            </button>
+                          </div>
+
+                          <div className="space-y-2 mt-2">
+                            {spec.values.map((option, optIndex) => (
+                              <div key={optIndex} className="flex items-center">
+                                <input
+                                  type="text"
+                                  placeholder={`选项${optIndex + 1}`}
+                                  value={option}
+                                  onChange={(e) =>
+                                    updateSpecOption(
+                                      spec.id,
+                                      optIndex,
+                                      e.target.value
+                                    )
+                                  }
+                                  className="flex-1 p-2 border border-gray-200 rounded text-sm"
+                                />
+                                {spec.values.length > 1 && (
+                                  <button
+                                    className="ml-2 text-gray-400 hover:text-red-500"
+                                    onClick={() =>
+                                      removeSpecOption(spec.id, optIndex)
+                                    }
+                                  >
+                                    <i className="fas fa-times text-xs"></i>
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            onClick={() => addSpecOption(spec.id)}
+                            className="mt-2 px-3 py-1 bg-gray-100 rounded text-xs text-gray-700 flex items-center"
+                          >
+                            <i className="fas fa-plus text-xs mr-1"></i>
+                            添加选项
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 购买须知 */}
+              {activeTab === "notices" && (
+                <div className="purchase-notices">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-base font-medium">购买须知</h3>
+                    <button
+                      onClick={addPurchaseNotice}
+                      className="px-3 py-1 bg-primary/10 rounded text-xs text-primary flex items-center"
+                    >
+                      <i className="fas fa-plus text-xs mr-1"></i>
+                      添加须知
+                    </button>
+                  </div>
+
+                  {formData.purchaseNotices.length === 0 ? (
+                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <p className="text-gray-500 text-sm">
+                        点击上方按钮添加购买须知
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {formData.purchaseNotices.map((notice, index) => (
+                        <div
+                          key={notice.id}
+                          className="p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <input
+                              type="text"
+                              placeholder="须知标题，如退换政策、发货说明等"
+                              value={notice.title}
+                              onChange={(e) =>
+                                updatePurchaseNotice(
+                                  notice.id,
+                                  "title",
+                                  e.target.value
+                                )
+                              }
+                              className="flex-1 p-2 border border-gray-200 rounded text-sm"
+                            />
+                            <button
+                              className="ml-2 text-gray-400 hover:text-red-500"
+                              onClick={() => removePurchaseNotice(notice.id)}
+                            >
+                              <i className="fas fa-trash-alt text-xs"></i>
+                            </button>
+                          </div>
+
+                          <textarea
+                            placeholder="须知内容详情"
+                            value={notice.content}
                             onChange={(e) =>
                               updatePurchaseNotice(
                                 notice.id,
-                                "title",
+                                "content",
                                 e.target.value
                               )
                             }
-                            className="flex-1 p-2 border border-gray-200 rounded text-sm"
-                          />
-                          <button
-                            className="ml-2 text-gray-400 hover:text-red-500"
-                            onClick={() => removePurchaseNotice(notice.id)}
-                          >
-                            <i className="fas fa-trash-alt text-xs"></i>
-                          </button>
+                            className="w-full p-2 border border-gray-200 rounded text-sm min-h-[80px] mt-2"
+                          ></textarea>
                         </div>
-
-                        <textarea
-                          placeholder="须知内容详情"
-                          value={notice.content}
-                          onChange={(e) =>
-                            updatePurchaseNotice(
-                              notice.id,
-                              "content",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-2 border border-gray-200 rounded text-sm min-h-[80px] mt-2"
-                        ></textarea>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* 底部操作栏 */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10 max-w-[375px] mx-auto">
-            <div className="flex gap-3">
-              <button
-                onClick={handleDraft}
-                className="flex-1 py-2.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700"
-              >
-                保存草稿
-              </button>
-              <button
-                onClick={handleSubmit}
-                className="flex-1 py-2.5 bg-primary rounded-full text-sm font-medium text-white"
-              >
-                发布商品
-              </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        </>
-      )}
-    </div>
+
+            {/* 底部操作栏 */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10 max-w-[375px] mx-auto">
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDraft}
+                  className="flex-1 py-2.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700"
+                >
+                  保存草稿
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 py-2.5 bg-primary rounded-full text-sm font-medium text-white"
+                >
+                  发布商品
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </BasePage>
   );
 };
 
