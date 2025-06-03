@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "./ProductDetail.css"; // Keep your existing styles
 import instance from "../../utils/axios";
 import { useAuth } from "../../App"; // 添加上下文导入
-import { BasePage } from "../../theme";
+import { BasePage, Button } from "../../theme";
 
 const ProductDetail = () => {
 
@@ -53,9 +53,13 @@ const ProductDetail = () => {
       try {
         setLoading(true);
         const response = await instance.get(`/product/${id}`);
+        // 打印返回内容
+        console.log('商品详情接口返回：', response.data);
 
-        if (response.data) {
-          setRecommendation(response.data);
+
+        const data = response.data?.data;
+        if (data) {
+          setRecommendation(response.data.data);
 
           // Record browsing history
           try {
@@ -305,7 +309,11 @@ const ProductDetail = () => {
         );
       }
       return null;
-    });
+    }).filter(Boolean).length > 0
+      ? details.map((item, index) => {
+        // ...如上
+      })
+      : <p>暂无内容</p>;
   };
 
   return (
@@ -384,33 +392,6 @@ const ProductDetail = () => {
                 </div>
               )}
             </div>
-
-            {recommendation.specifications && recommendation.specifications.length > 0 && (
-              <div className="product-specifications">
-                <h3>规格参数</h3>
-                <div className="specifications-list">
-                  {recommendation.specifications.map((spec, index) => (
-                    <div key={index} className="specification-item">
-                      <span className="spec-name">{spec.name}:</span>
-                      <span className="spec-value">
-                        {spec.values && spec.values.length > 0
-                          ? spec.values.join(", ")
-                          : spec.value || "无"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="product-actions">
-              <button className="add-to-cart-btn" onClick={handleAddToCart}>
-                <i className="fas fa-shopping-cart"></i> 加入购物车
-              </button>
-              <button className="buy-now-btn" onClick={handleBuyNow}>
-                <i className="fas fa-bolt"></i> 立即购买
-              </button>
-            </div>
           </div>
         </div>
 
@@ -468,8 +449,8 @@ const ProductDetail = () => {
           <div className="flex border-b">
             <button
               className={`flex-1 py-3 text-center ${activeTab === "introduction"
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-gray-500"
+                ? "text-primary border-b-2 border-primary"
+                : "text-gray-500"
                 }`}
               onClick={() => setActiveTab("introduction")}
             >
@@ -477,8 +458,8 @@ const ProductDetail = () => {
             </button>
             <button
               className={`flex-1 py-3 text-center ${activeTab === "purchaseNotice"
-                  ? "text-primary border-b-2 border-primary"
-                  : "text-gray-500"
+                ? "text-primary border-b-2 border-primary"
+                : "text-gray-500"
                 }`}
               onClick={() => setActiveTab("purchaseNotice")}
             >
@@ -506,7 +487,9 @@ const ProductDetail = () => {
               <>{renderProductDetails(recommendation.purchaseNotices)}</>
             )}
           </div>
+
         </div>
+
       </div>
 
       {/* Modal for selecting specifications */}
@@ -549,8 +532,8 @@ const ProductDetail = () => {
                           <label
                             htmlFor={`${spec.name}-${idx}`}
                             className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${selectedSpecs[spec.name] === value
-                                ? "bg-primary text-white"
-                                : ""
+                              ? "bg-primary text-white"
+                              : ""
                               }`}
                           >
                             {value}
@@ -597,6 +580,24 @@ const ProductDetail = () => {
           </div>
         </div>
       )}
+
+      {/* 固定底部按钮栏 */}
+      <div className="product-detail-bottom-bar">
+        <Button
+          className="add-to-cart-btn"
+          onClick={handleAddToCart}
+          style={{ marginRight: 12 }}
+        >
+          <i className="fas fa-shopping-cart"></i> 加入购物车
+        </Button>
+        <Button
+          className="buy-now-btn"
+          type="danger"
+          onClick={handleBuyNow}
+        >
+          <i className="fas fa-bolt"></i> 立即购买
+        </Button>
+      </div>
     </BasePage>
   );
 };

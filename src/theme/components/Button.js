@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '../ThemeProvider';
+import './Button.css';
 
 /**
  * 高级主题按钮组件
@@ -31,13 +32,11 @@ const Button = ({
   // 构建按钮样式类
   const buttonClasses = [
     'btn',
-    variant ? `btn-${variant}` : '',
+    variant === 'primary' ? 'btn-primary' : '',
+    variant === 'secondary' ? 'btn-secondary' : '',
     size !== 'md' ? `btn-${size}` : '',
     block ? 'btn-block' : '',
-    disabled || loading ? 'opacity-60 cursor-not-allowed' : '',
-    rounded ? `rounded-${rounded}` : '',
-    elevation && !disabled && !loading ? 'shadow-sm hover:shadow' : '',
-    loading ? 'btn-loading' : '',
+    disabled || loading ? 'btn-disabled' : '',
     className
   ].filter(Boolean).join(' ');
 

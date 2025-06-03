@@ -355,3 +355,18 @@ body {
 .image-error {
     opacity: 0.8;
 }
+
+.product-detail-bottom-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 16px 16px 16px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+    border-top: 1px solid #f0f0f0;
+  }

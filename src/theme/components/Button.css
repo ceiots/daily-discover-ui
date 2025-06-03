@@ -1,0 +1,26 @@
+.btn-primary {
+    background: #6B4EFF;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    box-shadow: none;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover, .btn-primary:active {
+    background: #4B36A8;
+  }
+  .btn-secondary {
+    background: #F4F4F5;
+    color: #6B4EFF;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+  }
+  .btn-disabled, .btn:disabled {
+    background: #E5E7EB;
+    color: #A1A1AA;
+    cursor: not-allowed;
+  }

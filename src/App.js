@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate,useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate,useLocation, matchPath } from 'react-router-dom';
 import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './theme/components/NavBar';
@@ -185,14 +185,13 @@ function showNavBar(pathname) {
     '/register',
     '/forgot-password',
     '/ecommerce-creation',
-    '/address-list',
-    '/product/:id'
+    '/address-list'
   ];
 
   const currentPath = location.pathname;
   console.log("currentPath", currentPath);
   // 只要是 /ecommerce-creation 开头的都不显示
-  if (currentPath.startsWith('/ecommerce-creation')) return false;
+  if (currentPath.startsWith('/ecommerce-creation') || currentPath.startsWith('/product/')) return false;
   return !pathsWithoutNavBar.includes(currentPath);
 }
 
@@ -200,6 +199,7 @@ const App = () => {
 
   const location = useLocation();
   const shouldShowNavBar = showNavBar(location.pathname);
+
 
   return (
     <ThemeProvider>
