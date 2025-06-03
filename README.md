@@ -19,7 +19,7 @@ cd android
 # 打开android studio
 npx cap open android
 
-# Tailwind
+# Tailwind 
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 
