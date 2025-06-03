@@ -102,7 +102,7 @@ const BasePage = ({
     >
       {renderHeader()}
       
-      <main className="page-content" style={{overflowY: 'auto', flex: 1, minHeight: 0, marginBottom: '13px'}}>
+      <main className="page-content" >
         {renderLoading()}
         {renderError()}
         {!loading && !error && children}

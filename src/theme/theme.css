@@ -577,6 +577,10 @@
 
 .page-content{
   margin-top: 70px;
+  overflow-Y: 'auto';
+  flex: 1;
+  min-Height: 0;
+  margin-Bottom: 7px;
 }
 
 /* 按钮美化 */

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import instance from "../utils/axios";
 import "./ForgotPasswordPage.css"; // 引入样式文件
-import NavBar from "./NavBar"; // 引入NavBar组件
+import NavBar from "../theme/components/NavBar"; // 引入NavBar组件
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();

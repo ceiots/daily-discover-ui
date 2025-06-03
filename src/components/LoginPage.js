@@ -5,7 +5,7 @@ import { Input } from 'antd';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import './LoginPage.css'; // 创建一个新的 CSS 文件来存放样式
 import instance from '../utils/axios';
-import NavBar from './NavBar'; // 引入NavBar组件
+import NavBar from '../theme/components/NavBar'; // 引入NavBar组件
 
 const LoginPage = () => {
   const { refreshUserInfo } = useAuth(); // 替换 setIsLoggedIn, setUserInfo

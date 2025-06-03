@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { BrowserRouter as Router, Routes, Route, Navigate,useLocation } from 'react-router-dom';
 import instance from './utils/axios';
 import Daily from './components/Daily';
-import NavBar from './components/NavBar';
+import NavBar from './theme/components/NavBar';
 import LoginPage from './components/LoginPage';
 import Profile from './components/Profile';
 import Cart from './components/myService/Cart';
@@ -13,7 +13,7 @@ const OrderList = lazy(() => import('./components/myService/OrderList'));
 import OrderDetail from './components/myService/OrderDetail';
 import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
-import ProductDetail from "./components/ProductDetail"; // 导入详情页面组件
+import ProductDetail from "./components/product/ProductDetail"; // 导入详情页面组件
 import RefundForm from "./components/RefundForm"; // 导入退款表单组件
 import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
@@ -185,7 +185,8 @@ function showNavBar(pathname) {
     '/register',
     '/forgot-password',
     '/ecommerce-creation',
-    '/address-list'
+    '/address-list',
+    '/product/:id'
   ];
 
   const currentPath = location.pathname;

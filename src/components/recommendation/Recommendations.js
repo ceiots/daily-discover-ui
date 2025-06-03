@@ -1,15 +1,17 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import instance from "../utils/axios";
-import { useAuth } from "../App";
+import instance from "../../utils/axios";
+import { useAuth } from "../../App";
+import { useTheme } from "../../theme";
 import "./Recommendations.css";
 
 const Recommendations = () => {
   const { isLoggedIn, userInfo } = useAuth();
+  const theme = useTheme();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [aiInsights, setAiInsights] = useState({});
-  const [showPreferenceModal, setShowPreferenceModal] = useState(false);
+  const [showPreferenceModal, setShowPreferenceModal] = useState(false); // Changed to false initially
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [isColdStart, setIsColdStart] = useState(false);
@@ -170,12 +172,15 @@ const Recommendations = () => {
     <>
       <div className="daily-recommendations-section">
         <div className="recommendations-header">
-          <h3>
+          <h3 style={{ fontSize: theme.fontSize["2xl"] }}>
             <i className="fas fa-thumbs-up"></i> 今日推荐
-            {isColdStart && !showPreferenceModal && isLoggedIn && (
+            {!showPreferenceModal && isLoggedIn && (
               <button 
                 className="preference-button"
-                onClick={() => setShowPreferenceModal(true)}
+                onClick={() => {
+                  fetchCategories(); // Make sure we fetch categories before showing modal
+                  setShowPreferenceModal(true);
+                }}
               >
                 <i className="fas fa-sliders-h"></i> 设置偏好
               </button>
@@ -218,8 +223,8 @@ const Recommendations = () => {
                 />
               </div>
               <div className="product-info">
-                <div className="product-name">{product.title}</div>
-                <div className="product-price">¥{product.price}</div>
+                <div className="product-name" style={{ fontSize: theme.fontSize.base }}>{product.title}</div>
+                <div className="product-price" style={{ fontSize: theme.fontSize.lg }}>{`¥${product.price}`}</div>
                 <div className="product-match">
                   <i className="fas fa-chart-line"></i>
                   匹配度{product.matchScore || "90"}%
@@ -251,20 +256,27 @@ const Recommendations = () => {
             </div>
             <div className="preference-modal-content">
               <p>为了给您提供更精准的推荐，请选择您感兴趣的类别</p>
-              <div className="category-grid">
-                {availableCategories.map(category => (
-                  <div 
-                    key={category.id}
-                    className={`category-item ${selectedPreferences.includes(category.id) ? 'selected' : ''}`}
-                    onClick={() => handlePreferenceToggle(category.id)}
-                  >
-                    <div className="category-icon">
-                      <i className={category.icon || "fas fa-tag"}></i>
+              
+              {availableCategories.length > 0 ? (
+                <div className="category-grid">
+                  {availableCategories.map(category => (
+                    <div 
+                      key={category.id}
+                      className={`category-item ${selectedPreferences.includes(category.id) ? 'selected' : ''}`}
+                      onClick={() => handlePreferenceToggle(category.id)}
+                    >
+                      <div className="category-icon">
+                        <i className={category.icon || "fas fa-tag"}></i>
+                      </div>
+                      <div className="category-name">{category.name}</div>
                     </div>
-                    <div className="category-name">{category.name}</div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="category-loading">
+                  <p>正在加载类别...</p>
+                </div>
+              )}
             </div>
             <div className="preference-modal-footer">
               <button 
@@ -276,6 +288,7 @@ const Recommendations = () => {
               <button 
                 className="save-button"
                 onClick={savePreferences}
+                disabled={selectedPreferences.length === 0}
               >
                 保存偏好
               </button>
@@ -287,4 +300,4 @@ const Recommendations = () => {
   );
 };
 
-export default Recommendations; 
+export default Recommendations;

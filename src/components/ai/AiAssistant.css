@@ -30,6 +30,7 @@
   border: 1px solid var(--border-color);
   overflow: hidden;
   max-width: 100%;
+  margin-top: 1px;
 }
 
 /* AI主卡片 */

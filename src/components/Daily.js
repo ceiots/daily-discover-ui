@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
-import NavBar from "./NavBar";
+import NavBar from "../theme/components/NavBar";
 import AiAssistant from "./ai/AiAssistant"; // 引入AI助手组件
-import Recommendations from "./Recommendations"; // Import the new Recommendations component
+import Recommendations from "./recommendation/Recommendations"; // Import the new Recommendations component
 import { BasePage } from "../theme";
 // Helper function to get Lunar Date (simplified)
 const getLunarDate = (date) => {

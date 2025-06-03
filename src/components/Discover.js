@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import "./Discover.css";
 import { useAuth } from "../App";
 import { Link, useNavigate } from "react-router-dom";
-import NavBar from "./NavBar";
+import NavBar from "../theme/components/NavBar";
 // 引入游戏组件
 import MatchThree from "./games/MatchThree/MatchThree";
 import TetrisGame from "./games/TetrisGame/TetrisGame";

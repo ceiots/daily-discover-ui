@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './NavBar.css';
-import { useAuth } from '../App'; // 确保已导入 useAuth
+import { useAuth } from '../../App'; // 确保已导入 useAuth
 
 const NavBar = ({ className }) => {
   const location = useLocation();

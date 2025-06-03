@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ProductDetail.css"; // Keep your existing styles
-import instance from "../utils/axios";
-import { useAuth } from "../App"; // 添加上下文导入
-import { BasePage } from "../theme";
+import instance from "../../utils/axios";
+import { useAuth } from "../../App"; // 添加上下文导入
+import { BasePage } from "../../theme";
 
 const ProductDetail = () => {
-  
+
   const { userInfo } = useAuth(); // 获取登录状态
   const { id } = useParams(); // Get the recommendation ID from the URL
   const [recommendation, setRecommendation] = useState(null);
@@ -21,7 +21,7 @@ const ProductDetail = () => {
   const [selectedSpecs, setSelectedSpecs] = useState({});
   // 初始化转换后的规格数组
   const [transformedSpecs, setTransformedSpecs] = useState([]);
-  
+
   // 新增状态来记录是否是立即购买
   const [isBuyNow, setIsBuyNow] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
@@ -53,10 +53,10 @@ const ProductDetail = () => {
       try {
         setLoading(true);
         const response = await instance.get(`/product/${id}`);
-        
+
         if (response.data) {
           setRecommendation(response.data);
-          
+
           // Record browsing history
           try {
             await instance.post("/browsing-history/record", {
@@ -66,7 +66,7 @@ const ProductDetail = () => {
           } catch (historyError) {
             console.error("Failed to record browsing history:", historyError);
           }
-          
+
           // Fetch AI insights for this product
           try {
             const insightsResponse = await instance.get(`/product/recommendations`);
@@ -146,48 +146,48 @@ const ProductDetail = () => {
   ) => {
     // 打印 productInfo.specifications 以确认其结构
     console.log("productInfo.specifications:", productInfo.specifications);
-    
+
     // 检查是否所有规格都已选择
     const areAllSpecsSelected = () => {
       // 如果没有规格，或者规格数组为空，直接返回true
       if (!productInfo.specifications || productInfo.specifications.length === 0) {
         return true;
       }
-      
+
       const allSpecs = productInfo.specifications.map(spec => spec.name);
       console.log("All possible specs:", allSpecs);
       console.log("Selected specs:", selectedSpecs);
-      
+
       // 修复逻辑：确保所有规格都有对应的选择值
       return allSpecs.every(specName => {
         // 判断 selectedSpecs 是否有该规格的值
-        return selectedSpecs[specName] !== undefined && 
-               selectedSpecs[specName] !== null && 
-               selectedSpecs[specName].toString().trim() !== '';
+        return selectedSpecs[specName] !== undefined &&
+          selectedSpecs[specName] !== null &&
+          selectedSpecs[specName].toString().trim() !== '';
       });
     };
-    
+
     console.log("areAllSpecsSelected:", areAllSpecsSelected());
 
     // 检查用户是否已登录
     const isUserLoggedIn = () => userInfo && userInfo.id;
 
     console.log("isUserLoggedIn:", isUserLoggedIn()); // 打印规格数组
-    
+
     // 如果规格未全部选择或用户未登录，返回 null
     if (!areAllSpecsSelected()) {
       alert("请选择所有规格");
       return null;
     }
-    
+
     if (!isUserLoggedIn()) {
       navigate("/login");
       return null;
     }
-    
+
     // 继续执行后续逻辑
     console.log("All specs are selected and user is logged in. Proceeding...");
-    
+
     // 将选择的规格转换为后端需要的格式
     const formattedSpecifications = Object.keys(selectedSpecs).map(specName => ({
       name: specName,
@@ -231,10 +231,10 @@ const ProductDetail = () => {
         quantity,
         selectedSpecs
       );
-      
+
       console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
       console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
-      
+
       if (orderPayload) {
         if (isBuyNow) {
           // 立即购买，直接跳转到支付页面并传递 orderPayload
@@ -261,20 +261,20 @@ const ProductDetail = () => {
     setIsModalOpen(true);
     setIsBuyNow(false); // 标记为加入购物车
   };
-  
+
   // 添加 handleBuyNow 函数
   const handleBuyNow = () => {
     setIsModalOpen(true);
     setIsBuyNow(true); // 标记为立即购买
     // 这里不需要再调用 handleAddOrBuy，因为在点击确定时再处理
   };
-  
+
   // Function to render product details
   const renderProductDetails = (details) => {
     if (!details || !Array.isArray(details) || details.length === 0) {
       return <p>暂无详细信息</p>;
     }
-    
+
     return details.map((item, index) => {
       if (item.type === "image") {
         return (
@@ -309,15 +309,14 @@ const ProductDetail = () => {
   };
 
   return (
-    <BasePage showHeader={true}>
+    <BasePage title="商品详情"
+      showHeader={true}
+      headerLeft={
+        <button className="btn" onClick={() => navigate("/profile")}>
+          <i className="fas fa-arrow-left"></i>
+        </button>
+      }>
       <div className="recommendation-detail-container">
-        <div className="recommendation-detail-header">
-          <button onClick={handleBack} className="back-button">
-            <i className="fas fa-arrow-left"></i> 返回
-          </button>
-          <h2>商品详情</h2>
-        </div>
-
         <div className="recommendation-detail-content">
           <div className="product-image-gallery">
             <img
@@ -344,7 +343,7 @@ const ProductDetail = () => {
 
           <div className="product-info-container">
             <h1 className="product-title">{recommendation.title}</h1>
-            
+
             <div className="product-price-section">
               <div className="product-price">¥{recommendation.price}</div>
               {recommendation.originalPrice && recommendation.originalPrice > recommendation.price && (
@@ -468,21 +467,19 @@ const ProductDetail = () => {
         <div className="mt-2 bg-white">
           <div className="flex border-b">
             <button
-              className={`flex-1 py-3 text-center ${
-                activeTab === "introduction"
+              className={`flex-1 py-3 text-center ${activeTab === "introduction"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-500"
-              }`}
+                }`}
               onClick={() => setActiveTab("introduction")}
             >
               商品介绍
             </button>
             <button
-              className={`flex-1 py-3 text-center ${
-                activeTab === "purchaseNotice"
+              className={`flex-1 py-3 text-center ${activeTab === "purchaseNotice"
                   ? "text-primary border-b-2 border-primary"
                   : "text-gray-500"
-              }`}
+                }`}
               onClick={() => setActiveTab("purchaseNotice")}
             >
               购买须知
@@ -551,11 +548,10 @@ const ProductDetail = () => {
                           />
                           <label
                             htmlFor={`${spec.name}-${idx}`}
-                            className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${
-                              selectedSpecs[spec.name] === value
+                            className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${selectedSpecs[spec.name] === value
                                 ? "bg-primary text-white"
                                 : ""
-                            }`}
+                              }`}
                           >
                             {value}
                           </label>

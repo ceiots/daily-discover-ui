@@ -1,0 +1,67 @@
+.theme-scrollable-section {
+  margin: 16px 0;
+  padding: 0 0 16px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.theme-scrollable-header {
+  padding: 16px 16px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-scrollable-header h3 {
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.theme-scrollable-icon {
+  color: #6366f1;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.theme-scrollable-action {
+  margin-left: 10px;
+}
+
+.theme-scroll-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-scroll-control-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.theme-scroll-control-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.theme-scrollable-content {
+  display: flex;
+  overflow-x: auto;
+  padding: 0 16px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.theme-scrollable-content::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
