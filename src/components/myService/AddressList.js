@@ -280,7 +280,7 @@ const AddressList = () => {
       const endpoint = currentAddress.id ? "/address/update" : "/address/save";
 
       const addrData = {
-        orderAddrId: currentAddress.id,
+        id: currentAddress.id,
         userId: currentAddress.userId,
         name: currentAddress.name,
         phone: currentAddress.phone,
@@ -290,7 +290,8 @@ const AddressList = () => {
         district: currentAddress.district,
         isDefault: currentAddress.isDefault ? 1 : 0,
       };
-
+      
+     
       const response = await instance.post(endpoint, addrData);
       if (response.data.code === 200) {
         // 重新获取地址列表
