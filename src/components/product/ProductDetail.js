@@ -4,6 +4,7 @@ import "./ProductDetail.css"; // Keep your existing styles
 import instance from "../../utils/axios";
 import { useAuth } from "../../App"; // 添加上下文导入
 import { BasePage, Button } from "../../theme";
+import getDeviceInfo from "../../utils/deviceInfo";
 // 导入AI客服组件
 import ProductAiCustomerService from "../ai/ProductAiCustomerService";
 
@@ -68,6 +69,7 @@ const ProductDetail = () => {
               productId: id,
               categoryId: data.categoryId,
               behaviorType: "CLICK",
+              deviceInfo: JSON.stringify(getDeviceInfo()),
             });
           } catch (historyError) {
             console.error("Failed to record browsing history:", historyError);
@@ -281,7 +283,7 @@ const ProductDetail = () => {
         selectedSpecs
       );
 
-      console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
+      console.log("orderPayload:", orderPayload); 
       console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
 
       if (orderPayload) {
