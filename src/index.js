@@ -8,6 +8,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import './index.css'; // 确保引入包含Tailwind CSS的样式表
 
 const root = createRoot(document.getElementById('root')); // 创建根节点
+if (process.env.NODE_ENV === 'development') {
+  import('./StagewiseToolbarDev');
+}
 root.render(
   <React.StrictMode>
     <HelmetProvider>

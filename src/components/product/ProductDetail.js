@@ -15,16 +15,18 @@ const ProductDetail = () => {
   const [activeTab, setActiveTab] = useState("introduction"); // State to track active tab
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const [quantity, setQuantity] = useState(1); // State for quantity
-  //const [selectedVariant, setSelectedVariant] = useState(""); // State for selected variant
   const navigate = useNavigate(); // Create navigate object
   // 初始化选择状态
   const [selectedSpecs, setSelectedSpecs] = useState({});
   // 初始化转换后的规格数组
   const [transformedSpecs, setTransformedSpecs] = useState([]);
-
   // 新增状态来记录是否是立即购买
   const [isBuyNow, setIsBuyNow] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
+  // 新增客服对话状态
+  const [showCustomerService, setShowCustomerService] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
 
   // 处理选择变化
   const handleSpecChange = (specName, value) => {
@@ -56,16 +58,15 @@ const ProductDetail = () => {
         // 打印返回内容
         console.log('商品详情接口返回：', response.data);
 
-
         const data = response.data?.data;
         if (data) {
-          setRecommendation(response.data.data);
+          setRecommendation(data);  // 修正这里，使用data而不是response.data
 
           // Record browsing history
           try {
             await instance.post("/browsing-history/record", {
               productId: id,
-              categoryId: response.data.categoryId
+              categoryId: data.categoryId
             });
           } catch (historyError) {
             console.error("Failed to record browsing history:", historyError);
@@ -100,6 +101,32 @@ const ProductDetail = () => {
     }
   }, [id]);
 
+  // 处理客服消息发送
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return;
+    
+    const newMessage = {
+      id: Date.now(),
+      content: messageInput,
+      sender: 'user',
+      time: new Date().toLocaleTimeString()
+    };
+    
+    setChatMessages([...chatMessages, newMessage]);
+    setMessageInput("");
+    
+    // 模拟客服回复
+    setTimeout(() => {
+      const reply = {
+        id: Date.now() + 1,
+        content: "您好，感谢您的咨询。我们的客服人员将尽快回复您的问题。",
+        sender: 'service',
+        time: new Date().toLocaleTimeString()
+      };
+      setChatMessages(prev => [...prev, reply]);
+    }, 1000);
+  };
+
   // Handle image loading error
   const handleImageError = (event) => {
     const target = event.target;
@@ -111,6 +138,49 @@ const ProductDetail = () => {
     target.classList.add("image-error");
     target.onerror = null;
     target.src = fallbackUrl;
+  };
+
+  // Function to render product details - 修改后确保始终返回内容
+  const renderProductDetails = (details) => {
+    if (!details || !Array.isArray(details) || details.length === 0) {
+      return <p className="text-neutral-500 text-center py-4">暂无内容</p>;
+    }
+
+    const renderedItems = details.map((item, index) => {
+      if (item.type === "image") {
+        return (
+          <img
+            key={index}
+            src={item.content}
+            alt="Product Detail"
+            className="w-full h-auto mb-4"
+          />
+        );
+      } else if (item.type === "text") {
+        return (
+          <div
+            key={index}
+            className="text-sm text-gray-800 leading-relaxed mb-4 font-light"
+          >
+            {item.content}
+          </div>
+        );
+      } else if (item.title && item.content) {
+        return (
+          <div key={index} className="mb-4">
+            <h4 className="text-base font-semibold mb-2">{item.title}</h4>
+            <p className="text-sm text-gray-700 leading-relaxed font-light">
+              {item.content}
+            </p>
+          </div>
+        );
+      }
+      return null;
+    }).filter(Boolean);
+    
+    return renderedItems.length > 0 
+      ? renderedItems 
+      : <p className="text-neutral-500 text-center py-4">暂无内容</p>;
   };
 
   if (loading) {
@@ -139,7 +209,6 @@ const ProductDetail = () => {
     navigate(-1); // Go back to the previous page
   };
 
-  // Function to confirm adding to cart
   // 抽取共用逻辑到新函数
   const prepareOrderPayload = (
     userInfo,
@@ -220,11 +289,6 @@ const ProductDetail = () => {
     alert(`操作失败: ${error.message || '请稍后重试'}`);
   };
 
-  // 封装导航逻辑
-  const navigateToPayment = () => {
-    navigate("/payment");
-  };
-
   // 修改为通用的处理函数
   const handleAddOrBuy = async (isBuyNow) => {
     try {
@@ -270,57 +334,18 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     setIsModalOpen(true);
     setIsBuyNow(true); // 标记为立即购买
-    // 这里不需要再调用 handleAddOrBuy，因为在点击确定时再处理
   };
 
-  // Function to render product details
-  const renderProductDetails = (details) => {
-    if (!details || !Array.isArray(details) || details.length === 0) {
-      return <p>暂无详细信息</p>;
-    }
-
-    return details.map((item, index) => {
-      if (item.type === "image") {
-        return (
-          <img
-            key={index}
-            src={item.content}
-            alt="Product Detail"
-            className="w-full h-auto mb-4"
-          />
-        );
-      } else if (item.type === "text") {
-        return (
-          <div
-            key={index}
-            className="text-sm text-gray-800 leading-relaxed mb-4 font-light"
-          >
-            {item.content}
-          </div>
-        );
-      } else if (item.title && item.content) {
-        return (
-          <div key={index} className="mb-4">
-            <h4 className="text-base font-semibold mb-2">{item.title}</h4>
-            <p className="text-sm text-gray-700 leading-relaxed font-light">
-              {item.content}
-            </p>
-          </div>
-        );
-      }
-      return null;
-    }).filter(Boolean).length > 0
-      ? details.map((item, index) => {
-        // ...如上
-      })
-      : <p>暂无内容</p>;
+  // 处理客服点击
+  const handleCustomerServiceClick = () => {
+    setShowCustomerService(!showCustomerService);
   };
 
   return (
     <BasePage title="商品详情"
       showHeader={true}
       headerLeft={
-        <button className="btn" onClick={() => navigate("/profile")}>
+        <button className="btn" onClick={() => navigate(-1)}>
           <i className="fas fa-arrow-left"></i>
         </button>
       }>
@@ -376,21 +401,74 @@ const ProductDetail = () => {
               </div>
             )}
 
-            <div className="product-basic-info">
-              <div className="info-item">
-                <span className="info-label">销量:</span>
-                <span className="info-value">{recommendation.soldCount || 0}</span>
+            {/* 美化店铺/库存/销量UI */}
+            <div className="product-stats-container">
+              <div className="product-stat-item">
+                <div className="stat-icon">
+                  <i className="fas fa-shopping-bag"></i>
+                </div>
+                <div className="stat-content">
+                  <div className="stat-label">销量</div>
+                  <div className="stat-value">{recommendation.soldCount || 0}</div>
+                </div>
               </div>
-              <div className="info-item">
-                <span className="info-label">库存:</span>
-                <span className="info-value">{recommendation.stock || 0}</span>
+              
+              <div className="product-stat-item">
+                <div className="stat-icon">
+                  <i className="fas fa-cubes"></i>
+                </div>
+                <div className="stat-content">
+                  <div className="stat-label">库存</div>
+                  <div className="stat-value">{recommendation.stock || 0}</div>
+                </div>
               </div>
+              
               {recommendation.shopName && (
-                <div className="info-item">
-                  <span className="info-label">店铺:</span>
-                  <span className="info-value">{recommendation.shopName}</span>
+                <div className="product-stat-item">
+                  <div className="stat-icon">
+                    <i className="fas fa-store"></i>
+                  </div>
+                  <div className="stat-content">
+                    <div className="stat-label">店铺</div>
+                    <div className="stat-value shop-name">{recommendation.shopName}</div>
+                  </div>
                 </div>
               )}
+            </div>
+
+            {recommendation.specifications && recommendation.specifications.length > 0 && (
+              <div className="product-specifications">
+                <h3>规格参数</h3>
+                <div className="specifications-list">
+                  {recommendation.specifications.map((spec, index) => (
+                    <div key={index} className="specification-item">
+                      <span className="spec-name">{spec.name}:</span>
+                      <span className="spec-value">
+                        {spec.values && spec.values.length > 0
+                          ? spec.values.join(", ")
+                          : spec.value || "无"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="product-actions">
+              <Button 
+                variant="secondary" 
+                icon={<i className="fas fa-shopping-cart"></i>}
+                onClick={handleAddToCart}
+              >
+                加入购物车
+              </Button>
+              <Button 
+                variant="primary" 
+                icon={<i className="fas fa-bolt"></i>}
+                onClick={handleBuyNow}
+              >
+                立即购买
+              </Button>
             </div>
           </div>
         </div>
@@ -445,8 +523,9 @@ const ProductDetail = () => {
 
         <div className="my-0 w-full h-2 bg-gray-100"></div>
 
+        {/* 修复TAB切换问题 */}
         <div className="mt-2 bg-white">
-          <div className="flex border-b">
+          <div className="flex border-b tab-container">
             <button
               className={`flex-1 py-3 text-center ${activeTab === "introduction"
                 ? "text-primary border-b-2 border-primary"
@@ -466,30 +545,26 @@ const ProductDetail = () => {
               购买须知
             </button>
           </div>
-          <div className="p-4">
+          <div className="p-4 tab-content">
             {activeTab === "introduction" && (
-              <>
+              <div className="tab-pane">
                 <h3 className="text-lg font-medium tracking-wide mb-3">
                   产品详情
                 </h3>
-                {renderProductDetails(recommendation.productDetails)}{" "}
-                {/* Render product details */}
-                {/* <div
-                  className="text-sm text-gray-700 leading-relaxed mb-4 font-light"
-                  dangerouslySetInnerHTML={{
-                    __html: recommendation.productDetails,
-                  }} // Use fetched data 
-                /> */}
-              </>
+                {renderProductDetails(recommendation.productDetails)}
+              </div>
             )}
 
             {activeTab === "purchaseNotice" && (
-              <>{renderProductDetails(recommendation.purchaseNotices)}</>
+              <div className="tab-pane">
+                <h3 className="text-lg font-medium tracking-wide mb-3">
+                  购买须知
+                </h3>
+                {renderProductDetails(recommendation.purchaseNotices)}
+              </div>
             )}
           </div>
-
         </div>
-
       </div>
 
       {/* Modal for selecting specifications */}
@@ -532,8 +607,8 @@ const ProductDetail = () => {
                           <label
                             htmlFor={`${spec.name}-${idx}`}
                             className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${selectedSpecs[spec.name] === value
-                              ? "bg-primary text-white"
-                              : ""
+                                ? "bg-primary text-white"
+                                : ""
                               }`}
                           >
                             {value}
@@ -571,31 +646,87 @@ const ProductDetail = () => {
                 </button>
               </div>
             </div>
-            <button
-              className="w-full py-2 bg-primary text-white rounded-button"
-              onClick={() => handleAddOrBuy(isBuyNow)} // 传递标志位
+            <Button
+              variant="primary"
+              block
+              onClick={() => handleAddOrBuy(isBuyNow)}
             >
               确定
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
+      {/* 客服聊天组件 */}
+      <div className="customer-service-container">
+        <button 
+          className="customer-service-button"
+          onClick={handleCustomerServiceClick}
+        >
+          <i className="fas fa-headset"></i>
+          <span>客服</span>
+        </button>
+        
+        {showCustomerService && (
+          <div className="customer-service-panel">
+            <div className="customer-service-header">
+              <h3>在线客服</h3>
+              <button onClick={() => setShowCustomerService(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <div className="customer-service-messages">
+              {chatMessages.length > 0 ? (
+                chatMessages.map(msg => (
+                  <div 
+                    key={msg.id} 
+                    className={`chat-message ${msg.sender === 'user' ? 'user-message' : 'service-message'}`}
+                  >
+                    <div className="message-content">{msg.content}</div>
+                    <div className="message-time">{msg.time}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-chat">
+                  <p>您好，有什么可以帮助您的吗？</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="customer-service-input">
+              <input
+                type="text"
+                placeholder="请输入您的问题..."
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              <button onClick={handleSendMessage}>
+                <i className="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* 固定底部按钮栏 */}
       <div className="product-detail-bottom-bar">
         <Button
-          className="add-to-cart-btn"
+          variant="secondary"
+          icon={<i className="fas fa-shopping-cart"></i>}
           onClick={handleAddToCart}
-          style={{ marginRight: 12 }}
+          block
         >
-          <i className="fas fa-shopping-cart"></i> 加入购物车
+          加入购物车
         </Button>
         <Button
-          className="buy-now-btn"
-          type="danger"
+          variant="primary"
+          icon={<i className="fas fa-bolt"></i>}
           onClick={handleBuyNow}
+          block
         >
-          <i className="fas fa-bolt"></i> 立即购买
+          立即购买
         </Button>
       </div>
     </BasePage>

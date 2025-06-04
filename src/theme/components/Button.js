@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '../ThemeProvider';
 import './Button.css';
 
 /**
- * 高级主题按钮组件
+ * 高级主题按钮组件 - 优化版
  */
 const Button = ({
   children,
@@ -32,11 +32,13 @@ const Button = ({
   // 构建按钮样式类
   const buttonClasses = [
     'btn',
-    variant === 'primary' ? 'btn-primary' : '',
-    variant === 'secondary' ? 'btn-secondary' : '',
+    `btn-${variant}`,
     size !== 'md' ? `btn-${size}` : '',
     block ? 'btn-block' : '',
     disabled || loading ? 'btn-disabled' : '',
+    `rounded-${rounded}`,
+    elevation && !disabled && !loading ? 'shadow-sm hover:shadow' : '',
+    loading ? 'btn-loading' : '',
     className
   ].filter(Boolean).join(' ');
 
@@ -44,7 +46,7 @@ const Button = ({
   const handleClick = (e) => {
     if (disabled || loading) return;
     
-    if (ripple) {
+    if (ripple && variant === 'primary') {
       const button = buttonRef.current;
       const rect = button.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
@@ -55,7 +57,8 @@ const Button = ({
         width: `${size}px`,
         height: `${size}px`,
         top: `${y}px`,
-        left: `${x}px`
+        left: `${x}px`,
+        backgroundColor: 'rgba(255, 255, 255, 0.25)' // 淡色水波纹
       });
       
       setIsRippling(true);
@@ -134,7 +137,7 @@ const Button = ({
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text', 'success', 'warning', 'error', 'info', 'glass']),
+  variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text', 'success', 'warning', 'danger', 'info']),
   size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
   block: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -150,4 +153,4 @@ Button.propTypes = {
   type: PropTypes.oneOf(['button', 'submit', 'reset'])
 };
 
-export default Button; 
+export default Button;

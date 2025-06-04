@@ -33,5 +33,8 @@
     "rules": {
       // 禁用未使用变量的规则
       "no-unused-vars": "off"
-    }
+    },
+  "globals": {
+    "process": "readonly"
+  }
 }
