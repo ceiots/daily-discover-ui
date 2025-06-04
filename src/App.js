@@ -182,7 +182,9 @@ const ProtectedRoute = ({ children }) => {
 function showNavBar(pathname) {
   const pathsWithoutNavBar = [
     '/ecommerce-creation',
-    '/address-list'
+    '/address-list',
+    '/cart',
+    '/payment'
   ];
 
   const currentPath = location.pathname;
@@ -201,9 +203,10 @@ const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <div className="page-container">
+        
             <CommonHelmet />
             {shouldShowNavBar && <NavBar className="bottom-nav" />}
+            <div className="page-container">
             <Routes>
               {/* 主题示例页面 */}
               <Route path="/theme-example" element={<ExamplePage />} />

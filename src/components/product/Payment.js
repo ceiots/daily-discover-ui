@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import instance from "../../utils/axios";
 import BasePage from "../../theme/BasePage";
-
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();

@@ -33,20 +33,26 @@ const Cart = () => {
         }
 
         const response = await instance.get(`/cart/${userId}`);
-        const items = response.data;
-        setCartItems(items);
+        console.log('购物车response: ',response);  
+        // 适配 CommonResult 返回格式
+        if (response.data && response.data.code === 200) {
+          const items = response.data.data || [];
+          setCartItems(items);
 
-        // 初始化数量状态
-        const initialQuantities = {};
-        items.forEach((item) => {
-          initialQuantities[item.id] = item.quantity || 1;
-        });
-        setQuantities(initialQuantities);
+          // 初始化数量状态
+          const initialQuantities = {};
+          items.forEach((item) => {
+            initialQuantities[item.id] = item.quantity || 1;
+          });
+          setQuantities(initialQuantities);
+        } else {
+          throw new Error(response.data?.message || "获取购物车数据失败");
+        }
 
         setLoading(false);
       } catch (error) {
         console.error("获取购物车数据失败:", error);
-        setError("获取购物车数据失败，请稍后重试");
+        setError(error.message || "获取购物车数据失败，请稍后重试");
         setLoading(false);
       }
     };
@@ -127,18 +133,25 @@ const Cart = () => {
 
     try {
       const request = { quantity: newQuantity };
-      await instance.put(`/cart/update/${itemId}`, request);
-      setCartItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === itemId ? { ...item, quantity: newQuantity } : item
-        )
-      );
-      setQuantities((prev) => ({
-        ...prev,
-        [itemId]: newQuantity,
-      }));
+      const response = await instance.put(`/cart/update/${itemId}`, request);
+      
+      // 检查 CommonResult 返回格式
+      if (response.data && response.data.code === 200) {
+        setCartItems((prevItems) =>
+          prevItems.map((item) =>
+            item.id === itemId ? { ...item, quantity: newQuantity } : item
+          )
+        );
+        setQuantities((prev) => ({
+          ...prev,
+          [itemId]: newQuantity,
+        }));
+      } else {
+        alert(response.data?.message || "更新数量失败");
+      }
     } catch (error) {
       console.error("Error updating quantity:", error);
+      alert(error.response?.data?.message || "更新数量失败，请稍后重试");
     }
   };
 
@@ -194,16 +207,32 @@ const Cart = () => {
     }
 
     try {
-      await Promise.all(
+      // 处理删除请求并检查 CommonResult 格式
+      const deleteResults = await Promise.all(
         idsToDelete.map((id) => instance.delete(`/cart/delete/${id}`))
       );
-      setCartItems((prevItems) =>
-        prevItems.filter((item) => !idsToDelete.includes(item.id.toString()))
+      
+      // 检查所有删除请求是否成功
+      const allSuccess = deleteResults.every(
+        (res) => res.data && res.data.code === 200
       );
-      setSelectedItems({});
-      setShowDropdown(false);
+      
+      if (allSuccess) {
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => !idsToDelete.includes(item.id.toString()))
+        );
+        setSelectedItems({});
+        setShowDropdown(false);
+      } else {
+        const failedMessage = deleteResults
+          .filter((res) => res.data && res.data.code !== 200)
+          .map((res) => res.data?.message)
+          .join("; ");
+        alert(`删除失败: ${failedMessage || "请稍后重试"}`);
+      }
     } catch (error) {
       console.error("Error deleting items:", error);
+      alert("删除商品失败，请稍后重试");
     }
   };
 

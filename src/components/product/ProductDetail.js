@@ -281,7 +281,7 @@ const ProductDetail = () => {
         selectedSpecs
       );
 
-      console.log("orderPayload:", orderPayload); 
+      console.log("orderPayload:", orderPayload); // 打印 orderPayload 以确认其结构
       console.log("isBuyNow:", isBuyNow); // 打印 isBuyNow 
 
       if (orderPayload) {
@@ -292,14 +292,18 @@ const ProductDetail = () => {
           // 加入购物车，调用加入购物车接口
           const response = await instance.post("/cart/add", orderPayload);
           if (response.data && response.data.code === 200) {
-            console.log("已成功加入购物车");
+            alert("已成功加入购物车");
           } else {
+            // 处理库存不足等错误情况
             alert(response.data?.message || "加入购物车失败");
           }
         }
       }
     } catch (error) {
-      handleOrderError(error, isBuyNow ? "购买商品" : "加入购物车");
+      // 改进错误处理，显示更具体的错误信息
+      const errorMessage = error.response?.data?.message || error.message || "操作失败，请稍后重试";
+      console.error(`Error ${isBuyNow ? "购买商品" : "加入购物车"}:`, errorMessage);
+      alert(`操作失败: ${errorMessage}`);
     } finally {
       setIsModalOpen(false); // 无论成功失败都关闭模态框
     }
