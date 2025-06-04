@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import instance from "../utils/axios";
+import instance from "../../utils/axios";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const Payment = () => {
           return navigate("/login");
         }
         const response = await instance.get(
-          `/orderAddr/getDefaultByUserId?userId=${userId}`
+          `/address/getDefaultByUserId?userId=${userId}`
         );
         console.log(userId + " 获取到的地址信息:", response.data);
         setAddress(response.data.data);
@@ -62,7 +62,7 @@ const Payment = () => {
       ? parseInt(localStorage.getItem("userId"))
       : null;
     if (userId) {
-      navigate("/edit-address", {
+      navigate("/address-list", {
         state: {
           userId,
           currentAddress: address,

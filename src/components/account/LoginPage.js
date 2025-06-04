@@ -86,61 +86,62 @@ const LoginPage = () => {
   };
 
   return (
-    <BasePage showHeader={true} headerTitle="登录" className="login-page">
-      <div className="login-form-container">
-        <h1 className="text-2xl font-bold text-center mb-2">每日发现</h1>
-        <p className="text-center text-neutral-500 mb-6">发现生活中的美好时刻</p>
-        {errorMsg && <div className="error-message mb-2">{errorMsg}</div>}
-        <input
-          type="tel"
-          className="theme-input"
-          placeholder="请输入手机号"
-          maxLength={11}
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
-        <div className="relative mb-4">
+    <BasePage showHeader={true}  className="login-page">
+      <div className="form-section">
+        <div className="login-form-container">
+          <h1 className="text-2xl font-bold text-center mb-2">登录</h1>
+          <p className="text-center text-neutral-500 mb-6">每日发现</p>
+          {errorMsg && <div className="error-message mb-2">{errorMsg}</div>}
           <input
-            type={showPassword ? 'text' : 'password'}
-            className="theme-input pr-10"
-            placeholder="请输入密码"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="tel"
+            className="theme-input"
+            placeholder="请输入手机号"
+            maxLength={11}
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
           />
-          <button
-            type="button"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400"
-            onClick={() => setShowPassword(!showPassword)}
-            tabIndex={-1}
-            style={{ background: 'none', border: 'none' }}
+          <div className="relative mb-4">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className="theme-input pr-10"
+              placeholder="请输入密码"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400"
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
+              style={{ background: 'none', border: 'none' }}
+            >
+              <i className={`ri-${showPassword ? 'eye-off' : 'eye'}-line text-gray-400`} />
+            </button>
+          </div>
+          <Button
+            variant="primary"
+            block
+            loading={loading}
+            onClick={handleSubmit}
           >
-            <i className={`ri-${showPassword ? 'eye-off' : 'eye'}-line text-gray-400`} />
-          </button>
-        </div>
-        <Button
-          variant="primary"
-          block
-          loading={loading}
-          onClick={handleSubmit}
-        >
-          登录
-        </Button>
-        <div className="flex justify-between items-center text-xs mt-2 mb-2 w-full">
-          <a href="#" className="text-gray-500" onClick={handleForgotPassword}>
-            忘记密码？
-          </a>
-          <a href="#" className="text-primary" onClick={handleRegister}>
-            立即注册
-          </a>
-        </div>
-        <div className="text-center text-xs text-gray-500 w-full">
-          登录即表示同意
-          <a href="#" className="text-primary"> 《用户协议》 </a>
-          和
-          <a href="#" className="text-primary"> 《隐私政策》 </a>
+            登录
+          </Button>
+          <div className="flex justify-between items-center text-xs mt-2 mb-2 w-full">
+            <a href="#" className="text-gray-500" onClick={handleForgotPassword}>
+              忘记密码？
+            </a>
+            <a href="#" className="text-primary" onClick={handleRegister}>
+              立即注册
+            </a>
+          </div>
+          <div className="text-center text-xs text-gray-500 w-full">
+            登录即表示同意
+            <a href="#" className="text-primary"> 《用户协议》 </a>
+            和
+            <a href="#" className="text-primary"> 《隐私政策》 </a>
+          </div>
         </div>
       </div>
-      <NavBar />
     </BasePage>
   );
 };

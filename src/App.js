@@ -6,7 +6,7 @@ import NavBar from './theme/components/NavBar';
 import LoginPage from './components/account/LoginPage';
 import Profile from './components/Profile';
 import Cart from './components/myService/Cart';
-import Payment from './components/Payment';
+import Payment from './components/product/Payment';
 import OrderConfirmation from './components/myService/OrderConfirmation';
 import { lazy, Suspense } from 'react';
 const OrderList = lazy(() => import('./components/myService/OrderList'));
@@ -181,9 +181,6 @@ const ProtectedRoute = ({ children }) => {
 
 function showNavBar(pathname) {
   const pathsWithoutNavBar = [
-    '/login',
-    '/register',
-    '/forgot-password',
     '/ecommerce-creation',
     '/address-list'
   ];

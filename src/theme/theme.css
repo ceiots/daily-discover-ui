@@ -564,6 +564,7 @@
   color: #fff;
 }
 
+
 .page-header-left {
   grid-column: 1;
   justify-self: start;
@@ -729,4 +730,91 @@ input, textarea, select, button {
   margin-bottom: 2px;
   padding-left: 2px;
   letter-spacing: 0.01em;
+}
+
+/* 通用表单容器 */
+.form-section {
+  padding: 32px 18px 0 18px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* 标题、副标题 */
+.form-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-neutral-900);
+  margin-bottom: 0.5em;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.form-subtitle {
+  font-size: 1rem;
+  color: var(--color-neutral-500);
+  text-align: center;
+  margin-bottom: 2em;
+  font-weight: 400;
+}
+
+/* 输入框右侧图标按钮 */
+.input-icon-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: #a1a1aa;
+  z-index: 2;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 输入框右侧静态图标（如手机号） */
+.input-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a1a1aa;
+  z-index: 1;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 如果同一输入框有两个图标（如手机号和小眼睛），调整一个的 right 值 */
+.input-icon.left {
+  left: 12px;
+  right: auto;
+}
+.input-icon.right {
+  right: 12px;
+  left: auto;
+}
+.input-icon-btn.right {
+  right: 12px;
+  left: auto;
+}
+.input-icon-btn.left {
+  left: 12px;
+  right: auto;
+}
+
+/* 链接美化 */
+.theme-link {
+  color: var(--color-primary-500);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.theme-link:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
 }

@@ -64,9 +64,10 @@ const ProductDetail = () => {
 
           // Record browsing history
           try {
-            await instance.post("/browsing-history/record", {
+            await instance.post("/user/behavior/record", {
               productId: id,
-              categoryId: data.categoryId
+              categoryId: data.categoryId,
+              behaviorType: "CLICK",
             });
           } catch (historyError) {
             console.error("Failed to record browsing history:", historyError);
