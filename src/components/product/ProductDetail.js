@@ -252,7 +252,7 @@ const ProductDetail = () => {
       userId: userInfo.id, // 动态获取用户ID
       productId: productId,
       productName: productInfo.title,
-      productImage: productInfo.imageUrl,
+      productImage: productInfo.imageUrl || (productInfo.images && productInfo.images[0]) || "",
       // 确保 specifications 是有效的数组
       specifications: formattedSpecifications,
       price: productInfo.price,

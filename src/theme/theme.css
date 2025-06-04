@@ -568,7 +568,7 @@
 .page-header-left {
   grid-column: 1;
   justify-self: start;
-  margin-left: -20px;
+  margin-left: 5px;
 }
 
 .page-header-right {
