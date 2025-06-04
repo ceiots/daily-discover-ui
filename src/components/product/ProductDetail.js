@@ -5,6 +5,7 @@ import instance from "../../utils/axios";
 import { useAuth } from "../../App"; // 添加上下文导入
 import { BasePage, Button } from "../../theme";
 import getDeviceInfo from "../../utils/deviceInfo";
+import Toast from "../../theme/components/Toast";
 // 导入AI客服组件
 import ProductAiCustomerService from "../ai/ProductAiCustomerService";
 
@@ -28,6 +29,8 @@ const ProductDetail = () => {
   const [aiInsight, setAiInsight] = useState("");
   // 新增客服对话状态 - 只保留控制显示/隐藏的状态
   const [showCustomerService, setShowCustomerService] = useState(false);
+
+  const [toastVisible, setToastVisible] = useState(false);
 
   // 处理选择变化
   const handleSpecChange = (specName, value) => {
@@ -187,11 +190,6 @@ const ProductDetail = () => {
     );
   }
 
-  // Function to handle back navigation
-  const handleBack = () => {
-    navigate(-1); // Go back to the previous page
-  };
-
   // 抽取共用逻辑到新函数
   const prepareOrderPayload = (
     userInfo,
@@ -294,7 +292,7 @@ const ProductDetail = () => {
           // 加入购物车，调用加入购物车接口
           const response = await instance.post("/cart/add", orderPayload);
           if (response.data && response.data.code === 200) {
-            alert("已成功加入购物车");
+            console.log("已成功加入购物车");
           } else {
             alert(response.data?.message || "加入购物车失败");
           }
@@ -311,6 +309,7 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     setIsModalOpen(true);
     setIsBuyNow(false); // 标记为加入购物车
+    setToastVisible(true);
   };
 
   // 添加 handleBuyNow 函数
@@ -606,6 +605,11 @@ const ProductDetail = () => {
         >
           立即购买
         </Button>
+        <Toast
+        message="已成功加入购物车"
+        visible={toastVisible}
+        onClose={() => setToastVisible(false)}
+      />
       </div>)}
     </BasePage>
   );

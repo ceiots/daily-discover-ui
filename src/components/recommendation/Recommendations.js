@@ -82,8 +82,9 @@ const Recommendations = () => {
   const fetchCategories = async () => {
     try {
       const response = await instance.get('/category/all');
+      console.log('fetchCategories: ',response.data);
       if (response.data) {
-        setAvailableCategories(response.data);
+        setAvailableCategories(response.data.data);
       }
     } catch (error) {
       console.error("Error fetching categories:", error);

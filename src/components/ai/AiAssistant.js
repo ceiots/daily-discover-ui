@@ -94,8 +94,19 @@ const AiAssistant = ({ userInfo }) => {
     },
     // 轮播内容变化后的回调函数
     afterChange: (current) => {
-      //console.log("当前滚动到索引:", current);
-    }
+      // 让当前 slide 可聚焦，其它 slide 不可聚焦
+      setTimeout(() => {
+        const slides = document.querySelectorAll('.slick-slide');
+        slides.forEach((slide, idx) => {
+          if (slide) {
+            slide.tabIndex = idx === current + 1 ? 0 : -1; // slick 会有 clone，current+1 通常是当前
+          }
+        });
+        // 自动聚焦到当前 slide
+        const currentSlide = document.querySelector('.slick-slide[tabindex="0"]');
+        if (currentSlide) currentSlide.focus();
+      }, 50);
+    },  
   };
 
 

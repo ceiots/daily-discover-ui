@@ -818,3 +818,14 @@ input, textarea, select, button {
   color: var(--color-primary-700);
   text-decoration: underline;
 }
+
+.slick-slide:focus {
+  outline: 2px solid #409eff;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-10px);}
+}
+.animate-fade-in {
+  animation: fade-in 0.3s;
+}
