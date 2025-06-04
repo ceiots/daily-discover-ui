@@ -130,6 +130,12 @@ const Daily = () => {
   const [aiInsights, setAiInsights] = useState({});
   const focusScrollRef = useRef(null);
 
+  // 1. 添加状态
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const formattedDate = `${currentDate.getFullYear()}年${
     currentDate.getMonth() + 1
   }月${currentDate.getDate()}日`;
@@ -288,6 +294,151 @@ const Daily = () => {
       setCartItemCount(0);
     }
   }, [isLoggedIn, fetchDailyPageData]);
+
+  // 2. 在 useEffect 中检查是否需要冷启动
+  useEffect(() => {
+    const checkNeedColdStart = async () => {
+      if (isLoggedIn && userInfo?.id) {
+        try {
+          // 检查用户是否需要冷启动
+          const response = await instance.get(`/tags/${userInfo.id}/need-cold-start`);
+          if (response.data?.data === true) {
+            // 需要冷启动，获取热门标签
+            fetchPopularTags();
+            setShowInterestModal(true);
+          }
+        } catch (error) {
+          console.error("检查冷启动状态失败:", error);
+        }
+      }
+    };
+    
+    checkNeedColdStart();
+  }, [isLoggedIn, userInfo]);
+
+  // 3. 获取热门标签
+  const fetchPopularTags = async () => {
+    setIsLoading(true);
+    try {
+      const response = await instance.get('/tags/popular?limit=30');
+      if (response.data?.code === 200) {
+        setAvailableTags(response.data.data || []);
+      }
+    } catch (error) {
+      console.error("获取热门标签失败:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 4. 处理标签选择
+  const handleTagSelect = (tagId) => {
+    setSelectedTags(prev => {
+      if (prev.includes(tagId)) {
+        return prev.filter(id => id !== tagId);
+      } else {
+        return [...prev, tagId];
+      }
+    });
+  };
+
+  // 5. 保存用户兴趣
+  const saveUserInterests = async () => {
+    if (selectedTags.length === 0) {
+      alert("请至少选择一个感兴趣的类别");
+      return;
+    }
+    
+    setIsLoading(true);
+    try {
+      const response = await instance.post('/user/interests', {
+        userId: userInfo.id,
+        tagIds: selectedTags
+      });
+      
+      if (response.data?.code === 200) {
+        setShowInterestModal(false);
+        // 刷新推荐
+        fetchDailyPageData();
+      } else {
+        alert(response.data?.message || "保存失败，请重试");
+      }
+    } catch (error) {
+      console.error("保存用户兴趣失败:", error);
+      alert("网络错误，请重试");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 6. 跳过冷启动
+  const skipColdStart = async () => {
+    try {
+      await instance.post('/user/skip-cold-start', {
+        userId: userInfo.id
+      });
+      setShowInterestModal(false);
+    } catch (error) {
+      console.error("跳过冷启动失败:", error);
+    }
+  };
+
+  // 7. 渲染兴趣选择弹窗
+  const renderInterestModal = () => {
+    if (!showInterestModal) return null;
+    
+    return (
+      <div className="interest-modal-overlay">
+        <div className="interest-modal">
+          <div className="interest-modal-header">
+            <h3>选择您感兴趣的类别</h3>
+            <button className="close-btn" onClick={() => setShowInterestModal(false)}>
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div className="interest-modal-body">
+            <p className="interest-modal-description">
+              为了给您提供更精准的推荐，请选择您感兴趣的类别
+            </p>
+            
+            {isLoading ? (
+              <div className="loading-spinner">正在加载类别...</div>
+            ) : (
+              <div className="tag-selection-container">
+                {availableTags.map(tag => (
+                  <div 
+                    key={tag.id}
+                    className={`tag-item ${selectedTags.includes(tag.id) ? 'selected' : ''}`}
+                    onClick={() => handleTagSelect(tag.id)}
+                  >
+                    {tag.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div className="interest-modal-footer">
+            <button 
+              className="skip-btn" 
+              onClick={skipColdStart}
+              disabled={isLoading}
+            >
+              跳过
+            </button>
+            <button 
+              className="save-btn" 
+              onClick={saveUserInterests}
+              disabled={isLoading || selectedTags.length === 0}
+            >
+              保存偏好
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const handleTipToggle = (id) => {
     setDailyTips((tips) =>
@@ -591,6 +742,7 @@ const Daily = () => {
           </div>
       }
     >
+      {renderInterestModal()}
       <div className="daily-page-container">
         {/* 使用AiAssistant组件替代原有的AI功能 */}
         <AiAssistant userInfo={userInfo} />

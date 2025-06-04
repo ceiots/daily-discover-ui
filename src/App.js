@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate,useLocation, matchPath
 import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './theme/components/NavBar';
-import LoginPage from './components/LoginPage';
+import LoginPage from './components/account/LoginPage';
 import Profile from './components/Profile';
 import Cart from './components/myService/Cart';
 import Payment from './components/Payment';
@@ -18,8 +18,8 @@ import RefundForm from "./components/RefundForm"; // 导入退款表单组件
 import RefundDetail from "./components/RefundDetail"; // 导入退款详情组件
 import './App.css';
 import AddressList from './components/myService/AddressList'; // 导入地址管理列表组件
-import RegisterPage from './components/RegisterPage';
-import ForgotPasswordPage from './components/ForgotPasswordPage';
+import RegisterPage from './components/account/RegisterPage';
+import ForgotPasswordPage from './components/account/ForgotPasswordPage';
 import EventDetail from "./components/EventDetail"; // 事件详情页面
 import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';

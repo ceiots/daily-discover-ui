@@ -1,0 +1,280 @@
+ /* 商品AI客服组件样式 */
+:root {
+    --ai-primary-color: #7952b3; /* 主色调 */
+    --ai-light-color: #9373c8; /* 浅色调 */
+    --ai-dark-color: #5c3b97; /* 深色调 */
+    --ai-accent-color: #efe7ff; /* 强调色 */
+    --ai-bg-color: #ffffff; /* 背景色 */
+    --ai-text-primary: #1e293b; /* 主文本色 */
+    --ai-text-secondary: #64748b; /* 次要文本色 */
+    --ai-shadow-color: rgba(121, 82, 179, 0.1); /* 阴影色 */
+    --ai-border-color: rgba(121, 82, 179, 0.12); /* 边框色 */
+    --ai-hover-color: #f9f5ff; /* 悬停色 */
+    --ai-user-bubble-bg: #f0f2f5; /* 用户消息气泡背景 */
+    --ai-ai-bubble-bg: #efe7ff; /* AI消息气泡背景 */
+  }
+  
+  /* 容器 */
+  .product-ai-cs-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+  
+  /* 面板 */
+  .product-ai-cs-panel {
+    width: 90%;
+    max-width: 400px;
+    height: 80%;
+    max-height: 600px;
+    background-color: var(--ai-bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--ai-shadow-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* 头部 */
+  .product-ai-cs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background-color: var(--ai-primary-color);
+    color: white;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  
+  .product-ai-cs-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .product-ai-cs-title i {
+    font-size: 16px;
+  }
+  
+  .product-ai-cs-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .product-ai-cs-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+  
+  .product-ai-cs-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  /* 消息区域 */
+  .product-ai-cs-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .product-ai-cs-message {
+    display: flex;
+    gap: 8px;
+    max-width: 100%;
+  }
+  
+  .user-message {
+    flex-direction: row-reverse;
+  }
+  
+  .message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .ai-avatar {
+    background-color: var(--ai-primary-color);
+    color: white;
+  }
+  
+  .user-avatar {
+    background-color: var(--ai-light-color);
+    color: white;
+  }
+  
+  .message-bubble {
+    padding: 10px 12px;
+    border-radius: 16px;
+    max-width: 80%;
+    word-break: break-word;
+  }
+  
+  .ai-message .message-bubble {
+    background-color: var(--ai-ai-bubble-bg);
+    border-top-left-radius: 4px;
+  }
+  
+  .user-message .message-bubble {
+    background-color: var(--ai-user-bubble-bg);
+    border-top-right-radius: 4px;
+  }
+  
+  .message-content {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ai-text-primary);
+  }
+  
+  .message-time {
+    font-size: 10px;
+    color: var(--ai-text-secondary);
+    margin-top: 4px;
+    text-align: right;
+  }
+  
+  /* 输入区域 */
+  .product-ai-cs-input {
+    padding: 12px;
+    background-color: white;
+    border-top: 1px solid var(--ai-border-color);
+    display: flex;
+    gap: 8px;
+  }
+  
+  .product-ai-cs-input textarea {
+    flex: 1;
+    border: 1px solid var(--ai-border-color);
+    border-radius: 18px;
+    padding: 10px 16px;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+    min-height: 40px;
+    max-height: 100px;
+  }
+  
+  .product-ai-cs-input textarea:focus {
+    border-color: var(--ai-primary-color);
+  }
+  
+  .send-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--ai-primary-color);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .send-button:hover {
+    background-color: var(--ai-dark-color);
+  }
+  
+  .send-button.disabled {
+    background-color: var(--ai-text-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* 空聊天提示 */
+  .empty-chat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: var(--ai-text-secondary);
+    font-style: italic;
+  }
+  
+  /* 输入指示器 */
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+  }
+  
+  .typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background-color: var(--ai-primary-color);
+    border-radius: 50%;
+    display: inline-block;
+    animation: typing 1.4s infinite both;
+  }
+  
+  .typing-indicator span:nth-of-type(2) {
+    animation-delay: 0.2s;
+  }
+  
+  .typing-indicator span:nth-of-type(3) {
+    animation-delay: 0.4s;
+  }
+  
+  @keyframes typing {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
+  }
+  
+  /* 页脚 */
+  .product-ai-cs-footer {
+    padding: 8px 16px;
+    font-size: 11px;
+    color: var(--ai-text-secondary);
+    text-align: center;
+    border-top: 1px solid var(--ai-border-color);
+    background-color: #f8f9fa;
+  }
+  
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .product-ai-cs-panel {
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      border-radius: 0;
+    }
+    
+    .product-ai-cs-header {
+      border-radius: 0;
+    }
+    
+    .message-bubble {
+      max-width: 85%;
+    }
+  }

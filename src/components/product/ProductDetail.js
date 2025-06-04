@@ -4,6 +4,8 @@ import "./ProductDetail.css"; // Keep your existing styles
 import instance from "../../utils/axios";
 import { useAuth } from "../../App"; // 添加上下文导入
 import { BasePage, Button } from "../../theme";
+// 导入AI客服组件
+import ProductAiCustomerService from "../ai/ProductAiCustomerService";
 
 const ProductDetail = () => {
 
@@ -23,10 +25,8 @@ const ProductDetail = () => {
   // 新增状态来记录是否是立即购买
   const [isBuyNow, setIsBuyNow] = useState(false);
   const [aiInsight, setAiInsight] = useState("");
-  // 新增客服对话状态
+  // 新增客服对话状态 - 只保留控制显示/隐藏的状态
   const [showCustomerService, setShowCustomerService] = useState(false);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState("");
 
   // 处理选择变化
   const handleSpecChange = (specName, value) => {
@@ -100,32 +100,6 @@ const ProductDetail = () => {
       setLoading(false);
     }
   }, [id]);
-
-  // 处理客服消息发送
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-
-    const newMessage = {
-      id: Date.now(),
-      content: messageInput,
-      sender: 'user',
-      time: new Date().toLocaleTimeString()
-    };
-
-    setChatMessages([...chatMessages, newMessage]);
-    setMessageInput("");
-
-    // 模拟客服回复
-    setTimeout(() => {
-      const reply = {
-        id: Date.now() + 1,
-        content: "您好，感谢您的咨询。我们的客服人员将尽快回复您的问题。",
-        sender: 'service',
-        time: new Date().toLocaleTimeString()
-      };
-      setChatMessages(prev => [...prev, reply]);
-    }, 1000);
-  };
 
   // Handle image loading error
   const handleImageError = (event) => {
@@ -342,7 +316,7 @@ const ProductDetail = () => {
     setIsBuyNow(true); // 标记为立即购买
   };
 
-  // 处理客服点击
+  // 处理客服点击 - 简化为只切换显示状态
   const handleCustomerServiceClick = () => {
     setShowCustomerService(!showCustomerService);
   };
@@ -603,50 +577,13 @@ const ProductDetail = () => {
         </div>
       )}
 
-      {/* 客服聊天组件 */}
-      <div className="customer-service-container">
-        {showCustomerService && (
-          <div className="customer-service-panel">
-            <div className="customer-service-header">
-              <h3>在线客服</h3>
-              <button onClick={() => setShowCustomerService(false)}>
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-
-            <div className="customer-service-messages">
-              {chatMessages.length > 0 ? (
-                chatMessages.map(msg => (
-                  <div
-                    key={msg.id}
-                    className={`chat-message ${msg.sender === 'user' ? 'user-message' : 'service-message'}`}
-                  >
-                    <div className="message-content">{msg.content}</div>
-                    <div className="message-time">{msg.time}</div>
-                  </div>
-                ))
-              ) : (
-                <div className="empty-chat">
-                  <p>您好，有什么可以帮助您的吗？</p>
-                </div>
-              )}
-            </div>
-
-            <div className="customer-service-input">
-              <input
-                type="text"
-                placeholder="请输入您的问题..."
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              />
-              <button onClick={handleSendMessage}>
-                <i className="fas fa-paper-plane"></i>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* 使用新的AI客服组件替换原有客服聊天组件 */}
+      <ProductAiCustomerService 
+        isOpen={showCustomerService}
+        onClose={() => setShowCustomerService(false)}
+        productId={id}
+        productName={recommendation?.title}
+      />
 
       {/* 固定底部按钮栏 */}
       {!isModalOpen && (<div className="product-detail-bottom-bar">
