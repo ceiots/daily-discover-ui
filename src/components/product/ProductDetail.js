@@ -649,7 +649,7 @@ const ProductDetail = () => {
       </div>
 
       {/* 固定底部按钮栏 */}
-      <div className="product-detail-bottom-bar">
+      {!isModalOpen && (<div className="product-detail-bottom-bar">
         <Button
           variant="secondary"
           icon={<i className="fas fa-shopping-cart"></i>}
@@ -666,7 +666,7 @@ const ProductDetail = () => {
         >
           立即购买
         </Button>
-      </div>
+      </div>)}
     </BasePage>
   );
 };
