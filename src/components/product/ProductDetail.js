@@ -104,17 +104,17 @@ const ProductDetail = () => {
   // 处理客服消息发送
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
-    
+
     const newMessage = {
       id: Date.now(),
       content: messageInput,
       sender: 'user',
       time: new Date().toLocaleTimeString()
     };
-    
+
     setChatMessages([...chatMessages, newMessage]);
     setMessageInput("");
-    
+
     // 模拟客服回复
     setTimeout(() => {
       const reply = {
@@ -146,41 +146,47 @@ const ProductDetail = () => {
       return <p className="text-neutral-500 text-center py-4">暂无内容</p>;
     }
 
-    const renderedItems = details.map((item, index) => {
-      if (item.type === "image") {
+    return details.map((item, index) => {
+      // 1. 如果是图片链接字符串
+      if (typeof item === 'string' && item.match(/\.(jpeg|jpg|gif|png|webp|svg|bmp)|^https?:\/\/.*\.(jpeg|jpg|gif|png|webp|svg|bmp)/i)) {
+        return (
+          <img
+            key={index}
+            src={item}
+            alt="商品详情图"
+            style={{ width: '100%', borderRadius: 8, margin: '12px 0' }}
+          />
+        );
+      }
+      // 2. 如果是图片类型对象
+      if (item.type === "image" && item.content) {
         return (
           <img
             key={index}
             src={item.content}
-            alt="Product Detail"
-            className="w-full h-auto mb-4"
+            alt="商品详情图"
+            style={{ width: '100%', borderRadius: 8, margin: '12px 0' }}
           />
         );
-      } else if (item.type === "text") {
+      }
+      // 3. 普通文本
+      if (item.content) {
         return (
-          <div
-            key={index}
-            className="text-sm text-gray-800 leading-relaxed mb-4 font-light"
-          >
+          <div key={index} className="text-base text-gray-700 mb-2" style={{ wordBreak: 'break-all' }}>
             {item.content}
           </div>
         );
-      } else if (item.title && item.content) {
+      }
+      // 4. 兼容 title 字段
+      if (item.title) {
         return (
-          <div key={index} className="mb-4">
-            <h4 className="text-base font-semibold mb-2">{item.title}</h4>
-            <p className="text-sm text-gray-700 leading-relaxed font-light">
-              {item.content}
-            </p>
+          <div key={index} className="text-base text-gray-700 mb-2" style={{ wordBreak: 'break-all' }}>
+            {item.title}
           </div>
         );
       }
       return null;
-    }).filter(Boolean);
-    
-    return renderedItems.length > 0 
-      ? renderedItems 
-      : <p className="text-neutral-500 text-center py-4">暂无内容</p>;
+    });
   };
 
   if (loading) {
@@ -348,7 +354,14 @@ const ProductDetail = () => {
         <button className="btn" onClick={() => navigate(-1)}>
           <i className="fas fa-arrow-left"></i>
         </button>
-      }>
+      }
+      headerRight={<button
+        className="customer-service-button"
+        onClick={handleCustomerServiceClick}
+      >
+        <i className="fas fa-headset"></i>
+        <span>客服</span>
+      </button>}>
       <div className="recommendation-detail-container">
         <div className="recommendation-detail-content">
           <div className="product-image-gallery">
@@ -412,7 +425,7 @@ const ProductDetail = () => {
                   <div className="stat-value">{recommendation.soldCount || 0}</div>
                 </div>
               </div>
-              
+
               <div className="product-stat-item">
                 <div className="stat-icon">
                   <i className="fas fa-cubes"></i>
@@ -422,7 +435,7 @@ const ProductDetail = () => {
                   <div className="stat-value">{recommendation.stock || 0}</div>
                 </div>
               </div>
-              
+
               {recommendation.shopName && (
                 <div className="product-stat-item">
                   <div className="stat-icon">
@@ -434,41 +447,6 @@ const ProductDetail = () => {
                   </div>
                 </div>
               )}
-            </div>
-
-            {recommendation.specifications && recommendation.specifications.length > 0 && (
-              <div className="product-specifications">
-                <h3>规格参数</h3>
-                <div className="specifications-list">
-                  {recommendation.specifications.map((spec, index) => (
-                    <div key={index} className="specification-item">
-                      <span className="spec-name">{spec.name}:</span>
-                      <span className="spec-value">
-                        {spec.values && spec.values.length > 0
-                          ? spec.values.join(", ")
-                          : spec.value || "无"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="product-actions">
-              <Button 
-                variant="secondary" 
-                icon={<i className="fas fa-shopping-cart"></i>}
-                onClick={handleAddToCart}
-              >
-                加入购物车
-              </Button>
-              <Button 
-                variant="primary" 
-                icon={<i className="fas fa-bolt"></i>}
-                onClick={handleBuyNow}
-              >
-                立即购买
-              </Button>
             </div>
           </div>
         </div>
@@ -548,18 +526,12 @@ const ProductDetail = () => {
           <div className="p-4 tab-content">
             {activeTab === "introduction" && (
               <div className="tab-pane">
-                <h3 className="text-lg font-medium tracking-wide mb-3">
-                  产品详情
-                </h3>
                 {renderProductDetails(recommendation.productDetails)}
               </div>
             )}
 
             {activeTab === "purchaseNotice" && (
               <div className="tab-pane">
-                <h3 className="text-lg font-medium tracking-wide mb-3">
-                  购买须知
-                </h3>
                 {renderProductDetails(recommendation.purchaseNotices)}
               </div>
             )}
@@ -569,12 +541,9 @@ const ProductDetail = () => {
 
       {/* Modal for selecting specifications */}
       {isModalOpen && (
-        <div
-          id="specificationModal"
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
-        >
-          <div className="bg-white w-full max-w-md rounded-t-xl p-4">
-            <div className="flex justify-between items-center mb-6">
+        <div id="specificationModal" className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-t-xl modal-content">
+            <div className="flex justify-between items-center mb-6" style={{ padding: '24px 16px 0 16px' }}>
               <h3 className="text-lg font-semibold">选择规格</h3>
               <button
                 className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
@@ -583,8 +552,7 @@ const ProductDetail = () => {
                 ×
               </button>
             </div>
-
-            <div>
+            <div className="modal-body">
               {recommendation.specifications && recommendation.specifications.length > 0 ? (
                 recommendation.specifications.map((spec, index) => (
                   <div key={index} className="mb-4">
@@ -607,8 +575,8 @@ const ProductDetail = () => {
                           <label
                             htmlFor={`${spec.name}-${idx}`}
                             className={`px-4 py-2 border rounded-full text-sm cursor-pointer ${selectedSpecs[spec.name] === value
-                                ? "bg-primary text-white"
-                                : ""
+                              ? "bg-primary text-white"
+                              : ""
                               }`}
                           >
                             {value}
@@ -622,51 +590,21 @@ const ProductDetail = () => {
                 <p className="text-center text-gray-500 py-2">该商品无规格选择</p>
               )}
             </div>
-
-            <div className="mb-4">
-              <p className="mb-2">数量</p>
-              <div className="flex items-center">
-                <button
-                  className="w-8 h-8 border rounded-full flex items-center justify-center"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  -
-                </button>
-                <input
-                  type="text"
-                  value={quantity}
-                  className="w-12 text-center mx-2 border-none"
-                  readOnly
-                />
-                <button
-                  className="w-8 h-8 border rounded-full flex items-center justify-center"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  +
-                </button>
-              </div>
+            <div className="modal-footer">
+              <Button
+                variant="primary"
+                block
+                onClick={() => handleAddOrBuy(isBuyNow)}
+              >
+                确定
+              </Button>
             </div>
-            <Button
-              variant="primary"
-              block
-              onClick={() => handleAddOrBuy(isBuyNow)}
-            >
-              确定
-            </Button>
           </div>
         </div>
       )}
 
       {/* 客服聊天组件 */}
       <div className="customer-service-container">
-        <button 
-          className="customer-service-button"
-          onClick={handleCustomerServiceClick}
-        >
-          <i className="fas fa-headset"></i>
-          <span>客服</span>
-        </button>
-        
         {showCustomerService && (
           <div className="customer-service-panel">
             <div className="customer-service-header">
@@ -675,12 +613,12 @@ const ProductDetail = () => {
                 <i className="fas fa-times"></i>
               </button>
             </div>
-            
+
             <div className="customer-service-messages">
               {chatMessages.length > 0 ? (
                 chatMessages.map(msg => (
-                  <div 
-                    key={msg.id} 
+                  <div
+                    key={msg.id}
                     className={`chat-message ${msg.sender === 'user' ? 'user-message' : 'service-message'}`}
                   >
                     <div className="message-content">{msg.content}</div>
@@ -693,7 +631,7 @@ const ProductDetail = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="customer-service-input">
               <input
                 type="text"
