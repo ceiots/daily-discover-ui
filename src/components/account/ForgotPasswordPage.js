@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import instance from "../../utils/axios";
 import "./ForgotPasswordPage.css"; // 引入样式文件
 import NavBar from "../../theme/components/NavBar"; // 引入NavBar组件
+import { BasePage, Button } from "../../theme";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -114,123 +115,104 @@ const ForgotPasswordPage = () => {
     navigate("/login");
   };
   return (
-    <div className="forgot-password-page-outer">
-      <div className="forgot-password-bg-image">
-        <div className="forgot-password-bg-mask" />
-      </div>
-      <div className="forgot-password-page-inner">
-        <div className="bg-image flex flex-col items-center justify-center text-white">
-          <div className="header-title mb-0.5 text-center">每日发现</div>
-          <div className="header-subtitle opacity-80 text-center">发现生活中的美好时刻</div>
+    <BasePage showHeader={true} headerTitle="找回密码" className="login-page">
+      <div className="login-form-container">
+        <h1 className="text-2xl font-bold text-center mb-2">每日发现</h1>
+        <p className="text-center text-neutral-500 mb-6">发现生活中的美好时刻</p>
+        <input
+          className="theme-input"
+          placeholder="请输入手机号"
+          value={formData.phoneNumber}
+          onChange={handleInputChange}
+        />
+        <div className="flex space-x-1.5">
+          <input
+            className="theme-input"
+            type="text"
+            placeholder="请输入验证码"
+            name="verificationCode"
+            value={formData.verificationCode}
+            onChange={handleInputChange}
+          />
+          <button
+            type="button"
+            onClick={handleGetVerificationCode}
+            disabled={countdown > 0}
+            className={`forgot-button w-20 bg-primary text-white rounded-md ${
+              countdown > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
+            } transition-colors`}
+          >
+            {countdown > 0 ? `${countdown}秒` : "获取验证码"}
+          </button>
         </div>
-        <div className="px-4 mt-4">
-          <h1 className="page-title mb-4 text-center">找回密码</h1>
-          <div className="space-y-2.5">
-            <div>
-              <input
-                type="tel"
-                name="phoneNumber"
-                placeholder="请输入手机号码"
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                className="w-full h-10 pr-12 rounded-lg bg-white/50 border-none text-sm"
-              />
-              {errors.phoneNumber && (
-                <p className="error-message">{errors.phoneNumber}</p>
-              )}
-            </div>
-            <div className="flex space-x-1.5">
-              <input
-                type="text"
-                placeholder="请输入验证码"
-                name="verificationCode"
-                value={formData.verificationCode}
-                onChange={handleInputChange}
-                className={`forgot-input flex-1 bg-gray-50 text-sm border-none ${
-                  errors.verificationCode ? "border-red-500" : ""
-                }`}
-              />
-              <button
-                type="button"
-                onClick={handleGetVerificationCode}
-                disabled={countdown > 0}
-                className={`forgot-button w-20 bg-primary text-white rounded-md ${
-                  countdown > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
-                } transition-colors`}
-              >
-                {countdown > 0 ? `${countdown}秒` : "获取验证码"}
-              </button>
-            </div>
-            {errors.verificationCode && (
-              <p className="error-message">{errors.verificationCode}</p>
-            )}
-            <div className="relative">
-              <input
-                type={showNewPassword ? "text" : "password"}
-                placeholder="请设置密码"
-                name="newPassword"
-                className="w-full h-10 pr-12 rounded-lg bg-white/50 border-none text-sm"
-                value={formData.newPassword}
-                onChange={handleInputChange}
-              />
-              <button 
-                type="button"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-              >
-                <i className={`${showNewPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
-              </button>
-              {errors.newPassword && (
-                <p className="error-message">{errors.newPassword}</p>
-              )}
-              {passwordRules.map((rule, index) => (
-                <p key={index} className="rule-text">- {rule}</p>
-              ))}
-            </div>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="请再次输入密码"
-                name="confirmPassword"
-                className="w-full h-10 pr-12 rounded-lg bg-white/50 border-none text-sm"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-              />
-              <button 
-                type="button"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                <i className={`${showConfirmPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
-              </button>
-              {errors.confirmPassword && (
-                <p className="error-message">{errors.confirmPassword}</p>
-              )}
-            </div>
-            <button
-              type="submit"
-              className="forgot-button w-full bg-primary text-white font-medium rounded-md mt-4"
-              onClick={handleSubmit}
-            >
-              提交
-            </button>
-            <div className="flex justify-between mt-2 mb-6">
-              <a
-                href="#"
-                className="link-text text-gray-500"
-                onClick={handleLogin}
-              >
-                返回登录
-              </a>
-              <div className="space-x-2">
-                <a href="#" className="link-text text-gray-500">
-                  用户协议
-                </a>
-                <a href="#" className="link-text text-gray-500">
-                  隐私政策
-                </a>
-              </div>
-            </div>
+        {errors.verificationCode && (
+          <p className="error-message">{errors.verificationCode}</p>
+        )}
+        <div className="relative">
+          <input
+            className="theme-input"
+            type={showNewPassword ? "text" : "password"}
+            placeholder="请设置密码"
+            name="newPassword"
+            value={formData.newPassword}
+            onChange={handleInputChange}
+          />
+          <button 
+            type="button"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
+            onClick={() => setShowNewPassword(!showNewPassword)}
+          >
+            <i className={`${showNewPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
+          </button>
+          {errors.newPassword && (
+            <p className="error-message">{errors.newPassword}</p>
+          )}
+          {passwordRules.map((rule, index) => (
+            <p key={index} className="rule-text">- {rule}</p>
+          ))}
+        </div>
+        <div className="relative">
+          <input
+            className="theme-input"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="请再次输入密码"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+          />
+          <button 
+            type="button"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <i className={`${showConfirmPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
+          </button>
+          {errors.confirmPassword && (
+            <p className="error-message">{errors.confirmPassword}</p>
+          )}
+        </div>
+        <Button
+          variant="primary"
+          block
+          onClick={handleSubmit}
+        >
+          提交
+        </Button>
+        <div className="flex justify-between mt-2 mb-6">
+          <a
+            href="#"
+            className="link-text text-gray-500"
+            onClick={handleLogin}
+          >
+            返回登录
+          </a>
+          <div className="space-x-2">
+            <a href="#" className="link-text text-gray-500">
+              用户协议
+            </a>
+            <a href="#" className="link-text text-gray-500">
+              隐私政策
+            </a>
           </div>
         </div>
       </div>
@@ -239,7 +221,7 @@ const ForgotPasswordPage = () => {
         id="toast"
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white px-2.5 py-1 rounded-md text-xs hidden"
       ></div>
-    </div>
+    </BasePage>
   );
 };
 

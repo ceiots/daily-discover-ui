@@ -18,6 +18,12 @@ const NavBar = ({ className }) => {
     return path.startsWith(route);
   };
 
+  // 判断是否为登录、注册、找回密码页面
+  const isNotAuthPage =
+    path.startsWith('/login') ||
+    path.startsWith('/register') ||
+    path.startsWith('/forgot-password');
+
   const handleCenterClick = (e) => {
     e.preventDefault();
     if (isLoggedIn) {
@@ -38,7 +44,7 @@ const NavBar = ({ className }) => {
         
         <div className="nav-center-button-container">
           <a href="#" className="nav-center-button" onClick={handleCenterClick}>
-            {isLoggedIn && userInfo?.avatar ? (
+            {!isNotAuthPage && isLoggedIn && userInfo?.avatar ? (
               <img
                 src={userInfo.avatar}
                 alt="头像"
