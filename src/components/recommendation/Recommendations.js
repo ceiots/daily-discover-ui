@@ -177,7 +177,7 @@ const Recommendations = () => {
       <div className="daily-recommendations-section">
         <div className="recommendations-header">
           <h3 style={{ fontSize: theme.fontSize["2xl"] }}>
-            <i className="fas fa-thumbs-up"></i> 今日推荐
+            <i className="fas fa-thumbs-up" style={{ color: theme.colors.primary.main }}></i> 今日推荐
             {!showPreferenceModal && isLoggedIn && (
               <button 
                 className="preference-button"
@@ -228,8 +228,8 @@ const Recommendations = () => {
               </div>
               <div className="product-info">
                 <div className="product-name" style={{ fontSize: theme.fontSize.base }}>{product.title}</div>
-                <div className="product-price" style={{ fontSize: theme.fontSize.lg }}>{`¥${product.price}`}</div>
-                <div className="product-match">
+                <div className="product-price" style={{ color: theme.colors.error }}>{`¥${product.price}`}</div>
+                <div className="product-match" style={{ color: theme.colors.primary.main }}>
                   <i className="fas fa-chart-line"></i>
                   匹配度{product.matchScore || "90"}%
                 </div>
@@ -241,8 +241,10 @@ const Recommendations = () => {
                 )}
               </div>
               <div className="shop-info">
-                <img src={product.shopAvatarUrl || DEFAULT_AVATAR} className="shop-avatar" alt="店铺logo" />
-                <span className="shop-name">{product.shopName}</span>
+                {product.shopAvatarUrl && (
+                  <img src={product.shopAvatarUrl || DEFAULT_AVATAR} className="shop-avatar" alt="店铺logo" />
+                )}
+                <span className="shop-name">{product.shopName || "官方商城"}</span>
               </div>
             </Link>
           ))}

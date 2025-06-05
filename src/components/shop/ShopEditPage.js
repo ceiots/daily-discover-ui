@@ -45,7 +45,7 @@ const ShopEditPage = () => {
         }
 
         // 获取指定店铺信息
-        const response = await instance.get(`/shops/${shopId}`, {
+        const response = await instance.get(`/shop/${shopId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -55,7 +55,7 @@ const ShopEditPage = () => {
           setShop(response.data.data);
 
           // 验证用户是否为店铺所有者
-          const userShopResponse = await instance.get('/shops/user', {
+          const userShopResponse = await instance.get('/shop/user', {
             headers: {
               'Authorization': `Bearer ${token}`
             }
@@ -179,7 +179,7 @@ const ShopEditPage = () => {
             logoFormData.append('file', formData.shopLogo);
 
             // 上传图片到店铺logo上传接口
-            const logoResponse = await instance.post('/shops/upload-logo', logoFormData, {
+            const logoResponse = await instance.post('/shop/upload-logo', logoFormData, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
@@ -217,7 +217,7 @@ const ShopEditPage = () => {
         try {
           const response = await instance({
             method: 'put',
-            url: `/shops/${shopId}`,
+            url: `/shop/${shopId}`,
             data: shopData,
             headers: {
               'Authorization': `Bearer ${token}`,

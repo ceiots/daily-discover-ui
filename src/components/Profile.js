@@ -73,7 +73,7 @@ const Profile = () => {
           return;
         }
         
-        const response = await instance.get('/shops/user', {
+        const response = await instance.get('/shop/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

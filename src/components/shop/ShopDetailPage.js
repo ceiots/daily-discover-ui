@@ -20,7 +20,7 @@ const ShopDetailPage = () => {
     const fetchShopDetails = async () => {
       try {
         setLoading(true);
-        const response = await instance.get(`/shops/${shopId}`);
+        const response = await instance.get(`/shop/${shopId}`);
         
         if (response.data && response.data.code === 200) {
           setShop(response.data.data);
@@ -28,7 +28,7 @@ const ShopDetailPage = () => {
           // 检查当前用户是否为店铺所有者
           if (isLoggedIn) {
             const token = localStorage.getItem('token');
-            const userResponse = await instance.get('/shops/user', {
+            const userResponse = await instance.get('/shop/user', {
               headers: {
                 'Authorization': `Bearer ${token}`
               }

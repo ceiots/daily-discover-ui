@@ -42,7 +42,7 @@ const ShopCreationPage = () => {
           return;
         }
 
-        const response = await instance.get('/shops/user', {
+        const response = await instance.get('/shop/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -157,7 +157,7 @@ const ShopCreationPage = () => {
             logoFormData.append('file', formData.shopLogo);
 
             // 上传图片到店铺logo上传接口
-            const logoResponse = await instance.post('/shops/upload-logo', logoFormData, {
+            const logoResponse = await instance.post('/shop/upload-logo', logoFormData, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
@@ -192,7 +192,7 @@ const ShopCreationPage = () => {
         }
 
         // 根据是否已有店铺决定是创建还是更新
-        const endpoint = hasShop ? `/shops/${shop.id}` : '/shops';
+        const endpoint = hasShop ? `/shop/${shop.id}` : '/shop';
         const method = hasShop ? 'put' : 'post';
 
         try {

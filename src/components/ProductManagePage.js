@@ -28,18 +28,37 @@ const ProductManagePage = () => {
     try {
       setLoading(true);
       const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
       
-      if (!userId) {
+      if (!userId || !token) {
         navigate('/login');
         return;
       }
       
-      const response = await instance.get('/product/user');
+      // 先获取用户的店铺信息
+      const shopResponse = await instance.get('/shop/user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      if (response.data && response.data.code === 200) {
-        setProducts(response.data.data || []);
+      if (shopResponse.data && shopResponse.data.code === 200 && shopResponse.data.data) {
+        const shopId = shopResponse.data.data.id;
+        
+        // 使用店铺ID获取商品列表
+        const response = await instance.get(`/shop/${shopId}/products`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.data && response.data.code === 200) {
+          setProducts(response.data.data || []);
+        } else {
+          setError(response.data?.message || '获取商品失败');
+        }
       } else {
-        setError(response.data?.message || '获取商品失败');
+        setError('您还没有创建店铺或获取店铺信息失败');
       }
     } catch (error) {
       console.error('获取商品列表失败：', error);

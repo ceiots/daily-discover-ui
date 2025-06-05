@@ -2,12 +2,14 @@
 import Button from './Button';
 import Card from './Card';
 import ScrollableSection from './ScrollableSection';
+import ShopInfo from './ShopInfo';
 
 // 导出所有组件
 export {
   Button,
   Card,
-  ScrollableSection
+  ScrollableSection,
+  ShopInfo
 };
 
 // 可以在这里添加更多组件导出
