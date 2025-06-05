@@ -31,7 +31,7 @@ import ContentCreationPage from './components/ContentCreationPage'; // 图文创
 import EcommerceCreationPage from './components/creation/EcommerceCreationPage'; // 电商创建页面
 import MyContentPage from './components/MyContentPage'; // 我的图文内容页面
 import MyShopPage from './components/shop/MyShopPage'; // 我的店铺内容页面
-import ProductManagePage from './components/ProductManagePage'; // 商品管理页面
+import ProductManagePage from './components/product/ProductManagePage'; // 商品管理页面
 import ShopCreationPage from './components/shop/ShopCreationPage'; // 店铺创建页
 import ShopDetailPage from './components/shop/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/shop/ShopEditPage'; // 店铺编辑页面

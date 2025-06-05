@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import instance from '../utils/axios';
+import instance from '../../utils/axios';
 
 const PaymentResult = () => {
   const navigate = useNavigate();

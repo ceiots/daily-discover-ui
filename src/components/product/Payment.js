@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import instance from "../../utils/axios";
-import BasePage from "../../theme/BasePage";
+import { BasePage, Button, Card } from "../../theme";
+
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,7 +45,7 @@ const Payment = () => {
         itemIds: selectedItems.map(i => i.id),
         totalAmount: calculateTotal(),
         payType: paymentMethod === "支付宝" ? 1 : 2,
-        address,
+        addressDto: address, // 将 address 改为 addressDto 以匹配后端接口
         items: selectedItems.map(i => ({
           id: i.id,
           productId: i.productId,
@@ -68,7 +69,8 @@ const Payment = () => {
       } else {
         alert("订单创建失败: " + res.data.message);
       }
-    } catch {
+    } catch (error) {
+      console.error("支付请求失败", error);
       alert("支付请求失败，请稍后重试");
     }
   };

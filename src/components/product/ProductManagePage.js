@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
-import { useAuth } from '../App';
-import instance from '../utils/axios';
-import PropTypes from 'prop-types';
-import '../App.css';
+import { useAuth } from '../../App';
+import instance from '../../utils/axios';
 
 const ProductManagePage = () => {
   const navigate = useNavigate();
