@@ -259,6 +259,7 @@ const ProductDetail = () => {
       quantity: selectedQuantity,
       shopName: productInfo.shopName || '',
       shopAvatarUrl: productInfo.shopAvatarUrl || '',
+      shopId: productInfo.shopId || productInfo.shop?.id || null, // 添加店铺ID字段
     };
 
     return orderPayload;
@@ -292,7 +293,7 @@ const ProductDetail = () => {
           // 加入购物车，调用加入购物车接口
           const response = await instance.post("/cart/add", orderPayload);
           if (response.data && response.data.code === 200) {
-            alert("已成功加入购物车");
+            console.log ("已成功加入购物车");
           } else {
             // 处理库存不足等错误情况
             alert(response.data?.message || "加入购物车失败");

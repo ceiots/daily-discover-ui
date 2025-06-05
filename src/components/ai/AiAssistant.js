@@ -66,7 +66,6 @@ const AiAssistant = ({ userInfo }) => {
     swipeToSlide: true,
     arrows: false,
     dots: false,
-    focusOnSelect: true, // 点击选中
     waitForAnimate: false, // 不等待动画完成就响应用户操作
     responsive: [
       {
@@ -91,22 +90,7 @@ const AiAssistant = ({ userInfo }) => {
     // 轮播初始化完成后的回调函数
     onInit: () => {
       console.log("轮播初始化完成");
-    },
-    // 轮播内容变化后的回调函数
-    afterChange: (current) => {
-      // 让当前 slide 可聚焦，其它 slide 不可聚焦
-      setTimeout(() => {
-        const slides = document.querySelectorAll('.slick-slide');
-        slides.forEach((slide, idx) => {
-          if (slide) {
-            slide.tabIndex = idx === current + 1 ? 0 : -1; // slick 会有 clone，current+1 通常是当前
-          }
-        });
-        // 自动聚焦到当前 slide
-        const currentSlide = document.querySelector('.slick-slide[tabindex="0"]');
-        if (currentSlide) currentSlide.focus();
-      }, 50);
-    },  
+    }
   };
 
 
@@ -948,7 +932,6 @@ const AiAssistant = ({ userInfo }) => {
     const randomRecommendation =
       quickReads[Math.floor(Math.random() * quickReads.length)];
     setCurrentRecommendation(randomRecommendation);
-
 
     // 滚动到最新消息位置
     if (chatEndRef.current) {

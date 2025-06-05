@@ -5,6 +5,9 @@ import { useAuth } from "../../App";
 import { useTheme } from "../../theme";
 import "./Recommendations.css";
 
+// 默认头像常量
+const DEFAULT_AVATAR = "https://source.unsplash.com/featured/100x100/?avatar";
+
 const Recommendations = () => {
   const { isLoggedIn, userInfo } = useAuth();
   const theme = useTheme();
@@ -236,6 +239,10 @@ const Recommendations = () => {
                     {aiInsights[`product${product.id}`]}
                   </div>
                 )}
+              </div>
+              <div className="shop-info">
+                <img src={product.shopAvatarUrl || DEFAULT_AVATAR} className="shop-avatar" alt="店铺logo" />
+                <span className="shop-name">{product.shopName}</span>
               </div>
             </Link>
           ))}

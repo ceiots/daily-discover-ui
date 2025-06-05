@@ -38,6 +38,15 @@ const Cart = () => {
         if (response.data && response.data.code === 200) {
           const groups = response.data.data || [];
           setCartGroups(groups);
+          
+          // 初始化商品数量
+          const initialQuantities = {};
+          groups.forEach(group => {
+            group.items.forEach(item => {
+              initialQuantities[item.id] = item.quantity;
+            });
+          });
+          setQuantities(initialQuantities);
         } else {
           throw new Error(response.data?.message || "获取购物车数据失败");
         }
@@ -62,43 +71,45 @@ const Cart = () => {
   };
 
   const handleCheckboxChange = (id) => {
-    // Bug 修复：修改了对象展开语法和多余括号的问题
     setSelectedItems((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-
-    // Update shop selection based on item selection
-    const item = cartGroups.find((item) => item.id === id);
-    if (item) {
-      const shopItems = cartGroups.filter((i) => i.shopId === item.shopId);
-      const shopChecked = shopItems.every((i) => selectedItems[i.id]);
-
-      setSelectedShops((prev) => ({
-        ...prev,
-        [item.shopId]: shopChecked,
-      }));
-    }
-
-    setSelectAll(Object.values(selectedItems).every(Boolean));
-    updateTotal();
   };
 
+  const handleShopCheckboxChange = (shopId) => {
+    const shopChecked = !selectedShops[shopId];
+    setSelectedShops((prev) => ({
+      ...prev,
+      [shopId]: shopChecked,
+    }));
+
+    // 更新该店铺下所有商品的选中状态
+    const shopGroup = cartGroups.find(group => group.shopId === shopId);
+    if (shopGroup) {
+      const newSelectedItems = { ...selectedItems };
+      shopGroup.items.forEach(item => {
+        newSelectedItems[item.id] = shopChecked;
+      });
+      setSelectedItems(newSelectedItems);
+    }
+  };
 
   const handleSelectAllChange = (e) => {
     const checked = e.target.checked;
     const newSelectedItems = {};
     const newSelectedShops = {};
 
-    cartGroups.forEach((item) => {
-      newSelectedItems[item.id] = checked;
-      newSelectedShops[item.shopId] = checked;
+    cartGroups.forEach(group => {
+      newSelectedShops[group.shopId] = checked;
+      group.items.forEach(item => {
+        newSelectedItems[item.id] = checked;
+      });
     });
 
     setSelectedItems(newSelectedItems);
     setSelectedShops(newSelectedShops);
     setSelectAll(checked);
-    updateTotal();
   };
 
   const updateQuantity = async (itemId, newQuantity) => {
@@ -110,15 +121,21 @@ const Cart = () => {
       
       // 检查 CommonResult 返回格式
       if (response.data && response.data.code === 200) {
-        setCartGroups((prevGroups) =>
-          prevGroups.map((group) =>
-            group.shopId === itemId ? { ...group, quantity: newQuantity } : group
-          )
-        );
-        setQuantities((prev) => ({
+        // 更新本地商品数量状态
+        setQuantities(prev => ({
           ...prev,
-          [itemId]: newQuantity,
+          [itemId]: newQuantity
         }));
+        
+        // 更新购物车商品数量
+        setCartGroups(prevGroups => {
+          return prevGroups.map(group => {
+            const updatedItems = group.items.map(item => 
+              item.id === itemId ? { ...item, quantity: newQuantity } : item
+            );
+            return { ...group, items: updatedItems };
+          });
+        });
       } else {
         alert(response.data?.message || "更新数量失败");
       }
@@ -129,22 +146,20 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    const selectedCartItems = cartGroups.filter(
-      (item) => selectedItems[item.id]
-    );
+    // 收集所有选中的商品
+    const selectedCartItems = [];
+    cartGroups.forEach(group => {
+      group.items.forEach(item => {
+        if (selectedItems[item.id]) {
+          selectedCartItems.push(item);
+        }
+      });
+    });
+    
     if (selectedCartItems.length === 0) {
       alert("请选择要结算的商品！");
       return;
     }
-
-    // Extract shop information for selected items
-    /* const shopInfo = {};
-    selectedCartItems.forEach((item) => {
-      shopInfo[item.shopId] = {
-        shopName: item.shopName,
-        shopAvatarUrl: item.shopAvatarUrl,
-      };
-    }); */
 
     navigate("/payment", { state: { selectedItems: selectedCartItems } });
   };
@@ -153,12 +168,13 @@ const Cart = () => {
     let total = 0;
     let count = 0;
 
-    cartGroups.forEach((item) => {
-      if (selectedItems[item.id] === true) {
-        // 明确检查是否为 true
-        total += item.price * item.quantity;
-        count += item.quantity;
-      }
+    cartGroups.forEach(group => {
+      group.items.forEach(item => {
+        if (selectedItems[item.id]) {
+          total += item.price * item.quantity;
+          count += item.quantity;
+        }
+      });
     });
 
     const totalPriceElement = document.getElementById("totalPrice");
@@ -191,9 +207,19 @@ const Cart = () => {
       );
       
       if (allSuccess) {
-        setCartGroups((prevGroups) =>
-          prevGroups.filter((item) => !idsToDelete.includes(item.id.toString()))
-        );
+        // 更新购物车分组数据，移除已删除的商品
+        setCartGroups(prevGroups => {
+          const newGroups = prevGroups.map(group => {
+            const remainingItems = group.items.filter(
+              item => !idsToDelete.includes(item.id.toString())
+            );
+            return { ...group, items: remainingItems };
+          }).filter(group => group.items.length > 0); // 移除没有商品的店铺分组
+          
+          return newGroups;
+        });
+        
+        // 清除选中状态
         setSelectedItems({});
         setShowDropdown(false);
       } else {
@@ -220,34 +246,48 @@ const Cart = () => {
       headerTitle="购物车"
       backgroundColor="default"
     >
-      <main className="pb-[65px]">
-        {cartGroups.length > 0 ? (
+      <main className="pb-[65px] bg-gray-50">
+        {loading ? (
+          <div className="text-center py-8 text-gray-400">加载中...</div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-500">{error}</div>
+        ) : cartGroups.length > 0 ? (
           cartGroups.map((shop) => (
-            <div key={shop.shopId} className="mb-4 mx-1">
-              <div className="flex items-center mb-2">
-                <img
-                  src={shop.shopAvatarUrl}
-                  className="w-6 h-6 rounded-full"
-                  alt="店铺logo"
-                />
-                <span className="ml-2 text-sm text-gray-700 font-semibold">
-                  {shop.shopName}
-                </span>
-              </div>
-              {shop.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white px-2 py-2 mb-2 rounded-lg shadow-sm flex gap-2 items-center"
-                >
-                  {showDropdown && (
-                    <div className="absolute top-20 right-4 bg-white shadow-lg rounded-md">
-                      <button onClick={handleDelete}>删除</button>
-                    </div>
-                  )}
+            <div key={shop.shopId} className="mb-3 mx-2 bg-white rounded-lg shadow-sm p-3">
+              <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
+                <div className="flex items-center">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 border-gray-300"
-                    checked={selectedItems[item.id]}
+                    className="w-4 h-4 mr-2 border-gray-300 rounded"
+                    checked={selectedShops[shop.shopId] || false}
+                    onChange={() => handleShopCheckboxChange(shop.shopId)}
+                  />
+                  <img
+                    src={shop.shopAvatarUrl}
+                    className="w-5 h-5 rounded-full"
+                    alt="店铺logo"
+                  />
+                  <span className="ml-2 text-sm text-gray-700 font-medium">
+                    {shop.shopName}
+                  </span>
+                </div>
+                <button 
+                  className="text-xs text-gray-500"
+                  onClick={handleDelete}
+                >
+                  删除
+                </button>
+              </div>
+              
+              {shop.items.map(item => (
+                <div
+                  key={item.id}
+                  className="flex gap-2 py-2 border-b border-gray-50 last:border-0"
+                >
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 mt-8 border-gray-300 rounded"
+                    checked={selectedItems[item.id] || false}
                     onChange={() => handleCheckboxChange(item.id)}
                   />
                   <img
@@ -255,27 +295,23 @@ const Cart = () => {
                     className="w-16 h-16 rounded object-cover"
                     alt={item.productName}
                   />
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium truncate">
-                      {item.productName}
-                    </h3>
-                    <p className="text-xs text-gray-400 truncate">
-                      规格：
-                      {item.specifications
-                        .map((spec) => `${spec.name}-${spec.values.join(", ")}`)
-                        .join("，")}
-                    </p>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-800 line-clamp-2">
+                        {item.productName}
+                      </h3>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-1">
+                        {item.specifications
+                          .map((spec) => `${spec.name}:${spec.values.join(",")}`)
+                          .join(" ")}
+                      </p>
+                    </div>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-primary font-bold">¥ {item.price}</span>
-                      <div className="flex items-center gap-2 bg-gray-50 rounded px-1">
+                      <span className="text-primary font-semibold text-base">¥{item.price}</span>
+                      <div className="flex items-center gap-1 bg-gray-50 rounded-full px-1">
                         <button
-                          className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded text-gray-500"
-                          onClick={() =>
-                            updateQuantity(
-                              item.id,
-                              (quantities[item.id] || 1) - 1
-                            )
-                          }
+                          className="w-6 h-6 flex items-center justify-center rounded-full text-gray-500"
+                          onClick={() => updateQuantity(item.id, quantities[item.id] - 1)}
                         >
                           -
                         </button>
@@ -288,16 +324,11 @@ const Cart = () => {
                               updateQuantity(item.id, value);
                             }
                           }}
-                          className="w-10 h-5 text-center border border-gray-200 rounded bg-gray-50"
+                          className="w-8 h-6 text-center bg-transparent border-0 text-sm"
                         />
                         <button
-                          className="w-5 h-5 flex items-center justify-center border border-gray-300 rounded text-gray-500"
-                          onClick={() =>
-                            updateQuantity(
-                              item.id,
-                              (quantities[item.id] || 1) + 1
-                            )
-                          }
+                          className="w-6 h-6 flex items-center justify-center rounded-full text-gray-500"
+                          onClick={() => updateQuantity(item.id, quantities[item.id] + 1)}
                         >
                           +
                         </button>
@@ -309,30 +340,34 @@ const Cart = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-8 text-gray-400">购物车是空的</div>
+          <div className="text-center py-12 text-gray-400">
+            <div className="text-4xl mb-4">🛒</div>
+            <p>购物车是空的</p>
+          </div>
         )}
       </main>
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 h-[60px] flex items-center justify-between px-4">
+      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 h-[60px] flex items-center justify-between px-4 shadow-md">
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
             id="selectAll"
-            className="w-5 h-5 rounded border-gray-300"
+            className="w-4 h-4 rounded border-gray-300"
+            checked={selectAll}
             onChange={handleSelectAllChange}
           />
-          <label htmlFor="selectAll" className="text-sm">
+          <label htmlFor="selectAll" className="text-sm text-gray-600">
             全选
           </label>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-sm">
             合计:{" "}
-            <span className="text-primary font-medium" id="totalPrice">
-              ¥ 0
+            <span className="text-primary font-semibold" id="totalPrice">
+              ¥ 0.00
             </span>
           </div>
           <button
-            className="bg-primary text-white px-6 py-2 !rounded-button"
+            className="bg-primary text-white px-6 py-2 rounded-full text-sm"
             onClick={handleCheckout}
           >
             结算 (<span id="totalItems">0</span>)

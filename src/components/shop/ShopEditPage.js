@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
-import instance from '../utils/axios';
+import { useAuth } from '../../App';
+import instance from '../../utils/axios';
 import './MyShopPage.css';
 
 const ShopEditPage = () => {
