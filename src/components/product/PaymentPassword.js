@@ -16,6 +16,39 @@ const PaymentPassword = () => {
         return null;
     }
 
+    // 检查用户是否已设置支付密码
+    const [hasPaymentPassword, setHasPaymentPassword] = useState(null);
+
+    // 检查支付密码状态
+    useEffect(() => {
+        const checkPaymentPassword = async () => {
+            try {
+                const response = await instance.get("/user/payment-password/status");
+                if (response.data && response.data.code === 200) {
+                    setHasPaymentPassword(response.data.data.hasPaymentPassword);
+                    // 如果未设置支付密码，跳转到专门的支付密码设置页面
+                    if (!response.data.data.hasPaymentPassword) {
+                        // 将当前支付信息作为状态传递，以便设置密码后返回继续支付
+                        navigate("/payment-password-setting", {
+                            state: {
+                                returnTo: "/payment",
+                                orderNo,
+                                paymentAmount,
+                                paymentMethod
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("检查支付密码状态失败:", error);
+                // 默认假设用户已设置密码，避免阻塞流程
+                setHasPaymentPassword(true);
+            }
+        };
+        
+        checkPaymentPassword();
+    }, [navigate, orderNo, paymentAmount, paymentMethod]);
+
     // 支付状态
     const [paymentStatus, setPaymentStatus] = useState("pending"); // pending, loading, success, failed
     const [errorMessage, setErrorMessage] = useState("");
@@ -24,6 +57,8 @@ const PaymentPassword = () => {
     const [countdown, setCountdown] = useState(0);
     const [errorCountdown, setErrorCountdown] = useState(0);
     const passwordBoxes = Array.from({ length: 6 }, (_, i) => `pwd${i + 1}`);
+    
+
 
     // 获取支付方式信息
     const isAlipay = paymentMethod === "1";
@@ -47,6 +82,10 @@ const PaymentPassword = () => {
                 orderNo,
                 paymentMethod,
                 paymentPassword: newPassword
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
             });
             const result = response.data;
             if (result.code === 200) {
@@ -131,6 +170,8 @@ const PaymentPassword = () => {
     const handleCancel = async () => {
         navigate(-1);
     };
+    
+
 
     // 监听 paymentStatus 变化
     useEffect(() => {
@@ -276,6 +317,8 @@ const PaymentPassword = () => {
                     </div>
                 </div>
             )}
+            
+
         </BasePage>
     );
 };

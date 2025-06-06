@@ -300,8 +300,6 @@ const Profile = () => {
         </div>
       )}
 
-      
-
       {/* 功能菜单 */}
       {FEATURE_MENUS.map((menu, index) => (
         <div key={index} className="bg-white rounded-lg p-3 mt-2 h-auto min-h-0">
@@ -324,7 +322,7 @@ const Profile = () => {
       ))}
 
       {/* 店铺信息卡片 */}
-      <div className="bg-white rounded-lg p-3 mt-2 h-[100px]">
+      <div className="bg-white rounded-lg p-3 mt-2 h-auto min-h-[140px]">
         <div className="flex items-center justify-between mb-3">
           <div className="text-base font-medium">我的店铺</div>
           <div
@@ -336,7 +334,7 @@ const Profile = () => {
           </div>
         
         {hasShop ? (
-        <div className="grid grid-cols-2 gap-3 items-start">
+        <div className="grid grid-cols-4 gap-3 items-start">
           <div 
               className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
               onClick={() => navigate(`/shop-edit/${shopId}`)}
@@ -355,8 +353,28 @@ const Profile = () => {
                 <i className="ri-shopping-basket-2-line text-primary text-lg"></i>
               </div>
               <div className="text-xs mt-1">商品管理</div>
-            </div>
           </div>
+            
+          <div 
+              className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
+            onClick={() => navigate(`/shop/orders/${shopId}`)}
+          >
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-file-list-3-line text-primary text-lg"></i>
+              </div>
+              <div className="text-xs mt-1">订单管理</div>
+          </div>
+
+          <div 
+              className="flex flex-col items-center p-2 bg-gray-50 rounded-lg cursor-pointer"
+            onClick={() => navigate(`/shop/settlement/${shopId}`)}
+          >
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mb-1">
+                <i className="ri-wallet-3-line text-primary text-lg"></i>
+              </div>
+              <div className="text-xs mt-1">结算中心</div>
+          </div>
+        </div>
         ) : (
           <div 
             className="flex flex-col items-center justify-center py-3 bg-gray-50 rounded-lg cursor-pointer"

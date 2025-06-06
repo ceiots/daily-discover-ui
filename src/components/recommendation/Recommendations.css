@@ -29,61 +29,7 @@
 
 
 
-.recommendations-header {
-  padding: 16px 16px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.recommendations-header h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-  display: flex;
-  align-items: center;
-}
-
-.recommendations-header h3 i {
-  color: #6366f1;
-  margin-right: 8px;
-}
-
-.scroll-controls {
-  display: flex;
-  gap: 8px;
-}
-
-.scroll-control-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background-color: #f3f4f6;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.scroll-control-btn:hover {
-  background-color: #e5e7eb;
-}
-
-.recommendations-scroll {
-  display: flex;
-  overflow-x: auto;
-  padding: 0 16px 10px;
-  margin-top: 10px;
-  scroll-behavior: smooth;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-.recommendations-scroll::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
 
 .product-recommendation-card {
   min-width: 150px;

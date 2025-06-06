@@ -235,7 +235,18 @@ const ProductDetail = () => {
     }
 
     if (!isUserLoggedIn()) {
-      navigate("/login");
+      // 保存商品信息和目标页面，登录后自动跳转
+      navigate("/login", { 
+        state: { 
+          redirect: "/payment",
+          orderPayload: {
+            productId,
+            productInfo,
+            selectedQuantity,
+            selectedSpecs
+          }
+        } 
+      });
       return null;
     }
 
