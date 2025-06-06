@@ -70,7 +70,7 @@ const LoginPage = () => {
           navigate(redirectUrl);
         } else {
           // 如果没有重定向URL，则导航到首页
-          navigate('/');
+        navigate('/');
         }
       } else {
         setErrorMsg(

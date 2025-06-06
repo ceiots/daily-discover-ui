@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../theme/components/NavBar";
 import AiAssistant from "./ai/AiAssistant"; // 引入AI助手组件
 import Recommendations from "./recommendation/Recommendations"; // Import the new Recommendations component
 import { BasePage } from "../theme";
@@ -287,7 +286,7 @@ const Daily = () => {
       headerLeft={
         <div style={{ marginLeft: '30px', fontSize: '13px' }}>
             <h2>
-              {greeting}好，{userInfo?.nickname || "测试者"}！
+              {greeting}好，{userInfo?.nickname || "未知用户"}！
             </h2>
             <p className="date-compact">
               {formattedDate} {weekday} · {lunarDateInfo.month}

@@ -4,7 +4,7 @@ import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './theme/components/NavBar';
 import LoginPage from './components/account/LoginPage';
-import Profile from './components/Profile';
+import Profile from './components/MyService';
 import Cart from './components/myService/Cart';
 import Payment from './components/product/Payment';
 import OrderConfirmation from './components/myService/OrderConfirmation';
@@ -150,8 +150,13 @@ const AuthProvider = ({ children }) => {
       logout: () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        // 清除请求头中的 Authorization 字段
+        instance.defaults.headers.common['Authorization'] = '';
+        // 确保用户信息被清空
         setIsLoggedIn(false);
         setUserInfo(null);
+        // 强制刷新页面以确保所有组件状态重置
+        window.location.href = '/';
       },
       userAvatar: userInfo?.avatar || '',
       setUserAvatar: (newAvatar) => {

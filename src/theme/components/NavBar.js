@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import './NavBar.css';
 import { useAuth } from '../../App'; // 确保已导入 useAuth
 
+// 默认头像 - 与 Profile 组件保持一致
+const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
+
 const NavBar = ({ className }) => {
   const location = useLocation();
   const path = location.pathname;
@@ -32,6 +35,12 @@ const NavBar = ({ className }) => {
       window.location.href = '/login'; // 跳转到登录页
     }
   };
+
+  // 添加 useEffect 监听登录状态变化
+  React.useEffect(() => {
+    // 当登录状态变化时，组件会重新渲染
+    console.log("NavBar 检测到登录状态变化:", isLoggedIn);
+  }, [isLoggedIn, userInfo]);
 
   return (
     <div className={`nav-bar-container ${className || ''}`}>

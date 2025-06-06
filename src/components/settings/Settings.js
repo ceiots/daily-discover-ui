@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { BasePage } from "../../theme";
 
 const Settings = () => {
-  const { refreshUserInfo } = useAuth();
+  const { refreshUserInfo, logout } = useAuth();
   const navigate = useNavigate();
 
   // 账户设置状态
@@ -72,21 +72,9 @@ const Settings = () => {
   // 退出登录
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await instance.post("/user/logout", null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      // 清除本地存储
-      localStorage.removeItem("token");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("userInfo");
-      // 刷新用户信息
-      refreshUserInfo();
-      // 跳转到首页
-      navigate("/");
+      // 直接使用全局的 logout 函数
+      logout();
+      // 不需要手动导航，logout 函数会处理重定向
     } catch (error) {
       console.error("退出登录失败:", error);
     }

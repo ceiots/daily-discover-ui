@@ -218,6 +218,33 @@ const Profile = () => {
   // 判断是否为官方账号
   const isOfficialAccount = profileInfo?.is_official === 1 || profileInfo?.isOfficial === true;
 
+  // 官方账号管理菜单
+  const ADMIN_MENU = {
+    title: "管理后台",
+    items: [
+      {
+        icon: "ri-dashboard-line",
+        text: "平台统计",
+        onClick: () => navigate('/admin/dashboard')
+      },
+      {
+        icon: "ri-shopping-basket-line",
+        text: "商品审核",
+        onClick: () => navigate('/admin/products/pending')
+      },
+      {
+        icon: "ri-store-line",
+        text: "店铺审核",
+        onClick: () => navigate('/admin/shops/pending')
+      },
+      {
+        icon: "ri-user-settings-line",
+        text: "用户管理",
+        onClick: () => navigate('/admin/users')
+      }
+    ]
+  };
+
   return (
     <BasePage
       title="个人中心"
@@ -240,7 +267,7 @@ const Profile = () => {
       }
       headerTitle={<div className="flex-1" style={{ marginLeft: '30px' }}>
         <div className="font-medium text-lg">
-          {profileInfo?.nickname || "用户"}
+          {profileInfo?.nickname || "未知用户"}
         </div>
         <div className="text-sm opacity-80">
           {isOfficialAccount ? (
@@ -316,6 +343,38 @@ const Profile = () => {
                   )} 
                 </div>
                 <div className="text-xs">{tab.name}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 官方账号管理后台菜单 */}
+      {isOfficialAccount && (
+        <div className="bg-white rounded-lg p-3 mt-2 h-auto min-h-0">
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-base font-medium flex items-center">
+              <i className="ri-shield-star-fill text-yellow-500 mr-1"></i>
+              {ADMIN_MENU.title}
+            </div>
+            <div
+              className="text-xs text-gray-500 flex items-center cursor-pointer"
+              onClick={() => navigate('/admin/dashboard')}
+            >
+              进入管理后台 <i className="ri-arrow-right-s-line ml-1"></i>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-3 items-start h-[100px]">
+            {ADMIN_MENU.items.map((item, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center py-2 cursor-pointer"
+                onClick={item.onClick}
+              >
+                <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center mb-1">
+                  <i className={`${item.icon} text-yellow-500 text-lg`}></i>
+                </div>
+                <div className="text-xs">{item.text}</div>
               </div>
             ))}
           </div>
