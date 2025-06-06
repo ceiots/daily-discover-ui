@@ -39,28 +39,24 @@ const PaymentPasswordSetting = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        
+        console.log("检查支付密码状态", response.data);
         if (response.data && response.data.code === 200) {
           setHasPaymentPassword(response.data.data.hasPaymentPassword);
-          
-          // 如果已有支付密码，初始步骤为验证，否则为设置
-          // 但如果是从支付页面跳转来的，直接进入设置阶段
-          if (returnTo === '/payment') {
-            setStep('set');
+          // 统一入口逻辑
+          if (response.data.data.hasPaymentPassword) {
+            setStep('verify');
           } else {
-            setStep(response.data.data.hasPaymentPassword ? 'verify' : 'set');
+            setStep('reset');
           }
         }
       } catch (error) {
-        console.error('检查支付密码状态失败:', error);
         setError('获取支付密码状态失败，请稍后再试');
       } finally {
         setLoading(false);
       }
     };
-    
     checkPaymentPassword();
-  }, [returnTo]);
+  }, []);
 
   // 发送验证码
   const handleSendVerificationCode = async () => {
@@ -180,22 +176,24 @@ const PaymentPasswordSetting = () => {
         }
       });
       
+      console.log("设置密码", response.data);
       if (response.data && response.data.code === 200) {
         setSuccess('支付密码设置成功');
-        setTimeout(() => {
-          // 如果是从支付页面过来的，设置成功后返回支付页面
+          // 如果是从支付页面过来的，设置成功后返回支付密码输入页面
           if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
+            console.log("返回支付密码输入页面");
             navigate('/payment-password', {
               state: {
                 orderNo,
                 paymentAmount,
                 paymentMethod
-              }
+              },
+              replace: true // 避免回退到设置页
             });
           } else {
+            console.log("返回设置页面");
             navigate('/settings');
           }
-        }, 2000);
       } else {
         setError(response.data?.message || '设置支付密码失败');
         setStep('set');

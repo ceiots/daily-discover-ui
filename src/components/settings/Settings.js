@@ -66,7 +66,9 @@ const Settings = () => {
 
   // 跳转到支付密码设置页面
   const handleNavigateToPaymentPassword = () => {
-    navigate("/payment-password-setting");
+    navigate("/payment-password", {
+      state: { returnTo: "/settings" }
+    });
   };
 
   // 退出登录
