@@ -39,7 +39,7 @@ const AdminDashboard = () => {
         } else if (response.data && response.data.code === 403) {
           setError('您没有权限访问管理后台');
           setTimeout(() => {
-            navigate('/profile');
+            navigate('/promy-servicefile');
           }, 2000);
         }
       } catch (error) {
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
       title="管理后台"
       showHeader={true}
       showBack={true}
-      onBack={() => navigate('/profile')}
+      onBack={() => navigate('/my-service')}
     >
       <div className="p-4">
         {loading ? (

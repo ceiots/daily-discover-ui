@@ -4,7 +4,7 @@ import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './theme/components/NavBar';
 import LoginPage from './components/account/LoginPage';
-import Profile from './components/MyService';
+import MyService from './components/MyService';
 import Cart from './components/myService/Cart';
 import Payment from './components/product/Payment';
 import OrderConfirmation from './components/myService/OrderConfirmation';
@@ -248,7 +248,7 @@ const App = () => {
               <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
               <Route path="/" element={<Daily />} />
               <Route path="/daily" element={<Daily />} />
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/my-service" element={<ProtectedRoute><MyService /></ProtectedRoute>} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/order-confirmation" element={<OrderConfirmation />} />

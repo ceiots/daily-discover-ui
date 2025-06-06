@@ -41,7 +41,7 @@ const ProductAudit = () => {
       } else if (response.data && response.data.code === 403) {
         setError('您没有权限访问此页面');
         setTimeout(() => {
-          navigate('/profile');
+          navigate('/my-service');
         }, 2000);
       }
     } catch (error) {

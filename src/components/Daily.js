@@ -176,10 +176,10 @@ const Daily = () => {
         <div style={{ marginLeft: '30px', fontSize: '13px' }}>
             <h2>
               {isLoggedIn ? `${greeting}好，${userInfo?.nickname || "未知用户"}！` : (
-                <span style={{ color: '#3b82f6', cursor: 'pointer' }} onClick={() => navigate('/login')}>请登录</span>
+                <span style={{ color: 'var(--color-primary-600)', cursor: 'pointer' }} onClick={() => navigate('/login')}>请登录</span>
               )}
             </h2>
-            <p className="date-compact">
+            <p className="date-compact" style={{ color: '#fff' }}>
               {formattedDate} {weekday} · {lunarDateInfo.month}
               {lunarDateInfo.day}
             </p>

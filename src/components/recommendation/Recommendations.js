@@ -517,7 +517,7 @@ const Recommendations = () => {
               />
             </div>
             <div className="product-info">
-              <div className="product-name" style={{ fontSize: theme.fontSize.base }}>{product.title}</div>
+              <div className="product-name" style={{ fontSize: theme.fontSize.base, color: theme.colors.neutral[900] }}>{product.title}</div>
               <div className="product-price" style={{ color: theme.colors.error }}>{`¥${product.price}`}</div>
               <div className="product-match" style={{ color: theme.colors.primary.main }}>
                 <i className="fas fa-chart-line"></i>

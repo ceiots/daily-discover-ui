@@ -209,7 +209,7 @@ const ShopCreationPage = () => {
 
           if (response.data && response.data.code === 200) {
             // 根据跳转来源决定跳转目标
-            const redirectURL = localStorage.getItem('shopRedirect') || '/profile';
+            const redirectURL = localStorage.getItem('shopRedirect') || '/my-service';
             localStorage.removeItem('shopRedirect');
             navigate(redirectURL);
           } else {

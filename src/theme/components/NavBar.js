@@ -30,7 +30,7 @@ const NavBar = ({ className }) => {
   const handleCenterClick = (e) => {
     e.preventDefault();
     if (isLoggedIn) {
-      window.location.href = '/profile'; // 跳转到个人中心
+      window.location.href = '/my-service'; // 跳转到个人中心
     } else {
       window.location.href = '/login'; // 跳转到登录页
     }

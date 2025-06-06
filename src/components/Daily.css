@@ -1,100 +1,42 @@
 /* 优化整体字体、排版和背景，使其更加协调美观 */
+@import url("../theme/theme.css");
+
 :root {
-  /* 更协调的紫色配色方案 */
-  --primary-color: #8b5cf6; /* 明亮紫色 */
-  --primary-light: #a78bfa; /* 浅紫色 */
-  --primary-dark: #7c3aed; /* 深紫色 */
-  --primary-gradient: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  --secondary-gradient: linear-gradient(135deg, #7c3aed, #6d28d9);
-  --accent-color: #c4b5fd; /* 淡紫色强调 */
-  
-  /* 更协调的文本颜色 */
-  --text-primary: #1f2937;
-  --text-secondary: #4b5563;
-  --text-light: #9ca3af;
-  --text-purple: #7c3aed; /* 紫色文本 */
-  
-  /* 更协调的背景颜色 */
-  --bg-light: #f9fafb;
-  --bg-white: #ffffff;
-  --bg-purple-light: #f8f5ff; /* 更柔和的淡紫色背景 */
-  --bg-purple-extra-light: #fcfaff; /* 极淡紫色背景 */
-  
-  /* 更协调的阴影 */
-  --shadow-sm: 0 2px 6px rgba(139, 92, 246, 0.06);
-  --shadow-md: 0 3px 10px rgba(139, 92, 246, 0.1);
-  --shadow-lg: 0 8px 20px rgba(139, 92, 246, 0.15);
-  
-  /* 更协调的AI标签颜色 */
-  --ai-tag-bg: rgba(139, 92, 246, 0.9);
-  --ai-tag-light-bg: rgba(139, 92, 246, 0.06);
-  --ai-tag-border: rgba(139, 92, 246, 0.15);
-  
-  /* 更协调的字体尺寸 - 进一步减小2号 */
-  --font-xl: 0.82rem;   /* 之前是0.95rem */
-  --font-lg: 0.75rem;   /* 之前是0.88rem */
-  --font-md: 0.7rem;    /* 之前是0.82rem */
-  --font-sm: 0.65rem;   /* 之前是0.75rem */
-  --font-xs: 0.6rem;    /* 之前是0.69rem */
-  
-  /* 更协调的字体粗细 */
-  --font-regular: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
-  --font-bold: 700;
-  
-  /* 更协调的行高 */
-  --line-height-tight: 1.3;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.6;
-  
-  /* 更协调的圆角 */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 16px;
-  
-  /* 更协调的间距 */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 24px;
+  /* 这里不再定义颜色变量，全部用 theme.css 变量 */
 }
 
 /* 主页面容器 - 更柔和的背景 */
 .daily-page-container {
-  background-color: var(--bg-light);
-  background-image: linear-gradient(to bottom, var(--bg-purple-light) 0%, var(--bg-light) 100%);
+  background-color: var(--color-bg-light);
+  background-image: linear-gradient(to bottom, var(--color-primary-50) 0%, var(--color-bg-light) 100%);
   min-height: 100vh;
   position: relative;
-  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)); /* 适配底部安全区域 */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font-family-base, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif);
   letter-spacing: 0.01em;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* 为iOS设备启用平滑滚动 */
-  overscroll-behavior: none; /* 防止滚动链接 */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
 }
 
-/* 顶部区域设计 - 更精致的渐变和阴影 */
+/* 顶部区域设计 */
 .daily-header-compact {
-  background-color: #7c3aed;
-  color: white;
-  padding: var(--spacing-md) var(--spacing-lg);
-  padding-top: calc(var(--spacing-md) + env(safe-area-inset-top, 0px)); /* 适配刘海屏 */
-  border-radius: 0px 0px 16px 16px;
-  box-shadow: 0 3px 10px rgba(255, 255, 255, 0.1);
-  margin-bottom: var(--spacing-lg);
-  position: fixed; /* 固定定位 */
-  top: 0; /* 距离顶部为0 */
+  background: linear-gradient(90deg, var(--color-primary-600), var(--color-primary-700));
+  color: #fff;
+  padding: var(--spacing-3) var(--spacing-4);
+  padding-top: calc(var(--spacing-3) + env(safe-area-inset-top, 0px));
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-4);
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 100; /* 确保在其他内容之上 */
+  z-index: 100;
   overflow: hidden;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
 }
 
-/* 添加顶部装饰元素 */
 .daily-header-compact::before {
   content: '';
   position: absolute;
@@ -117,39 +59,27 @@
   border-radius: 50%;
 }
 
-/* 顶部元素排版 - 确保购物车与头像对齐 */
-.header-top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-sm);
-  position: relative;
-  z-index: 1;
-}
-
-/* 问候语和日期样式 */
 .daily-greeting {
-  font-size: 0.75rem; /* 从0.85rem减小 */
-  font-weight: var(--font-semibold);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   margin-bottom: 2px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .daily-date {
-  font-size: 0.75rem; /* 从0.75rem减小 */
+  font-size: var(--font-size-sm);
   opacity: 0.9;
-  font-weight: var(--font-medium);
+  font-weight: var(--font-weight-medium);
 }
 
-/* 搜索栏样式优化 */
 .search-bar {
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-lg);
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--spacing-3);
   height: 36px;
   display: flex;
   align-items: center;
-  margin-top: var(--spacing-xs);
+  margin-top: var(--spacing-1);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
@@ -159,8 +89,8 @@
 .search-bar input {
   background: transparent;
   border: none;
-  color: white;
-  font-size: 0.65rem; /* 减小2号 */
+  color: #fff;
+  font-size: var(--font-size-sm);
   width: 100%;
   padding: 0;
   height: 100%;
@@ -172,14 +102,17 @@
 
 .search-bar i {
   color: rgba(255, 255, 255, 0.7);
-  margin-right: var(--spacing-xs);
+  margin-right: var(--spacing-1);
 }
 
-/* 顶部推荐文字 - 减小2号 */
 .daily-header-compact .ai-recommendation {
-  font-size: 0.65rem; /* 减小2号 */
+  font-size: var(--font-size-xs);
   opacity: 0.9;
   margin-top: 4px;
+}
+
+.daily-header-compact .date-compact {
+  color: #fff !important;
 }
 
 /* 内容部分通用样式 */
