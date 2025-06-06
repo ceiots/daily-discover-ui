@@ -85,11 +85,21 @@ const AuthProvider = ({ children }) => {
             // 向服务器请求用户信息
             const response = await instance.get(`/user/info?userId=${userId}`);
 
-            // 检查响应状态
+            // 检查响应状态和数据结构
             if (response.status === 200) {
-              // 更新用户信息和登录状态
-              setUserInfo(response.data);
-              setIsLoggedIn(true);
+              // 根据后端API的实际返回结构调整
+              if (response.data && response.data.code === 200) {
+                // 优先使用response.data.data，如果不存在则使用response.data
+                const userData = response.data.data || response.data;
+                setUserInfo(userData);
+                setIsLoggedIn(true);
+                console.log("初始化用户信息成功:", userData);
+              } else {
+                console.error('用户信息响应格式错误:', response.data);
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                setIsLoggedIn(false);
+              }
             } else {
               console.error('用户信息请求失败:', response.statusText);
               // 清除本地存储中的无效数据
@@ -140,11 +150,23 @@ const AuthProvider = ({ children }) => {
           const userId = localStorage.getItem('userId');
           if (userId) {
             const response = await instance.get(`/user/info?userId=${userId}`);
-            setUserInfo(response.data);
-            setIsLoggedIn(true);
+            console.log("用户信息刷新成功:", response.data);
+            // 检查响应结构，确保正确设置用户信息
+            if (response.data && response.data.code === 200) {
+              setUserInfo(response.data.data || response.data);
+              setIsLoggedIn(true);
+              console.log("用户信息刷新成功:", response.data);
+            } else {
+              console.error('用户信息响应格式错误:', response.data);
+              throw new Error('获取用户信息失败');
+            }
+          } else {
+            console.error("无法刷新用户信息: 未找到用户ID");
+            throw new Error('未找到用户ID');
           }
         } catch (error) {
           console.error("用户信息刷新失败:", error);
+          throw error; // 将错误向上传递，让调用者处理
         }
       },
       logout: () => {

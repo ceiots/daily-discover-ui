@@ -42,24 +42,42 @@ const LoginPage = () => {
         // 先清除可能存在的旧数据
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userInfo');
         
         // 保存新数据
         const userId = response.data.userInfo.id;
         const token = response.data.token;
         
+        // 确保userId和token有效
+        if (!userId || !token) {
+          throw new Error('服务器返回的用户ID或令牌无效');
+        }
+        
+        // 保存到localStorage
         localStorage.setItem('token', token);
         localStorage.setItem('userId', userId);
         
         // 设置请求头
         instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         
-        // 保存用户信息
+        // 保存用户信息 - 确保保存完整的用户信息
         localStorage.setItem('userInfo', JSON.stringify(response.data.userInfo));
         
         console.log('登录成功，保存的用户ID:', userId);
+        console.log('登录成功，保存的token:', token);
+        
+        // 强制触发一个自定义事件，通知其他组件登录状态已更改
+        const loginEvent = new Event('loginStateChanged');
+        window.dispatchEvent(loginEvent);
         
         // 使用await等待refreshUserInfo完成
-        await refreshUserInfo();
+        try {
+          await refreshUserInfo();
+          console.log('用户信息刷新成功');
+        } catch (refreshError) {
+          console.error('刷新用户信息失败:', refreshError);
+          // 即使刷新失败也继续导航，因为登录已成功
+        }
         
         // 检查是否有重定向URL
         const redirectUrl = sessionStorage.getItem('redirectUrl');
@@ -70,7 +88,7 @@ const LoginPage = () => {
           navigate(redirectUrl);
         } else {
           // 如果没有重定向URL，则导航到首页
-        navigate('/');
+          navigate('/');
         }
       } else {
         setErrorMsg(
@@ -79,7 +97,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('登录时出错:', error);
-      setErrorMsg(error.response?.data?.message || '登录失败，请稍后再试');
+      setErrorMsg(error.response?.data?.message || error.message || '登录失败，请稍后再试');
     } finally {
       setLoading(false);
     }

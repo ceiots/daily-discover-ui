@@ -40,6 +40,23 @@ const NavBar = ({ className }) => {
   React.useEffect(() => {
     // 当登录状态变化时，组件会重新渲染
     console.log("NavBar 检测到登录状态变化:", isLoggedIn);
+    console.log("NavBar 检测到用户信息:", userInfo);
+    
+    // 添加登录状态变化的事件监听器
+    const handleLoginStateChanged = () => {
+      console.log("NavBar 检测到登录事件触发");
+      // 重新获取token和userId状态
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      console.log("NavBar 事件检测 - token存在:", !!token, "userId:", userId);
+    };
+    
+    window.addEventListener('loginStateChanged', handleLoginStateChanged);
+    
+    // 清理函数
+    return () => {
+      window.removeEventListener('loginStateChanged', handleLoginStateChanged);
+    };
   }, [isLoggedIn, userInfo]);
 
   return (

@@ -313,4 +313,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 确保图标正确显示 */
+.category-icon i {
+  font-size: 18px;
+  color: #6b7280;
 } 

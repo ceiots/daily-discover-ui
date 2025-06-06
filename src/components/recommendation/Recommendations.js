@@ -33,6 +33,48 @@ const Recommendations = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [hotArticles, setHotArticles] = useState([]);
 
+  // 冷启动兴趣标签弹窗
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [popularTags, setPopularTags] = useState([]);
+
+  // 获取热门标签（冷启动用）
+  const fetchPopularTags = async () => {
+    try {
+      const response = await instance.get('/tags/popular');
+      if (response.data && Array.isArray(response.data.data)) {
+        setPopularTags(response.data.data);
+      } else {
+        setPopularTags([]);
+      }
+    } catch (error) {
+      setPopularTags([]);
+      console.error('获取热门标签失败:', error);
+    }
+  };
+
+  // 检查是否需要冷启动，仅在 isLoggedIn 和 userInfo.id 变化时执行
+  useEffect(() => {
+    let cancelled = false;
+    const checkNeedColdStart = async () => {
+      if (isLoggedIn && userInfo?.id) {
+        try {
+          const response = await instance.get(`/tags/${userInfo.id}/need-cold-start`);
+          if (!cancelled && response.data?.data === true) {
+            // 需要冷启动，获取热门标签
+            fetchPopularTags();
+            setShowInterestModal(true);
+          }
+        } catch (error) {
+          if (!cancelled) {
+            console.error("检查冷启动状态失败:", error);
+          }
+        }
+      }
+    };
+    checkNeedColdStart();
+    return () => { cancelled = true; };
+  }, [isLoggedIn, userInfo]);
+
   // 添加事件监听器，用于监听refreshRecommendations事件
   useEffect(() => {
     // 由于fetchRecommendations在useEffect中定义，我们需要在这里提前声明
@@ -307,6 +349,19 @@ const Recommendations = () => {
     }
   };
 
+  // 简化的辅助函数，直接使用数据库中存储的类名
+  const getIconClassName = (iconName) => {
+    if (!iconName) return "fas fa-tag"; // 默认图标
+    
+    // 检查是否已经包含"fas"或"fa"前缀
+    if (iconName.startsWith('fas ') || iconName.startsWith('fa ')) {
+      return iconName;
+    }
+    
+    // 否则添加"fas"前缀
+    return `fas fa-${iconName}`;
+  };
+
   // Handle preference selection
   const handlePreferenceToggle = (categoryId) => {
     setSelectedPreferences(prev => {
@@ -510,7 +565,7 @@ const Recommendations = () => {
                       onClick={() => handlePreferenceToggle(category.id)}
                     >
                       <div className="category-icon">
-                        <i className={category.icon || "fas fa-tag"}></i>
+                        <i className={getIconClassName(category.icon)}></i>
                       </div>
                       <div className="category-name">{category.name}</div>
                     </div>

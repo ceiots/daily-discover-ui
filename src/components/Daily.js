@@ -167,117 +167,6 @@ const Daily = () => {
     }
   };
 
-  // 4. 处理标签选择
-  const handleTagSelect = (tagId) => {
-    setSelectedTags(prev => {
-      if (prev.includes(tagId)) {
-        return prev.filter(id => id !== tagId);
-      } else {
-        return [...prev, tagId];
-      }
-    });
-  };
-
-  // 5. 保存用户兴趣
-  const saveUserInterests = async () => {
-    if (selectedTags.length === 0) {
-      alert("请至少选择一个感兴趣的类别");
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      const response = await instance.post('/user/interests', {
-        userId: userInfo.id,
-        tagIds: selectedTags
-      });
-      
-      if (response.data?.code === 200) {
-        setShowInterestModal(false);
-        // 发布一个自定义事件，通知Recommendations组件刷新数据
-        const refreshEvent = new CustomEvent('refreshRecommendations');
-        window.dispatchEvent(refreshEvent);
-      } else {
-        alert(response.data?.message || "保存失败，请重试");
-      }
-    } catch (error) {
-      console.error("保存用户兴趣失败:", error);
-      alert("网络错误，请重试");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 6. 跳过冷启动
-  const skipColdStart = async () => {
-    try {
-      await instance.post('/user/skip-cold-start', {
-        userId: userInfo.id
-      });
-      setShowInterestModal(false);
-    } catch (error) {
-      console.error("跳过冷启动失败:", error);
-    }
-  };
-
-  // 7. 渲染兴趣选择弹窗
-  const renderInterestModal = () => {
-    if (!showInterestModal) return null;
-    
-    return (
-      <div className="interest-modal-overlay">
-        <div className="interest-modal">
-          <div className="interest-modal-header">
-            <h3>选择您感兴趣的类别</h3>
-            <button className="close-btn" onClick={() => setShowInterestModal(false)}>
-              <i className="fas fa-times"></i>
-            </button>
-          </div>
-          
-          <div className="interest-modal-body">
-            <p className="interest-modal-description">
-              为了给您提供更精准的推荐，请选择您感兴趣的类别
-            </p>
-            
-            {isLoading ? (
-              <div className="loading-spinner">正在加载类别...</div>
-            ) : (
-              <div className="tag-selection-container">
-                {availableTags.map(tag => (
-                  <div 
-                    key={tag.id}
-                    className={`tag-item ${selectedTags.includes(tag.id) ? 'selected' : ''}`}
-                    onClick={() => handleTagSelect(tag.id)}
-                  >
-                    {tag.name}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
-          <div className="interest-modal-footer">
-            <button 
-              className="skip-btn" 
-              onClick={skipColdStart}
-              disabled={isLoading}
-            >
-              跳过
-            </button>
-            <button 
-              className="save-btn" 
-              onClick={saveUserInterests}
-              disabled={isLoading || selectedTags.length === 0}
-            >
-              保存偏好
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-
 
   // 调整主页面渲染，使用AiAssistant组件替换原有的AI相关部分
   return (
@@ -286,7 +175,9 @@ const Daily = () => {
       headerLeft={
         <div style={{ marginLeft: '30px', fontSize: '13px' }}>
             <h2>
-              {greeting}好，{userInfo?.nickname || "未知用户"}！
+              {isLoggedIn ? `${greeting}好，${userInfo?.nickname || "未知用户"}！` : (
+                <span style={{ color: '#3b82f6', cursor: 'pointer' }} onClick={() => navigate('/login')}>请登录</span>
+              )}
             </h2>
             <p className="date-compact">
               {formattedDate} {weekday} · {lunarDateInfo.month}
@@ -295,7 +186,6 @@ const Daily = () => {
           </div>
       }
     >
-      {renderInterestModal()}
       <div className="daily-page-container">
         {/* 使用AiAssistant组件替代原有的AI功能 */}
         <AiAssistant userInfo={userInfo} />
