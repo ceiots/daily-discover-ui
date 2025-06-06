@@ -25,7 +25,7 @@ import CategoryPage from "./components/CategoryPage"; // 类别页面
 import SearchResultsPage from './components/SearchResultsPage';
 import PropTypes from 'prop-types';
 import Settings from './components/settings/Settings';
-import PaymentPassword from './components/PaymentPassword';
+import PaymentPassword from './components/product/PaymentPassword';
 import PaymentPasswordSetting from './components/settings/PaymentPasswordSetting'; // 导入支付密码设置页面
 import ContentCreationPage from './components/ContentCreationPage'; // 图文创作页面
 import EcommerceCreationPage from './components/creation/EcommerceCreationPage'; // 电商创建页面
@@ -166,12 +166,15 @@ const AuthProvider = ({ children }) => {
 // 新增受保护路由组件
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <div>加载中...</div>;
   }
- console.log("ProtectedRoute isLoggedIn:", isLoggedIn);
+  console.log("ProtectedRoute isLoggedIn:", isLoggedIn);
   if (!isLoggedIn) {
+    // 保存当前路径到sessionStorage，登录成功后可以跳转回来
+    sessionStorage.setItem('redirectUrl', location.pathname + location.search);
     return <Navigate to="/login" />;
   }
 
@@ -183,7 +186,8 @@ function showNavBar(pathname) {
     '/ecommerce-creation',
     '/address-list',
     '/cart',
-    '/payment'
+    '/payment',
+    '/payment-password'
   ];
 
   const currentPath = location.pathname;

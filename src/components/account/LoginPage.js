@@ -61,8 +61,17 @@ const LoginPage = () => {
         // 使用await等待refreshUserInfo完成
         await refreshUserInfo();
         
-        // 导航到首页
-        navigate('/');
+        // 检查是否有重定向URL
+        const redirectUrl = sessionStorage.getItem('redirectUrl');
+        if (redirectUrl) {
+          // 清除存储的URL
+          sessionStorage.removeItem('redirectUrl');
+          // 导航到之前尝试访问的页面
+          navigate(redirectUrl);
+        } else {
+          // 如果没有重定向URL，则导航到首页
+          navigate('/');
+        }
       } else {
         setErrorMsg(
           response.data.message || response.data || '登录失败，请检查账号密码'

@@ -12,12 +12,8 @@ const MyShopPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // 检查登录状态
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate('/login');
-    }
-  }, [isLoggedIn, navigate]);
+  // 不再需要在组件内部检查登录状态
+  // 因为已经通过ProtectedRoute进行了保护
 
   // 获取商品数据
   useEffect(() => {
@@ -27,7 +23,6 @@ const MyShopPage = () => {
         const token = localStorage.getItem('token');
         
         if (!token) {
-          navigate('/login');
           return;
         }
         
