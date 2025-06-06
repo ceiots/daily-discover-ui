@@ -3,10 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import instance from '../../utils/axios';
 import { BasePage, useTheme } from '../../theme';
 import PropTypes from 'prop-types'; 
-const PaymentPasswordSetting = () => {
+import { useAuth } from '../../App'; // 导入useAuth
+
+const PaymentPassword = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
+  const { userInfo } = useAuth(); // 获取用户信息
   
   // 从支付页面跳转过来的支付信息
   const { returnTo, orderNo, paymentAmount, paymentMethod } = location.state || {};
@@ -39,14 +42,46 @@ const PaymentPasswordSetting = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        console.log("检查支付密码状态", response.data);
-        if (response.data && response.data.code === 200) {
-          setHasPaymentPassword(response.data.data.hasPaymentPassword);
-          // 统一入口逻辑
-          if (response.data.data.hasPaymentPassword) {
-            setStep('verify');
+       
+        if (response.data.code === 200 && response.data.data) {
+          console.log("检查支付密码状态", response.data.data);
+          // 兼容两种数据结构
+          const hasPassword = response.data.data?.hasPaymentPassword || false;
+          setHasPaymentPassword(hasPassword);
+          console.log("hasPassword", hasPassword);
+          
+          // 根据来源设置不同的初始步骤
+          if (returnTo === '/payment') {
+            // 从支付页面过来
+            if (hasPassword) {
+              // 有密码，直接验证
+              console.log("有支付密码，验证密码");
+              setStep('verify');
+            } else {
+              // 没有密码，设置密码
+              console.log("没有支付密码，设置密码");
+              setStep('set');
+            }
+          } else if (returnTo === '/settings') {
+            // 从设置页面过来
+            if (hasPassword) {
+              // 有密码，进入重置流程
+              console.log("有支付密码，重置密码");
+              setStep('reset');
+            } else {
+              // 没有密码，设置密码
+              console.log("没有支付密码，设置密码");
+              setStep('set');
+            }
           } else {
-            setStep('reset');
+            // 默认流程
+            if (hasPassword) {
+              console.log("有支付密码，验证密码");
+              setStep('verify');
+            } else {
+              console.log("没有支付密码，设置密码");
+              setStep('set');
+            }
           }
         }
       } catch (error) {
@@ -56,7 +91,7 @@ const PaymentPasswordSetting = () => {
       }
     };
     checkPaymentPassword();
-  }, []);
+  }, [returnTo]);
 
   // 发送验证码
   const handleSendVerificationCode = async () => {
@@ -117,9 +152,44 @@ const PaymentPasswordSetting = () => {
       });
       
       if (response.data && response.data.code === 200) {
-        setStep('set');
-        setCurrentPassword('');
-        setError('');
+        // 如果是从支付页面过来的，验证成功后直接处理支付
+        if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
+          // 处理支付逻辑
+          try {
+            const payResponse = await instance.post('/order/pay', {
+              orderNo,
+              paymentAmount,
+              paymentMethod,
+              paymentPassword: currentPassword
+            }, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            if (payResponse.data && payResponse.data.code === 200) {
+              // 支付成功，跳转到订单成功页面
+              navigate('/order-success', {
+                state: {
+                  orderNo,
+                  paymentAmount,
+                  paymentMethod
+                },
+                replace: true
+              });
+            } else {
+              setError(payResponse.data?.message || '支付失败');
+            }
+          } catch (payError) {
+            console.error('支付失败:', payError);
+            setError('支付处理失败，请稍后再试');
+          }
+        } else {
+          // 如果是从设置页面过来的，验证成功后进入设置新密码步骤
+          setStep('set');
+          setCurrentPassword('');
+          setError('');
+        }
       } else {
         setError(response.data?.message || '支付密码验证失败');
       }
@@ -170,30 +240,61 @@ const PaymentPasswordSetting = () => {
         };
       }
       
+      // 如果是通过重置步骤过来的，添加验证码
+      if (step === 'confirm' && verificationCode) {
+        payload.verificationCode = verificationCode;
+        payload.password = newPassword; // 重置时使用password字段
+      }
+      
       const response = await instance.post(apiPath, payload, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       
-      console.log("设置密码", response.data);
+      console.log(returnTo+" 设置密码", response.data);
       if (response.data && response.data.code === 200) {
         setSuccess('支付密码设置成功');
-          // 如果是从支付页面过来的，设置成功后返回支付密码输入页面
-          if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
-            console.log("返回支付密码输入页面");
-            navigate('/payment-password', {
-              state: {
-                orderNo,
-                paymentAmount,
-                paymentMethod
-              },
-              replace: true // 避免回退到设置页
+        
+        // 根据来源决定跳转
+        if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
+          // 从支付页面来，设置完密码后直接处理支付
+          try {
+            const payResponse = await instance.post('/order/pay', {
+              orderNo,
+              paymentAmount,
+              paymentMethod,
+              paymentPassword: newPassword
+            }, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
             });
-          } else {
-            console.log("返回设置页面");
-            navigate('/settings');
+            
+            if (payResponse.data && payResponse.data.code === 200) {
+              // 支付成功，跳转到订单成功页面
+              navigate('/order-success', {
+                state: {
+                  orderNo,
+                  paymentAmount,
+                  paymentMethod
+                },
+                replace: true
+              });
+            } else {
+              setError(payResponse.data?.message || '支付失败');
+            }
+          } catch (payError) {
+            console.error('支付失败:', payError);
+            setError('支付处理失败，请稍后再试');
           }
+        } else if (returnTo === '/settings') {
+          // 从设置页面来，返回设置页面
+          navigate('/settings', { replace: true });
+        } else {
+          // 默认返回我的服务页面
+          navigate('/my-service', { replace: true });
+        }
       } else {
         setError(response.data?.message || '设置支付密码失败');
         setStep('set');
@@ -353,7 +454,11 @@ NumberPad.propTypes = {
     <div className="space-y-4">
       <div className="text-center mb-6">
         <h3 className="text-lg font-medium">重置支付密码</h3>
-        <p className="text-gray-500 text-sm mt-2">请先获取手机验证码</p>
+        <p className="text-gray-500 text-sm mt-2">
+          {userInfo && userInfo.phoneNumber ? 
+            `验证码将发送至 ${userInfo.phoneNumber.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}` : 
+            '请先获取手机验证码'}
+        </p>
       </div>
       
       <div className="mb-4 relative">
@@ -378,12 +483,22 @@ NumberPad.propTypes = {
         </button>
       </div>
       
+      <div className="mb-4">
+        <PasswordDots value={currentPassword} />
+        
+        <NumberPad 
+          onNumberPress={(num) => setCurrentPassword(prev => prev + num)}
+          onDelete={() => setCurrentPassword(prev => prev.slice(0, -1))}
+          value={currentPassword}
+        />
+      </div>
+      
       <button
         className="w-full py-3 rounded-lg"
         onClick={() => setStep('set')}
-        disabled={loading || !verificationCode}
+        disabled={loading || !verificationCode || currentPassword.length !== 6}
         style={{
-          backgroundColor: loading || !verificationCode 
+          backgroundColor: loading || !verificationCode || currentPassword.length !== 6
             ? theme.colors.neutral[300] 
             : theme.colors.primary.main,
           color: theme.colors.neutral[0]
@@ -512,4 +627,4 @@ NumberPad.propTypes = {
 };
 
 
-export default PaymentPasswordSetting;
+export default PaymentPassword;

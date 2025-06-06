@@ -38,9 +38,8 @@ const NavBar = ({ className }) => {
 
   // 添加 useEffect 监听登录状态变化
   React.useEffect(() => {
-    // 当登录状态变化时，组件会重新渲染
+    // 只在登录状态变化时输出日志，而不是每次 userInfo 变化
     console.log("NavBar 检测到登录状态变化:", isLoggedIn);
-    console.log("NavBar 检测到用户信息:", userInfo);
     
     // 添加登录状态变化的事件监听器
     const handleLoginStateChanged = () => {
@@ -57,7 +56,7 @@ const NavBar = ({ className }) => {
     return () => {
       window.removeEventListener('loginStateChanged', handleLoginStateChanged);
     };
-  }, [isLoggedIn, userInfo]);
+  }, [isLoggedIn]); // 只依赖 isLoggedIn，移除 userInfo
 
   return (
     <div className={`nav-bar-container ${className || ''}`}>

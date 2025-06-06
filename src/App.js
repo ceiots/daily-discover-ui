@@ -7,10 +7,10 @@ import LoginPage from './components/account/LoginPage';
 import MyService from './components/MyService';
 import Cart from './components/myService/Cart';
 import Payment from './components/product/Payment';
-import OrderConfirmation from './components/myService/OrderConfirmation';
+import OrderConfirmation from './components/order/OrderConfirmation';
 import { lazy, Suspense } from 'react';
-const OrderList = lazy(() => import('./components/myService/OrderList'));
-import OrderDetail from './components/myService/OrderDetail';
+const OrderList = lazy(() => import('./components/order/OrderList'));
+import OrderDetail from './components/order/OrderDetail';
 import LogisticsTracker from './components/LogisticsTracker';
 import CommonHelmet from './components/CommonHelmet';
 import ProductDetail from "./components/product/ProductDetail"; // 导入详情页面组件
@@ -38,6 +38,7 @@ import Discover from './components/Discover';
 import { ThemeProvider } from './theme';
 import ExamplePage from './ExamplePage';
 import ProfileEdit from './components/settings/ProfileEdit';
+import OrderSuccess from './components/order/OrderSuccess'; // 添加订单成功页面
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -213,7 +214,8 @@ function showNavBar(pathname) {
     '/address-list',
     '/cart',
     '/payment',
-    '/payment-password'
+    '/payment-password',
+    '/order-success'
   ];
 
   const currentPath = location.pathname;
@@ -281,6 +283,7 @@ const App = () => {
               <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
               <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
               <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
+              <Route path="/order-success" element={<OrderSuccess />} />
             </Routes>
         </div>
       </AuthProvider>

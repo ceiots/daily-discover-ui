@@ -64,6 +64,7 @@ const Payment = () => {
             orderNo,
             paymentAmount: res.data.data.paymentAmount,
             paymentMethod: res.data.data.paymentMethod,
+            returnTo: "/payment",
           },
         });
       } else {
