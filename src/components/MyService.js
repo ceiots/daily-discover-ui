@@ -252,7 +252,7 @@ const Profile = () => {
       headerLeft={
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative" style={{ marginLeft: '30px' }}>
             <img
-              src={profileInfo?.avatar || DEFAULT_AVATAR}
+              src={profileInfo?.avatar}
               className="w-full h-full object-cover"
               alt="用户头像"
             />
