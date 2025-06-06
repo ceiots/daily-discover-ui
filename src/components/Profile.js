@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from "react";
+import PropTypes from 'prop-types';
 import { useAuth } from "../App";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { BasePage } from "../theme";
 
+// 默认头像 - 更适合的用户头像
+const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
+
 const Profile = () => {
-  const { userInfo, refreshUserInfo, isLoggedIn } = useAuth();
+  const { userInfo, refreshUserInfo, isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
-  // 新增登录态校验
+  // 强化登录态校验，确保未登录时不显示头像
   useEffect(() => {
+    // 登出状态时强制跳转登录页
     if (!isLoggedIn) {
       navigate("/login");
+      return;
     }
-  }, [isLoggedIn, navigate]);
 
-  // 组件加载时强制刷新
-  useEffect(() => {
-    // 确保只有在已登录且没有用户信息时才刷新
-    if (isLoggedIn && (!userInfo || !userInfo.id)) {
-      refreshUserInfo();
+    // 检查 localStorage 是否有 token，没有则直接登出并跳转
+    const token = localStorage.getItem("token");
+    if (!token) {
+      logout();
+      navigate("/login");
+      return;
     }
-  }, [isLoggedIn, refreshUserInfo, userInfo]);
+    
+    // 强制刷新用户信息，确保退出登录后不会显示头像
+    refreshUserInfo();
+  }, [isLoggedIn, navigate, logout, refreshUserInfo]);
 
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -37,21 +46,27 @@ const Profile = () => {
       try {
         setLoading(true);
         const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("token");
 
-        if (!userId) {
+        if (!userId || !token) {
+          logout();
           navigate("/login");
           return;
         }
+        
         const response = await instance.get(`/user/info?userId=${userId}`);
-        setProfileInfo(response.data);
-
-        console.log("userInfo:", userInfo);
-        // 只有当全局用户信息不存在时才刷新
-        if (!userInfo || !userInfo.id) {
-          refreshUserInfo();
+        if (response.data && response.data.code === 200) {
+          setProfileInfo(response.data.data);
+        } else {
+          // 如果获取失败，可能是登录状态有问题，清理登录状态
+          logout();
+          navigate("/login");
         }
       } catch (error) {
         setError("获取用户信息失败");
+        // 如果获取失败，可能是登录状态有问题，清理登录状态
+        logout();
+        navigate("/login");
       } finally {
         setLoading(false);
       }
@@ -61,7 +76,7 @@ const Profile = () => {
     if (isLoggedIn) {
       fetchUserProfile();
     }
-  }, [navigate, refreshUserInfo, isLoggedIn, userInfo]);
+  }, [navigate, refreshUserInfo, isLoggedIn, logout]);
 
   // 添加检查用户是否有店铺的逻辑
   useEffect(() => {
@@ -200,6 +215,9 @@ const Profile = () => {
     }
   ];
 
+  // 判断是否为官方账号
+  const isOfficialAccount = profileInfo?.is_official === 1 || profileInfo?.isOfficial === true;
+
   return (
     <BasePage
       title="个人中心"
@@ -207,10 +225,7 @@ const Profile = () => {
       headerLeft={
         <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative" style={{ marginLeft: '30px' }}>
             <img
-              src={
-                profileInfo?.avatar ||
-                "https://public.readdy.ai/ai/img_res/7b50db19b2e90195755169d36aa07020.jpg"
-              }
+              src={profileInfo?.avatar || DEFAULT_AVATAR}
               className="w-full h-full object-cover"
               alt="用户头像"
             />
@@ -225,10 +240,17 @@ const Profile = () => {
       }
       headerTitle={<div className="flex-1" style={{ marginLeft: '30px' }}>
         <div className="font-medium text-lg">
-          {profileInfo?.nickname || "测试者"}
+          {profileInfo?.nickname || "用户"}
         </div>
         <div className="text-sm opacity-80">
-          会员等级：{profileInfo?.memberLevel || "普通会员"}
+          {isOfficialAccount ? (
+            <span className="text-yellow-400 font-medium flex items-center">
+              <i className="ri-verified-badge-fill mr-1"></i>
+              官方认证账号
+            </span>
+          ) : (
+            `会员等级：${profileInfo?.memberLevel || "普通会员"}`
+          )}
         </div>
       </div>}
       headerRight={

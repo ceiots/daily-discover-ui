@@ -85,7 +85,7 @@ const ShopEditPage = () => {
           }
         } else {
           setErrors({ general: '获取店铺信息失败' });
-          setTimeout(() => navigate('/profile'), 2000);
+          setTimeout(() => navigate('/my-service'), 2000);
         }
       } catch (error) {
         console.error('获取店铺信息失败：', error);

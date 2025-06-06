@@ -266,7 +266,7 @@ const OrderList = () => {
     <BasePage
       showHeader={true}
       headerLeft={
-        <button className="btn" onClick={() => navigate("/profile")}>
+        <button className="btn" onClick={() => navigate("/my-service")}>
           <i className="fas fa-arrow-left"></i>
         </button>
       }

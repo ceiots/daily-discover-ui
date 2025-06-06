@@ -113,7 +113,7 @@ const ProductManagePage = () => {
       <div className="fixed top-0 left-0 right-0 bg-primary text-white z-10 w-full">
         <div className="flex items-center justify-between px-4 py-3 max-w-[480px] mx-auto">
           <button 
-            onClick={() => navigate('/profile')} 
+            onClick={() => navigate('/my-service')} 
             className="w-8 h-8 flex items-center justify-center"
           >
             <FaArrowLeft />

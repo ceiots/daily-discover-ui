@@ -420,7 +420,7 @@ const EcommerceCreationPage = () => {
 
         if (response.data && response.data.code === 200) {
           alert("商品创建成功，等待审核！");
-          navigate("/profile");
+          navigate("/my-service");
         } else {
           alert("商品创建失败：" + (response.data.message || "未知错误"));
         }
@@ -558,7 +558,7 @@ const EcommerceCreationPage = () => {
     <BasePage
       showHeader={true}
       headerLeft={
-        <button className="btn" onClick={() => navigate("/profile")}>
+        <button className="btn" onClick={() => navigate("/my-service")}>
           <i className="fas fa-arrow-left"></i>
         </button>
       }
