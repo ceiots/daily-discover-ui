@@ -1,8 +1,0 @@
-@keyframes checkmark {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-.success-animation {
-    animation: checkmark 0.5s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-} 

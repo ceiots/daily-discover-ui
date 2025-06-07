@@ -9,8 +9,8 @@ const OrderSuccess = () => {
 
   // 格式化支付方式显示
   const formatPaymentMethod = (method) => {
-    if (method === '支付宝') return '支付宝';
-    if (method === '微信支付') return '微信支付';
+    if (method === 1) return '支付宝';
+    if (method === 2) return '微信支付';
     return method || '未知支付方式';
   };
 
@@ -21,7 +21,9 @@ const OrderSuccess = () => {
 
   // 查看订单
   const handleViewOrder = () => {
-    navigate('/my-orders', { replace: true });
+    if (orderNo) {
+      navigate(`/order/${orderNo}`, { replace: true });
+    }
   };
 
   return (

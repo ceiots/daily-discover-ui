@@ -6,8 +6,7 @@ import NavBar from './theme/components/NavBar';
 import LoginPage from './components/account/LoginPage';
 import MyService from './components/MyService';
 import Cart from './components/myService/Cart';
-import Payment from './components/product/Payment';
-import OrderConfirmation from './components/order/OrderConfirmation';
+import Payment from './components/order/Payment';
 import { lazy, Suspense } from 'react';
 const OrderList = lazy(() => import('./components/order/OrderList'));
 import OrderDetail from './components/order/OrderDetail';
@@ -252,7 +251,6 @@ const App = () => {
               <Route path="/my-service" element={<ProtectedRoute><MyService /></ProtectedRoute>} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/payment" element={<Payment />} />
-              <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route
                 path="/order-list/:status"
                 element={

@@ -44,7 +44,7 @@ const PaymentPassword = () => {
         });
        
         if (response.data.code === 200 && response.data.data) {
-          console.log("检查支付密码状态", response.data.data);
+          console.log("检查支付密码状态", response.data);
           // 兼容两种数据结构
           const hasPassword = response.data.data?.hasPaymentPassword || false;
           setHasPaymentPassword(hasPassword);
@@ -156,7 +156,7 @@ const PaymentPassword = () => {
         if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
           // 处理支付逻辑
           try {
-            const payResponse = await instance.post('/order/pay', {
+            const payResponse = await instance.post('/payment/process', {
               orderNo,
               paymentAmount,
               paymentMethod,
@@ -260,7 +260,7 @@ const PaymentPassword = () => {
         if (returnTo === '/payment' && orderNo && paymentAmount && paymentMethod) {
           // 从支付页面来，设置完密码后直接处理支付
           try {
-            const payResponse = await instance.post('/order/pay', {
+            const payResponse = await instance.post('/payment/process', {
               orderNo,
               paymentAmount,
               paymentMethod,
