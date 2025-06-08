@@ -5,6 +5,8 @@ import instance from "../../utils/axios";
 import { BasePage, Button, Card } from "../../theme";
 // 由于主题中缺少 Input, Typography 和 Select 组件，使用自定义组件
 import { Input, Typography, Select } from '../common/FormComponents';
+import { toast } from "react-hot-toast";
+import { v4 as uuidv4 } from "uuid";
 
 const EcommerceCreationPage = () => {
   const navigate = useNavigate();
@@ -343,48 +345,49 @@ const EcommerceCreationPage = () => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
     if (!formData.title.trim()) {
-      newErrors.title = "请输入商品标题";
+      toast.error("请输入商品标题");
+      return false;
     }
-    if (!formData.price.trim()) {
-      newErrors.price = "请输入商品价格";
-    } else if (
-      isNaN(parseFloat(formData.price)) ||
-      parseFloat(formData.price) <= 0
-    ) {
-      newErrors.price = "请输入有效的价格";
-    }
+
     if (formData.images.length === 0) {
-      newErrors.images = "请上传至少一张商品图片";
+      toast.error("请上传至少一张商品图片");
+      return false;
     }
-    
-    // 验证SKU数据
-    if (formData.specifications.length > 0 && formData.skus.length === 0) {
-      newErrors.skus = "您已添加规格，请生成对应的SKU";
+
+    if (!formData.categoryId) {
+      toast.error("请选择商品分类");
+      return false;
     }
-    
-    // 验证每个SKU的价格和库存
-    const invalidSkus = formData.skus.filter(
-      sku => isNaN(parseFloat(sku.price)) || parseFloat(sku.price) <= 0 || 
-             isNaN(parseInt(sku.stock)) || parseInt(sku.stock) < 0
-    );
-    if (invalidSkus.length > 0) {
-      newErrors.skus = "部分SKU的价格或库存无效，请检查";
+
+    // 当没有规格参数时，验证基本价格和库存
+    if (formData.specifications.length === 0) {
+      if (!formData.price || parseFloat(formData.price) <= 0) {
+        toast.error("请输入有效的商品价格");
+        return false;
+      }
+
+      if (!formData.stock || parseInt(formData.stock) < 0) {
+        toast.error("请输入有效的商品库存");
+        return false;
+      }
     }
-    
-    // alert内容优化
-    if (Object.keys(newErrors).length > 0) {
-      alert(Object.values(newErrors).join('\n'));
-    }
-    return Object.keys(newErrors).length === 0;
+
+    return true;
   };
 
   const handleSubmit = async () => {
-    console.log("formData", formData);
-    if (validateForm()) {
-      try {
+    if (!validateForm()) {
+      return;
+    }
+    
+    if (formData.specifications.length > 0 && !validateSkus()) {
+      return;
+    }
+
         setLoading(true);
+
+    try {
         const token = localStorage.getItem("token");
 
         // 准备商品详情数据，过滤无效内容
@@ -409,16 +412,17 @@ const EcommerceCreationPage = () => {
           }))
           .filter((spec) => spec.name.trim() !== "" && spec.values.length > 0); // 移除没有名称或选项的规格
 
-        // 处理SKU数据
-        const cleanSkus = formData.skus.map(sku => ({
-          price: parseFloat(sku.price) || 0,
-          stock: parseInt(sku.stock) || 0,
-          imageUrl: sku.imageUrl || (formData.images.length > 0 ? formData.images[0].url : ''),
-          specifications: sku.specifications || {},
-        }));
+      // 处理SKU数据
+      const cleanSkus = formData.skus.map(sku => ({
+        skuCode: sku.skuCode || generateSkuCode(sku.specifications || {}),
+        price: parseFloat(sku.price) || 0,
+        stock: parseInt(sku.stock) || 0,
+        imageUrl: sku.imageUrl || (formData.images.length > 0 ? formData.images[0].url : ''),
+        specifications: sku.specifications || {}
+      }));
 
-        // 计算总库存
-        const totalStock = cleanSkus.reduce((sum, sku) => sum + (parseInt(sku.stock) || 0), 0);
+      // 计算总库存
+      const totalStock = cleanSkus.reduce((sum, sku) => sum + (parseInt(sku.stock) || 0), 0);
 
         // 准备提交数据，转换为后端接受的格式
         const productData = {
@@ -427,8 +431,8 @@ const EcommerceCreationPage = () => {
           originalPrice: formData.originalPrice
             ? parseFloat(formData.originalPrice)
             : null,
-          stock: parseInt(formData.stock) || 0, // 确保stock是整数
-          totalStock: totalStock || parseInt(formData.totalStock) || 0,
+        stock: parseInt(formData.stock) || 0, // 单品库存，可以是默认SKU的库存
+        totalStock: totalStock || parseInt(formData.totalStock) || 0,
           categoryId: formData.categoryId,
           parentCategoryId: formData.parentCategoryId,
           grandCategoryId: formData.grandCategoryId,
@@ -440,7 +444,7 @@ const EcommerceCreationPage = () => {
             (notice) =>
               notice.title.trim() !== "" || notice.content.trim() !== ""
           ),
-          skus: cleanSkus,
+        skus: formData.specifications.length > 0 ? formatSkusForSubmission() : [],
         };
 
         console.log("提交商品数据:", productData);
@@ -460,7 +464,6 @@ const EcommerceCreationPage = () => {
         alert("商品创建失败，请稍后重试");
       } finally {
         setLoading(false);
-      }
     }
   };
 
@@ -587,82 +590,169 @@ const EcommerceCreationPage = () => {
 
   // 生成SKU组合
   const generateSkuCombinations = () => {
+    // 确保有规格参数
     if (formData.specifications.length === 0) {
-      return [];
+      toast.warning("请先添加商品规格");
+      return;
     }
-    
-    // 筛选有效的规格（有名称且有选项）
+
+    // 筛选出有效的规格（有名称且有选项值）
     const validSpecs = formData.specifications.filter(
-      spec => spec.name.trim() !== '' && spec.values.some(v => v.trim() !== '')
+      (spec) => spec.name.trim() !== "" && spec.values.some((v) => v.trim() !== "")
     );
-    
+
     if (validSpecs.length === 0) {
-      return [];
+      toast.warning("请先添加有效的规格和选项");
+      return;
     }
-    
-    // 获取所有规格的有效选项
-    const options = validSpecs.map(spec => ({
-      name: spec.name,
-      values: spec.values.filter(val => val.trim() !== '')
-    }));
-    
-    // 递归生成所有规格组合
-    const generateCombinations = (optionIndex, currentCombination) => {
-      if (optionIndex >= options.length) {
-        return [currentCombination];
+
+    // 获取每个规格的选项列表
+    const specOptions = validSpecs.map((spec) => {
+      return {
+        name: spec.name,
+        values: spec.values.filter((val) => val.trim() !== ""),
+      };
+    });
+
+    // 使用递归生成所有可能的组合
+    const generateCombinations = (specs, currentIndex = 0, currentCombination = {}) => {
+      if (currentIndex === specs.length) {
+        return [{ ...currentCombination }];
       }
-      
-      const currentOption = options[optionIndex];
+
+      const currentSpec = specs[currentIndex];
       const combinations = [];
-      
-      for (const value of currentOption.values) {
-        const newCombination = { ...currentCombination, [currentOption.name]: value };
-        combinations.push(...generateCombinations(optionIndex + 1, newCombination));
-      }
-      
+
+      currentSpec.values.forEach((value) => {
+        const newCombination = {
+          ...currentCombination,
+          [currentSpec.name]: value,
+        };
+        
+        combinations.push(
+          ...generateCombinations(specs, currentIndex + 1, newCombination)
+        );
+      });
+
       return combinations;
     };
+
+    // 生成所有组合
+    const specCombinations = generateCombinations(specOptions);
     
-    // 生成所有规格组合
-    const specCombinations = generateCombinations(0, {});
-    
-    // 检查已有的SKU，避免重复生成
-    const existingCombinations = formData.skus.map(sku => JSON.stringify(sku.specifications || {}));
-    
-    // 为每个新组合创建SKU对象
-    const newSkus = specCombinations
-      .filter(combo => !existingCombinations.includes(JSON.stringify(combo)))
-      .map(combo => ({
-        id: Date.now() + Math.random(),
-        price: formData.price || 0,
-        stock: 0,
+    // 转换成 SKU 数据结构
+    const newSkus = specCombinations.map((combo) => {
+      // 检查是否已经存在同样组合的 SKU
+      const existingSku = formData.skus.find((sku) => {
+        if (!sku.specifications) return false;
+        
+        // 检查每个规格值是否匹配
+        return Object.keys(combo).every(
+          (key) => sku.specifications[key] === combo[key]
+        );
+      });
+
+      // 如果已存在，保留其价格和库存信息
+      if (existingSku) {
+        return {
+          ...existingSku,
+        };
+      }
+
+      // 否则创建新的 SKU
+      const skuCode = generateSkuCode(combo);
+      return {
+        id: uuidv4(),
+        skuCode,
         specifications: combo,
-        imageUrl: formData.images.length > 0 ? formData.images[0].url : ''
-      }));
-    
-    // 更新表单数据，合并已有的SKU和新生成的SKU
+        price: formData.price || "0",
+        stock: "0",
+        imageUrl: "",
+      };
+    });
+
     setFormData({
       ...formData,
-      skus: [...formData.skus, ...newSkus]
+      skus: newSkus,
     });
+
+    toast.success(`已生成 ${newSkus.length} 个规格组合`);
   };
-  
+
+  // 生成SKU编码
+  const generateSkuCode = (specifications) => {
+    // 使用商品 ID 前缀 + 规格值的首字母组合
+    const prefix = "SKU";
+    const timestamp = Date.now().toString().slice(-4);
+    
+    // 从规格值中获取部分字符
+    const specPart = Object.values(specifications)
+      .map(val => val.slice(0, 2))
+      .join("")
+      .replace(/\s+/g, "")
+      .slice(0, 8);
+    
+    return `${prefix}${timestamp}${specPart}`.toUpperCase();
+  };
+
   // 更新SKU信息
   const updateSku = (skuId, field, value) => {
     setFormData({
       ...formData,
-      skus: formData.skus.map(sku => 
-        sku.id === skuId ? { ...sku, [field]: value } : sku
-      )
+      skus: formData.skus.map((sku) => {
+        if (sku.id === skuId) {
+          return {
+            ...sku,
+            [field]: value,
+          };
+        }
+        return sku;
+      }),
     });
   };
-  
+
   // 删除SKU
   const removeSku = (skuId) => {
     setFormData({
       ...formData,
-      skus: formData.skus.filter(sku => sku.id !== skuId)
+      skus: formData.skus.filter((sku) => sku.id !== skuId),
     });
+  };
+
+  // 将 SKU 数据转换为提交格式
+  const formatSkusForSubmission = () => {
+    return formData.skus.map((sku) => ({
+      skuCode: sku.skuCode,
+      specifications: Object.entries(sku.specifications || {}).map(([key, value]) => ({
+        name: key,
+        value: value
+      })),
+      price: parseFloat(sku.price) || 0,
+      stock: parseInt(sku.stock) || 0,
+      imageUrl: sku.imageUrl || (formData.images.length > 0 ? formData.images[0].url : "")
+    }));
+  };
+
+  // 在提交表单前验证 SKU 数据
+  const validateSkus = () => {
+    if (formData.specifications.length > 0 && formData.skus.length === 0) {
+      toast.error("请先生成规格组合");
+      return false;
+    }
+
+    for (const sku of formData.skus) {
+      if (!sku.price || parseFloat(sku.price) <= 0) {
+        toast.error("请为所有规格组合设置有效价格");
+        return false;
+      }
+      
+      if (!sku.stock || parseInt(sku.stock) < 0) {
+        toast.error("请为所有规格组合设置有效库存");
+        return false;
+      }
+    }
+
+    return true;
   };
 
   return (
@@ -676,31 +766,24 @@ const EcommerceCreationPage = () => {
       headerTitle="电商创建"
       backgroundColor="default"
     >
-      <div 
-        style={{ 
-          paddingBottom: '80px',
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(155, 155, 155, 0.5) transparent' 
-        }}
-        className="custom-scrollbar"
-      >
+      <div className="ecommerce-creation-container">
         {/* 店铺检查提示 */}
         {shopChecking ? (
-          <div className="flex flex-col items-center justify-center" style={{ minHeight: '200px' }}>
+          <div className="flex flex-col items-center justify-center" style={{ minHeight: '150px' }}>
             <div className="text-center">
-              <i className="fas fa-spinner fa-spin text-primary text-2xl mb-3"></i>
-              <p>正在检查店铺信息...</p>
+              <i className="fas fa-spinner fa-spin text-primary text-xl mb-2"></i>
+              <p className="text-sm">正在检查店铺信息...</p>
             </div>
           </div>
         ) : !hasShop ? (
-          <div className="flex flex-col items-center justify-center p-4" style={{ minHeight: '200px' }}>
+          <div className="flex flex-col items-center justify-center p-4" style={{ minHeight: '150px' }}>
             <div className="text-center">
-              <i className="fas fa-store text-primary text-5xl mb-4"></i>
-              <h2 className="text-xl font-medium mb-2">您还没有创建店铺</h2>
-              <p className="text-gray-500 mb-6">创建商品前，请先创建您的店铺</p>
+              <i className="fas fa-store text-primary text-3xl mb-3"></i>
+              <h2 className="text-base font-medium mb-2">您还没有创建店铺</h2>
+              <p className="text-gray-500 text-sm mb-4">创建商品前，请先创建您的店铺</p>
               <button
                 onClick={() => navigate("/create-shop")}
-                className="px-6 py-3 bg-primary text-white rounded-lg"
+                className="px-4 py-2 bg-primary text-white rounded-lg text-sm"
               >
                 去创建店铺
               </button>
@@ -708,105 +791,72 @@ const EcommerceCreationPage = () => {
           </div>
         ) : (
           <>
-            {/* 标签切换 */}
-            <div className="fixed top-20 left-0 right-0 bg-white z-10 max-w-[375px] mx-auto border-b">
-              <div className="flex whitespace-nowrap">
-                <Button
-                  className={`px-4 py-3 text-center text-sm font-medium ${
-                    activeTab === "basic"
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-gray-500"
-                  }`}
+            {/* 标签导航栏 */}
+            <div className="tab-nav">
+                <button
+                className={`tab-item ${activeTab === "basic" ? "active" : ""}`}
                   onClick={() => setActiveTab("basic")}
-                  type="text"
                 >
                   基本信息
-                </Button>
-                <Button
-                  className={`px-4 py-3 text-center text-sm font-medium ${
-                    activeTab === "details"
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-gray-500"
-                  }`}
+                </button>
+                <button
+                className={`tab-item ${activeTab === "details" ? "active" : ""}`}
                   onClick={() => setActiveTab("details")}
-                  type="text"
                 >
                   商品详情
-                </Button>
-                <Button
-                  className={`px-4 py-3 text-center text-sm font-medium ${
-                    activeTab === "specs"
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-gray-500"
-                  }`}
+                </button>
+                <button
+                className={`tab-item ${activeTab === "specs" ? "active" : ""}`}
                   onClick={() => setActiveTab("specs")}
-                  type="text"
                 >
                   规格参数
-                </Button>
-                <Button
-                  className={`px-4 py-3 text-center text-sm font-medium ${
-                    activeTab === "notices"
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-gray-500"
-                  }`}
+                </button>
+                <button
+                className={`tab-item ${activeTab === "notices" ? "active" : ""}`}
                   onClick={() => setActiveTab("notices")}
-                  type="text"
                 >
                   购买须知
-                </Button>
-                <Button
-                  className={`px-4 py-3 text-center text-sm font-medium ${
-                    activeTab === "skus"
-                      ? "text-primary border-b-2 border-primary"
-                      : "text-gray-500"
-                  }`}
-                  onClick={() => setActiveTab("skus")}
-                  type="text"
-                >
-                  SKU管理
-                </Button>
-              </div>
+                </button>
+              <button
+                className={`tab-item ${activeTab === "skus" ? "active" : ""}`}
+                onClick={() => setActiveTab("skus")}
+              >
+                SKU管理
+              </button>
             </div>
 
-            {/* 主内容区域 */}
-            <div className="pt-3 px-4 custom-scrollbar" style={{
-              marginTop: '63px', 
-              paddingBottom: '80px',
-              scrollBehavior: 'smooth'
-            }}>
+            {/* 内容区域 */}
+            <div className="content-section">
               {/* 基本信息 */}
               {activeTab === "basic" && (
                 <div className="basic-info">
                   {/* 商品标题 */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      商品标题
-                    </label>
-                    <Input
+                  <div className="form-card">
+                    <div className="form-group">
+                      <label className="form-label">商品标题</label>
+                      <Input
                       type="text"
                       name="title"
                       placeholder="请输入商品标题"
                       value={formData.title}
                       onChange={handleInputChange}
-                      error={errors.title}
-                      fullWidth
-                    />
-                    {errors.title && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.title}
-                      </p>
-                    )}
+                        error={errors.title}
+                        fullWidth
+                      />
+                    </div>
                   </div>
 
-                  {/* 商品价格 */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      商品价格
-                    </label>
-                    <div className="flex gap-3">
-                      <div className="flex-1">
-                        <div className="relative">
+                  {/* 商品价格和库存 */}
+                  <div className="form-card">
+                    <div className="card-title">
+                      <i className="fas fa-tag"></i>价格与库存
+                    </div>
+                    
+                    {/* 价格 */}
+                    <div className="form-group">
+                      <label className="form-label">商品价格</label>
+                      <div className="two-column">
+                        <div>
                           <Input
                             type="text"
                             name="price"
@@ -817,225 +867,164 @@ const EcommerceCreationPage = () => {
                             prefix="¥"
                             fullWidth
                           />
-                        </div>
                         {errors.price && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.price}
-                          </p>
+                            <p className="form-error">{errors.price}</p>
                         )}
                       </div>
-                      <div className="flex-1">
-                        <Input
+                        <div>
+                          <Input
                           type="text"
                           name="originalPrice"
                           placeholder="原价（选填）"
                           value={formData.originalPrice}
                           onChange={handleInputChange}
-                          prefix="¥"
-                          fullWidth
+                            prefix="¥"
+                            fullWidth
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* 商品库存 */}
-                  <div className="mb-4">
-                    <Card className="p-3">
-                      <Typography.Title level={5} className="mb-3">库存管理</Typography.Title>
-                      <div className="flex gap-3 mb-3">
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            单品库存
-                          </label>
+                    {/* 库存 */}
+                    <div className="form-group">
+                      <div className="two-column">
+                        <div>
+                          <label className="form-label">总库存</label>
                           <Input
-                            type="number"
-                            name="stock"
-                            placeholder="请输入库存数量"
-                            value={formData.stock}
-                            onChange={handleInputChange}
-                            min="0"
-                            fullWidth
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            总库存
-                          </label>
-                          <Input
-                            type="number"
+                          type="number"
                             name="totalStock"
-                            placeholder="请输入总库存数量"
+                            placeholder="总库存数量"
                             value={formData.totalStock}
-                            onChange={handleInputChange}
-                            min="0"
+                          onChange={handleInputChange}
+                          min="0"
                             fullWidth
-                          />
-                        </div>
+                        />
                       </div>
-                      <Typography.Text type="secondary" className="text-xs">
-                        注：总库存为所有SKU库存总和，单品库存为默认SKU库存
-                      </Typography.Text>
-                    </Card>
+                      </div>
+                      <p className="form-hint">总库存为所有SKU库存总和，单品库存为默认SKU库存</p>
+                    </div>
                   </div>
 
                   {/* 商品分类 */}
-                  <div className="mb-4">
-                    <Card className="p-3">
-                      <Typography.Title level={5} className="mb-3">商品分类</Typography.Title>
-                      <div className="space-y-2">
-                        {/* 一级分类 */}
+                  <div className="form-card">
+                    <div className="card-title">
+                      <i className="fas fa-folder"></i>商品分类
+                    </div>
+                    <div className="form-group">
+                      <Select
+                        value={selectedCategoryId || ""}
+                        onChange={handleCategoryChange}
+                        placeholder="请选择一级分类"
+                        fullWidth
+                        error={errors.category}
+                      >
+                        <option value="">请选择一级分类</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+
+                      {subCategories.length > 0 && (
+                      <div className="form-group">
                         <Select
-                          value={selectedCategoryId || ""}
-                          onChange={handleCategoryChange}
-                          placeholder="请选择一级分类"
+                          value={selectedSubCategoryId || ""}
+                          onChange={handleSubCategoryChange}
+                          placeholder="请选择二级分类"
                           fullWidth
-                          error={errors.category}
                         >
-                          <option value="">请选择一级分类</option>
-                          {categories.map((category) => (
+                          <option value="">请选择二级分类</option>
+                          {subCategories.map((category) => (
                             <option key={category.id} value={category.id}>
                               {category.name}
                             </option>
                           ))}
                         </Select>
-
-                        {/* 二级分类 */}
-                        {subCategories.length > 0 && (
-                          <Select
-                            value={selectedSubCategoryId || ""}
-                            onChange={handleSubCategoryChange}
-                            placeholder="请选择二级分类"
-                            fullWidth
-                          >
-                            <option value="">请选择二级分类</option>
-                            {subCategories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </Select>
-                        )}
-
-                        {/* 三级分类 */}
-                        {thirdCategories.length > 0 && (
-                          <Select
-                            value={formData.categoryId || ""}
-                            onChange={handleThirdCategoryChange}
-                            placeholder="请选择三级分类"
-                            fullWidth
-                          >
-                            <option value="">请选择三级分类</option>
-                            {thirdCategories.map((category) => (
-                              <option key={category.id} value={category.id}>
-                                {category.name}
-                              </option>
-                            ))}
-                          </Select>
-                        )}
                       </div>
-                      {errors.category && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.category}
-                        </p>
                       )}
-                    </Card>
-                  </div>
 
-                  {/* 商品标签 */}
-                  {/* <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">商品标签 (最多选择5个)</label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {tags.map(tag => (
-                      <div 
-                        key={tag.id}
-                        onClick={() => handleTagToggle(tag.id)}
-                        className={`px-3 py-1.5 rounded-full text-xs cursor-pointer ${
-                          selectedTags.includes(tag.id)
-                            ? 'bg-primary text-white'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}
-                        style={tag.color ? { backgroundColor: selectedTags.includes(tag.id) ? tag.color : '#f3f4f6', color: selectedTags.includes(tag.id) ? '#ffffff' : '#374151' } : {}}
-                      >
-                        {tag.name}
-                      </div>
-                    ))}
-                    {tags.length === 0 && (
-                      <div className="text-gray-500 text-xs">
-                        {formData.categoryId ? '该分类下暂无标签' : '请先选择商品分类以查看相关标签'}
-                      </div>
+                      {thirdCategories.length > 0 && (
+                      <div className="form-group">
+                        <Select
+                          value={formData.categoryId || ""}
+                          onChange={handleThirdCategoryChange}
+                          placeholder="请选择三级分类"
+                          fullWidth
+                        >
+                          <option value="">请选择三级分类</option>
+                          {thirdCategories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                              {category.name}
+                            </option>
+                          ))}
+                        </Select>
+                    </div>
+                    )}
+                    
+                    {errors.category && (
+                      <p className="form-error">{errors.category}</p>
                     )}
                   </div>
-                </div> */}
 
                   {/* 商品图片 */}
-                  <div className="mb-4">
-                    <Card className="p-3">
-                      <Typography.Title level={5} className="mb-3">商品图片</Typography.Title>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {formData.images.map((image) => (
-                          <div key={image.id} className="relative w-24 h-24">
-                            <img
-                              src={image.url}
-                              alt=""
-                              className="w-full h-full object-cover rounded"
-                            />
-                            <Button
-                              type="danger"
-                              size="small"
-                              icon={<i className="fas fa-times text-xs"></i>}
-                              className="absolute -top-2 -right-2 rounded-full w-5 h-5 flex items-center justify-center"
-                              onClick={() => removeImage(image.id)}
-                            />
+                  <div className="form-card">
+                    <div className="card-title">
+                      <i className="fas fa-image"></i>商品图片
+                    </div>
+                    
+                    <div className="image-upload-area">
+                      {formData.images.map((image) => (
+                        <div key={image.id} className="image-item">
+                          <img src={image.url} alt="" />
+                          <div 
+                            className="image-delete"
+                            onClick={() => removeImage(image.id)}
+                          >
+                            <i className="fas fa-times"></i>
                           </div>
-                        ))}
-                        <label
-                          className={`w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50 ${
-                            loading ? "opacity-50 cursor-not-allowed" : ""
-                          }`}
-                        >
-                          {loading ? (
-                            <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
-                          ) : (
-                            <i className="fas fa-plus text-gray-400 mb-1"></i>
-                          )}
-                          <span className="text-xs text-gray-500">
-                            {loading ? "上传中..." : "添加图片"}
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            className="hidden"
-                            onChange={handleImageUpload}
-                            disabled={loading}
-                          />
-                        </label>
-                        <Button
-                          onClick={() => {
-                            const url = prompt("请输入图片URL");
-                            if (url && url.trim()) {
-                              handleImageUpload([url.trim()]);
-                            }
-                          }}
-                          icon={<i className="fas fa-link text-gray-400 mr-1"></i>}
-                          className="w-24 h-24 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-gray-50"
+                        </div>
+                      ))}
+                      
+                      <label
+                        className={`image-upload-btn ${loading ? "opacity-50" : ""}`}
+                      >
+                        {loading ? (
+                          <i className="fas fa-spinner fa-spin"></i>
+                        ) : (
+                          <i className="fas fa-plus"></i>
+                        )}
+                        <span>{loading ? "上传中..." : "添加图片"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleImageUpload}
                           disabled={loading}
-                        >
-                          <span className="text-xs text-gray-500">输入URL</span>
-                        </Button>
-                      </div>
-                      <Typography.Text type="secondary" className="text-xs block">
-                        建议上传尺寸800x800像素以上、大小不超过10MB的图片
-                      </Typography.Text>
-                      <Typography.Text type="secondary" className="text-xs block">
-                        如果图片过大，请使用图片压缩工具处理后再上传
-                      </Typography.Text>
-                      {errors.images && (
-                        <Typography.Text type="danger" className="text-xs mt-1">
-                          {errors.images}
-                        </Typography.Text>
-                      )}
-                    </Card>
+                        />
+                      </label>
+                      
+                      <div 
+                        className="image-upload-btn"
+                        onClick={() => {
+                          const url = prompt("请输入图片URL");
+                          if (url && url.trim()) {
+                            handleImageUpload([url.trim()]);
+                          }
+                        }}
+                      >
+                        <i className="fas fa-link"></i>
+                        <span>输入URL</span>
+                    </div>
+                    </div>
+                    
+                    <p className="form-hint">建议上传尺寸800x800像素以上、大小不超过10MB的图片</p>
+                    
+                    {errors.images && (
+                      <p className="form-error">{errors.images}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -1043,499 +1032,565 @@ const EcommerceCreationPage = () => {
               {/* 商品详情 */}
               {activeTab === "details" && (
                 <div className="product-details">
-                  <Card className="p-3">
-                    <div className="flex justify-between items-center mb-4">
-                      <Typography.Title level={5}>商品详情</Typography.Title>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => addDetail("text")}
-                          size="small"
-                          icon={<i className="fas fa-font text-xs mr-1"></i>}
-                        >
-                          添加文字
-                        </Button>
-                        <Button
-                          onClick={() => addDetail("image")}
-                          size="small"
-                          icon={<i className="fas fa-image text-xs mr-1"></i>}
-                        >
-                          添加图片
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            const detailUrl = prompt("请输入详情图片URL");
-                            if (detailUrl && detailUrl.trim()) {
-                              // 找到第一个未设置content的image类型detail，否则新建一个
-                              let found = false;
-                              setFormData(prev => {
-                                const details = prev.details.map(d => {
-                                  if (!found && d.type === 'image' && !d.content) {
-                                    found = true;
-                                    return { ...d, content: detailUrl.trim() };
-                                  }
-                                  return d;
-                                });
-                                // 如果没有空image detail，则新建
-                                if (!found) {
-                                  details.push({ id: Date.now(), type: 'image', content: detailUrl.trim(), sort: details.length });
-                                }
-                                return { ...prev, details };
-                              });
-                            }
-                          }}
-                          size="small"
-                          icon={<i className="fas fa-link text-gray-400 mr-1"></i>}
-                          disabled={loading}
-                        >
-                          输入URL
-                        </Button>
-                      </div>
+                  <div className="form-card">
+                    <div className="card-title">
+                      <i className="fas fa-align-left"></i>商品详情
                     </div>
-
-                    {formData.details.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <Typography.Text type="secondary">
-                          点击上方按钮添加商品详情
-                        </Typography.Text>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {formData.details.map((detail, index) => (
-                          <Card
-                            key={detail.id}
-                            className="p-3 bg-gray-50 rounded-lg relative"
-                          >
-                            <Button
-                              type="text"
-                              size="small"
-                              className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
-                              icon={<i className="fas fa-trash-alt text-xs"></i>}
-                              onClick={() => removeDetail(detail.id)}
-                            />
-
-                            {detail.type === "text" ? (
-                              <Input.TextArea
-                                placeholder="请输入详情文字描述"
-                                value={detail.content || ""}
-                                onChange={(e) =>
-                                  updateDetail(detail.id, e.target.value)
+                    
+                    <div className="flex gap-2 mb-3">
+                      <button
+                        onClick={() => addDetail("text")}
+                        className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs flex items-center"
+                      >
+                        <i className="fas fa-font text-xs mr-1"></i>添加文字
+                      </button>
+                      <button
+                        onClick={() => addDetail("image")}
+                        className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs flex items-center"
+                      >
+                        <i className="fas fa-image text-xs mr-1"></i>添加图片
+                      </button>
+                      <button
+                        onClick={() => {
+                          const detailUrl = prompt("请输入详情图片URL");
+                          if (detailUrl && detailUrl.trim()) {
+                            // 找到第一个未设置content的image类型detail，否则新建一个
+                            let found = false;
+                            setFormData(prev => {
+                              const details = prev.details.map(d => {
+                                if (!found && d.type === 'image' && !d.content) {
+                                  found = true;
+                                  return { ...d, content: detailUrl.trim() };
                                 }
-                                className="min-h-[80px]"
+                                return d;
+                              });
+                              // 如果没有空image detail，则新建
+                              if (!found) {
+                                details.push({ id: Date.now(), type: 'image', content: detailUrl.trim(), sort: details.length });
+                              }
+                              return { ...prev, details };
+                            });
+                          }
+                        }}
+                        className="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-xs flex items-center"
+                      >
+                        <i className="fas fa-link text-xs mr-1"></i>输入URL
+                      </button>
+                  </div>
+
+                  {formData.details.length === 0 ? (
+                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <p className="text-gray-400 text-sm">点击上方按钮添加商品详情</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                        {formData.details.map((detail) => (
+                        <div
+                          key={detail.id}
+                          className="p-3 bg-gray-50 rounded-lg relative"
+                        >
+                          <button
+                              className="absolute top-2 right-2 text-gray-400 hover:text-red-500 bg-transparent border-0"
+                            onClick={() => removeDetail(detail.id)}
+                          >
+                            <i className="fas fa-trash-alt text-xs"></i>
+                          </button>
+
+                          {detail.type === "text" ? (
+                              <Input.TextArea
+                              placeholder="请输入详情文字描述"
+                              value={detail.content || ""}
+                                onChange={(e) => updateDetail(detail.id, e.target.value)}
+                                rows={4}
+                                className="w-full"
                               />
-                            ) : (
-                              <div>
-                                {detail.content ? (
-                                  <div className="relative">
-                                    <img
-                                      src={detail.content}
-                                      alt=""
-                                      className="w-full rounded"
-                                    />
-                                    <Button
-                                      type="danger"
-                                      size="small"
-                                      className="absolute top-2 right-2 rounded-full w-5 h-5 flex items-center justify-center"
-                                      icon={<i className="fas fa-times text-xs"></i>}
-                                      onClick={() =>
-                                        updateDetail(detail.id, null)
-                                      }
-                                    />
-                                  </div>
-                                ) : (
-                                  <label
-                                    className={`block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white ${
-                                      loading
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                    }`}
-                                  >
-                                    {loading ? (
-                                      <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
-                                    ) : (
-                                      <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
-                                    )}
-                                    <span className="text-xs text-gray-500">
-                                      {loading ? "上传中..." : "上传详情图片"}
-                                    </span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      className="hidden"
-                                      disabled={loading}
-                                      onChange={(e) => {
-                                        if (e.target.files && e.target.files[0]) {
-                                          const file = e.target.files[0];
+                          ) : (
+                            <div>
+                              {detail.content ? (
+                                <div className="relative">
+                                  <img
+                                    src={detail.content}
+                                    alt=""
+                                    className="w-full rounded"
+                                  />
+                                  <button
+                                      className="absolute top-2 right-2 w-5 h-5 rounded-full bg-black bg-opacity-50 flex items-center justify-center"
+                                      onClick={() => updateDetail(detail.id, null)}
+                                    >
+                                      <i className="fas fa-times text-white text-xs"></i>
+                                  </button>
+                                </div>
+                              ) : (
+                                  <label className="block w-full p-4 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center cursor-pointer bg-white">
+                                  {loading ? (
+                                    <i className="fas fa-spinner fa-spin text-gray-400 mb-1"></i>
+                                  ) : (
+                                    <i className="fas fa-cloud-upload-alt text-gray-400 mb-1"></i>
+                                  )}
+                                  <span className="text-xs text-gray-500">
+                                    {loading ? "上传中..." : "上传详情图片"}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    disabled={loading}
+                                    onChange={(e) => {
+                                      if (e.target.files && e.target.files[0]) {
+                                        const file = e.target.files[0];
+                                          const maxSizeInMB = 10;
+                                          const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
-                                          // 检查文件大小
-                                          const maxSizeInMB = 10; // 10MB限制
-                                          const maxSizeInBytes =
-                                            maxSizeInMB * 1024 * 1024;
-
-                                          if (file.size > maxSizeInBytes) {
-                                            alert(
-                                              `图片 ${file.name} 超过${maxSizeInMB}MB大小限制，请压缩后再上传`
-                                            );
-                                            return;
-                                          }
-
-                                          // 显示上传中状态
-                                          setLoading(true);
-
-                                          // 创建FormData对象用于文件上传
-                                          const formData = new FormData();
-                                          formData.append("file", file);
-
-                                          // 调用上传接口
-                                          instance({
-                                            method: "post",
-                                            url: "/product/upload",
-                                            data: formData,
-                                            headers: {
-                                              "Content-Type": undefined, // 让浏览器自动设置正确的Content-Type和boundary
-                                            },
-                                          })
-                                            .then((response) => {
-                                              if (
-                                                response.data &&
-                                                response.data.code === 200
-                                              ) {
-                                                const responseData =
-                                                  response.data.data;
-                                                // 检查后端返回的数据结构
-                                                let imageUrl;
-
-                                                if (responseData.url) {
-                                                  // 如果返回了单个url
-                                                  imageUrl = responseData.url;
-                                                } else if (
-                                                  responseData.urls &&
-                                                  Array.isArray(
-                                                    responseData.urls
-                                                  ) &&
-                                                  responseData.urls.length > 0
-                                                ) {
-                                                  // 如果返回了urls数组，使用第一个
-                                                  imageUrl = responseData.urls[0];
-                                                } else {
-                                                  // 如果数据结构不符合预期，提示错误
-                                                  console.error(
-                                                    "图片上传响应格式不正确:",
-                                                    responseData
-                                                  );
-                                                  alert(
-                                                    "图片上传响应格式不正确，请稍后重试"
-                                                  );
-                                                  return;
-                                                }
-
-                                                // 更新详情
-                                                updateDetail(detail.id, imageUrl);
-                                              } else {
-                                                alert(
-                                                  "图片上传失败：" +
-                                                    (response.data.message ||
-                                                      "未知错误")
-                                                );
-                                              }
-                                            })
-                                            .catch((error) => {
-                                              console.error(
-                                                "上传详情图片时发生错误：",
-                                                error
-                                              );
-                                              alert("图片上传失败，请稍后重试");
-                                            })
-                                            .finally(() => {
-                                              setLoading(false);
-                                            });
+                                        if (file.size > maxSizeInBytes) {
+                                            alert(`图片 ${file.name} 超过${maxSizeInMB}MB大小限制，请压缩后再上传`);
+                                          return;
                                         }
-                                      }}
-                                    />
-                                  </label>
-                                )}
-                              </div>
-                            )}
-                          </Card>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
+
+                                        setLoading(true);
+                                        const formData = new FormData();
+                                        formData.append("file", file);
+
+                                        instance({
+                                          method: "post",
+                                          url: "/product/upload",
+                                          data: formData,
+                                            headers: { "Content-Type": undefined },
+                                        })
+                                          .then((response) => {
+                                              if (response.data && response.data.code === 200) {
+                                                const responseData = response.data.data;
+                                              let imageUrl;
+
+                                              if (responseData.url) {
+                                                imageUrl = responseData.url;
+                                              } else if (
+                                                responseData.urls &&
+                                                  Array.isArray(responseData.urls) &&
+                                                responseData.urls.length > 0
+                                              ) {
+                                                imageUrl = responseData.urls[0];
+                                              } else {
+                                                  console.error("图片上传响应格式不正确:", responseData);
+                                                  alert("图片上传响应格式不正确，请稍后重试");
+                                                return;
+                                              }
+
+                                              updateDetail(detail.id, imageUrl);
+                                            } else {
+                                                alert("图片上传失败：" + (response.data.message || "未知错误"));
+                                            }
+                                          })
+                                          .catch((error) => {
+                                              console.error("上传详情图片时发生错误：", error);
+                                            alert("图片上传失败，请稍后重试");
+                                          })
+                                          .finally(() => {
+                                            setLoading(false);
+                                          });
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  </div>
                 </div>
               )}
 
               {/* 规格参数 */}
               {activeTab === "specs" && (
                 <div className="specifications">
-                  <Card className="p-3">
-                    <div className="flex justify-between items-center mb-4">
-                      <Typography.Title level={5}>规格参数</Typography.Title>
-                      <Button
-                        onClick={addSpecification}
-                        type="primary"
-                        size="small"
-                        icon={<i className="fas fa-plus text-xs mr-1"></i>}
-                      >
-                        添加规格
-                      </Button>
+                  <div className="spec-container">
+                    <div className="spec-header">
+                      <div className="spec-title">
+                        <i className="fas fa-list-ul"></i> 规格参数
+                      </div>
+                    <button
+                      onClick={addSpecification}
+                        className="add-spec-btn"
+                    >
+                        <i className="fas fa-plus"></i>添加规格
+                    </button>
+                  </div>
+
+                  {formData.specifications.length === 0 ? (
+                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <p className="text-gray-400 text-sm">点击上方按钮添加商品规格</p>
+                    </div>
+                  ) : (
+                      <>
+                        <div className="space-y-3 mb-4">
+                          {formData.specifications.map((spec) => (
+                            <div key={spec.id} className="spec-item">
+                              <div className="spec-name">
+                                <Input
+                              type="text"
+                              placeholder="规格名称，如颜色、尺寸等"
+                              value={spec.name}
+                                  onChange={(e) => updateSpecName(spec.id, e.target.value)}
+                                  className="w-full"
+                                  size="small"
+                            />
+                            <button
+                                  className="spec-delete"
+                              onClick={() => removeSpecification(spec.id)}
+                            >
+                                  <i className="fas fa-trash-alt"></i>
+                            </button>
+                          </div>
+
+                              <div className="spec-options">
+                            {spec.values.map((option, optIndex) => (
+                                  <div key={optIndex} className="spec-option">
+                                    <Input
+                                  type="text"
+                                  placeholder={`选项${optIndex + 1}`}
+                                  value={option}
+                                      onChange={(e) => updateSpecOption(spec.id, optIndex, e.target.value)}
+                                      className="flex-1"
+                                      size="small"
+                                />
+                                {spec.values.length > 1 && (
+                                  <button
+                                        className="option-delete"
+                                        onClick={() => removeSpecOption(spec.id, optIndex)}
+                                      >
+                                        <i className="fas fa-times"></i>
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            onClick={() => addSpecOption(spec.id)}
+                                className="add-option-btn"
+                          >
+                                <i className="fas fa-plus"></i>添加选项
+                          </button>
+                        </div>
+                      ))}
                     </div>
 
-                    {formData.specifications.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <Typography.Text type="secondary">
-                          点击上方按钮添加商品规格
-                        </Typography.Text>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {formData.specifications.map((spec, index) => (
-                          <Card
-                            key={spec.id}
-                            className="p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <Input
-                                type="text"
-                                placeholder="规格名称，如颜色、尺寸等"
-                                value={spec.name}
-                                onChange={(e) =>
-                                  updateSpecName(spec.id, e.target.value)
-                                }
-                                className="flex-1"
-                              />
-                              <Button
-                                type="text"
-                                size="small"
-                                className="ml-2 text-gray-400 hover:text-red-500"
-                                icon={<i className="fas fa-trash-alt text-xs"></i>}
-                                onClick={() => removeSpecification(spec.id)}
-                              />
+                        {formData.specifications.length > 0 && (
+                          <div className="sku-generation">
+                            <div className="sku-header">
+                              <div className="sku-title">
+                                <i className="fas fa-tags"></i> 规格组合
+                              </div>
+                              <button
+                                onClick={generateSkuCombinations}
+                                className="generate-sku-btn"
+                              >
+                                <i className="fas fa-magic"></i>生成规格组合
+                              </button>
                             </div>
-
-                            <div className="space-y-2 mt-2">
-                              {spec.values.map((option, optIndex) => (
-                                <div key={optIndex} className="flex items-center">
-                                  <Input
-                                    type="text"
-                                    placeholder={`选项${optIndex + 1}`}
-                                    value={option}
-                                    onChange={(e) =>
-                                      updateSpecOption(
-                                        spec.id,
-                                        optIndex,
-                                        e.target.value
-                                      )
-                                    }
-                                    className="flex-1"
-                                  />
-                                  {spec.values.length > 1 && (
-                                    <Button
-                                      type="text"
-                                      size="small"
-                                      className="ml-2 text-gray-400 hover:text-red-500"
-                                      icon={<i className="fas fa-times text-xs"></i>}
-                                      onClick={() =>
-                                        removeSpecOption(spec.id, optIndex)
-                                      }
-                                    />
-                                  )}
-                                </div>
-                              ))}
+                            
+                            {formData.skus.length === 0 ? (
+                              <div className="sku-empty">
+                                <p className="sku-empty-text">点击生成规格组合按钮生成SKU组合</p>
+                              </div>
+                            ) : (
+                              <div className="sku-table-container">
+                                <table className="sku-table">
+                                  <thead>
+                                    <tr>
+                                      <th>规格组合</th>
+                                      <th>价格(¥)</th>
+                                      <th>库存</th>
+                                      <th>图片</th>
+                                      <th>操作</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {formData.skus.map((sku) => (
+                                      <tr key={sku.id}>
+                                        <td>
+                                          {Object.entries(sku.specifications || {}).map(([key, value]) => (
+                                            <span key={key} className="sku-spec-tag">
+                                              {key}: {value}
+                                            </span>
+                                          ))}
+                                        </td>
+                                        <td>
+                                          <Input
+                                            type="number"
+                                            value={sku.price}
+                                            onChange={(e) => updateSku(sku.id, "price", e.target.value)}
+                                            size="small"
+                                            style={{ width: "80px" }}
+                                          />
+                                        </td>
+                                        <td>
+                                          <Input
+                                            type="number"
+                                            value={sku.stock}
+                                            onChange={(e) => updateSku(sku.id, "stock", e.target.value)}
+                                            size="small"
+                                            style={{ width: "80px" }}
+                                          />
+                                        </td>
+                                        <td>
+                                          <div className="sku-image-selector">
+                                            {sku.imageUrl ? (
+                                              <div className="sku-image-preview" style={{ position: "relative" }}>
+                                                <img 
+                                                  src={sku.imageUrl} 
+                                                  alt="SKU图片" 
+                                                  style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "4px" }}
+                                                />
+                                                <button 
+                                                  className="sku-image-clear"
+                                                  onClick={() => updateSku(sku.id, "imageUrl", "")}
+                                                  style={{ position: "absolute", top: "-5px", right: "-5px", fontSize: "10px", background: "rgba(0,0,0,0.5)", color: "white", borderRadius: "50%", width: "16px", height: "16px", display: "flex", alignItems: "center", justifyContent: "center", border: "none" }}
+                                                >
+                                                  <i className="fas fa-times"></i>
+                                                </button>
+                                              </div>
+                                            ) : (
+                                              <button
+                                                onClick={() => {
+                                                  if (formData.images.length > 0) {
+                                                    // 显示图片选择器或直接使用第一张图片
+                                                    updateSku(sku.id, "imageUrl", formData.images[0].url);
+                                                  } else {
+                                                    alert("请先上传商品图片");
+                                                  }
+                                                }}
+                                                className="sku-image-add"
+                                                style={{ fontSize: "12px", color: "#5B5FEF", background: "none", border: "none" }}
+                                              >
+                                                <i className="fas fa-image mr-1"></i>设置图片
+                                              </button>
+                                            )}
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <button
+                                            className="text-red-500 bg-transparent border-0"
+                                            onClick={() => removeSku(sku.id)}
+                                          >
+                                            <i className="fas fa-trash-alt text-xs mr-1"></i>删除
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            )}
+                            
+                            <div className="mt-3 p-3 bg-gray-50 rounded">
+                              <p className="text-gray-500 text-sm mb-1">
+                                总库存: {formData.skus.reduce((sum, sku) => sum + (parseInt(sku.stock) || 0), 0)} 件
+                              </p>
+                              <p className="text-gray-500 text-xs">
+                                提示: 修改SKU价格和库存后，系统会自动计算总库存
+                              </p>
                             </div>
-
-                            <Button
-                              onClick={() => addSpecOption(spec.id)}
-                              size="small"
-                              className="mt-2"
-                              icon={<i className="fas fa-plus text-xs mr-1"></i>}
-                            >
-                              添加选项
-                            </Button>
-                          </Card>
-                        ))}
-                      </div>
+                          </div>
+                        )}
+                      </>
                     )}
-                  </Card>
+                  </div>
                 </div>
               )}
 
               {/* 购买须知 */}
               {activeTab === "notices" && (
                 <div className="purchase-notices">
-                  <Card className="p-3">
-                    <div className="flex justify-between items-center mb-4">
-                      <Typography.Title level={5}>购买须知</Typography.Title>
-                      <Button
-                        onClick={addPurchaseNotice}
-                        type="primary"
-                        size="small"
-                        icon={<i className="fas fa-plus text-xs mr-1"></i>}
-                      >
-                        添加须知
-                      </Button>
-                    </div>
-
-                    {formData.purchaseNotices.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <Typography.Text type="secondary">
-                          点击上方按钮添加购买须知
-                        </Typography.Text>
+                  <div className="form-card">
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="card-title mb-0">
+                        <i className="fas fa-info-circle"></i>购买须知
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        {formData.purchaseNotices.map((notice, index) => (
-                          <Card
-                            key={notice.id}
-                            className="p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="flex justify-between items-center mb-2">
-                              <Input
-                                type="text"
-                                placeholder="须知标题，如退换政策、发货说明等"
-                                value={notice.title}
-                                onChange={(e) =>
-                                  updatePurchaseNotice(
-                                    notice.id,
-                                    "title",
-                                    e.target.value
-                                  )
-                                }
-                                className="flex-1"
-                              />
-                              <Button
-                                type="text"
-                                size="small"
-                                className="ml-2 text-gray-400 hover:text-red-500"
-                                icon={<i className="fas fa-trash-alt text-xs"></i>}
-                                onClick={() => removePurchaseNotice(notice.id)}
-                              />
-                            </div>
+                    <button
+                      onClick={addPurchaseNotice}
+                        className="px-2 py-1 bg-blue-600 text-white rounded-md text-xs flex items-center"
+                    >
+                        <i className="fas fa-plus text-xs mr-1"></i>添加须知
+                    </button>
+                  </div>
 
-                            <Input.TextArea
-                              placeholder="须知内容详情"
-                              value={notice.content}
+                  {formData.purchaseNotices.length === 0 ? (
+                      <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <p className="text-gray-400 text-sm">点击上方按钮添加购买须知</p>
+                    </div>
+                  ) : (
+                      <div className="space-y-3">
+                        {formData.purchaseNotices.map((notice) => (
+                        <div
+                          key={notice.id}
+                          className="p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                              <Input
+                              type="text"
+                              placeholder="须知标题，如退换政策、发货说明等"
+                              value={notice.title}
                               onChange={(e) =>
                                 updatePurchaseNotice(
                                   notice.id,
-                                  "content",
+                                  "title",
                                   e.target.value
                                 )
                               }
-                              className="min-h-[80px] mt-2"
+                                className="flex-1"
+                                size="small"
                             />
-                          </Card>
-                        ))}
-                      </div>
-                    )}
-                  </Card>
+                            <button
+                                className="ml-2 text-gray-400 hover:text-red-500 bg-transparent border-0"
+                              onClick={() => removePurchaseNotice(notice.id)}
+                            >
+                              <i className="fas fa-trash-alt text-xs"></i>
+                            </button>
+                          </div>
+
+                            <Input.TextArea
+                            placeholder="须知内容详情"
+                            value={notice.content}
+                            onChange={(e) =>
+                              updatePurchaseNotice(
+                                notice.id,
+                                "content",
+                                e.target.value
+                              )
+                            }
+                              rows={3}
+                              className="w-full"
+                            />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  </div>
                 </div>
               )}
 
               {/* SKU管理 */}
               {activeTab === "skus" && (
                 <div className="skus">
-                  <Card className="p-3">
-                    <div className="flex justify-between items-center mb-4">
-                      <Typography.Title level={5}>SKU管理</Typography.Title>
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={generateSkuCombinations}
-                          type="primary"
-                          size="small"
-                          icon={<i className="fas fa-magic text-xs mr-1"></i>}
-                        >
-                          生成SKU组合
-                        </Button>
+                  <div className="form-card">
+                    <div className="sku-header">
+                      <div className="sku-title">
+                        <i className="fas fa-tags"></i> SKU管理
                       </div>
+                      <button
+                        onClick={generateSkuCombinations}
+                        className="generate-sku-btn"
+                      >
+                        <i className="fas fa-magic"></i>生成SKU组合
+                      </button>
                     </div>
 
                     {formData.specifications.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <Typography.Text type="secondary" className="block mb-2">
-                          请先在「规格参数」选项卡中添加商品规格
-                        </Typography.Text>
-                        <Button
+                      <div className="sku-empty">
+                        <p className="sku-empty-text">请先在「规格参数」选项卡中添加商品规格</p>
+                        <button
                           onClick={() => setActiveTab("specs")}
-                          type="primary"
-                          size="small"
+                          className="sku-empty-btn"
                         >
                           去添加规格
-                        </Button>
+                        </button>
                       </div>
                     ) : formData.skus.length === 0 ? (
-                      <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                        <Typography.Text type="secondary" className="block mb-2">
-                          基于已添加的规格生成SKU组合
-                        </Typography.Text>
-                        <Button
+                      <div className="sku-empty">
+                        <p className="sku-empty-text">基于已添加的规格生成SKU组合</p>
+                        <button
                           onClick={generateSkuCombinations}
-                          type="primary"
-                          size="small"
+                          className="sku-empty-btn"
                         >
                           生成SKU组合
-                        </Button>
+                        </button>
                       </div>
                     ) : (
                       <div>
                         <div className="overflow-x-auto">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                          <table className="sku-table">
+                            <thead>
                               <tr>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  规格组合
-                                </th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  价格(¥)
-                                </th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  库存
-                                </th>
-                                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  操作
-                                </th>
+                                <th>规格组合</th>
+                                <th>价格(¥)</th>
+                                <th>库存</th>
+                                <th>图片</th>
+                                <th>操作</th>
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {formData.skus.map((sku, index) => (
-                                <tr key={sku.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                  <td className="px-3 py-2 whitespace-nowrap text-sm">
+                            <tbody>
+                              {formData.skus.map((sku) => (
+                                <tr key={sku.id}>
+                                  <td>
                                     {Object.entries(sku.specifications || {}).map(([key, value]) => (
-                                      <span key={key} className="inline-block px-2 py-1 m-1 bg-gray-100 rounded-full text-xs">
+                                      <span key={key} className="sku-spec-tag">
                                         {key}: {value}
                                       </span>
                                     ))}
                                   </td>
-                                  <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                  <td>
                                     <Input
                                       type="number"
                                       value={sku.price}
-                                      onChange={(e) =>
-                                        updateSku(sku.id, "price", e.target.value)
-                                      }
+                                      onChange={(e) => updateSku(sku.id, "price", e.target.value)}
                                       size="small"
-                                      style={{ width: "100px" }}
+                                      style={{ width: "80px" }}
                                     />
                                   </td>
-                                  <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                  <td>
                                     <Input
                                       type="number"
                                       value={sku.stock}
-                                      onChange={(e) =>
-                                        updateSku(sku.id, "stock", e.target.value)
-                                      }
+                                      onChange={(e) => updateSku(sku.id, "stock", e.target.value)}
                                       size="small"
-                                      style={{ width: "100px" }}
+                                      style={{ width: "80px" }}
                                     />
                                   </td>
-                                  <td className="px-3 py-2 whitespace-nowrap text-sm">
-                                    <Button
-                                      type="text"
-                                      size="small"
-                                      className="text-red-500"
-                                      icon={<i className="fas fa-trash-alt text-xs"></i>}
+                                  <td>
+                                    <div className="sku-image-selector">
+                                      {sku.imageUrl ? (
+                                        <div className="sku-image-preview">
+                                          <img 
+                                            src={sku.imageUrl} 
+                                            alt="SKU图片" 
+                                            style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "4px" }}
+                                          />
+                                          <button 
+                                            className="sku-image-clear"
+                                            onClick={() => updateSku(sku.id, "imageUrl", "")}
+                                            style={{ position: "absolute", top: "-5px", right: "-5px", fontSize: "10px" }}
+                                          >
+                                            <i className="fas fa-times-circle"></i>
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => {
+                                            if (formData.images.length > 0) {
+                                              // 显示图片选择器或直接使用第一张图片
+                                              updateSku(sku.id, "imageUrl", formData.images[0].url);
+                                            } else {
+                                              alert("请先上传商品图片");
+                                            }
+                                          }}
+                                          className="sku-image-add"
+                                          style={{ fontSize: "12px", color: "#5B5FEF" }}
+                                        >
+                                          <i className="fas fa-image mr-1"></i>设置图片
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="text-red-500 bg-transparent border-0"
                                       onClick={() => removeSku(sku.id)}
                                     >
-                                      删除
-                                    </Button>
+                                      <i className="fas fa-trash-alt text-xs mr-1"></i>删除
+                                    </button>
                                   </td>
                                 </tr>
                               ))}
@@ -1543,42 +1598,37 @@ const EcommerceCreationPage = () => {
                           </table>
                         </div>
                         
-                        <div className="mt-4 p-3 bg-gray-50 rounded">
-                          <Typography.Text type="secondary" className="block mb-2">
+                        <div className="mt-3 p-3 bg-gray-50 rounded">
+                          <p className="text-gray-500 text-sm mb-1">
                             总库存: {formData.skus.reduce((sum, sku) => sum + (parseInt(sku.stock) || 0), 0)} 件
-                          </Typography.Text>
-                          <Typography.Text type="secondary" className="block text-xs">
+                          </p>
+                          <p className="text-gray-500 text-xs">
                             提示: 修改SKU价格和库存后，系统会自动计算总库存
-                          </Typography.Text>
+                          </p>
                         </div>
                       </div>
                     )}
-                  </Card>
+                  </div>
                 </div>
               )}
             </div>
 
             {/* 底部操作栏 */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-10 max-w-[375px] mx-auto">
-              <div className="flex gap-3">
-                <Button
+            <div className="bottom-actions">
+                <button
                   onClick={handleDraft}
-                  type="outline"
-                  size="large"
-                  className="flex-1 py-2.5 border border-gray-300 rounded-full text-sm font-medium text-gray-700"
+                className="btn-draft"
+                disabled={loading}
                 >
                   保存草稿
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={handleSubmit}
-                  type="primary"
-                  size="large"
-                  className="flex-1 py-2.5 rounded-full text-sm font-medium"
-                  loading={loading}
+                className="btn-publish"
+                disabled={loading}
                 >
-                  发布商品
-                </Button>
-              </div>
+                {loading ? "处理中..." : "发布商品"}
+                </button>
             </div>
           </>
         )}
