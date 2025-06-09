@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useTheme } from '../ThemeProvider';
+import { useTheme } from './ThemeProvider';
 
 /**
- * 高级主题卡片组件
+ * 高级主题卡片组件 - 优化版简洁高级UI/UX设计
  */
 const Card = ({
   children,
@@ -35,11 +35,11 @@ const Card = ({
   const getPadding = () => {
     switch (padding) {
       case 'none': return '0';
-      case 'xs': return theme.spacing[1];
-      case 'sm': return theme.spacing[2];
-      case 'lg': return theme.spacing[6];
-      case 'xl': return theme.spacing[8];
-      default: return theme.spacing[4];
+      case 'xs': return theme.spacing[2]; // 8px
+      case 'sm': return theme.spacing[4]; // 16px
+      case 'lg': return theme.spacing[6]; // 24px
+      case 'xl': return theme.spacing[8]; // 32px
+      default: return theme.spacing[5]; // 20px (md)
     }
   };
 
@@ -47,7 +47,7 @@ const Card = ({
   const getVariantClasses = () => {
     switch (variant) {
       case 'outlined':
-        return 'bg-transparent border border-neutral';
+        return 'bg-transparent border border-neutral-300';
       case 'filled':
         return 'bg-primary-50';
       case 'elevated':
@@ -86,7 +86,7 @@ const Card = ({
     getVariantClasses(),
     getStatusClasses(),
     hover && onClick ? 'hover:shadow-md transition' : '',
-    bordered ? 'border border-neutral' : '',
+    bordered ? 'border border-neutral-300' : '',
     loading ? 'card-loading' : '',
     onClick ? 'cursor-pointer transition' : '',
     className
@@ -97,7 +97,19 @@ const Card = ({
     if (!loading) return null;
     
     return (
-      <div className="card-loader">
+      <div className="card-loader" style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        zIndex: 1,
+        borderRadius: 'inherit'
+      }}>
         <div className="loading-spinner"></div>
       </div>
     );
@@ -110,6 +122,7 @@ const Card = ({
       style={{
         padding: getPadding(),
         position: 'relative',
+        borderRadius: '8px',
         ...style
       }}
       {...props}
@@ -117,11 +130,13 @@ const Card = ({
       {loading && renderLoading()}
       
       {(title || subtitle) && (
-        <div className="card-header">
-          <div>
-            {title && <h3 className="card-title">{title}</h3>}
-            {subtitle && <div className="text-neutral text-sm mt-1">{subtitle}</div>}
-          </div>
+        <div className="card-header" style={{ 
+          marginBottom: theme.spacing[3],
+          paddingBottom: subtitle ? theme.spacing[3] : 0,
+          borderBottom: subtitle ? `1px solid ${theme.colors.neutral[200]}` : 'none'
+        }}>
+          {title && <h3 className="card-title text-h3">{title}</h3>}
+          {subtitle && <div className="text-neutral text-caption mt-1">{subtitle}</div>}
         </div>
       )}
       
@@ -130,7 +145,11 @@ const Card = ({
       </div>
       
       {footer && (
-        <div className="card-footer">
+        <div className="card-footer" style={{ 
+          marginTop: theme.spacing[4],
+          paddingTop: theme.spacing[3],
+          borderTop: `1px solid ${theme.colors.neutral[200]}`
+        }}>
           {footer}
         </div>
       )}

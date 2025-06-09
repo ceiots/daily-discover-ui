@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useTheme } from '../ThemeProvider';
+import { useTheme } from './ThemeProvider';
 import './Button.css';
 
 /**
- * 高级主题按钮组件 - 优化版
+ * 高级主题按钮组件 - 优化版简洁高级UI/UX设计
  */
 const Button = ({
   children,
@@ -97,6 +97,17 @@ const Button = ({
     );
   };
 
+  // 获取按钮高度
+  const getButtonHeight = () => {
+    switch (size) {
+      case 'xs': return '32px';
+      case 'sm': return '36px';
+      case 'lg': return '52px';
+      case 'xl': return '60px';
+      default: return '44px'; // md
+    }
+  };
+
   return (
     <button
       ref={buttonRef}
@@ -107,6 +118,7 @@ const Button = ({
       style={{
         position: 'relative',
         overflow: 'hidden',
+        height: getButtonHeight(),
         ...style
       }}
       {...props}
@@ -121,7 +133,9 @@ const Button = ({
       )}
       
       {icon && iconPosition === 'left' && (
-        <span className="btn-icon">{icon}</span>
+        <span className="btn-icon" style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
+          {icon}
+        </span>
       )}
       
       <span className={loading ? 'opacity-0' : ''}>
@@ -129,7 +143,9 @@ const Button = ({
       </span>
       
       {icon && iconPosition === 'right' && (
-        <span className="btn-icon-right">{icon}</span>
+        <span className="btn-icon-right" style={{ marginLeft: '8px', display: 'flex', alignItems: 'center' }}>
+          {icon}
+        </span>
       )}
     </button>
   );
@@ -137,7 +153,7 @@ const Button = ({
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  variant: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text', 'success', 'warning', 'danger', 'info']),
+  variant: PropTypes.oneOf(['primary', 'secondary', 'text', 'success', 'warning', 'error', 'info']),
   size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
   block: PropTypes.bool,
   disabled: PropTypes.bool,

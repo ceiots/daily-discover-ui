@@ -1,59 +1,84 @@
-// 主题配置文件 - 高级美学优化
+// 主题配置文件 - 优化版简洁高级UI/UX设计体系
 const theme = {
   colors: {
-    // 主色调：深邃蓝紫
+    // 主色调：深紫色
     primary: {
-      light: '#E6E3F7', // 浅紫
-      main: '#6B4EFF',  // 主色（更深更低饱和度）
-      dark: '#4B36A8',  // 深紫
+      50: '#F4F2FF',  // 极浅紫
+      100: '#E6E3F7', // 浅紫背景
+      200: '#D0B7FA',
+      300: '#C0A0F8',
+      400: '#7C69EF', // 浅紫色（悬停状态）
+      500: '#5B47E8', // 主色调
+      600: '#5B47E8', // 主色调（保持一致）
+      700: '#4A3BD1', // 深紫色（按压状态）
+      800: '#3A2A82', // 更深紫
+      900: '#2E2266',
     },
-    // 灰阶
+    // 中性色谱
     neutral: {
-      0: '#fff',
-      50: '#FAFAFA',
-      100: '#F4F4F5',
-      200: '#E4E4E7',
-      300: '#D4D4D8',
-      400: '#A1A1AA',
-      500: '#71717A',
-      600: '#52525B',
-      700: '#3F3F46',
-      800: '#27272A',
-      900: '#18181B',
+      50: '#FFFFFF',  // 主背景
+      100: '#FAFBFC', // 次级背景
+      200: '#F1F3F5', // 三级背景
+      300: '#E5E7EB', // 分割线
+      400: '#9CA3AF',
+      500: '#6B7280', // 辅助文本
+      600: '#4B5563', // 次要文本
+      700: '#374151',
+      800: '#1F2937', // 主文本
+      900: '#111827',
     },
-    // 状态色
-    success: '#22C55E',
-    warning: '#F59E42',
-    error: '#EF4444',
-    info: '#3B82F6',
+    // 功能色彩
+    success: '#059669', // 成功
+    warning: '#F59E0B', // 警告
+    error: '#DC2626',   // 错误
+    info: '#3B82F6',    // 信息
     // 背景
     background: {
-      default: '#F7F7FA',
-      paper: '#fff',
-      dark: '#18181B',
+      default: '#FFFFFF',
+      paper: '#FAFBFC',
+      tertiary: '#F1F3F5',
     },
-    // 禁用色
-    disabled: '#E5E7EB',
   },
+  
   fontFamily: {
-    base: `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif`,
+    base: `'PingFang SC', 'Source Han Sans', 'SF Pro Display', 'Inter', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif`,
   },
+  
+  // 精密字体系统
   fontSize: {
-    xs: '12px',
-    sm: '14px',
-    base: '16px',
-    lg: '18px',
-    xl: '20px',
-    '2xl': '24px',
-    '3xl': '28px',
-    '4xl': '32px',
+    // 桌面端 (1024px+)
+    display: '28px',
+    h1: '22px',
+    h2: '18px',
+    h3: '16px',
+    'body-large': '15px',
+    body: '14px',
+    caption: '12px',
+    micro: '11px',
+    
+    // 移动端尺寸在媒体查询中处理
   },
+  
+  lineHeight: {
+    display: '1.15',
+    h1: '1.18',
+    h2: '1.22',
+    h3: '1.25',
+    'body-large': '1.47',
+    body: '1.43',
+    caption: '1.33',
+    micro: '1.27',
+  },
+  
   fontWeight: {
-    normal: 400,
+    light: 300,
+    regular: 400,
     medium: 500,
     semibold: 600,
     bold: 700,
   },
+  
+  // 精密布局网格
   spacing: {
     0: '0',
     1: '4px',
@@ -66,30 +91,50 @@ const theme = {
     10: '40px',
     12: '48px',
     16: '64px',
+    20: '80px',
   },
+  
   borderRadius: {
+    none: '0',
     sm: '4px',
-    md: '8px',
-    lg: '16px',
+    DEFAULT: '6px',
+    md: '6px',
+    lg: '8px',
+    xl: '12px',
+    '2xl': '16px',
+    '3xl': '24px',
     full: '9999px',
   },
+  
   boxShadow: {
-    sm: '0 1px 4px 0 rgba(75, 54, 168, 0.04)',
-    md: '0 2px 8px 0 rgba(75, 54, 168, 0.08)',
-    lg: '0 4px 16px 0 rgba(75, 54, 168, 0.10)',
+    sm: '0 1px 3px rgba(0,0,0,0.1)',
+    DEFAULT: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
+    md: '0 4px 12px rgba(0,0,0,0.15)',
+    lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)',
+    xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
     none: 'none',
+    primary: '0 4px 14px rgba(91, 71, 232, 0.25)',
   },
+  
+  // 高级交互模式
   transition: {
-    fast: 'all 0.15s cubic-bezier(0.4,0,0.2,1)',
-    normal: 'all 0.25s cubic-bezier(0.4,0,0.2,1)',
+    default: 'all 200ms cubic-bezier(0.4, 0.0, 0.2, 1)',
+    fast: 'all 150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    slow: 'all 350ms cubic-bezier(0.19, 1, 0.22, 1)',
+    elastic: 'all 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
   },
+  
+  // 智能断点系统
   screens: {
-    sm: '640px',
-    md: '768px',
-    lg: '1024px',
-    xl: '1280px',
-    '2xl': '1536px',
+    'mobile-sm': '320px',
+    mobile: '480px',
+    tablet: '768px',
+    desktop: '1024px',
+    large: '1440px',
+    xl: '1920px',
   },
+  
+  // 安全区域
   safeArea: {
     top: 'env(safe-area-inset-top, 0)',
     right: 'env(safe-area-inset-right, 0)',

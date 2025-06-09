@@ -1,9 +1,9 @@
 .theme-scrollable-section {
   margin: 16px 0;
   padding: 0 0 16px;
-  background-color: #fff;
+  background-color: var(--color-bg-light);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-sm);
 }
 
 .theme-scrollable-header {
@@ -14,14 +14,14 @@
 }
 
 .theme-scrollable-header h3 {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   margin: 0;
   display: flex;
   align-items: center;
 }
 
 .theme-scrollable-icon {
-  color: #6366f1;
+  color: var(--color-primary-500);
   margin-right: 8px;
   display: flex;
   align-items: center;
@@ -40,17 +40,19 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: #f3f4f6;
+  background-color: var(--color-neutral-100);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: var(--transition-base);
+  color: var(--color-neutral-600);
 }
 
 .theme-scroll-control-btn:hover {
-  background-color: #e5e7eb;
+  background-color: var(--color-neutral-200);
+  color: var(--color-primary-500);
 }
 
 .theme-scrollable-content {
@@ -60,6 +62,7 @@
   scroll-behavior: smooth;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  gap: 16px;
 }
 
 .theme-scrollable-content::-webkit-scrollbar {

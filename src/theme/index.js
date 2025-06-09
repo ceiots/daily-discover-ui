@@ -1,6 +1,6 @@
-// 主题模块入口文件
+// 主题模块入口文件 - 优化版简洁高级UI/UX设计体系
 import theme from './theme';
-import ThemeProvider, { useTheme, ThemeContext } from './ThemeProvider';
+import ThemeProvider, { useTheme, ThemeContext } from './components/ThemeProvider';
 import BasePage from './BasePage';
 
 // 导入组件
@@ -20,7 +20,14 @@ export {
 };
 
 // 直接导出常用组件
-export const { Button, Card } = components;
+export const { 
+  Button, 
+  Card, 
+  NavBar, 
+  ScrollableSection, 
+  ShopInfo,
+  Toast 
+} = components;
 
 // 默认导出 ThemeProvider
 export default ThemeProvider; 

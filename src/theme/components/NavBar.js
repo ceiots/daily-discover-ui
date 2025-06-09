@@ -7,6 +7,9 @@ import { useAuth } from '../../App'; // 确保已导入 useAuth
 // 默认头像 - 与 Profile 组件保持一致
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
 
+/**
+ * 底部导航栏组件 - 优化版简洁高级UI/UX设计
+ */
 const NavBar = ({ className }) => {
   const location = useLocation();
   const path = location.pathname;
@@ -83,7 +86,7 @@ const NavBar = ({ className }) => {
                 }}
               />
             ) : (
-            <i className="fas fa-qrcode"></i>
+              <i className="fas fa-qrcode"></i>
             )}
           </a>
         </div>

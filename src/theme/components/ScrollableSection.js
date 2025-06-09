@@ -1,10 +1,11 @@
 import React, { useRef } from "react";
 import PropTypes from "prop-types";
-import { useTheme } from "../ThemeProvider";
+import { useTheme } from "./ThemeProvider";
 import "./ScrollableSection.css";
 
 /**
- * ScrollableSection - A reusable component for horizontally scrollable content
+ * ScrollableSection - 优化版简洁高级UI/UX设计
+ * 用于横向滚动内容的可复用组件
  */
 const ScrollableSection = ({
   children,
@@ -18,7 +19,7 @@ const ScrollableSection = ({
 
   const handleScroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = direction === "left" ? -200 : 200;
+      const scrollAmount = direction === "left" ? -240 : 240;
       scrollRef.current.scrollBy({
         left: scrollAmount,
         behavior: "smooth",
@@ -29,7 +30,7 @@ const ScrollableSection = ({
   return (
     <div className={`theme-scrollable-section ${className}`}>
       <div className="theme-scrollable-header">
-        <h3 style={{ fontSize: theme.fontSize["2xl"] }}>
+        <h3 className="text-h3">
           {titleIcon && <span className="theme-scrollable-icon">{titleIcon}</span>}
           {title}
           {actionButton && <span className="theme-scrollable-action">{actionButton}</span>}
@@ -38,12 +39,14 @@ const ScrollableSection = ({
           <button
             className="theme-scroll-control-btn"
             onClick={() => handleScroll("left")}
+            aria-label="向左滚动"
           >
             <i className="fas fa-chevron-left"></i>
           </button>
           <button
             className="theme-scroll-control-btn"
             onClick={() => handleScroll("right")}
+            aria-label="向右滚动"
           >
             <i className="fas fa-chevron-right"></i>
           </button>
