@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useTheme } from './ThemeProvider';
+import { useTheme } from '../ThemeProvider';
 import '../theme.css';
 
 /**

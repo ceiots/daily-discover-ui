@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate,useLocation, matchPath } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, matchPath } from 'react-router-dom';
 import instance from './utils/axios';
 import Daily from './components/Daily';
 import NavBar from './theme/components/NavBar';
@@ -217,11 +217,11 @@ function showNavBar(pathname) {
     '/order-success'
   ];
 
-  const currentPath = location.pathname;
-  console.log("currentPath", currentPath);
+  // 使用传入的pathname参数而不是全局location
+  console.log("pathname", pathname);
   // 只要是 /ecommerce-creation 开头的都不显示
-  if (currentPath.startsWith('/ecommerce-creation') || currentPath.startsWith('/product/')) return false;
-  return !pathsWithoutNavBar.includes(currentPath);
+  if (pathname.startsWith('/ecommerce-creation') || pathname.startsWith('/product/')) return false;
+  return !pathsWithoutNavBar.includes(pathname);
 }
 
 const App = () => {

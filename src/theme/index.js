@@ -1,6 +1,6 @@
 // 主题模块入口文件 - 优化版简洁高级UI/UX设计体系
 import theme from './theme';
-import ThemeProvider, { useTheme, ThemeContext } from './components/ThemeProvider';
+import ThemeProvider, { useTheme, ThemeContext } from './ThemeProvider';
 import BasePage from './BasePage';
 
 // 导入组件

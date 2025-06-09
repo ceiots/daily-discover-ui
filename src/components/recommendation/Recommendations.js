@@ -524,7 +524,7 @@ const Recommendations = () => {
                 匹配度{product.matchScore || "90"}%
               </div>
 
-              {aiInsights[`product${product.id}`] && (
+              {product && product.id && aiInsights[`product${product.id}`] && (
                 <div className="product-ai-insight">
                   {aiInsights[`product${product.id}`]}
                 </div>
