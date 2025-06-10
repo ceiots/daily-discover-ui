@@ -86,7 +86,7 @@ const NavBar = ({ className }) => {
                 }}
               />
             ) : (
-              <i className="fas fa-qrcode"></i>
+            <i className="fas fa-qrcode"></i>
             )}
           </a>
         </div>

@@ -691,7 +691,7 @@
   font-size: var(--font-size-display); 
   line-height: var(--line-height-display);
   font-weight: var(--font-weight-light);
-}
+  }
 .text-h1 { 
   font-size: var(--font-size-h1); 
   line-height: var(--line-height-h1);
