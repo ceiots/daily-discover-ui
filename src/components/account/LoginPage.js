@@ -32,10 +32,15 @@ const LoginPage = () => {
 
     try {
       const user = {
-        phoneNumber: phoneNumber,
+        username: phoneNumber, // 使用手机号作为用户名登录
         password: password,
+        deviceId: "web",
+        deviceType: 5,
+        deviceModel: "browser",
+        osVersion: navigator.userAgent,
+        appVersion: "1.0.0"
       };
-      const response = await instance.post('/user/login', user);
+      const response = await instance.post('/users/login', user);
 
       // 处理登录成功
       if (response.data.code === 200 && response.data.message === '登录成功') {

@@ -10,9 +10,7 @@ import shadows from './shadows';
 import breakpoints from './breakpoints';
 
 // 导入组件
-import Button from './components/Button';
-import Card from './components/Card';
-import BasePage from './BasePage';
+import { Button, Card, BasePage } from './components';
 import ThemeProvider from './ThemeProvider';
 import { useTheme } from './ThemeProvider';
 

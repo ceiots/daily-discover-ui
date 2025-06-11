@@ -18,6 +18,8 @@ const BasePage = ({
   className = '',
   contentClassName = '',
   headerClassName = '',
+  showHeader,
+  headerLeft,
   ...props
 }) => {
   // 组合所有样式
@@ -89,7 +91,7 @@ const BasePage = ({
 
   return (
     <div className={pageClasses} {...props}>
-      {renderHeader()}
+      {showHeader !== false && renderHeader()}
       <main className={contentClasses}>
         {children}
       </main>
@@ -110,6 +112,8 @@ BasePage.propTypes = {
   className: PropTypes.string,
   contentClassName: PropTypes.string,
   headerClassName: PropTypes.string,
+  showHeader: PropTypes.bool,
+  headerLeft: PropTypes.node,
 };
 
-export default BasePage; 
+export default BasePage;

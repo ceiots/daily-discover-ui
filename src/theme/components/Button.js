@@ -9,6 +9,7 @@ import classNames from 'classnames';
 const Button = ({
   children,
   type = 'primary',
+  htmlType,
   size = 'medium',
   block = false,
   disabled = false,
@@ -53,12 +54,18 @@ const Button = ({
     onClick && onClick(e);
   };
 
+  // 提取htmlType属性，不直接传递给DOM元素
+  const buttonProps = { ...props };
+  if (htmlType) {
+    buttonProps.type = htmlType;
+  }
+
   return (
     <button
       className={buttonClasses}
       onClick={handleClick}
       disabled={disabled || loading}
-      {...props}
+      {...buttonProps}
     >
       {loading && (
         <svg
@@ -91,6 +98,7 @@ const Button = ({
 Button.propTypes = {
   children: PropTypes.node.isRequired,
   type: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text', 'danger']),
+  htmlType: PropTypes.string,
   size: PropTypes.oneOf(['small', 'medium', 'large']),
   block: PropTypes.bool,
   disabled: PropTypes.bool,

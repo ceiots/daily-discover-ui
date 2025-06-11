@@ -45,8 +45,8 @@ const ForgotPasswordPage = () => {
         return;
     }
     try {
-        const response = await instance.post("/user/reset-password-code", {
-            phoneNumber: formData.phoneNumber
+        const response = await instance.post("/users/password/reset", {
+            mobile: formData.phoneNumber
         });
        
         if (response.data.code === 200) {
@@ -97,15 +97,19 @@ const ForgotPasswordPage = () => {
 
     try {
       const response = await instance.post(
-        "/user/reset-password",
-        formData
+        "/users/password/reset",
+        {
+          mobile: formData.phoneNumber,
+          code: formData.verificationCode,
+          password: formData.newPassword
+        }
       );
-      if (response.data === "密码重置成功") {
-        alert("密码重置成功，请重新登录");
-        navigate("/login");
-      } else {
-        alert(response.data.message || "重置密码失败");
-      }
+              if (response.data.code === 200) {
+          alert("密码重置成功，请重新登录");
+          navigate("/login");
+        } else {
+          alert(response.data.message || "重置密码失败");
+        }
     } catch (error) {
       alert("重置密码失败，请稍后重试");
     }

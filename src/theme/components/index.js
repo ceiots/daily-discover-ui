@@ -8,6 +8,7 @@ import NavBar from './NavBar';
 import ScrollableSection from './ScrollableSection';
 import Toast from './Toast';
 import ShopInfo from './ShopInfo';
+import BasePage from './BasePage';
 
 // 导出所有组件
 export {
@@ -16,7 +17,8 @@ export {
   NavBar,
   ScrollableSection,
   Toast,
-  ShopInfo
+  ShopInfo,
+  BasePage
 };
 
 // 可以在这里添加更多组件导出
