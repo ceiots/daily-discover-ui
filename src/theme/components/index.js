@@ -1,14 +1,21 @@
-// 组件模块入口文件
+/**
+ * 组件统一导出
+ */
+
 import Button from './Button';
 import Card from './Card';
+import NavBar from './NavBar';
 import ScrollableSection from './ScrollableSection';
+import Toast from './Toast';
 import ShopInfo from './ShopInfo';
 
 // 导出所有组件
 export {
   Button,
   Card,
+  NavBar,
   ScrollableSection,
+  Toast,
   ShopInfo
 };
 

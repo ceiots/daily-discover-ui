@@ -1,50 +1,49 @@
-// 主题模块入口文件 - 优化版简洁高级UI/UX设计体系
-import React, { createContext, useContext } from 'react';
-import PropTypes from 'prop-types';
-import theme from './theme';
-import BasePage from './BasePage';
+/**
+ * 主题系统统一导出
+ * 提供设计令牌(Design Tokens)，确保UI一致性
+ */
 
-// 创建主题上下�?
-export const ThemeContext = createContext(theme);
-
-// 自定义钩子，方便组件获取主题
-export const useTheme = () => useContext(ThemeContext);
-
-// 主题提供者组�?
-export const ThemeProvider = ({ children }) => {
-  return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
-
-ThemeProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};
+import colors from './colors';
+import typography from './typography';
+import spacing from './spacing';
+import shadows from './shadows';
+import breakpoints from './breakpoints';
 
 // 导入组件
-import * as components from './components';
+import Button from './components/Button';
+import Card from './components/Card';
+import BasePage from './BasePage';
+import ThemeProvider from './ThemeProvider';
+import { useTheme } from './ThemeProvider';
 
-// 导入样式
-import './theme.css';
+/**
+ * 主题配置
+ * 作为统一的设计系统，供组件使用
+ */
+export const theme = {
+  colors,
+  typography,
+  spacing,
+  shadows,
+  breakpoints,
 
-// 导出所有主题相关组件和工具
-export {
-  theme,
-  BasePage,
-  components
+  // 主题模式
+  modes: {
+    light: {
+      primary: colors.primary,
+      background: colors.neutral[50],
+      text: colors.neutral[800],
+      border: colors.neutral[200],
+      shadow: shadows.default,
+    },
+    dark: {
+      primary: colors.primary,
+      background: colors.neutral[900],
+      text: colors.neutral[100],
+      border: colors.neutral[700],
+      shadow: shadows.darkMode,
+    },
+  },
 };
 
-// 直接导出常用组件
-export const { 
-  Button, 
-  Card, 
-  NavBar, 
-  ScrollableSection, 
-  ShopInfo,
-  Toast 
-} = components;
-
-// 默认导出 ThemeProvider
-export default ThemeProvider; 
+export { ThemeProvider, useTheme, Button, Card, BasePage }; 

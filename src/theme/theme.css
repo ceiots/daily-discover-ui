@@ -1,5 +1,7 @@
 /* 全局主题CSS变量和通用样式 - 优化版简洁高级UI/UX设计体系 */
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 :root {
   /* 主色调 - 深紫色 */
   --color-primary-50: #F4F2FF;  /* 极浅紫 */

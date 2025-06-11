@@ -1,22 +1,24 @@
 // index.js
 import React from 'react';
-import { createRoot } from 'react-dom/client'; // 导入 createRoot
-import App from './App';
-import { BrowserRouter as Router } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // 引入 Font Awesome CSS
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import './index.css'; // 确保引入包含Tailwind CSS的样式表
+import './index.css';
+ import App from './App';
+import reportWebVitals from './reportWebVitals';
 
-const root = createRoot(document.getElementById('root')); // 创建根节点
-if (process.env.NODE_ENV === 'development') {
-  import('./StagewiseToolbarDev');
-}
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <Router>
+      <BrowserRouter>
         <App />
-      </Router>
+      </BrowserRouter>
     </HelmetProvider>
   </React.StrictMode>
-); // 使用 render 方法渲染应用
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

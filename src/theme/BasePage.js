@@ -1,163 +1,115 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useTheme } from './ThemeProvider';
-import './theme.css';
+import classNames from 'classnames';
 
 /**
- * 基础页面组件 - 优化版简洁高级UI/UX设计
- * 提供了统一的页面布局、主题样式和常用功能
+ * 基础页面组件
+ * 提供统一的页面布局结构
  */
 const BasePage = ({
   children,
   title,
-  showHeader = true,
-  headerTitle,
-  headerLeft,
-  headerRight,
-  showFooter = false,
-  footerContent,
-  backgroundColor = 'default',
-  className = '',
-  safeArea = true,
+  subtitle,
+  headerActions,
+  backButton,
+  onBack,
   loading = false,
-  error = null,
-  onRefresh = null,
-  style = {}
+  padding = true,
+  className = '',
+  contentClassName = '',
+  headerClassName = '',
+  ...props
 }) => {
-  const theme = useTheme();
-
-  // 构建页面容器的样式类
-  const containerClasses = [
-    'page-container',
-    backgroundColor === 'default' ? 'bg-light' : `bg-${backgroundColor}`,
-    safeArea ? 'safe-area-padding' : '',
+  // 组合所有样式
+  const pageClasses = classNames(
+    'base-page flex flex-col min-h-screen bg-neutral-50',
     className
-  ].filter(Boolean).join(' ');
+  );
 
-  // 页面头部
+  const contentClasses = classNames(
+    'flex-1',
+    {
+      'p-4': padding,
+    },
+    contentClassName
+  );
+
+  const headerClasses = classNames(
+    'page-header flex items-center justify-between p-4 bg-white border-b border-neutral-200',
+    headerClassName
+  );
+
+  // 渲染页面头部
   const renderHeader = () => {
-    if (!showHeader) return null;
+    if (!title && !subtitle && !headerActions && !backButton) return null;
 
     return (
-      <header className="page-header">
-        <div className="page-header-left">
-          {headerLeft}
+      <header className={headerClasses}>
+        <div className="flex items-center">
+          {backButton && (
+            <button
+              className="mr-3 p-1 rounded-full hover:bg-neutral-100"
+              onClick={onBack}
+              aria-label="返回"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+          <div>
+            {title && <h1 className="text-xl font-semibold text-neutral-800">{title}</h1>}
+            {subtitle && <p className="text-sm text-neutral-500 mt-1">{subtitle}</p>}
+          </div>
         </div>
-        <h1 className="text-h1 text-light">{headerTitle || title}</h1>
-        <div className="page-header-right">
-          {headerRight}
-        </div>
+        {headerActions && <div className="flex items-center">{headerActions}</div>}
       </header>
     );
   };
 
-  // 页面底部
-  const renderFooter = () => {
-    if (!showFooter) return null;
-
-    return (
-      <footer className="page-footer">
-        {footerContent}
-      </footer>
-    );
-  };
-
-  // 加载状态
+  // 渲染加载状态
   const renderLoading = () => {
     if (!loading) return null;
 
     return (
-      <div className="page-loading" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: theme.spacing[8],
-        width: '100%'
-      }}>
-        <div className="loading-spinner" style={{ marginBottom: theme.spacing[4] }}></div>
-        <p className="text-neutral">加载中...</p>
-      </div>
-    );
-  };
-
-  // 错误状态
-  const renderError = () => {
-    if (!error) return null;
-
-    return (
-      <div className="page-error" style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: theme.spacing[8],
-        width: '100%'
-      }}>
-        <div className="error-icon" style={{
-          width: '48px',
-          height: '48px',
-          borderRadius: '50%',
-          backgroundColor: theme.colors.error,
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
-          marginBottom: theme.spacing[4]
-        }}>!</div>
-        <p className="error-message text-error text-body-large" style={{ marginBottom: theme.spacing[4] }}>{error}</p>
-        {onRefresh && (
-          <button 
-            className="btn btn-primary"
-            onClick={onRefresh}
-          >
-            重试
-          </button>
-        )}
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
       </div>
     );
   };
 
   return (
-    <div 
-      className={containerClasses} 
-      style={{
-        ...style,
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
+    <div className={pageClasses} {...props}>
       {renderHeader()}
-      
-      <main className="page-content">
-        {renderLoading()}
-        {renderError()}
-        {!loading && !error && children}
+      <main className={contentClasses}>
+        {children}
       </main>
-      
-      {renderFooter()}
+      {renderLoading()}
     </div>
   );
 };
 
 BasePage.propTypes = {
   children: PropTypes.node,
-  title: PropTypes.string,
-  showHeader: PropTypes.bool,
-  headerTitle: PropTypes.node,
-  headerLeft: PropTypes.node,
-  headerRight: PropTypes.node,
-  showFooter: PropTypes.bool,
-  footerContent: PropTypes.node,
-  backgroundColor: PropTypes.oneOf(['default', 'paper', 'tertiary', 'primary', 'primary-light', 'primary-dark']),
-  className: PropTypes.string,
-  safeArea: PropTypes.bool,
+  title: PropTypes.node,
+  subtitle: PropTypes.node,
+  headerActions: PropTypes.node,
+  backButton: PropTypes.bool,
+  onBack: PropTypes.func,
   loading: PropTypes.bool,
-  error: PropTypes.string,
-  onRefresh: PropTypes.func,
-  style: PropTypes.object
+  padding: PropTypes.bool,
+  className: PropTypes.string,
+  contentClassName: PropTypes.string,
+  headerClassName: PropTypes.string,
 };
 
 export default BasePage; 

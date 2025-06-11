@@ -38,6 +38,8 @@ import { ThemeProvider } from './theme';
 import ExamplePage from './ExamplePage';
 import ProfileEdit from './components/settings/ProfileEdit';
 import OrderSuccess from './components/order/OrderSuccess'; // 添加订单成功页面
+import ThemeTestPage from './pages/ThemeTestPage';
+import SimpleThemeTest from './pages/SimpleThemeTest';
 
 // 创建认证上下文
 const AuthContext = createContext();
@@ -214,7 +216,9 @@ function showNavBar(pathname) {
     '/cart',
     '/payment',
     '/payment-password',
-    '/order-success'
+    '/order-success',
+    '/theme-test', // 添加主题测试页面路径
+    '/simple-theme-test' // 添加简单主题测试页面路径
   ];
 
   // 使用传入的pathname参数而不是全局location
@@ -224,70 +228,77 @@ function showNavBar(pathname) {
   return !pathsWithoutNavBar.includes(pathname);
 }
 
-const App = () => {
-
+const AppContent = () => {
   const location = useLocation();
   const shouldShowNavBar = showNavBar(location.pathname);
 
-
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        
-            <CommonHelmet />
-            {shouldShowNavBar && <NavBar className="bottom-nav" />}
-            <div className="page-container">
-            <Routes>
-              {/* 主题示例页面 */}
-              <Route path="/theme-example" element={<ExamplePage />} />
-              
-              {/* 原有路由 */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
-              <Route path="/" element={<Daily />} />
-              <Route path="/daily" element={<Daily />} />
-              <Route path="/my-service" element={<ProtectedRoute><MyService /></ProtectedRoute>} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/payment" element={<Payment />} />
-              <Route
-                path="/order-list/:status"
-                element={
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <OrderList />
-                  </Suspense>
-                }
-              />
-              <Route path="/address-list" element={<ProtectedRoute><AddressList /></ProtectedRoute>} />
-              <Route path="/order/:orderNumber" element={<OrderDetail />} />
-              <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
-              <Route path="/event/:id" element={<EventDetail />} />
-              <Route path="/category/:id" element={<CategoryPage />} />
-              <Route path="/product/:id" element={<ProductDetail/>} />
-              <Route path="/search-results" element={<SearchResultsPage />} />
-              <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-              <Route path="/payment-password" element={<PaymentPassword />} />
-              <Route path="/content-creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
-              <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
-             
-              <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
-              <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
-              <Route path="/product-manage" element={<ProtectedRoute><ProductManagePage /></ProtectedRoute>} />
-              <Route path="/create-shop" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
-              <Route path="/edit-shop/:id" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
-              <Route path="/shop/:shopId" element={<ShopDetailPage />} />
-              <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
-              <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
-              <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
-              <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
-              <Route path="/order-success" element={<OrderSuccess />} />
-            </Routes>
-        </div>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <CommonHelmet />
+      {shouldShowNavBar && <NavBar className="bottom-nav" />}
+      <div className="page-container">
+        <Routes>
+          {/* 主题测试页面 */}
+          <Route path="/theme-test" element={<ThemeTestPage />} />
+          <Route path="/simple-theme-test" element={<SimpleThemeTest />} />
+          
+          {/* 主题示例页面 */}
+          <Route path="/theme-example" element={<ExamplePage />} />
+          
+          {/* 原有路由 */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
+          <Route path="/" element={<Daily />} />
+          <Route path="/daily" element={<Daily />} />
+          <Route path="/my-service" element={<ProtectedRoute><MyService /></ProtectedRoute>} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route
+            path="/order-list/:status"
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <OrderList />
+              </Suspense>
+            }
+          />
+          <Route path="/address-list" element={<ProtectedRoute><AddressList /></ProtectedRoute>} />
+          <Route path="/order/:orderNumber" element={<OrderDetail />} />
+          <Route path="/logistics/:orderNumber" element={<LogisticsTracker />} />
+          <Route path="/event/:id" element={<EventDetail />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
+          <Route path="/product/:id" element={<ProductDetail/>} />
+          <Route path="/search-results" element={<SearchResultsPage />} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/payment-password" element={<PaymentPassword />} />
+          <Route path="/content-creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
+          <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
+         
+          <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
+          <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
+          <Route path="/product-manage" element={<ProtectedRoute><ProductManagePage /></ProtectedRoute>} />
+          <Route path="/create-shop" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
+          <Route path="/edit-shop/:id" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />          
+          <Route path="/shop/:shopId" element={<ShopDetailPage />} />
+          <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
+          <Route path="/refund/apply/:orderId" element={<ProtectedRoute><RefundForm /></ProtectedRoute>} />
+          <Route path="/refund/:refundId" element={<ProtectedRoute><RefundDetail /></ProtectedRoute>} />
+          <Route path="/profile-edit" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+        </Routes>
+      </div>
+    </AuthProvider>
   );
 };
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
 
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired

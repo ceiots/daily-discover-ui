@@ -1,84 +1,96 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
-import { useTheme } from "../ThemeProvider";
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { useTheme } from '../ThemeProvider';
+import classNames from 'classnames';
 
 /**
- * Toast组件 - 优化版简洁高级UI/UX设计
- * 显示临时消息通知
+ * 轻提示组件
+ * 基于Tailwind CSS实现的统一轻提示组件
  */
-const Toast = ({ message, visible, onClose, duration = 4000, type = 'default' }) => {
+const Toast = ({
+  message,
+  type = 'info',
+  duration = 3000,
+  position = 'top',
+  onClose,
+  visible = false,
+  icon = null,
+  className = '',
+}) => {
+  const [isVisible, setIsVisible] = useState(visible);
   const theme = useTheme();
-  
+
+  // 类型样式映射
+  const typeClasses = {
+    info: 'bg-primary-500 text-white',
+    success: 'bg-green-500 text-white',
+    warning: 'bg-yellow-500 text-white',
+    error: 'bg-error-DEFAULT text-white',
+  };
+
+  // 位置样式映射
+  const positionClasses = {
+    top: 'top-4 left-1/2 transform -translate-x-1/2',
+    bottom: 'bottom-4 left-1/2 transform -translate-x-1/2',
+    'top-left': 'top-4 left-4',
+    'top-right': 'top-4 right-4',
+    'bottom-left': 'bottom-4 left-4',
+    'bottom-right': 'bottom-4 right-4',
+    center: 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2',
+  };
+
+  // 组合所有样式
+  const toastClasses = classNames(
+    'fixed z-50 px-4 py-2 rounded-md shadow-md transition-opacity duration-300',
+    typeClasses[type],
+    positionClasses[position],
+    {
+      'opacity-0 pointer-events-none': !isVisible,
+      'opacity-100': isVisible,
+    },
+    className
+  );
+
+  // 处理自动关闭
   useEffect(() => {
-    if (visible) {
-      const timer = setTimeout(onClose, duration);
+    setIsVisible(visible);
+
+    if (visible && duration > 0) {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        onClose && onClose();
+      }, duration);
+
       return () => clearTimeout(timer);
     }
   }, [visible, duration, onClose]);
 
-  if (!visible) return null;
-  
-  // 获取Toast类型样式
-  const getTypeStyles = () => {
-    switch(type) {
-      case 'success':
-        return {
-          backgroundColor: 'rgba(5, 150, 105, 0.95)',
-          borderLeft: `4px solid ${theme.colors.success}`
-        };
-      case 'error':
-        return {
-          backgroundColor: 'rgba(220, 38, 38, 0.95)',
-          borderLeft: `4px solid ${theme.colors.error}`
-        };
-      case 'warning':
-        return {
-          backgroundColor: 'rgba(245, 158, 11, 0.95)',
-          borderLeft: `4px solid ${theme.colors.warning}`
-        };
-      case 'info':
-        return {
-          backgroundColor: 'rgba(59, 130, 246, 0.95)',
-          borderLeft: `4px solid ${theme.colors.info}`
-        };
-      default:
-        return {
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          borderLeft: 'none'
-        };
-    }
+  // 处理图标
+  const renderIcon = () => {
+    if (!icon) return null;
+
+    return <span className="mr-2">{icon}</span>;
   };
 
   return (
-    <div 
-      style={{
-        position: 'fixed',
-        right: '24px',
-        top: '24px',
-        zIndex: 9999,
-        backgroundColor: getTypeStyles().backgroundColor,
-        color: '#FFFFFF',
-        padding: '12px 16px',
-        borderRadius: '6px',
-        boxShadow: theme.boxShadow.lg,
-        maxWidth: '320px',
-        animation: 'fadeIn 0.3s ease-out forwards',
-        borderLeft: getTypeStyles().borderLeft,
-        display: 'flex',
-        alignItems: 'center'
-      }}
-    >
-      {message}
+    <div className={toastClasses}>
+      <div className="flex items-center">
+        {renderIcon()}
+        <span>{message}</span>
+      </div>
     </div>
   );
 };
 
 Toast.propTypes = {
   message: PropTypes.string.isRequired,
-  visible: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  type: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
   duration: PropTypes.number,
-  type: PropTypes.oneOf(['default', 'success', 'error', 'warning', 'info'])
+  position: PropTypes.oneOf(['top', 'bottom', 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'center']),
+  onClose: PropTypes.func,
+  visible: PropTypes.bool,
+  icon: PropTypes.node,
+  className: PropTypes.string,
 };
 
 export default Toast;
