@@ -147,10 +147,10 @@ const LoginPage = () => {
         <Form.Frame style={{
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.5s ease-out"
+          transition: "all 0.4s ease-out"
         }}>
           <Form.Container>
-            <Form.BrandLogo />
+            <Form.BrandLogo size={65} />
             <Form.Title>登录账号</Form.Title>
             
             <form onSubmit={handleSubmit}>
@@ -205,10 +205,9 @@ const LoginPage = () => {
                 
                 <Link to="/forgot-password" style={{
                   fontSize: '12px',
-                  color: '#6f5bff',
+                  color: '#5B47E8',
                   textDecoration: 'none',
                   fontWeight: '500',
-                  position: 'relative'
                 }}>
                   忘记密码?
                 </Link>

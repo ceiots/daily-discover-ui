@@ -153,7 +153,7 @@ const ForgotPasswordPage = () => {
         <Form.Frame style={{
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.5s ease-out"
+          transition: "all 0.4s ease-out"
         }}>
           <Form.Container>
             <Form.BrandLogo />
@@ -223,7 +223,7 @@ const ForgotPasswordPage = () => {
                     </button>
                   </Form.InputGroup>
                   {errors.newPassword && <Form.ErrorMessage>{errors.newPassword}</Form.ErrorMessage>}
-                  <div style={{ fontSize: "11px", color: "#666", margin: "3px 0 0 2px" }}>
+                  <div style={{ fontSize: "11px", color: "#333", margin: "3px 0 0 2px" }}>
                     • 密码长度至少为8个字符，且包含数字和字母
                   </div>
                 </Form.Group>
@@ -263,7 +263,7 @@ const ForgotPasswordPage = () => {
                     style={{
                       background: "none",
                       border: "none",
-                      color: "#6f5bff",
+                      color: "#5B47E8",
                       fontSize: "12px",
                       cursor: "pointer",
                       textDecoration: "underline"

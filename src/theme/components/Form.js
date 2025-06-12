@@ -58,7 +58,7 @@ export const Label = styled.label`
   font-size: 12px;
   font-weight: 500;
   margin-bottom: 3px;
-  color: #555;
+  color: #333;
   letter-spacing: -0.2px;
 `;
 
@@ -72,7 +72,8 @@ export const Input = styled.input`
   border-radius: 8px;
   transition: all 0.2s ease;
   outline: none;
-  background-color: #fafafa;
+  background-color: #ffffff;
+  color: #222;
   
   &:focus {
     border-color: ${props => props.accentColor || THEME_COLOR};
@@ -87,7 +88,7 @@ export const Input = styled.input`
   `};
 
   &::placeholder {
-    color: #bbb;
+    color: #999;
     font-size: 12px;
   }
 `;
@@ -216,7 +217,7 @@ export const Checkbox = styled.input`
 // 复选框标签
 export const CheckboxLabel = styled.label`
   font-size: 11px;
-  color: #666;
+  color: #333;
   line-height: 1.5;
   
   a {
@@ -247,7 +248,7 @@ export const BottomLink = styled.div`
   text-align: center;
   margin: 18px 0;
   font-size: 12px;
-  color: #666;
+  color: #333;
   
   a {
     color: ${props => props.linkColor || THEME_COLOR};
@@ -352,8 +353,8 @@ export const FooterText = styled.div`
   text-align: center;
   margin-bottom: 14px;
   font-size: 10px;
-  color: #aaa;
-  opacity: 0.8;
+  color: #666;
+  opacity: 0.9;
 `;
 
 // App Logo 组件
@@ -507,7 +508,7 @@ export const BrandLogo = ({ size = 60 }) => (
     </div>
     <div style={{ 
       fontSize: '11px', 
-      color: '#888', 
+      color: '#555',
       marginTop: '2px',
       letterSpacing: '0.5px'
     }}>

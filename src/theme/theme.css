@@ -584,7 +584,7 @@
 /* 页面布局 */
 .page-container {
   min-height: 100vh;
-  background-color: var(--color-bg-light);
+  background-color: #F2EFFF;
 }
 
 .page-header {
