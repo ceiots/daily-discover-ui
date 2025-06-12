@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import instance from "../../utils/axios";
-import "./RegisterPage.css"; // 引入样式文件
-import { BasePage, Button } from "../../theme";
+import { BasePage, Form } from "../../theme";
+import { useTheme } from "../../theme";
+import "../../styles/toast.css";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -21,16 +24,18 @@ const RegisterPage = () => {
     code: "",
     codeType: 1
   });
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [animateCard, setAnimateCard] = useState(false);
 
-  const isValidPhoneNumber = (phone) => {
-    const phoneRegex = /^1[3-9]\d{9}$/;
-    return phoneRegex.test(phone);
-  };
+  // 页面加载动画
+  useEffect(() => {
+    setAnimateCard(true);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +44,7 @@ const RegisterPage = () => {
 
     if (!formData.mobile) {
       newErrors.phoneNumber = "请输入手机号";
-    } else if (!isValidPhoneNumber(formData.mobile)) {
+    } else if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
       newErrors.phoneNumber = "请输入正确的手机号格式";
     }
 
@@ -71,14 +76,14 @@ const RegisterPage = () => {
     setLoading(true);
     try {
       const response = await instance.post("/users/register", formData);
-              if (response.data.code === 200) {
-          showToast("注册成功");
-          setTimeout(() => {
-            navigate("/login");
-          }, 1500);
-        } else {
-          showToast(response.data.message || "注册失败");
-        }
+      if (response.data.code === 200) {
+        showToast("注册成功");
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
+      } else {
+        showToast(response.data.message || "注册失败");
+      }
     } catch (error) {
       console.error("注册错误:", error);
       showToast(error.response?.data?.message || "注册失败，请稍后重试");
@@ -87,8 +92,19 @@ const RegisterPage = () => {
     }
   };
 
-  const handleLogin = () => {
-    navigate("/login");
+  const handleGetCode = () => {
+    if (!formData.mobile) {
+      setErrors({...errors, phoneNumber: "请先输入手机号"});
+      return;
+    }
+    
+    if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+      setErrors({...errors, phoneNumber: "请输入正确的手机号格式"});
+      return;
+    }
+    
+    // 这里添加获取验证码逻辑
+    showToast("验证码已发送");
   };
 
   const showToast = (message) => {
@@ -102,189 +118,102 @@ const RegisterPage = () => {
     }
   };
 
-  const passwordRules = ["密码长度至少为8个字符, 包含数字和字母"];
-
   return (
-    <BasePage className="bg-white">
-      <div className="max-w-md mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">注册</h1>
-          <p className="text-gray-500 mt-1">每日发现，探索精彩</p>
-        </div>
+    <BasePage padding={false} showHeader={false}>
+      <Form.PageContainer>
+        <Form.Frame style={{
+          opacity: animateCard ? 1 : 0,
+          transform: animateCard ? "translateY(0)" : "translateY(20px)",
+          transition: "all 0.5s ease-out"
+        }}>
+          <Form.Container>
+            <Form.Title>注册账号</Form.Title>
+            
+            <form onSubmit={handleSubmit}>
+              <Form.Group>
+                <Form.Label>请输入手机号码</Form.Label>
+                <Form.Input
+                  type="tel"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                  placeholder="请输入手机号码"
+                  $error={!!errors.phoneNumber}
+                />
+                {errors.phoneNumber && <Form.ErrorMessage>{errors.phoneNumber}</Form.ErrorMessage>}
+              </Form.Group>
+              
+              <Form.Group>
+                <Form.Label>请输入验证码</Form.Label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <Form.Input
+                    type="text"
+                    name="code"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    placeholder="请输入验证码"
+                    style={{ flex: 1 }}
+                  />
+                  <Form.CodeButton onClick={handleGetCode}>
+                    获取验证码
+                  </Form.CodeButton>
+                </div>
+              </Form.Group>
+              
+              <Form.Group>
+                <Form.Label>请设置登录密码</Form.Label>
+                <Form.InputGroup>
+                  <Form.Input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="请设置登录密码"
+                    $error={!!errors.password}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                  >
+                    <Form.EyeIcon closed={!showPassword} />
+                  </button>
+                </Form.InputGroup>
+                {errors.password && <Form.ErrorMessage>{errors.password}</Form.ErrorMessage>}
+              </Form.Group>
+              
+              <Form.CheckboxContainer>
+                <Form.Checkbox
+                  type="checkbox"
+                  id="agreeToTerms"
+                  checked={agreeToTerms}
+                  onChange={() => setAgreeToTerms(!agreeToTerms)}
+                />
+                <Form.CheckboxLabel htmlFor="agreeToTerms">
+                  我已阅读并同意<Link to="/terms">《用户协议》</Link> 和<Link to="/privacy">《隐私政策》</Link>
+                </Form.CheckboxLabel>
+              </Form.CheckboxContainer>
+              {errors.terms && <Form.ErrorMessage>{errors.terms}</Form.ErrorMessage>}
+              
+              <Form.SubmitButton type="submit" disabled={loading}>
+                {loading && <Form.Loader />}
+                注册
+              </Form.SubmitButton>
+            </form>
+            
+            <Form.BottomLink>
+              已有账号?<Link to="/login">立即登录</Link>
+            </Form.BottomLink>
+            
+            <Form.FooterText>
+              Copyright © 2024 All Rights Reserved
+            </Form.FooterText>
+          </Form.Container>
+        </Form.Frame>
         
-        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">手机号</label>
-            <div className="relative">
-              <input
-                type="tel"
-                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.phoneNumber ? 'border-error-DEFAULT' : 'border-gray-300'
-                }`}
-                placeholder="请输入手机号码"
-                value={formData.mobile}
-                onChange={(e) =>
-                  setFormData({ ...formData, mobile: e.target.value })
-                }
-              />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <i className="ri-smartphone-line"></i>
-              </div>
-            </div>
-            {errors.phoneNumber && (
-              <p className="text-error-DEFAULT text-xs">{errors.phoneNumber}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">用户名</label>
-            <div className="relative">
-              <input
-                type="text"
-                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.username ? 'border-error-DEFAULT' : 'border-gray-300'
-                }`}
-                placeholder="请输入用户名"
-                value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
-              />
-            </div>
-            {errors.username && (
-              <p className="text-error-DEFAULT text-xs">{errors.username}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">昵称</label>
-            <div className="relative">
-              <input
-                type="text"
-                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.nickname ? 'border-error-DEFAULT' : 'border-gray-300'
-                }`}
-                placeholder="请输入昵称"
-                value={formData.nickname}
-                onChange={(e) =>
-                  setFormData({ ...formData, nickname: e.target.value })
-                }
-              />
-            </div>
-            {errors.nickname && (
-              <p className="text-error-DEFAULT text-xs">{errors.nickname}</p>
-            )}
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">密码</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.password ? 'border-error-DEFAULT' : 'border-gray-300'
-                }`}
-                placeholder="请输入密码"
-                value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                onClick={() => setShowPassword(!showPassword)}
-                tabIndex={-1}
-              >
-                <i className={`ri-${showPassword ? "eye-off" : "eye"}-line`} />
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-error-DEFAULT text-xs">{errors.password}</p>
-            )}
-            {passwordRules.map((rule, index) => (
-              <p key={index} className="text-gray-500 text-xs">- {rule}</p>
-            ))}
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">确认密码</label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.confirmPassword ? 'border-error-DEFAULT' : 'border-gray-300'
-                }`}
-                placeholder="请再次输入密码"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                tabIndex={-1}
-              >
-                <i className={`ri-${showConfirmPassword ? "eye-off" : "eye"}-line`} />
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="text-error-DEFAULT text-xs">{errors.confirmPassword}</p>
-            )}
-          </div>
-
-          <div className="pt-2">
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="agreement"
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-                className={`w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500 ${
-                  errors.terms ? 'border-error-DEFAULT' : ''
-                }`}
-              />
-              <label htmlFor="agreement" className="ml-2 text-sm text-gray-600">
-                注册即表示同意
-                <a href="#" className="text-primary-500 hover:underline mx-1">用户协议</a>
-                和
-                <a href="#" className="text-primary-500 hover:underline ml-1">隐私政策</a>
-              </label>
-            </div>
-            {errors.terms && (
-              <p className="text-error-DEFAULT text-xs mt-1">{errors.terms}</p>
-            )}
-          </div>
-
-          <Button 
-            type="primary" 
-            block 
-            loading={loading}
-            className="mt-6"
-          >
-            立即注册
-          </Button>
-        </form>
-        
-        <div className="text-center mt-6">
-          <span className="text-gray-600 text-sm">已有账号？</span>
-          <button 
-            className="text-primary-500 text-sm ml-1 hover:underline"
-            onClick={handleLogin}
-            type="button"
-          >
-            立即登录
-          </button>
-        </div>
-
-        {/* Toast 消息 */}
-        <div 
-          id="toast" 
-          className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-full opacity-0 transition-opacity duration-300"
-        ></div>
-      </div>
+        <div id="toast" className="toast-message"></div>
+      </Form.PageContainer>
     </BasePage>
   );
 };
