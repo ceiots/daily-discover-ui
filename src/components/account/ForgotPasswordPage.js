@@ -1,24 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import instance from "../../utils/axios";
-import "./ForgotPasswordPage.css"; // 引入样式文件
-import NavBar from "../../theme/components/NavBar"; // 引入NavBar组件
-import { BasePage, Button } from "../../theme";
+import { BasePage, Form } from "../../theme";
+import "../../styles/toast.css";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
+  const [animateCard, setAnimateCard] = useState(false);
+  
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    mobile: "",
     newPassword: "",
     confirmPassword: "",
-    verificationCode: "",
+    code: "",
   });
-  const [isVerificationCodeSent, setIsVerificationCodeSent] = useState(false);
+  
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = useState(1); // 1: 手机验证, 2: 设置新密码
 
+  // 页面加载动画
+  useEffect(() => {
+    setAnimateCard(true);
+  }, []);
+
+  // 倒计时效果
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -26,56 +35,64 @@ const ForgotPasswordPage = () => {
     }
   }, [countdown]);
 
-  const passwordRules = ["密码长度至少为8个字符, 包含数字和字母"];
-  const isValidPhoneNumber = (phone) => {
-    const phoneRegex = /^1[3-9]\d{9}$/;
-    return phoneRegex.test(phone);
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
   const handleGetVerificationCode = async () => {
-    if (!isValidPhoneNumber(formData.phoneNumber)) {
-        setErrors({ ...errors, phoneNumber: "请输入正确的手机号" });
-        return;
+    if (!formData.mobile) {
+      setErrors({ ...errors, mobile: "请输入手机号" });
+      return;
     }
+    
+    if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+      setErrors({ ...errors, mobile: "请输入正确的手机号格式" });
+      return;
+    }
+    
     try {
-        const response = await instance.post("/users/password/reset", {
-            mobile: formData.phoneNumber
-        });
-       
-        if (response.data.code === 200) {
-            setIsVerificationCodeSent(true);
-            setCountdown(60);
-        } else {
-            alert(response.data.message);
-        }
+      const response = await instance.post("/users/password/reset", {
+        mobile: formData.mobile
+      });
+      
+      if (response.data.code === 200) {
+        showToast("验证码已发送，请查收短信");
+        setCountdown(60);
+      } else {
+        showToast(response.data.message || "获取验证码失败");
+      }
     } catch (error) {
-        alert(error.response?.data?.message || "获取验证码失败");
+      showToast(error.response?.data?.message || "获取验证码失败，请稍后重试");
     }
-};
-  const handleSubmit = async (e) => {
+  };
+
+  const handleVerifyCode = (e) => {
     e.preventDefault();
-
+    
     const newErrors = {};
-
-    if (!formData.phoneNumber) {
-      newErrors.phoneNumber = "请输入手机号";
-    } else if (!isValidPhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = "请输入正确的手机号格式";
+    
+    if (!formData.mobile) {
+      newErrors.mobile = "请输入手机号";
+    } else if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+      newErrors.mobile = "请输入正确的手机号格式";
     }
-
-    if (!formData.verificationCode) {
-      newErrors.verificationCode = "请输入验证码";
+    
+    if (!formData.code) {
+      newErrors.code = "请输入验证码";
     }
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    // 模拟验证成功，进入下一步
+    setStep(2);
+  };
 
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    
+    const newErrors = {};
+    
     if (!formData.newPassword) {
-      newErrors.newPassword = "请输入密码";
+      newErrors.newPassword = "请输入新密码";
     } else if (formData.newPassword.length < 8) {
       newErrors.newPassword = "密码长度至少为8个字符";
     } else if (!/[0-9]/.test(formData.newPassword)) {
@@ -83,145 +100,197 @@ const ForgotPasswordPage = () => {
     } else if (!/[a-z]/.test(formData.newPassword)) {
       newErrors.newPassword = "密码必须包含至少一个小写字母";
     }
-
+    
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "请确认密码";
     } else if (formData.newPassword !== formData.confirmPassword) {
       newErrors.confirmPassword = "两次输入的密码不一致";
     }
-
+    
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
+    
+    setLoading(true);
+    
     try {
-      const response = await instance.post(
-        "/users/password/reset",
-        {
-          mobile: formData.phoneNumber,
-          code: formData.verificationCode,
-          password: formData.newPassword
-        }
-      );
-              if (response.data.code === 200) {
-          alert("密码重置成功，请重新登录");
+      const response = await instance.post("/users/password/reset", {
+        mobile: formData.mobile,
+        code: formData.code,
+        password: formData.newPassword
+      });
+      
+      if (response.data.code === 200) {
+        showToast("密码重置成功，请使用新密码登录");
+        setTimeout(() => {
           navigate("/login");
-        } else {
-          alert(response.data.message || "重置密码失败");
-        }
+        }, 2000);
+      } else {
+        showToast(response.data.message || "重置密码失败");
+      }
     } catch (error) {
-      alert("重置密码失败，请稍后重试");
+      showToast(error.response?.data?.message || "重置密码失败，请稍后重试");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLogin = () => {
-    navigate("/login");
+  const showToast = (message) => {
+    const toast = document.getElementById("toast");
+    if (toast) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
   };
+
   return (
-    <BasePage showHeader={true} className="login-page">
-      <div className="form-section">
-        <div className="login-form-container">
-          <h1 className="text-2xl font-bold text-center mb-2">找回密码</h1>
-          <p className="text-center text-neutral-500 mb-6">发现生活中的美好</p>
-          <input
-            className="theme-input"
-            placeholder="请输入手机号"
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-          />
-          <div className="flex space-x-1.5">
-            <input
-              className="theme-input"
-              type="text"
-              placeholder="请输入验证码"
-              name="verificationCode"
-              value={formData.verificationCode}
-              onChange={handleInputChange}
-            />
-            <button
-              type="button"
-              onClick={handleGetVerificationCode}
-              disabled={countdown > 0}
-              className={`forgot-button w-20 bg-primary text-white rounded-md ${
-                countdown > 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-primary/90"
-              } transition-colors`}
-            >
-              {countdown > 0 ? `${countdown}秒` : "获取验证码"}
-            </button>
-          </div>
-          {errors.verificationCode && (
-            <p className="error-message">{errors.verificationCode}</p>
-          )}
-          <div className="relative">
-            <input
-              className="theme-input"
-              type={showNewPassword ? "text" : "password"}
-              placeholder="请设置密码"
-              name="newPassword"
-              value={formData.newPassword}
-              onChange={handleInputChange}
-            />
-            <button 
-              type="button"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
-              onClick={() => setShowNewPassword(!showNewPassword)}
-            >
-              <i className={`${showNewPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
-            </button>
-            {errors.newPassword && (
-              <p className="error-message">{errors.newPassword}</p>
+    <BasePage padding={false} showHeader={false}>
+      <Form.PageContainer>
+        <Form.Frame style={{
+          opacity: animateCard ? 1 : 0,
+          transform: animateCard ? "translateY(0)" : "translateY(20px)",
+          transition: "all 0.5s ease-out"
+        }}>
+          <Form.Container>
+            <Form.BrandLogo />
+            <Form.Title>{step === 1 ? "找回密码" : "设置新密码"}</Form.Title>
+            
+            {step === 1 ? (
+              <form onSubmit={handleVerifyCode}>
+                <Form.Group>
+                  <Form.Label>手机号</Form.Label>
+                  <Form.Input
+                    type="tel"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                    placeholder="请输入手机号"
+                    $error={!!errors.mobile}
+                  />
+                  {errors.mobile && <Form.ErrorMessage>{errors.mobile}</Form.ErrorMessage>}
+                </Form.Group>
+                
+                <Form.Group>
+                  <Form.Label>验证码</Form.Label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <Form.Input
+                      type="text"
+                      name="code"
+                      value={formData.code}
+                      onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                      placeholder="请输入验证码"
+                      style={{ flex: 1 }}
+                      $error={!!errors.code}
+                    />
+                    <Form.CodeButton 
+                      onClick={handleGetVerificationCode}
+                      disabled={countdown > 0}
+                    >
+                      {countdown > 0 ? `${countdown}秒` : "获取验证码"}
+                    </Form.CodeButton>
+                  </div>
+                  {errors.code && <Form.ErrorMessage>{errors.code}</Form.ErrorMessage>}
+                </Form.Group>
+                
+                <Form.SubmitButton type="submit">
+                  下一步
+                </Form.SubmitButton>
+              </form>
+            ) : (
+              <form onSubmit={handleResetPassword}>
+                <Form.Group>
+                  <Form.Label>设置新密码</Form.Label>
+                  <Form.InputGroup>
+                    <Form.Input
+                      type={showNewPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={formData.newPassword}
+                      onChange={(e) => setFormData({ ...formData, newPassword: e.target.value })}
+                      placeholder="请设置新密码"
+                      $error={!!errors.newPassword}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      aria-label={showNewPassword ? "隐藏密码" : "显示密码"}
+                    >
+                      <Form.EyeIcon closed={!showNewPassword} />
+                    </button>
+                  </Form.InputGroup>
+                  {errors.newPassword && <Form.ErrorMessage>{errors.newPassword}</Form.ErrorMessage>}
+                  <div style={{ fontSize: "11px", color: "#666", margin: "3px 0 0 2px" }}>
+                    • 密码长度至少为8个字符，且包含数字和字母
+                  </div>
+                </Form.Group>
+                
+                <Form.Group>
+                  <Form.Label>确认密码</Form.Label>
+                  <Form.InputGroup>
+                    <Form.Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      placeholder="请再次输入密码"
+                      $error={!!errors.confirmPassword}
+                    />
+                    <button
+                      type="button"
+                      className="toggle-password"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
+                    >
+                      <Form.EyeIcon closed={!showConfirmPassword} />
+                    </button>
+                  </Form.InputGroup>
+                  {errors.confirmPassword && <Form.ErrorMessage>{errors.confirmPassword}</Form.ErrorMessage>}
+                </Form.Group>
+                
+                <Form.SubmitButton type="submit" disabled={loading}>
+                  {loading && <Form.Loader />}
+                  重置密码
+                </Form.SubmitButton>
+                
+                <div style={{ marginTop: "10px", textAlign: "center" }}>
+                  <button 
+                    type="button"
+                    onClick={() => setStep(1)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "#6f5bff",
+                      fontSize: "12px",
+                      cursor: "pointer",
+                      textDecoration: "underline"
+                    }}
+                  >
+                    返回上一步
+                  </button>
+                </div>
+              </form>
             )}
-            {passwordRules.map((rule, index) => (
-              <p key={index} className="rule-text">- {rule}</p>
-            ))}
-          </div>
-          <div className="relative">
-            <input
-              className="theme-input"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="请再次输入密码"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-            />
-            <button 
-              type="button"
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-400"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
-              <i className={`${showConfirmPassword ? "ri-eye-off-line" : "ri-eye-line"} text-xs`}></i>
-            </button>
-            {errors.confirmPassword && (
-              <p className="error-message">{errors.confirmPassword}</p>
-            )}
-          </div>
-          <Button
-            variant="primary"
-            block
-            onClick={handleSubmit}
-          >
-            提交
-          </Button>
-          <div className="flex justify-between mt-2 mb-6">
-            <a
-              href="#"
-              className="link-text text-gray-500"
-              onClick={handleLogin}
-            >
-              返回登录
-            </a>
-            <div className="space-x-2">
-              <a href="#" className="link-text text-gray-500">
-                用户协议
-              </a>
-              <a href="#" className="link-text text-gray-500">
-                隐私政策
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+            
+            <Form.BottomLink>
+              <Link to="/login">返回登录</Link>
+            </Form.BottomLink>
+            
+            <Form.BrandText>
+              安全保障，轻松找回
+            </Form.BrandText>
+            
+            <Form.FooterText>
+              Copyright © {Form.getCurrentYear()} All Rights Reserved
+            </Form.FooterText>
+          </Form.Container>
+        </Form.Frame>
+        
+        <div id="toast" className="toast-message"></div>
+      </Form.PageContainer>
     </BasePage>
   );
 };

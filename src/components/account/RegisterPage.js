@@ -31,11 +31,20 @@ const RegisterPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [animateCard, setAnimateCard] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   // 页面加载动画
   useEffect(() => {
     setAnimateCard(true);
   }, []);
+
+  // 倒计时效果
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,6 +114,7 @@ const RegisterPage = () => {
     
     // 这里添加获取验证码逻辑
     showToast("验证码已发送");
+    setCountdown(60);
   };
 
   const showToast = (message) => {
@@ -127,6 +137,7 @@ const RegisterPage = () => {
           transition: "all 0.5s ease-out"
         }}>
           <Form.Container>
+            <Form.BrandLogo />
             <Form.Title>注册账号</Form.Title>
             
             <form onSubmit={handleSubmit}>
@@ -154,8 +165,11 @@ const RegisterPage = () => {
                     placeholder="请输入验证码"
                     style={{ flex: 1 }}
                   />
-                  <Form.CodeButton onClick={handleGetCode}>
-                    获取验证码
+                  <Form.CodeButton 
+                    onClick={handleGetCode} 
+                    disabled={countdown > 0}
+                  >
+                    {countdown > 0 ? `${countdown}秒` : "获取验证码"}
                   </Form.CodeButton>
                 </div>
               </Form.Group>
@@ -181,6 +195,32 @@ const RegisterPage = () => {
                   </button>
                 </Form.InputGroup>
                 {errors.password && <Form.ErrorMessage>{errors.password}</Form.ErrorMessage>}
+                <div style={{ fontSize: "11px", color: "#666", margin: "3px 0 0 2px" }}>
+                  • 密码长度至少为8个字符，且包含数字和字母
+                </div>
+              </Form.Group>
+              
+              <Form.Group>
+                <Form.Label>确认密码</Form.Label>
+                <Form.InputGroup>
+                  <Form.Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    placeholder="请再次输入密码"
+                    $error={!!errors.confirmPassword}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
+                  >
+                    <Form.EyeIcon closed={!showConfirmPassword} />
+                  </button>
+                </Form.InputGroup>
+                {errors.confirmPassword && <Form.ErrorMessage>{errors.confirmPassword}</Form.ErrorMessage>}
               </Form.Group>
               
               <Form.CheckboxContainer>
@@ -207,7 +247,7 @@ const RegisterPage = () => {
             </Form.BottomLink>
             
             <Form.FooterText>
-              Copyright © 2024 All Rights Reserved
+              Copyright © {Form.getCurrentYear()} All Rights Reserved
             </Form.FooterText>
           </Form.Container>
         </Form.Frame>
