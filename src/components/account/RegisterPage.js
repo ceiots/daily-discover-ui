@@ -4,10 +4,23 @@ import instance from "../../utils/axios";
 import { BasePage, Form } from "../../theme";
 import { useTheme } from "../../theme";
 import "../../styles/toast.css";
+import PropTypes from "prop-types";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
+  
+  // 定义以 #5B47E8 为主色调的简洁配色方案
+  const colors = {
+    primary: "#6C5CE7", // 主色调 - 更亮的紫色
+    primaryLight: "#F8F9FF", // 更亮的背景色，确保文字清晰可见
+    primaryDark: "#5649C0", // 深紫色
+    white: "#FFFFFF", // 纯白色
+    gray100: "#F7F7FC", // 最浅灰色
+    gray200: "#EEEEF5", // 浅灰色，用于边框
+    gray700: "#4E4B66", // 次要文字颜色
+    gray900: "#14142B", // 主要文字颜色
+  };
   
   const [formData, setFormData] = useState({
     username: "",
@@ -129,20 +142,52 @@ const RegisterPage = () => {
   };
 
   return (
-    <BasePage padding={false} showHeader={false}>
-      <Form.PageContainer>
+    <BasePage padding={false} showHeader={false} style={{ backgroundColor: colors.primaryLight }}>
+      <Form.PageContainer style={{ backgroundColor: colors.primaryLight }}>
         <Form.Frame style={{
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.5s ease-out"
+          transition: "all 0.5s ease-out",
+          position: 'relative',
+          backgroundColor: colors.white,
+          boxShadow: '0 6px 16px rgba(108, 92, 231, 0.08)',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          maxWidth: '380px',
+          margin: '0 auto'
         }}>
-          <Form.Container>
-            <Form.BrandLogo />
-            <Form.Title>注册账号</Form.Title>
+          {/* 顶部装饰 */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            backgroundColor: colors.primary,
+            zIndex: 1
+          }} />
+          
+          <Form.Container style={{ position: 'relative', zIndex: 3, padding: '24px 22px' }}>
+            <Form.Title style={{
+              color: colors.gray900,
+              fontWeight: '600',
+              fontSize: '20px',
+              marginBottom: '20px',
+              textAlign: 'center'
+            }}>
+              注册账号
+            </Form.Title>
             
             <form onSubmit={handleSubmit}>
-              <Form.Group>
-                <Form.Label>请输入手机号码</Form.Label>
+              <Form.Group style={{ marginBottom: '14px' }}>
+                <Form.Label style={{ 
+                  color: colors.gray900, 
+                  fontWeight: '500', 
+                  fontSize: '13px',
+                  marginBottom: '6px' 
+                }}>
+                  请输入手机号码
+                </Form.Label>
                 <Form.Input
                   type="tel"
                   name="mobile"
@@ -150,32 +195,75 @@ const RegisterPage = () => {
                   onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                   placeholder="请输入手机号码"
                   $error={!!errors.phoneNumber}
+                  style={{
+                    borderRadius: '6px',
+                    border: `1px solid ${colors.gray200}`,
+                    backgroundColor: colors.white,
+                    color: colors.gray900,
+                    padding: '10px 14px',
+                    fontSize: '13px',
+                    height: '38px'
+                  }}
                 />
-                {errors.phoneNumber && <Form.ErrorMessage>{errors.phoneNumber}</Form.ErrorMessage>}
+                {errors.phoneNumber && <Form.ErrorMessage style={{ fontSize: '12px' }}>{errors.phoneNumber}</Form.ErrorMessage>}
               </Form.Group>
               
-              <Form.Group>
-                <Form.Label>请输入验证码</Form.Label>
-                <div style={{ display: 'flex', gap: '10px' }}>
+              <Form.Group style={{ marginBottom: '14px' }}>
+                <Form.Label style={{ 
+                  color: colors.gray900, 
+                  fontWeight: '500', 
+                  fontSize: '13px',
+                  marginBottom: '6px' 
+                }}>
+                  请输入验证码
+                </Form.Label>
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <Form.Input
                     type="text"
                     name="code"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     placeholder="请输入验证码"
-                    style={{ flex: 1 }}
+                    style={{ 
+                      flex: 1,
+                      borderRadius: '6px',
+                      border: `1px solid ${colors.gray200}`,
+                      backgroundColor: colors.white,
+                      color: colors.gray900,
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      height: '38px'
+                    }}
                   />
                   <Form.CodeButton 
                     onClick={handleGetCode} 
                     disabled={countdown > 0}
+                    style={{
+                      borderRadius: '6px',
+                      backgroundColor: countdown > 0 ? colors.gray200 : colors.primary,
+                      color: countdown > 0 ? colors.gray700 : colors.white,
+                      border: 'none',
+                      fontWeight: '500',
+                      padding: '0 12px',
+                      fontSize: '12px',
+                      minWidth: '100px',
+                      height: '38px'
+                    }}
                   >
                     {countdown > 0 ? `${countdown}秒` : "获取验证码"}
                   </Form.CodeButton>
                 </div>
               </Form.Group>
               
-              <Form.Group>
-                <Form.Label>请设置登录密码</Form.Label>
+              <Form.Group style={{ marginBottom: '14px' }}>
+                <Form.Label style={{ 
+                  color: colors.gray900, 
+                  fontWeight: '500', 
+                  fontSize: '13px',
+                  marginBottom: '6px' 
+                }}>
+                  请设置登录密码
+                </Form.Label>
                 <Form.InputGroup>
                   <Form.Input
                     type={showPassword ? "text" : "password"}
@@ -184,24 +272,41 @@ const RegisterPage = () => {
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="请设置登录密码"
                     $error={!!errors.password}
+                    style={{
+                      borderRadius: '6px',
+                      border: `1px solid ${colors.gray200}`,
+                      backgroundColor: colors.white,
+                      color: colors.gray900,
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      height: '38px'
+                    }}
                   />
                   <button
                     type="button"
                     className="toggle-password"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "隐藏密码" : "显示密码"}
+                    style={{ color: colors.primary }}
                   >
                     <Form.EyeIcon closed={!showPassword} />
                   </button>
                 </Form.InputGroup>
-                {errors.password && <Form.ErrorMessage>{errors.password}</Form.ErrorMessage>}
-                <div style={{ fontSize: "11px", color: "#666", margin: "3px 0 0 2px" }}>
+                {errors.password && <Form.ErrorMessage style={{ fontSize: '12px' }}>{errors.password}</Form.ErrorMessage>}
+                <div style={{ fontSize: "11px", color: colors.gray700, margin: "3px 0 0 2px" }}>
                   • 密码长度至少为8个字符，且包含数字和字母
                 </div>
               </Form.Group>
               
-              <Form.Group>
-                <Form.Label>确认密码</Form.Label>
+              <Form.Group style={{ marginBottom: '14px' }}>
+                <Form.Label style={{ 
+                  color: colors.gray900, 
+                  fontWeight: '500', 
+                  fontSize: '13px',
+                  marginBottom: '6px' 
+                }}>
+                  确认密码
+                </Form.Label>
                 <Form.InputGroup>
                   <Form.Input
                     type={showConfirmPassword ? "text" : "password"}
@@ -210,43 +315,81 @@ const RegisterPage = () => {
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     placeholder="请再次输入密码"
                     $error={!!errors.confirmPassword}
+                    style={{
+                      borderRadius: '6px',
+                      border: `1px solid ${colors.gray200}`,
+                      backgroundColor: colors.white,
+                      color: colors.gray900,
+                      padding: '10px 14px',
+                      fontSize: '13px',
+                      height: '38px'
+                    }}
                   />
                   <button
                     type="button"
                     className="toggle-password"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
+                    style={{ color: colors.primary }}
                   >
                     <Form.EyeIcon closed={!showConfirmPassword} />
                   </button>
                 </Form.InputGroup>
-                {errors.confirmPassword && <Form.ErrorMessage>{errors.confirmPassword}</Form.ErrorMessage>}
+                {errors.confirmPassword && <Form.ErrorMessage style={{ fontSize: '12px' }}>{errors.confirmPassword}</Form.ErrorMessage>}
               </Form.Group>
               
-              <Form.CheckboxContainer>
+              <Form.CheckboxContainer style={{ marginTop: '12px' }}>
                 <Form.Checkbox
                   type="checkbox"
                   id="agreeToTerms"
                   checked={agreeToTerms}
                   onChange={() => setAgreeToTerms(!agreeToTerms)}
+                  style={{ accentColor: colors.primary }}
                 />
-                <Form.CheckboxLabel htmlFor="agreeToTerms">
-                  我已阅读并同意<Link to="/terms">《用户协议》</Link> 和<Link to="/privacy">《隐私政策》</Link>
+                <Form.CheckboxLabel htmlFor="agreeToTerms" style={{ fontSize: '12px', color: colors.gray700 }}>
+                  我已阅读并同意<Link to="/terms" style={{ color: colors.primary, fontWeight: '500' }}>《用户协议》</Link> 和<Link to="/privacy" style={{ color: colors.primary, fontWeight: '500' }}>《隐私政策》</Link>
                 </Form.CheckboxLabel>
               </Form.CheckboxContainer>
-              {errors.terms && <Form.ErrorMessage>{errors.terms}</Form.ErrorMessage>}
+              {errors.terms && <Form.ErrorMessage style={{ fontSize: '12px' }}>{errors.terms}</Form.ErrorMessage>}
               
-              <Form.SubmitButton type="submit" disabled={loading}>
+              <Form.SubmitButton 
+                type="submit" 
+                disabled={loading}
+                style={{
+                  marginTop: '20px',
+                  backgroundColor: colors.primary,
+                  borderRadius: '6px',
+                  padding: '12px',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  color: colors.white,
+                  border: 'none',
+                  width: '100%',
+                  boxShadow: '0 4px 8px rgba(108, 92, 231, 0.15)',
+                  height: '40px'
+                }}
+              >
                 {loading && <Form.Loader />}
                 注册
               </Form.SubmitButton>
             </form>
             
-            <Form.BottomLink>
-              已有账号?<Link to="/login">立即登录</Link>
+            <Form.BottomLink style={{ 
+              marginTop: '16px', 
+              fontSize: '12px', 
+              color: colors.gray700,
+              textAlign: 'center' 
+            }}>
+              已有账号?<Link to="/login" style={{ color: colors.primary, fontWeight: '500', marginLeft: '4px' }}>立即登录</Link>
             </Form.BottomLink>
             
-            <Form.FooterText>
+            <Form.FooterText style={{ 
+              marginTop: '14px',
+              fontSize: '11px',
+              color: colors.gray700,
+              textAlign: 'center',
+              opacity: 0.8
+            }}>
               Copyright © {Form.getCurrentYear()} All Rights Reserved
             </Form.FooterText>
           </Form.Container>
