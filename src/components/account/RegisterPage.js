@@ -10,16 +10,15 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   
-  // 定义以 #5B47E8 为主色调的简洁配色方案
+  // 定义以 #d85916 为主色调的简洁配色方案
   const colors = {
-    primary: "#6C5CE7", // 主色调 - 更亮的紫色
-    primaryLight: "#F8F9FF", // 更亮的背景色，确保文字清晰可见
-    primaryDark: "#5649C0", // 深紫色
-    white: "#FFFFFF", // 纯白色
-    gray100: "#F7F7FC", // 最浅灰色
-    gray200: "#EEEEF5", // 浅灰色，用于边框
-    gray700: "#4E4B66", // 次要文字颜色
-    gray900: "#14142B", // 主要文字颜色
+    primary: "#5B47E8",      // 铁棕，主色/按钮/高亮
+    background: "#fffcce",   // 初桃粉红，页面背景
+    white: "#FFFFFF",        // 白色，卡片/输入框背景
+    border: "#5B47E8",       // 边框色同主色
+    textMain: "#5B47E8",     // 主文字色
+    textSub: "#5B47E8",      // 次要文字色（铁棕加深）
+    error: "#d85916"         // 错误提示色
   };
   
   const [formData, setFormData] = useState({
@@ -142,8 +141,8 @@ const RegisterPage = () => {
   };
 
   return (
-    <BasePage padding={false} showHeader={false} style={{ backgroundColor: colors.primaryLight }}>
-      <Form.PageContainer style={{ backgroundColor: colors.primaryLight }}>
+    <BasePage padding={false} showHeader={false} style={{ backgroundColor: colors.background }}>
+      <Form.PageContainer style={{ backgroundColor: colors.background }}>
         <Form.Frame style={{
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
@@ -169,7 +168,7 @@ const RegisterPage = () => {
           
           <Form.Container style={{ position: 'relative', zIndex: 3, padding: '24px 22px' }}>
             <Form.Title style={{
-              color: colors.gray900,
+              color: colors.textMain,
               fontWeight: '600',
               fontSize: '20px',
               marginBottom: '20px',
@@ -181,7 +180,7 @@ const RegisterPage = () => {
             <form onSubmit={handleSubmit}>
               <Form.Group style={{ marginBottom: '14px' }}>
                 <Form.Label style={{ 
-                  color: colors.gray900, 
+                  color: colors.textMain, 
                   fontWeight: '500', 
                   fontSize: '13px',
                   marginBottom: '6px' 
@@ -197,9 +196,9 @@ const RegisterPage = () => {
                   $error={!!errors.phoneNumber}
                   style={{
                     borderRadius: '6px',
-                    border: `1px solid ${colors.gray200}`,
+                    border: `1px solid ${colors.border}`,
                     backgroundColor: colors.white,
-                    color: colors.gray900,
+                    color: colors.textMain,
                     padding: '10px 14px',
                     fontSize: '13px',
                     height: '38px'
@@ -210,7 +209,7 @@ const RegisterPage = () => {
               
               <Form.Group style={{ marginBottom: '14px' }}>
                 <Form.Label style={{ 
-                  color: colors.gray900, 
+                  color: colors.textMain, 
                   fontWeight: '500', 
                   fontSize: '13px',
                   marginBottom: '6px' 
@@ -227,9 +226,9 @@ const RegisterPage = () => {
                     style={{ 
                       flex: 1,
                       borderRadius: '6px',
-                      border: `1px solid ${colors.gray200}`,
+                      border: `1px solid ${colors.border}`,
                       backgroundColor: colors.white,
-                      color: colors.gray900,
+                      color: colors.textMain,
                       padding: '10px 14px',
                       fontSize: '13px',
                       height: '38px'
@@ -240,8 +239,8 @@ const RegisterPage = () => {
                     disabled={countdown > 0}
                     style={{
                       borderRadius: '6px',
-                      backgroundColor: countdown > 0 ? colors.gray200 : colors.primary,
-                      color: countdown > 0 ? colors.gray700 : colors.white,
+                      backgroundColor: colors.primary,
+                      color: colors.white,
                       border: 'none',
                       fontWeight: '500',
                       padding: '0 12px',
@@ -257,7 +256,7 @@ const RegisterPage = () => {
               
               <Form.Group style={{ marginBottom: '14px' }}>
                 <Form.Label style={{ 
-                  color: colors.gray900, 
+                  color: colors.textMain, 
                   fontWeight: '500', 
                   fontSize: '13px',
                   marginBottom: '6px' 
@@ -274,9 +273,9 @@ const RegisterPage = () => {
                     $error={!!errors.password}
                     style={{
                       borderRadius: '6px',
-                      border: `1px solid ${colors.gray200}`,
+                      border: `1px solid ${colors.border}`,
                       backgroundColor: colors.white,
-                      color: colors.gray900,
+                      color: colors.textMain,
                       padding: '10px 14px',
                       fontSize: '13px',
                       height: '38px'
@@ -293,14 +292,14 @@ const RegisterPage = () => {
                   </button>
                 </Form.InputGroup>
                 {errors.password && <Form.ErrorMessage style={{ fontSize: '12px' }}>{errors.password}</Form.ErrorMessage>}
-                <div style={{ fontSize: "11px", color: colors.gray700, margin: "3px 0 0 2px" }}>
+                <div style={{ fontSize: "11px", color: colors.textSub, margin: "3px 0 0 2px" }}>
                   • 密码长度至少为8个字符，且包含数字和字母
                 </div>
               </Form.Group>
               
               <Form.Group style={{ marginBottom: '14px' }}>
                 <Form.Label style={{ 
-                  color: colors.gray900, 
+                  color: colors.textMain, 
                   fontWeight: '500', 
                   fontSize: '13px',
                   marginBottom: '6px' 
@@ -317,9 +316,9 @@ const RegisterPage = () => {
                     $error={!!errors.confirmPassword}
                     style={{
                       borderRadius: '6px',
-                      border: `1px solid ${colors.gray200}`,
+                      border: `1px solid ${colors.border}`,
                       backgroundColor: colors.white,
-                      color: colors.gray900,
+                      color: colors.textMain,
                       padding: '10px 14px',
                       fontSize: '13px',
                       height: '38px'
@@ -346,7 +345,7 @@ const RegisterPage = () => {
                   onChange={() => setAgreeToTerms(!agreeToTerms)}
                   style={{ accentColor: colors.primary }}
                 />
-                <Form.CheckboxLabel htmlFor="agreeToTerms" style={{ fontSize: '12px', color: colors.gray700 }}>
+                <Form.CheckboxLabel htmlFor="agreeToTerms" style={{ fontSize: '12px', color: colors.textSub }}>
                   我已阅读并同意<Link to="/terms" style={{ color: colors.primary, fontWeight: '500' }}>《用户协议》</Link> 和<Link to="/privacy" style={{ color: colors.primary, fontWeight: '500' }}>《隐私政策》</Link>
                 </Form.CheckboxLabel>
               </Form.CheckboxContainer>
@@ -365,7 +364,7 @@ const RegisterPage = () => {
                   color: colors.white,
                   border: 'none',
                   width: '100%',
-                  boxShadow: '0 4px 8px rgba(108, 92, 231, 0.15)',
+                  boxShadow: 'none',
                   height: '40px'
                 }}
               >
@@ -377,7 +376,7 @@ const RegisterPage = () => {
             <Form.BottomLink style={{ 
               marginTop: '16px', 
               fontSize: '12px', 
-              color: colors.gray700,
+              color: colors.textSub,
               textAlign: 'center' 
             }}>
               已有账号?<Link to="/login" style={{ color: colors.primary, fontWeight: '500', marginLeft: '4px' }}>立即登录</Link>
@@ -386,7 +385,7 @@ const RegisterPage = () => {
             <Form.FooterText style={{ 
               marginTop: '14px',
               fontSize: '11px',
-              color: colors.gray700,
+              color: colors.textSub,
               textAlign: 'center',
               opacity: 0.8
             }}>
