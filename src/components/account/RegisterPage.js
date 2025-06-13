@@ -171,7 +171,7 @@ const RegisterPage = () => {
           
           <Form.Container style={{ position: 'relative', zIndex: 3, padding: '24px 22px' }}>
             <Form.Title style={{
-              color: colors.textMain,
+              color: colors.primary,
               fontWeight: '600',
               fontSize: '20px',
               marginBottom: '20px',
