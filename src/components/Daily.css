@@ -1,5 +1,4 @@
 /* 优化整体字体、排版和背景，使其更加协调美观 */
-@import url("../theme/theme.css");
 
 :root {
   /* 这里不再定义颜色变量，全部用 theme.css 变量 */

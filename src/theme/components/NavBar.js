@@ -1,11 +1,129 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import './NavBar.css';
-import { useAuth } from '../../App'; // 确保已导入 useAuth
+import styled from 'styled-components';
+import { useAuth } from '../../App';
+import { useTheme } from '../useTheme';
 
 // 默认头像 - 与 Profile 组件保持一致
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
+
+// 样式组件
+const NavContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background-color: ${({ theme }) => theme.colors.white};
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  ${({ className }) => className && className}
+`;
+
+const NavWrapper = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 0;
+  height: 56px;
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 2px;
+    background: transparent;
+  }
+`;
+
+const NavItem = styled(Link)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.textSub};
+  position: relative;
+  transition: all 0.2s ease;
+  flex: 1;
+  
+  &:hover {
+    transform: translateY(-2px);
+    color: ${({ theme }) => theme.colors.primary};
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  i {
+    font-size: 18px;
+    margin-bottom: 3px;
+  }
+  
+  span {
+    font-size: 12px;
+    font-weight: 500;
+  }
+`;
+
+const NavIndicator = styled.div`
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: ${({ theme }) => theme.colors.primary};
+  border-radius: 3px;
+  transition: all 0.3s ease;
+`;
+
+const CenterButtonContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  z-index: 2;
+`;
+
+const CenterButton = styled.a`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: white;
+  box-shadow: 0 4px 10px rgba(91, 71, 232, 0.3);
+  transition: all 0.3s ease;
+  transform: translateY(-8px);
+  
+  &:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(91, 71, 232, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(-6px) scale(0.95);
+  }
+  
+  i {
+    font-size: 18px;
+  }
+`;
 
 /**
  * 底部导航栏组件 - 优化版简洁高级UI/UX设计
@@ -13,8 +131,8 @@ const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy
 const NavBar = ({ className }) => {
   const location = useLocation();
   const path = location.pathname;
-  
   const { isLoggedIn, userInfo } = useAuth();
+  const { theme } = useTheme();
   
   // 判断当前路径是否为某个特定路径或其子路径
   const isActive = (route) => {
@@ -62,23 +180,27 @@ const NavBar = ({ className }) => {
   }, [isLoggedIn]); // 只依赖 isLoggedIn，移除 userInfo
 
   return (
-    <div className={`nav-bar-container ${className || ''}`}>
-      <div className="nav-bar">
-        <Link to="/daily" className={`nav-item ${isActive('/') || isActive('/daily') ? 'active' : ''}`}>
+    <NavContainer className={className} theme={theme}>
+      <NavWrapper>
+        <NavItem 
+          to="/daily" 
+          active={isActive('/') || isActive('/daily')} 
+          theme={theme}
+        >
           <i className="fas fa-calendar-day"></i>
           <span>每日</span>
-          {(isActive('/') || isActive('/daily')) && <div className="nav-indicator"></div>}
-        </Link>
+          {(isActive('/') || isActive('/daily')) && <NavIndicator theme={theme} />}
+        </NavItem>
         
-        <div className="nav-center-button-container">
-          <a href="#" className="nav-center-button" onClick={handleCenterClick}>
+        <CenterButtonContainer>
+          <CenterButton href="#" onClick={handleCenterClick} theme={theme}>
             {!isNotAuthPage && isLoggedIn && userInfo?.avatar ? (
               <img
                 src={userInfo.avatar}
                 alt="头像"
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
                   borderRadius: '50%',
                   objectFit: 'cover',
                   border: '2px solid #fff',
@@ -86,18 +208,22 @@ const NavBar = ({ className }) => {
                 }}
               />
             ) : (
-            <i className="fas fa-qrcode"></i>
+              <i className="fas fa-qrcode"></i>
             )}
-          </a>
-        </div>
+          </CenterButton>
+        </CenterButtonContainer>
         
-        <Link to="/discover" className={`nav-item ${isActive('/discover') ? 'active' : ''}`}>
+        <NavItem 
+          to="/discover" 
+          active={isActive('/discover')} 
+          theme={theme}
+        >
           <i className="fas fa-compass"></i>
           <span>发现</span>
-          {isActive('/discover') && <div className="nav-indicator"></div>}
-        </Link>
-      </div>
-    </div>
+          {isActive('/discover') && <NavIndicator theme={theme} />}
+        </NavItem>
+      </NavWrapper>
+    </NavContainer>
   );
 };
 

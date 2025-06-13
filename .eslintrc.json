@@ -32,7 +32,8 @@
     // 规则
     "rules": {
       // 禁用未使用变量的规则
-      "no-unused-vars": "off"
+      "no-unused-vars": "off",
+      "react/prop-types": "off"
     },
   "globals": {
     "process": "readonly"

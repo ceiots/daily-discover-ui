@@ -1,7 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { useTheme } from '../ThemeProvider';
-import '../theme.css';
+import { useTheme } from '../useTheme';
 
 /**
  * ShopInfo component - 优化版简洁高级UI/UX设计

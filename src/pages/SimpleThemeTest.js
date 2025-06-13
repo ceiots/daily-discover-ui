@@ -1,5 +1,12 @@
-import React from 'react';
-import { useTheme } from '../theme/ThemeProvider';
+/**
+ * 简单的主题测试页面
+ */
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { useTheme } from '../theme/useTheme';
+import TopBar from '../theme/components/TopBar';
+import Button from '../theme/components/Button';
+import { BasePage } from '../theme';
 
 const SimpleThemeTest = () => {
   const { mode, toggleMode, current } = useTheme();

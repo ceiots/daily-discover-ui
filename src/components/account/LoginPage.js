@@ -3,7 +3,6 @@ import { useAuth } from '../../App';
 import { Link, useNavigate } from 'react-router-dom';
 import instance from '../../utils/axios';
 import { BasePage, Form } from '../../theme';
-import "../../styles/toast.css";
 
 const LoginPage = () => {
   const { refreshUserInfo } = useAuth();

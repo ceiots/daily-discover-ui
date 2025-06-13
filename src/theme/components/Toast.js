@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { useTheme } from '../ThemeProvider';
+import { useTheme } from '../useTheme';
 import classNames from 'classnames';
 
 /**

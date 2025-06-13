@@ -1,175 +1,113 @@
-import React from "react";
-import PropTypes from 'prop-types';
-import "./FormComponents.css";
+import React from 'react';
+import styled from 'styled-components';
+import { theme } from '../../theme/tokens';
 
-// 输入框组件
-export const Input = ({ 
-  type = "text", 
-  name, 
-  placeholder, 
-  value, 
-  onChange, 
-  error, 
-  fullWidth, 
-  size = "default",
-  prefix,
-  min,
-  max,
-  className = "",
-  ...props 
-}) => {
-  const sizeClass = size === "small" ? "form-input-sm" : "form-input";
+/**
+ * 输入框组件
+ */
+export const Input = styled.input`
+  width: 100%;
+  height: 42px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid ${props => props.error ? theme.colors.error : theme.colors.neutral[300]};
+  background-color: ${theme.colors.neutral[50]};
+  font-size: 15px;
+  transition: all 0.2s ease;
   
-  // 处理普通Input
-  if (type !== "textarea") {
-    return (
-      <div className={`input-wrapper ${fullWidth ? 'w-full' : ''}`}>
-        {prefix && <span className="input-prefix">{prefix}</span>}
-        <input
-          type={type}
-          name={name}
-          placeholder={placeholder}
-          value={value || ""}
-          onChange={onChange}
-          className={`${sizeClass} ${error ? 'input-error' : ''} ${prefix ? 'pl-6' : ''} ${className}`}
-          min={min}
-          max={max}
-          {...props}
-        />
-        {error && <p className="error-text">{error}</p>}
-      </div>
-    );
+  &:focus {
+    outline: none;
+    border-color: ${theme.colors.primary[500]};
+    box-shadow: 0 0 0 2px rgba(91, 71, 232, 0.1);
   }
   
-  // 如果是textarea类型
-  return <TextArea placeholder={placeholder} value={value} onChange={onChange} {...props} />;
-};
-
-// 文本域组件
-class TextArea extends React.Component {
-  render() {
-    const { placeholder, value, onChange, rows = 3, className = "", ...props } = this.props;
-    return (
-      <textarea
-        placeholder={placeholder}
-        value={value || ""}
-        onChange={onChange}
-        className={`form-textarea ${className}`}
-        rows={rows}
-        {...props}
-      />
-    );
+  &:disabled {
+    background-color: ${theme.colors.neutral[100]};
+    cursor: not-allowed;
   }
-}
-
-TextArea.propTypes = {
-  placeholder: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func,
-  rows: PropTypes.number,
-  className: PropTypes.string
-};
-
-// 为了保持兼容性
-Input.TextArea = TextArea;
-
-Input.propTypes = {
-  type: PropTypes.string,
-  name: PropTypes.string,
-  placeholder: PropTypes.string,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func,
-  error: PropTypes.string,
-  fullWidth: PropTypes.bool,
-  size: PropTypes.string,
-  prefix: PropTypes.node,
-  min: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  max: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  className: PropTypes.string
-};
-
-// 选择框组件
-export const Select = ({ 
-  value, 
-  onChange, 
-  placeholder, 
-  children, 
-  fullWidth, 
-  error,
-  className = "",
-  ...props 
-}) => {
-  return (
-    <div className={`select-wrapper ${fullWidth ? 'w-full' : ''}`}>
-      <select
-        value={value}
-        onChange={onChange}
-        className={`form-select ${error ? 'select-error' : ''} ${className}`}
-        {...props}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {children}
-      </select>
-      {error && <p className="error-text">{error}</p>}
-    </div>
-  );
-};
-
-Select.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  onChange: PropTypes.func,
-  placeholder: PropTypes.string,
-  children: PropTypes.node,
-  fullWidth: PropTypes.bool,
-  error: PropTypes.string,
-  className: PropTypes.string
-};
-
-// 标题组件
-class Title extends React.Component {
-  render() {
-    const { level = 1, children, className = "", ...props } = this.props;
-    const TagName = `h${level}`;
-    return (
-      <TagName className={`title title-${level} ${className}`} {...props}>
-        {children}
-      </TagName>
-    );
+  
+  &::placeholder {
+    color: ${theme.colors.neutral[400]};
   }
-}
+`;
 
-Title.propTypes = {
-  level: PropTypes.number,
-  children: PropTypes.node,
-  className: PropTypes.string
-};
-
-// 文本组件
-class Text extends React.Component {
-  render() {
-    const { type = "default", children, className = "", ...props } = this.props;
-    return (
-      <span className={`text text-${type} ${className}`} {...props}>
-        {children}
-      </span>
-    );
-  }
-}
-
-Text.propTypes = {
-  type: PropTypes.string,
-  children: PropTypes.node,
-  className: PropTypes.string
-};
-
-// 排版组件
+/**
+ * 文本组件
+ */
 export const Typography = {
-  Title,
-  Text
+  H1: styled.h1`
+    font-size: 24px;
+    font-weight: 600;
+    color: ${props => props.color || theme.colors.neutral[800]};
+    margin-bottom: ${props => props.mb || '16px'};
+  `,
+  H2: styled.h2`
+    font-size: 20px;
+    font-weight: 600;
+    color: ${props => props.color || theme.colors.neutral[800]};
+    margin-bottom: ${props => props.mb || '12px'};
+  `,
+  H3: styled.h3`
+    font-size: 18px;
+    font-weight: 600;
+    color: ${props => props.color || theme.colors.neutral[800]};
+    margin-bottom: ${props => props.mb || '8px'};
+  `,
+  Body: styled.p`
+    font-size: 15px;
+    color: ${props => props.color || theme.colors.neutral[700]};
+    margin-bottom: ${props => props.mb || '8px'};
+  `,
+  Small: styled.p`
+    font-size: 13px;
+    color: ${props => props.color || theme.colors.neutral[500]};
+    margin-bottom: ${props => props.mb || '4px'};
+  `,
+  Label: styled.label`
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: ${props => props.color || theme.colors.neutral[700]};
+    margin-bottom: 6px;
+  `
 };
 
+/**
+ * 选择框组件
+ */
+export const Select = styled.select`
+  width: 100%;
+  height: 42px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid ${props => props.error ? theme.colors.error : theme.colors.neutral[300]};
+  background-color: ${theme.colors.neutral[50]};
+  font-size: 15px;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  
+  &:focus {
+    outline: none;
+    border-color: ${theme.colors.primary[500]};
+    box-shadow: 0 0 0 2px rgba(91, 71, 232, 0.1);
+  }
+  
+  &:disabled {
+    background-color: ${theme.colors.neutral[100]};
+    cursor: not-allowed;
+  }
+  
+  option {
+    font-size: 15px;
+  }
+`;
+
+// 导出默认对象
 export default {
   Input,
-  Select,
-  Typography
+  Typography,
+  Select
 }; 

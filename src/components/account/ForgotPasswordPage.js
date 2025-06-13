@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import instance from "../../utils/axios";
 import { BasePage, Form } from "../../theme";
-import "../../styles/toast.css";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();

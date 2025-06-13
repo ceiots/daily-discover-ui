@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
-import PropTypes from "prop-types";
-import { useTheme } from "../ThemeProvider";
+import React, { useRef, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useTheme } from '../useTheme';
 import "./ScrollableSection.css";
 
 /**

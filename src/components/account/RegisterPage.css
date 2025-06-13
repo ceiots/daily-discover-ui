@@ -1,1 +1,64 @@
-��
+/* RegisterPage样式 */
+.register-container {
+  background-color: #f8f8fb;
+  min-height: calc(100vh - 54px);
+}
+
+/* 提交按钮悬停效果 */
+.submit-button:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.submit-button:active {
+  transform: translateY(1px);
+}
+
+/* 验证码按钮动画 */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(91, 71, 232, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(91, 71, 232, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(91, 71, 232, 0); }
+}
+
+.code-button-active {
+  animation: pulse 1.5s infinite;
+}
+
+/* 复选框自定义样式 */
+.custom-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  background-color: white;
+  position: relative;
+  vertical-align: middle;
+}
+
+.custom-checkbox:checked {
+  background-color: #5B47E8;
+  border-color: #5B47E8;
+}
+
+.custom-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* 输入框聚焦效果 */
+.input-focus-effect:focus {
+  border-color: #5B47E8;
+  box-shadow: 0 0 0 2px rgba(91, 71, 232, 0.1);
+} 

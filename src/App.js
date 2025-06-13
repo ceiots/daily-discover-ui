@@ -34,8 +34,7 @@ import ShopCreationPage from './components/shop/ShopCreationPage'; // 店铺创�
 import ShopDetailPage from './components/shop/ShopDetailPage'; // 店铺详情页面
 import ShopEditPage from './components/shop/ShopEditPage'; // 店铺编辑页面
 import Discover from './components/Discover'; 
-import { ThemeProvider } from './theme';
-import ExamplePage from './ExamplePage';
+import { ThemeProvider, GlobalStyles } from './theme';
 import ProfileEdit from './components/settings/ProfileEdit';
 import OrderSuccess from './components/order/OrderSuccess'; // 添加订单成功页面
 import ThemeTestPage from './pages/ThemeTestPage';
@@ -238,12 +237,6 @@ const AppContent = () => {
       {shouldShowNavBar && <NavBar className="bottom-nav" />}
       <div className="page-container">
         <Routes>
-          {/* 主题测试页面 */}
-          <Route path="/theme-test" element={<ThemeTestPage />} />
-          <Route path="/simple-theme-test" element={<SimpleThemeTest />} />
-          
-          {/* 主题示例页面 */}
-          <Route path="/theme-example" element={<ExamplePage />} />
           
           {/* 原有路由 */}
           <Route path="/login" element={<LoginPage />} />
@@ -292,9 +285,14 @@ const AppContent = () => {
   );
 };
 
+AppContent.propTypes = {
+  className: PropTypes.string
+};
+
 function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider initialMode="light">
+      <GlobalStyles />
       <AppContent />
     </ThemeProvider>
   );
