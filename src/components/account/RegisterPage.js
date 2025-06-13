@@ -12,15 +12,18 @@ const RegisterPage = () => {
   
   // 定义以 #d85916 为主色调的简洁配色方案
   const colors = {
-    primary: "#5B47E8",      // 铁棕，主色/按钮/高亮
-    background: "#fffcce",   // 初桃粉红，页面背景
-    white: "#FFFFFF",        // 白色，卡片/输入框背景
-    border: "#5B47E8",       // 边框色同主色
-    textMain: "#5B47E8",     // 主文字色
-    textSub: "#5B47E8",      // 次要文字色（铁棕加深）
-    error: "#d85916"         // 错误提示色
+    primary: "#5B47E8",      // 主色，用于按钮、高亮元素，保持不变
+    primaryHover: "#4a39d1", // 主色悬停状态，新增，颜色稍深
+    background: "#f8f9fa",   // 浅灰色背景，更柔和且现代
+    white: "#FFFFFF",        // 白色，卡片/输入框背景，保持不变
+    border: "#e7e7e7",       // 极浅灰色边框，增加柔和感
+    textMain: "#2c2c2c",     // 深灰色主文字，与背景形成高对比度，更清晰
+    textSub: "#6b6b6b",      // 中灰色次要文字，有层次感
+    error: "#ff4d4f",        // 更鲜艳的红色错误提示，更醒目
+    success: "#52c41a",      // 新增成功提示色，用于成功反馈
+    info: "#1890ff"          // 新增信息提示色，用于信息反馈
   };
-  
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",

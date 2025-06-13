@@ -486,7 +486,7 @@ EyeIcon.propTypes = {
 export const BrandLogo = ({ size = 60 }) => (
   <div style={{ textAlign: 'center', marginBottom: '20px' }}>
     <img 
-      src="https://dailydiscover.top/media/logo/logo.jpg"
+      src="https://dailydiscover.top/media/logo/logo.png"
       alt="每日发现"
       style={{ 
         width: `${size}px`, 
