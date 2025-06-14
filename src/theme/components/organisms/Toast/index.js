@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { UI_COLORS, UI_SIZES, UI_BORDERS, UI_ANIMATIONS, UI_Z_INDEX } from '../../../../styles/uiConstants';
-import { useComponentPerformance } from '../../../../utils/performance';
+import { UI_COLORS, UI_SIZES, UI_BORDERS, UI_ANIMATIONS, UI_Z_INDEX } from '../../../styles/uiConstants';
+import { useComponentPerformance } from '../../../utils/performance';
 
 /**
  * 简单轻提示容器

@@ -5,7 +5,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { useComponentPerformance } from '../../../utils/performance';
 
 /**
  * 基础页面组件
@@ -27,8 +26,6 @@ const BasePage = ({
   headerLeft,
   ...props
 }) => {
-  // 性能监控
-  useComponentPerformance('BasePage');
   
   // 组合所有样式
   const pageClasses = classNames(

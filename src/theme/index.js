@@ -36,7 +36,17 @@ export {
 } from './hooks';
 
 // 导出样式工具
-import * as styles from './styles';
+import * as styleUtils from './styles/styleUtils';
+import * as commonStyles from './styles/commonStyles';
+import * as uiConstants from './styles/uiConstants';
+
+// 组合样式导出
+const styles = {
+  ...styleUtils,
+  ...commonStyles,
+  ...uiConstants
+};
+
 export { styles };
 
 // 导出设计令牌
@@ -49,7 +59,17 @@ import { useTheme } from './useTheme';
 export { ThemeProvider, useTheme };
 
 // 导出工具
-import * as utils from './utils';
+import * as performance from './utils/performance';
+import * as testing from './utils/testing';
+import * as analytics from './utils/analytics';
+
+// 组合工具导出
+const utils = {
+  performance,
+  testing,
+  analytics
+};
+
 export { utils };
 
 // 导出全局样式

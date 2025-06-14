@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Discover - AI设计稿</title>
+    <style>
+        :root {
+            --primary-color: #165DFF;
+            --secondary-color: #FF7D00;
+            --accent-color: #E63946;
+            --text-primary: #1D2129;
+            --text-secondary: #4E5969;
+            --text-tertiary: #86909C;
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F2F3F5;
+            --bg-tertiary: #F7F8FA;
+            --border-color: #E5E6EB;
+            --success-color: #00B42A;
+            --warning-color: #FF7D00;
+            --error-color: #F53F3F;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 24px;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-md: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-xxl: 24px;
+            --line-height-xs: 16px;
+            --line-height-sm: 20px;
+            --line-height-md: 24px;
+            --line-height-lg: 28px;
+            --line-height-xl: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: var(--font-size-sm);
+            line-height: var(--line-height-sm);
+        }
+
+        .container {
+            max-width: 414px;
+            margin: 0 auto;
+            background-color: var(--bg-primary);
+            min-height: 100vh;
+            box-shadow: var(--shadow-md);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: var(--spacing-xs);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-icon {
+            font-size: var(--font-size-lg);
+            cursor: pointer;
+        }
+
+        .search-bar {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-sm) var(--spacing-md);
+            margin: var(--spacing-md) var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-icon {
+            color: var(--text-tertiary);
+            margin-right: var(--spacing-sm);
+        }
+
+        .search-input {
+            border: none;
+            outline: none;
+            flex: 1;
+            font-size: var(--font-size-sm);
+            color: var(--text-primary);
+        }
+
+        .category-tabs {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-tab {
+            padding: var(--spacing-xs) var(--spacing-md);
+            margin-right: var(--spacing-md);
+            white-space: nowrap;
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .category-tab:not(.active) {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .content-section {
+            padding: 0 var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .see-all {
+            font-size: var(--font-size-xs);
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .content-card {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .content-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            background-color: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+        }
+
+        .card-content {
+            padding: var(--spacing-sm);
+        }
+
+        .card-title {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-xs);
+            color: var(--text-tertiary);
+        }
+
+        .hot-tag {
+            position: absolute;
+            top: var(--spacing-xs);
+            left: var(--spacing-xs);
+            background-color: var(--accent-color);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 0 var(--spacing-xs);
+            border-radius: var(--radius-sm);
+        }
+
+        .card-with-tag {
+            position: relative;
+        }
+
+        .banner {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-color), #0E42D2);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-md);
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 0 var(--spacing-md);
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 414px;
+            margin: 0 auto;
+            background-color: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: var(--spacing-xs) 0;
+            z-index: 10;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--spacing-xs);
+            color: var(--text-tertiary);
+            font-size: var(--font-size-xs);
+            flex: 1;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+        }
+
+        .nav-icon {
+            font-size: var(--font-size-md);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .fab-button {
+            position: fixed;
+            bottom: 70px;
+            right: var(--spacing-lg);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            font-size: var(--font-size-xl);
+            z-index: 10;
+        }
+
+        /* 中国传统美学元素 */
+        .chinese-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="chinese-pattern">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏮</span>
+                    Daily
+                </div>
+                <div class="nav-icons">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-icon">🏵️</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" placeholder="搜索内容、商品或用户...">
+        </div>
+
+        <div class="category-tabs">
+            <div class="category-tab active">📌 推荐</div>
+            <div class="category-tab">🔥 热点</div>
+            <div class="category-tab">🎥 视频</div>
+            <div class="category-tab">🎮 游戏</div>
+            <div class="category-tab">🔬 科技</div>
+            <div class="category-tab">🍽️ 美食</div>
+            <div class="category-tab">🗺️ 旅行</div>
+        </div>
+
+        <div class="content-section">
+            <div class="banner">
+                <div class="banner-content">
+                    <div>每日精选</div>
+                    <div style="font-size: var(--font-size-xs); margin-top: var(--spacing-xs);">发现生活中的美好</div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span>【热门内容】</span>
+                <span class="see-all">查看全部</span>
+            </div>
+
+            <div class="card-grid">
+                <div class="content-card card-with-tag">
+                    <div class="hot-tag">热门</div>
+                    <img src="https://picsum.photos/200/100?random=1" class="card-image" alt="热门内容图片">
+                    <div class="card-content">
+                        <div class="card-title">2023年最值得尝试的10款新应用</div>
+                        <div class="card-meta">
+                            <span>10.2k 阅读</span>
+                            <span>2小时前</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=2" class="card-image" alt="前端开发工具图片">
+                    <div class="card-content">
+                        <div class="card-title">前端开发必备的工具集合</div>
+                        <div class="card-meta">
+                            <span>8.7k 阅读</span>
+                            <span>5小时前</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=3" class="card-image" alt="独立游戏图片">
+                    <div class="card-content">
+                        <div class="card-title">独立游戏开发者的成功之路</div>
+                        <div class="card-meta">
+                            <span>5.3k 阅读</span>
+                            <span>昨天</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=4" class="card-image" alt="手机摄影图片">
+                    <div class="card-content">
+                        <div class="card-title">手机摄影构图技巧大全</div>
+                        <div class="card-meta">
+                            <span>12.1k 阅读</span>
+                            <span>3天前</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title">
+                <span>【为你推荐】</span>
+                <span class="see-all">换一批</span>
+            </div>
+
+            <div class="card-grid">
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=5" class="card-image" alt="远程工作图片">
+                    <div class="card-content">
+                        <div class="card-title">远程工作效率提升指南</div>
+                        <div class="card-meta">
+                            <span>7.4k 阅读</span>
+                            <span>2天前</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=6" class="card-image" alt="健康晚餐图片">
+                    <div class="card-content">
+                        <div class="card-title">30分钟快手健康晚餐</div>
+                        <div class="card-meta">
+                            <span>9.8k 阅读</span>
+                            <span>4天前</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=7" class="card-image" alt="阳台种植图片">
+                    <div class="card-content">
+                        <div class="card-title">城市阳台种植入门教程</div>
+                        <div class="card-meta">
+                            <span>6.2k 阅读</span>
+                            <span>1周前</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-card">
+                    <img src="https://picsum.photos/200/100?random=8" class="card-image" alt="独立音乐图片">
+                    <div class="card-content">
+                        <div class="card-title">本周新曲推荐：独立音乐精选</div>
+                        <div class="card-meta">
+                            <span>4.5k 阅读</span>
+                            <span>3天前</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="fab-button">✍️</div>
+
+        <div class="nav-bar">
+            <div class="nav-item active">
+                <div class="nav-icon">🏯</div>
+                <div>首页</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🔍</div>
+                <div>发现</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">🎥</div>
+                <div>视频</div>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">👨‍👩‍👧‍👦</div>
+                <div>我的</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

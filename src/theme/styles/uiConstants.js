@@ -146,6 +146,71 @@ export const UI_SPACING = {
 };
 
 /**
+ * UI边框系统
+ * 统一的边框样式
+ */
+export const UI_BORDERS = {
+  NONE: 'none',
+  THIN: '1px solid',
+  MEDIUM: '2px solid',
+  THICK: '3px solid',
+  DASHED: '1px dashed',
+  DOTTED: '1px dotted'
+};
+
+/**
+ * UI阴影系统
+ * 统一的阴影效果
+ */
+export const UI_SHADOWS = {
+  NONE: 'none',
+  SM: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+  DEFAULT: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+  MD: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+  LG: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+  XL: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+  XXL: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+  INNER: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+  FOCUS: '0 0 0 3px rgba(66, 153, 225, 0.5)'
+};
+
+/**
+ * UI Z-Index系统
+ * 统一的层叠顺序
+ */
+export const UI_Z_INDEX = {
+  HIDE: -1,
+  AUTO: 'auto',
+  BASE: 0,
+  DROPDOWN: 1000,
+  STICKY: 1020,
+  FIXED: 1030,
+  MODAL_BACKDROP: 1040,
+  MODAL: 1050,
+  POPOVER: 1060,
+  TOOLTIP: 1070,
+  TOAST: 1080
+};
+
+/**
+ * UI动画系统
+ * 统一的动画效果
+ */
+export const UI_ANIMATIONS = {
+  FADE_IN: 'fadeIn 0.3s ease-in',
+  FADE_OUT: 'fadeOut 0.3s ease-out',
+  SLIDE_UP: 'slideUp 0.3s ease-out',
+  SLIDE_DOWN: 'slideDown 0.3s ease-in',
+  SLIDE_LEFT: 'slideLeft 0.3s ease-in-out',
+  SLIDE_RIGHT: 'slideRight 0.3s ease-in-out',
+  PULSE: 'pulse 1.5s infinite',
+  SPIN: 'spin 1s linear infinite',
+  BOUNCE: 'bounce 1s infinite',
+  SCALE_IN: 'scaleIn 0.3s ease-in-out',
+  SCALE_OUT: 'scaleOut 0.3s ease-in-out'
+};
+
+/**
  * 断点系统
  * 响应式设计的断点
  */
@@ -176,6 +241,10 @@ export default {
   UI_COLORS,
   UI_SIZES,
   UI_SPACING,
+  UI_BORDERS,
+  UI_SHADOWS,
+  UI_Z_INDEX,
+  UI_ANIMATIONS,
   BREAKPOINTS,
   ANIMATIONS
 }; 

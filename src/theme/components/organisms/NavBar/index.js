@@ -7,10 +7,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useTheme } from '../../../../useTheme';
-import { UI_COLORS, UI_SIZES, UI_SHADOWS, UI_ANIMATIONS } from '../../../../styles/uiConstants';
-import { useComponentPerformance } from '../../../../utils/performance';
-import { useNavBar } from '../../../../hooks/useNavBar';
+import { useTheme } from '../../../useTheme';
+import { UI_COLORS, UI_SIZES, UI_SHADOWS, UI_ANIMATIONS } from '../../../styles/uiConstants';
+import { useComponentPerformance } from '../../../utils/performance';
+import useNavBar from '../../../hooks/useNavBar/useNavBar';
 
 // 样式组件
 const NavContainer = styled.div`
