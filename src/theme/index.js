@@ -1,73 +1,74 @@
 /**
- * 主题系统根索引文件
- * 统一导出所有主题相关的组件、设计令牌和工具
+ * 主题系统统一导出
+ * 此文件导出所有主题相关组件、钩子、工具和样式
  */
 
-// 导出主题提供者和上下文
-export { default as ThemeProvider } from './ThemeProvider';
-export { default as useTheme } from './useTheme';
+// 组件导出
+import { Button, Text, PageTitle } from './components/atoms';
+import { Card, ShopInfo, InfoCard } from './components/molecules';
+import { NavBar, TopBar } from './components/organisms';
+import { BasePage } from './components/templates';
 
-// 导出设计令牌
-export * from './tokens';
-
-// 导出全局样式组件
-export { default as GlobalStyles } from './GlobalStyles';
-
-// 导出所有主题组件
-export * from './components';
-export { default as Components } from './components';
-
-// 导出Hooks
-export { default as useToast } from './hooks/useToast';
-
-// 导出Providers
-export { 
-  ToastProvider, 
-  ConnectedToastProvider, 
-  useToastContext, 
-  toast 
-} from './providers/ToastProvider';
-
-// 导出工具函数
-export { default as PerformanceUtils } from './utils/performance';
-export { default as TestingUtils } from './utils/testing';
-export { default as Analytics } from './utils/analytics';
-
-// 创建并导出主题对象，便于整体引入
-import * as tokens from './tokens';
-import Components from './components';
-import ThemeProvider from './ThemeProvider';
+// 钩子导出
 import useTheme from './useTheme';
-import GlobalStyles from './GlobalStyles';
-import useToast from './hooks/useToast';
-import { ToastProvider, ConnectedToastProvider, useToastContext, toast } from './providers/ToastProvider';
-import PerformanceUtils from './utils/performance';
-import TestingUtils from './utils/testing';
-import Analytics from './utils/analytics';
+import { useToast } from './hooks';
 
-// 主题对象，包含所有主题相关的内容
-const theme = {
-  ...tokens,
-  Components,
-  ThemeProvider,
+// 样式导出
+import ThemeProvider from './ThemeProvider';
+import GlobalStyles from './GlobalStyles';
+import * as tokens from './tokens';
+import * as commonStyles from './styles/commonStyles';
+import * as styleUtils from './styles/styleUtils';
+import { UI_COLORS, UI_SIZES, UI_SPACING } from './styles/uiConstants';
+
+// 工具导出
+import { 
+  useComponentPerformance, 
+  measureFunctionPerformance 
+} from './utils/performance';
+import { renderWithTheme } from './utils/testing';
+import { trackEvent, trackPageView } from './utils/analytics';
+
+// 组件导出
+export {
+  // 原子组件
+  Button,
+  Text,
+  PageTitle,
+  
+  // 分子组件
+  Card,
+  ShopInfo,
+  InfoCard,
+  
+  // 有机体组件
+  NavBar,
+  TopBar,
+  
+  // 模板组件
+  BasePage,
+  
+  // 钩子
   useTheme,
+  useToast,
+  
+  // 样式
+  ThemeProvider,
   GlobalStyles,
-  hooks: {
-    useToast,
-    useTheme,
-    useToastContext
-  },
-  providers: {
-    ThemeProvider,
-    ToastProvider,
-    ConnectedToastProvider
-  },
-  utils: {
-    performance: PerformanceUtils,
-    testing: TestingUtils,
-    analytics: Analytics
-  },
-  toast
+  tokens,
+  commonStyles,
+  styleUtils,
+  UI_COLORS,
+  UI_SIZES,
+  UI_SPACING,
+  
+  // 工具
+  useComponentPerformance,
+  measureFunctionPerformance,
+  renderWithTheme,
+  trackEvent,
+  trackPageView
 };
 
-export default theme; 
+// 默认导出主题提供者，便于快速集成
+export default ThemeProvider; 
