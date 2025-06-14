@@ -1,10 +1,26 @@
+ /**
+ * Button 原子组件
+ * 基础按钮组件，支持不同的变体和样式
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { useComponentPerformance } from '../../utils/performance';
 
 /**
  * 按钮组件
- * 基于Tailwind CSS实现的统一按钮组件
+ * @param {Object} props - 组件属性
+ * @param {React.ReactNode} props.children - 子元素
+ * @param {string} props.type - 按钮类型：'primary', 'secondary', 'outline', 'text', 'danger'
+ * @param {string} props.htmlType - 原生按钮类型：'button', 'submit', 'reset'
+ * @param {string} props.size - 按钮尺寸：'small', 'medium', 'large'
+ * @param {boolean} props.block - 是否块级按钮
+ * @param {boolean} props.disabled - 是否禁用
+ * @param {boolean} props.loading - 是否加载中
+ * @param {React.ReactNode} props.icon - 按钮图标
+ * @param {string} props.className - 自定义类名
+ * @param {Function} props.onClick - 点击事件处理函数
+ * @returns {React.ReactElement} 按钮组件
  */
 const Button = ({
   children,
@@ -19,6 +35,9 @@ const Button = ({
   onClick,
   ...props
 }) => {
+  // 性能监控
+  useComponentPerformance('Button');
+  
   // 按钮类型样式映射
   const typeClasses = {
     primary: 'bg-primary-500 hover:bg-primary-600 text-white',
@@ -107,5 +126,8 @@ Button.propTypes = {
   className: PropTypes.string,
   onClick: PropTypes.func,
 };
+
+// 添加displayName用于性能监控
+Button.displayName = 'Button';
 
 export default Button;

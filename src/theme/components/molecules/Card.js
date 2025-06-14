@@ -1,10 +1,28 @@
+/**
+ * Card 分子组件
+ * 基于原子组件构建的卡片组件
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { useComponentPerformance } from '../../utils/performance';
 
 /**
  * 卡片组件
- * 基于Tailwind CSS实现的统一卡片组件
+ * @param {Object} props - 组件属性
+ * @param {React.ReactNode} props.children - 子元素
+ * @param {React.ReactNode} props.title - 卡片标题
+ * @param {React.ReactNode} props.subtitle - 卡片副标题
+ * @param {string|React.ReactNode} props.cover - 卡片封面
+ * @param {React.ReactNode|React.ReactNode[]} props.actions - 卡片操作区
+ * @param {boolean} props.bordered - 是否显示边框
+ * @param {boolean} props.hoverable - 是否显示悬停效果
+ * @param {string} props.shadow - 阴影大小：'none', 'sm', 'md', 'lg', 'xl'
+ * @param {string} props.className - 卡片容器类名
+ * @param {string} props.bodyClassName - 卡片内容类名
+ * @param {string} props.headerClassName - 卡片头部类名
+ * @param {string} props.footerClassName - 卡片底部类名
+ * @returns {React.ReactElement} 卡片组件
  */
 const Card = ({
   children,
@@ -21,6 +39,9 @@ const Card = ({
   footerClassName = '',
   ...props
 }) => {
+  // 性能监控
+  useComponentPerformance('Card');
+  
   // 阴影样式映射
   const shadowClasses = {
     none: '',
@@ -106,5 +127,8 @@ Card.propTypes = {
   headerClassName: PropTypes.string,
   footerClassName: PropTypes.string,
 };
+
+// 添加displayName用于性能监控
+Card.displayName = 'Card';
 
 export default Card; 

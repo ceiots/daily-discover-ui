@@ -1,7 +1,12 @@
+/**
+ * TopBar 有机体组件
+ * 顶部区域组件，显示页面标题和操作按钮
+ */
 import React from 'react';
-import { useTheme } from '../useTheme';
+import { useTheme } from '../../useTheme';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { useComponentPerformance } from '../../utils/performance';
 
 const TopBarContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.primary};
@@ -26,12 +31,15 @@ const TopBarContent = styled.div`
 
 /**
  * 顶部区域组件
- * 显示页面标题和操作按钮
  * @param {Object} props - 组件属性
  * @param {string} props.title - 页面标题
  * @param {React.ReactNode} props.actionButton - 操作按钮
+ * @returns {React.ReactElement} 顶部区域组件
  */
 const TopBar = ({ title, actionButton }) => {
+  // 性能监控
+  useComponentPerformance('TopBar');
+  
   const { theme } = useTheme();
 
   return (
@@ -49,4 +57,7 @@ TopBar.propTypes = {
   actionButton: PropTypes.node
 };
 
-export default TopBar;
+// 添加displayName用于性能监控
+TopBar.displayName = 'TopBar';
+
+export default TopBar; 
