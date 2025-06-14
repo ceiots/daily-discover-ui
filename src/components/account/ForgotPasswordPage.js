@@ -1,7 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import instance from "../../utils/axios";
-import { BasePage, Form } from "../../theme";
+import { BasePage } from "../../theme";
+import styled from "styled-components";
+import { UI_COLORS, UI_SIZES, UI_SHADOWS } from "../../theme/styles/uiConstants";
+import {
+  FormContainer,
+  FormFrame,
+  FormGroup,
+  FormLabel,
+  FormInput,
+  FormSubmitButton,
+  FormErrorMessage,
+  FormInputGroup,
+  FormCodeButton,
+  FormBottomLink,
+  FormBrandText,
+  FormFooterText,
+  FormEyeIcon,
+  FormLoader,
+  FormTitle,
+  FormBrandLogo,
+  SimpleToast,
+  validators,
+  showToast
+} from "../../theme/components";
+
+// 定制样式组件
+const ForgotPasswordContainer = styled.div`
+  background-color: ${UI_COLORS.BG_LIGHT};
+  min-height: calc(100vh - 54px); // 54px是TopBar的高度
+  overflow-y: auto; // 添加垂直滚动条
+  max-height: calc(100vh - 54px); // 设置最大高度，防止溢出
+`;
+
+const ForgotPasswordFormContainer = styled(FormContainer)`
+  padding-top: 12px;
+  background-color: transparent;
+  min-height: auto;
+`;
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -40,7 +77,7 @@ const ForgotPasswordPage = () => {
       return;
     }
     
-    if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+    if (!validators.isValidPhoneNumber(formData.mobile)) {
       setErrors({ ...errors, mobile: "请输入正确的手机号格式" });
       return;
     }
@@ -68,7 +105,7 @@ const ForgotPasswordPage = () => {
     
     if (!formData.mobile) {
       newErrors.mobile = "请输入手机号";
-    } else if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+    } else if (!validators.isValidPhoneNumber(formData.mobile)) {
       newErrors.mobile = "请输入正确的手机号格式";
     }
     
@@ -135,34 +172,27 @@ const ForgotPasswordPage = () => {
     }
   };
 
-  const showToast = (message) => {
-    const toast = document.getElementById("toast");
-    if (toast) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
-    }
-  };
+
 
   return (
     <BasePage padding={false} showHeader={false}>
-      <Form.PageContainer>
-        <Form.Frame style={{
+      <ForgotPasswordContainer>
+        <FormFrame style={
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
-          transition: "all 0.4s ease-out"
+          transition: "all 0.4s ease-out",
+          borderRadius: UI_SIZES.BORDER_RADIUS_LARGE,
+          boxShadow: UI_SHADOWS.CARD
         }}>
-          <Form.Container>
-            <Form.BrandLogo />
-            <Form.Title>{step === 1 ? "找回密码" : "设置新密码"}</Form.Title>
+          <ForgotPasswordFormContainer>
+            <FormBrandLogo />
+            <FormTitle>{step === 1 ? "找回密码" : "设置新密码"}</FormTitle>
             
             {step === 1 ? (
               <form onSubmit={handleVerifyCode}>
-                <Form.Group>
-                  <Form.Label>手机号</Form.Label>
-                  <Form.Input
+                <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                  <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>手机号</FormLabel>
+                  <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                     type="tel"
                     name="mobile"
                     value={formData.mobile}
@@ -170,13 +200,13 @@ const ForgotPasswordPage = () => {
                     placeholder="请输入手机号"
                     $error={!!errors.mobile}
                   />
-                  {errors.mobile && <Form.ErrorMessage>{errors.mobile}</Form.ErrorMessage>}
-                </Form.Group>
+                  {errors.mobile && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.mobile}</Form.ErrorMessage>}
+                </FormGroup>
                 
-                <Form.Group>
-                  <Form.Label>验证码</Form.Label>
+                <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                  <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>验证码</FormLabel>
                   <div style={{ display: 'flex', gap: '10px' }}>
-                    <Form.Input
+                    <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                       type="text"
                       name="code"
                       value={formData.code}
@@ -185,26 +215,23 @@ const ForgotPasswordPage = () => {
                       style={{ flex: 1 }}
                       $error={!!errors.code}
                     />
-                    <Form.CodeButton 
-                      onClick={handleGetVerificationCode}
-                      disabled={countdown > 0}
-                    >
+                    <FormCodeButton onClick={handleGetVerificationCode} disabled={countdown > 0} style={{ backgroundColor: UI_COLORS.PRIMARY, color: UI_COLORS.WHITE, padding: UI_SIZES.BUTTON_PADDING_SMALL }}>
                       {countdown > 0 ? `${countdown}秒` : "获取验证码"}
-                    </Form.CodeButton>
+                    </FormCodeButton>
                   </div>
-                  {errors.code && <Form.ErrorMessage>{errors.code}</Form.ErrorMessage>}
-                </Form.Group>
+                  {errors.code && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.code}</Form.ErrorMessage>}
+                </FormGroup>
                 
-                <Form.SubmitButton type="submit">
+                <FormSubmitButton type="submit" style={{ backgroundColor: UI_COLORS.PRIMARY, padding: UI_SIZES.BUTTON_PADDING }}>
                   下一步
                 </Form.SubmitButton>
               </form>
             ) : (
               <form onSubmit={handleResetPassword}>
-                <Form.Group>
-                  <Form.Label>设置新密码</Form.Label>
-                  <Form.InputGroup>
-                    <Form.Input
+                <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                  <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>设置新密码</FormLabel>
+                  <FormInputGroup>
+                    <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                       type={showNewPassword ? "text" : "password"}
                       name="newPassword"
                       value={formData.newPassword}
@@ -218,19 +245,19 @@ const ForgotPasswordPage = () => {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       aria-label={showNewPassword ? "隐藏密码" : "显示密码"}
                     >
-                      <Form.EyeIcon closed={!showNewPassword} />
+                      <FormEyeIcon closed={!showNewPassword} />
                     </button>
-                  </Form.InputGroup>
-                  {errors.newPassword && <Form.ErrorMessage>{errors.newPassword}</Form.ErrorMessage>}
+                  </FormInputGroup>
+                  {errors.newPassword && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.newPassword}</Form.ErrorMessage>}
                   <div style={{ fontSize: "11px", color: "#333", margin: "3px 0 0 2px" }}>
                     • 密码长度至少为8个字符，且包含数字和字母
                   </div>
-                </Form.Group>
+                </FormGroup>
                 
-                <Form.Group>
-                  <Form.Label>确认密码</Form.Label>
-                  <Form.InputGroup>
-                    <Form.Input
+                <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                  <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>确认密码</Form.Label>
+                  <FormInputGroup>
+                    <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                       type={showConfirmPassword ? "text" : "password"}
                       name="confirmPassword"
                       value={formData.confirmPassword}
@@ -244,14 +271,14 @@ const ForgotPasswordPage = () => {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       aria-label={showConfirmPassword ? "隐藏密码" : "显示密码"}
                     >
-                      <Form.EyeIcon closed={!showConfirmPassword} />
+                      <FormEyeIcon closed={!showConfirmPassword} />
                     </button>
-                  </Form.InputGroup>
-                  {errors.confirmPassword && <Form.ErrorMessage>{errors.confirmPassword}</Form.ErrorMessage>}
-                </Form.Group>
+                  </FormInputGroup>
+                  {errors.confirmPassword && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.confirmPassword}</Form.ErrorMessage>}
+                </FormGroup>
                 
-                <Form.SubmitButton type="submit" disabled={loading}>
-                  {loading && <Form.Loader />}
+                <FormSubmitButton type="submit" disabled={loading} style={{ backgroundColor: UI_COLORS.PRIMARY, padding: UI_SIZES.BUTTON_PADDING }}>
+                  {loading && <FormLoader />}
                   重置密码
                 </Form.SubmitButton>
                 
@@ -274,22 +301,22 @@ const ForgotPasswordPage = () => {
               </form>
             )}
             
-            <Form.BottomLink>
+            <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
               <Link to="/login">返回登录</Link>
             </Form.BottomLink>
             
-            <Form.BrandText>
+            <FormBrandText style={{ color: UI_COLORS.TEXT_MEDIUM }}>
               安全保障，轻松找回
             </Form.BrandText>
             
-            <Form.FooterText>
-              Copyright © {Form.getCurrentYear()} All Rights Reserved
+            <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
+              Copyright © {new Date().getFullYear()} All Rights Reserved
             </Form.FooterText>
-          </Form.Container>
+          </ForgotPasswordFormContainer>
         </Form.Frame>
         
-        <div id="toast" className="toast-message"></div>
-      </Form.PageContainer>
+        <SimpleToast id="toast" />
+      </ForgotPasswordContainer>
     </BasePage>
   );
 };

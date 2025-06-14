@@ -2,7 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../App';
 import { Link, useNavigate } from 'react-router-dom';
 import instance from '../../utils/axios';
-import { BasePage, Form } from '../../theme';
+import { BasePage } from '../../theme';
+import styled from 'styled-components';
+import { UI_COLORS, UI_SIZES } from '../../theme/styles/uiConstants';
+import {
+  FormContainer,
+  FormFrame,
+  FormGroup,
+  FormLabel,
+  FormInput,
+  FormSubmitButton,
+  FormErrorMessage,
+  FormInputGroup,
+  FormCheckboxContainer,
+  FormCheckbox,
+  FormCheckboxLabel,
+  FormBottomLink,
+  FormFooterText,
+  FormTitle,
+  FormBrandLogo,
+  FormLoader,
+  FormEyeIcon,
+  FormBrandText,
+  SimpleToast,
+  validators,
+  showToast
+} from '../../theme/components';
 
 const LoginPage = () => {
   const { refreshUserInfo } = useAuth();
@@ -43,7 +68,7 @@ const LoginPage = () => {
 
     if (!formData.mobile) {
       newErrors.mobile = "请输入手机号";
-    } else if (!Form.validators.isValidPhoneNumber(formData.mobile)) {
+    } else if (!validators.isValidPhoneNumber(formData.mobile)) {
       newErrors.mobile = "请输入正确的手机号格式";
     }
 
@@ -129,33 +154,25 @@ const LoginPage = () => {
     }
   };
 
-  const showToast = (message) => {
-    const toast = document.getElementById("toast");
-    if (toast) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
-    }
-  };
+  // 使用导入的showToast函数，移除自定义实现
+  
 
   return (
     <BasePage padding={false} showHeader={false}>
-      <Form.PageContainer>
-        <Form.Frame style={{
+      <LoginContainer>
+        <FormFrame style={{
           opacity: animateCard ? 1 : 0,
           transform: animateCard ? "translateY(0)" : "translateY(20px)",
           transition: "all 0.4s ease-out"
         }}>
-          <Form.Container>
-            <Form.BrandLogo size={65} />
-            <Form.Title>登录账号</Form.Title>
+          <LoginFormContainer>
+            <FormBrandLogo size={65} />
+            <FormTitle>登录账号</FormTitle>
             
             <form onSubmit={handleSubmit}>
-              <Form.Group>
-                <Form.Label>手机号</Form.Label>
-                <Form.Input
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>手机号</FormLabel>
+                <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                   type="tel"
                   name="mobile"
                   value={formData.mobile}
@@ -163,13 +180,13 @@ const LoginPage = () => {
                   placeholder="请输入手机号"
                   $error={!!errors.mobile}
                 />
-                {errors.mobile && <Form.ErrorMessage>{errors.mobile}</Form.ErrorMessage>}
-              </Form.Group>
+                {errors.mobile && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.mobile}</Form.ErrorMessage>}
+              </FormGroup>
               
-              <Form.Group>
-                <Form.Label>密码</Form.Label>
-                <Form.InputGroup>
-                  <Form.Input
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>密码</Form.Label>
+                <FormInputGroup style={{ display: 'flex', gap: '10px' }}>
+                  <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
@@ -183,28 +200,28 @@ const LoginPage = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? "隐藏密码" : "显示密码"}
                   >
-                    <Form.EyeIcon closed={!showPassword} />
+                    <FormEyeIcon closed={!showPassword} />
                   </button>
-                </Form.InputGroup>
-                {errors.password && <Form.ErrorMessage>{errors.password}</Form.ErrorMessage>}
+                </FormInputGroup>
+                {errors.password && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.password}</Form.ErrorMessage>}
               </Form.Group>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <Form.CheckboxContainer style={{ margin: 0 }}>
-                  <Form.Checkbox
+                <FormCheckboxContainer style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                  <FormCheckbox
                     type="checkbox"
                     id="rememberMe"
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                   />
-                  <Form.CheckboxLabel htmlFor="rememberMe" style={{ fontSize: '12px' }}>
+                  <FormCheckboxLabel htmlFor="rememberMe" style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
                     记住我
                   </Form.CheckboxLabel>
                 </Form.CheckboxContainer>
                 
                 <Link to="/forgot-password" style={{
-                  fontSize: '12px',
-                  color: '#5B47E8',
+                  fontSize: UI_SIZES.FONT_SMALL,
+                  color: UI_COLORS.PRIMARY,
                   textDecoration: 'none',
                   fontWeight: '500',
                 }}>
@@ -212,28 +229,28 @@ const LoginPage = () => {
                 </Link>
               </div>
               
-              <Form.SubmitButton type="submit" disabled={loading}>
-                {loading && <Form.Loader />}
+              <FormSubmitButton type="submit" disabled={loading} style={{ backgroundColor: UI_COLORS.PRIMARY, padding: UI_SIZES.BUTTON_PADDING }}>
+                {loading && <FormLoader />}
                 登录
               </Form.SubmitButton>
             </form>
             
-            <Form.BottomLink>
+            <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
               还没有账号?<Link to="/register">立即注册</Link>
             </Form.BottomLink>
             
-            <Form.BrandText>
+            <FormBrandText style={{ color: UI_COLORS.TEXT_MEDIUM }}>
               畅享发现生活中的每一份惊喜
             </Form.BrandText>
             
-            <Form.FooterText>
-              Copyright © {Form.getCurrentYear()} All Rights Reserved
+            <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
+              Copyright © {new Date().getFullYear()} All Rights Reserved
             </Form.FooterText>
-          </Form.Container>
+          </LoginFormContainer>
         </Form.Frame>
         
-        <div id="toast" className="toast-message"></div>
-      </Form.PageContainer>
+        <SimpleToast id="toast" />
+      </LoginContainer>
     </BasePage>
   );
 };

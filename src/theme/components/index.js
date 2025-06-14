@@ -1,56 +1,68 @@
 /**
- * 主题系统组件统一导出文件
- * 所有主题组件应该通过这个文件导出，方便管理和使用
+ * 主题组件索引文件
+ * 导出所有主题相关的组件，按原子设计分层
  */
 
-// 导入所有组件
+// 导出原子组件
+export * from './atoms';
+
+// 导出分子组件
+export * from './molecules';
+
+// 导出有机体组件
+// export * from './organisms';
+
+// 导出模板组件
+// export * from './templates';
+
+// 导出现有组件
+export { default as BasePage } from './BasePage';
+export { default as Button } from './Button';
+export { default as Card } from './Card';
+export { default as Form } from './Form';
+export { default as NavBar } from './NavBar';
+export { default as PageTitle } from './PageTitle';
+export { default as ScrollableSection } from './ScrollableSection';
+export { default as ShopInfo } from './ShopInfo';
+export { default as Toast } from './Toast';
+export { default as TopBar } from './TopBar';
+
+// 创建组件对象，便于整体引入
+import * as atoms from './atoms';
+import * as molecules from './molecules';
+// import * as organisms from './organisms';
+// import * as templates from './templates';
+
 import BasePage from './BasePage';
 import Button from './Button';
 import Card from './Card';
-import ScrollableSection from './ScrollableSection';
-import ShopInfo from './ShopInfo';
-import TopBar from './TopBar';
+import Form from './Form';
 import NavBar from './NavBar';
 import PageTitle from './PageTitle';
-import { SimpleToast, showToast, Toast, ToastContainer } from './Toast';
+import ScrollableSection from './ScrollableSection';
+import ShopInfo from './ShopInfo';
+import Toast from './Toast';
+import TopBar from './TopBar';
 
-// 从Form目录导出表单组件
-export * from './Form';
-
-// 导出基础组件
-export { 
+// 组件对象，包含所有组件
+const components = {
+  // 原子设计分层
+  atoms,
+  molecules,
+  // organisms,
+  // templates,
+  
+  // 现有组件
   BasePage,
   Button,
   Card,
+  Form,
   NavBar,
   PageTitle,
   ScrollableSection,
   ShopInfo,
+  Toast,
   TopBar
 };
 
-// 导出Toast相关组件
-export { 
-  SimpleToast, 
-  showToast,
-  Toast,
-  ToastContainer
-};
-
-// 导出所有组件作为对象，便于按需引入
-const Components = {
-  BasePage,
-  Button,
-  Card,
-  NavBar,
-  PageTitle,
-  ScrollableSection,
-  ShopInfo,
-  TopBar,
-  SimpleToast,
-  showToast,
-  Toast,
-  ToastContainer
-};
-
-export default Components; 
+export default components; 
