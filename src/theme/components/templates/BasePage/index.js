@@ -1,6 +1,12 @@
+/**
+ * BasePage组件索引文件
+ * 导出BasePage组件
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { useComponentPerformance } from '../../../../utils/performance';
 
 /**
  * 基础页面组件
@@ -22,6 +28,9 @@ const BasePage = ({
   headerLeft,
   ...props
 }) => {
+  // 性能监控
+  useComponentPerformance('BasePage');
+
   // 组合所有样式
   const pageClasses = classNames(
     'base-page flex flex-col min-h-screen bg-neutral-50',
@@ -116,4 +125,7 @@ BasePage.propTypes = {
   headerLeft: PropTypes.node,
 };
 
-export default BasePage;
+// 添加displayName便于性能分析
+BasePage.displayName = 'BasePage';
+
+export default BasePage; 

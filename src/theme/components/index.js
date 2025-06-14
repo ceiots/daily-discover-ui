@@ -1,68 +1,72 @@
 /**
- * 主题组件索引文件
- * 导出所有主题相关的组件，按原子设计分层
+ * 主题组件导出索引
+ * 按原子设计分层导出组件
  */
 
-// 导出原子组件
-export * from './atoms';
+// 原子(Atoms)级别组件
+import Button from './atoms/Button';
+import Text from './atoms/Text';
+import PageTitle from './atoms/PageTitle';
 
-// 导出分子组件
-export * from './molecules';
+// 分子(Molecules)级别组件
+import Card from './molecules/Card';
+import InfoCard from './molecules/InfoCard';
+import ShopInfo from './molecules/ShopInfo';
+import ScrollableSection from './molecules/ScrollableSection';
 
-// 导出有机体组件
-// export * from './organisms';
+// 有机体(Organisms)级别组件
+import NavBar from './organisms/NavBar';
+import TopBar from './organisms/TopBar';
+import * as ToastModule from './organisms/Toast';
 
-// 导出模板组件
-// export * from './templates';
+// 模板(Templates)级别组件
+import BasePage from './templates/BasePage';
 
-// 导出现有组件
-export { default as BasePage } from './BasePage';
-export { default as Button } from './Button';
-export { default as Card } from './Card';
-export { default as Form } from './Form';
-export { default as NavBar } from './NavBar';
-export { default as PageTitle } from './PageTitle';
-export { default as ScrollableSection } from './ScrollableSection';
-export { default as ShopInfo } from './ShopInfo';
-export { default as Toast } from './Toast';
-export { default as TopBar } from './TopBar';
-
-// 创建组件对象，便于整体引入
-import * as atoms from './atoms';
-import * as molecules from './molecules';
-// import * as organisms from './organisms';
-// import * as templates from './templates';
-
-import BasePage from './BasePage';
-import Button from './Button';
-import Card from './Card';
-import Form from './Form';
-import NavBar from './NavBar';
-import PageTitle from './PageTitle';
-import ScrollableSection from './ScrollableSection';
-import ShopInfo from './ShopInfo';
-import Toast from './Toast';
-import TopBar from './TopBar';
-
-// 组件对象，包含所有组件
-const components = {
-  // 原子设计分层
-  atoms,
-  molecules,
-  // organisms,
-  // templates,
-  
-  // 现有组件
-  BasePage,
+// 导出所有组件
+export {
+  // 原子组件
   Button,
-  Card,
-  Form,
-  NavBar,
+  Text,
   PageTitle,
-  ScrollableSection,
+  
+  // 分子组件
+  Card,
+  InfoCard,
   ShopInfo,
-  Toast,
-  TopBar
+  ScrollableSection,
+  
+  // 有机体组件
+  NavBar,
+  TopBar,
+  
+  // Toast组件的各个导出
+  ToastModule as Toast,
+  
+  // 模板组件
+  BasePage
 };
 
-export default components; 
+// 单独导出Toast组件内部接口，方便直接使用
+export const { SimpleToast, Toast: ToastComponent, showToast, ToastContainer } = ToastModule;
+
+// 默认导出所有组件
+export default {
+  // 原子组件
+  Button,
+  Text,
+  PageTitle,
+  
+  // 分子组件
+  Card,
+  InfoCard,
+  ShopInfo,
+  ScrollableSection,
+  
+  // 有机体组件
+  NavBar,
+  TopBar,
+  Toast: ToastModule,
+  
+  // 模板组件
+  BasePage
+}; 

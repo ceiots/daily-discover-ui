@@ -1,74 +1,69 @@
 /**
- * 主题系统统一导出
- * 此文件导出所有主题相关组件、钩子、工具和样式
+ * 主题系统入口文件
+ * 统一导出主题相关的组件、钩子、样式和工具
  */
 
-// 组件导出
-import { Button, Text, PageTitle } from './components/atoms';
-import { Card, ShopInfo, InfoCard } from './components/molecules';
-import { NavBar, TopBar } from './components/organisms';
-import { BasePage } from './components/templates';
+// 导出组件
+import * as components from './components';
+export { components };
 
-// 钩子导出
-import useTheme from './useTheme';
-import { useToast } from './hooks';
-
-// 样式导出
-import ThemeProvider from './ThemeProvider';
-import GlobalStyles from './GlobalStyles';
-import * as tokens from './tokens';
-import * as commonStyles from './styles/commonStyles';
-import * as styleUtils from './styles/styleUtils';
-import { UI_COLORS, UI_SIZES, UI_SPACING } from './styles/uiConstants';
-
-// 工具导出
-import { 
-  useComponentPerformance, 
-  measureFunctionPerformance 
-} from './utils/performance';
-import { renderWithTheme } from './utils/testing';
-import { trackEvent, trackPageView } from './utils/analytics';
-
-// 组件导出
-export {
-  // 原子组件
-  Button,
-  Text,
+// 导出常用组件，方便直接引用
+export { 
+  Button, 
+  Text, 
   PageTitle,
-  
-  // 分子组件
   Card,
-  ShopInfo,
   InfoCard,
-  
-  // 有机体组件
+  ShopInfo,
+  ScrollableSection,
   NavBar,
   TopBar,
-  
-  // 模板组件
-  BasePage,
-  
-  // 钩子
-  useTheme,
-  useToast,
-  
-  // 样式
-  ThemeProvider,
-  GlobalStyles,
-  tokens,
-  commonStyles,
-  styleUtils,
-  UI_COLORS,
-  UI_SIZES,
-  UI_SPACING,
-  
-  // 工具
-  useComponentPerformance,
-  measureFunctionPerformance,
-  renderWithTheme,
-  trackEvent,
-  trackPageView
-};
+  Toast,
+  SimpleToast,
+  ToastComponent,
+  showToast,
+  BasePage
+} from './components';
 
-// 默认导出主题提供者，便于快速集成
-export default ThemeProvider; 
+// 导出钩子
+import * as hooks from './hooks';
+export { hooks };
+
+// 导出常用钩子，方便直接引用
+export { 
+  useToast,
+  useNavBar
+} from './hooks';
+
+// 导出样式工具
+import * as styles from './styles';
+export { styles };
+
+// 导出设计令牌
+import tokens from './tokens';
+export { tokens };
+
+// 导出主题上下文
+import ThemeProvider from './ThemeProvider';
+import { useTheme } from './useTheme';
+export { ThemeProvider, useTheme };
+
+// 导出工具
+import * as utils from './utils';
+export { utils };
+
+// 导出全局样式
+import GlobalStyles from './GlobalStyles';
+export { GlobalStyles };
+
+// 默认导出
+export default {
+  components,
+  hooks,
+  styles,
+  tokens,
+  ThemeProvider,
+  useTheme,
+  utils,
+  GlobalStyles
+}; 

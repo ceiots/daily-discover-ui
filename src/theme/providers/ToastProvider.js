@@ -4,7 +4,6 @@
  */
 import React, { createContext, useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import useToast from '../hooks/useToast';
 import { Toast } from '../components/Toast';
 
 // 创建Toast上下文
@@ -18,18 +17,97 @@ const ToastContext = createContext(null);
  * @returns {React.ReactElement} Toast提供者组件
  */
 export const ToastProvider = ({ children, defaultOptions = {} }) => {
-  // 使用Toast Hook
-  const toast = useToast(defaultOptions);
+  // 使用内部状态实现Toast功能
+  const [visible, setVisible] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [options, setOptions] = React.useState({
+    type: 'info',
+    duration: 3000,
+    position: 'center',
+    ...defaultOptions
+  });
+  
+  const timerRef = React.useRef(null);
+  
+  // 清除定时器
+  const clearTimer = React.useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+  
+  // 隐藏Toast
+  const hide = React.useCallback(() => {
+    setVisible(false);
+    clearTimer();
+  }, [clearTimer]);
+  
+  // 显示Toast
+  const show = React.useCallback((msg, customOptions = {}) => {
+    // 清除之前的定时器
+    clearTimer();
+    
+    // 更新消息和选项
+    setMessage(msg);
+    setOptions(prev => ({ ...prev, ...customOptions }));
+    setVisible(true);
+    
+    // 设置自动关闭
+    const duration = customOptions.duration || options.duration;
+    if (duration > 0) {
+      timerRef.current = setTimeout(() => {
+        hide();
+      }, duration);
+    }
+    
+    // 返回隐藏方法，方便链式调用
+    return { hide };
+  }, [clearTimer, hide, options.duration]);
+  
+  // 快捷方法
+  const success = React.useCallback((msg, customOptions = {}) => {
+    return show(msg, { ...customOptions, type: 'success' });
+  }, [show]);
+  
+  const error = React.useCallback((msg, customOptions = {}) => {
+    return show(msg, { ...customOptions, type: 'error' });
+  }, [show]);
+  
+  const warning = React.useCallback((msg, customOptions = {}) => {
+    return show(msg, { ...customOptions, type: 'warning' });
+  }, [show]);
+  
+  const info = React.useCallback((msg, customOptions = {}) => {
+    return show(msg, { ...customOptions, type: 'info' });
+  }, [show]);
+  
+  // 清理定时器
+  React.useEffect(() => {
+    return () => clearTimer();
+  }, [clearTimer]);
+  
+  const toastContextValue = {
+    visible,
+    message,
+    options,
+    show,
+    hide,
+    success,
+    error,
+    warning,
+    info
+  };
   
   return (
-    <ToastContext.Provider value={toast}>
+    <ToastContext.Provider value={toastContextValue}>
       {children}
       <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.options.type}
-        position={toast.options.position}
-        onClose={toast.hide}
+        visible={visible}
+        message={message}
+        type={options.type}
+        position={options.position}
+        onClose={hide}
       />
     </ToastContext.Provider>
   );
