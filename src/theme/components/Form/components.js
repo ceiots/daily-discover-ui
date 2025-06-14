@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../tokens';
+import { UI_COLORS, UI_SIZES, UI_BORDERS, UI_SHADOWS, UI_ANIMATIONS } from '../../styles/uiConstants';
 import PropTypes from 'prop-types';
 
 /**
@@ -13,7 +14,7 @@ export const FormContainer = styled.div`
   justify-content: center;
   width: 100%;
   min-height: calc(100vh - 54px);
-  padding: ${theme.spacing[4]};
+  padding: ${theme.spacing[2]};
   background-color: #f8f8fb;
 `;
 
@@ -22,19 +23,19 @@ export const FormContainer = styled.div`
  */
 export const FormFrame = styled.div`
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-  padding: 24px 20px;
-  margin-bottom: 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  padding: 20px 16px;
+  margin-bottom: 12px;
 `;
 
 /**
  * 表单组 - 用于组织表单控件
  */
 export const FormGroup = styled.div`
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 `;
 
 /**
@@ -42,10 +43,10 @@ export const FormGroup = styled.div`
  */
 export const FormLabel = styled.label`
   display: block;
-  margin-bottom: 8px;
-  font-size: 14px;
+  margin-bottom: 5px;
+  font-size: 12px;
   font-weight: 500;
-  color: #333;
+  color: #4B5563;
 `;
 
 /**
@@ -53,68 +54,100 @@ export const FormLabel = styled.label`
  */
 export const FormInput = styled.input`
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid ${props => props.$error ? theme.colors.error : '#e7e7e7'};
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.2s ease;
+  height: 40px;
+  padding: 10px 12px;
+  border: 1px solid ${props => props.$error ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT};
+  border-radius: 6px;
+  font-size: 13px;
+  color: ${UI_COLORS.TEXT_DARK};
   background-color: white;
-  color: #2c2c2c;
+  transition: ${UI_ANIMATIONS.FAST};
   
   &:focus {
     outline: none;
-    border-color: ${props => props.$error ? theme.colors.error : theme.colors.primary};
+    border-color: ${props => props.$error ? UI_COLORS.ERROR : UI_COLORS.PRIMARY};
     box-shadow: ${props => props.$error 
-      ? `0 0 0 2px rgba(255, 77, 79, 0.1)`
-      : `0 0 0 2px rgba(91, 71, 232, 0.1)`};
+      ? `0 0 0 2px ${UI_COLORS.ERROR}20` 
+      : `0 0 0 2px ${UI_COLORS.PRIMARY_SHADOW}`};
   }
   
   &::placeholder {
-    color: #bbb;
+    color: #9ca3af;
+    font-size: 12px;
+  }
+  
+  &.input-focus-effect:focus {
+    border-color: ${UI_COLORS.PRIMARY};
+    box-shadow: 0 0 0 2px ${UI_COLORS.PRIMARY_SHADOW};
   }
 `;
 
 /**
- * 输入框组 - 水平排列输入框和按钮
+ * 输入框组 - 用于组合输入框和按钮
  */
 export const FormInputGroup = styled.div`
   display: flex;
-  align-items: stretch;
-  width: 100%;
-  
-  ${FormInput} {
-    flex: 1;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-right: none;
-  }
+  align-items: center;
 `;
 
 /**
- * 验证码按钮
+ * 表单验证码按钮
  */
 export const FormCodeButton = styled.button`
-  height: 44px;
+  flex-shrink: 0;
+  height: 40px;
+  min-width: 100px;
+  background-color: ${props => props.disabled ? '#F0F0F0' : 'white'};
+  color: ${props => props.disabled ? '#AAAAAA' : UI_COLORS.TEXT_MEDIUM};
+  border: 1px solid ${props => props.disabled ? '#E0E0E0' : UI_COLORS.BORDER_LIGHT};
+  border-radius: ${UI_BORDERS.RADIUS_MEDIUM};
   padding: 0 12px;
-  min-width: 108px;
-  border: none;
-  border-radius: 0 8px 8px 0;
-  background-color: ${props => props.disabled ? '#e0e0e0' : theme.colors.primary};
-  color: ${props => props.disabled ? '#999' : 'white'};
-  font-size: 14px;
+  margin-left: 10px;
+  font-size: ${UI_SIZES.FONT_SMALL};
   font-weight: 500;
-  transition: all 0.2s ease;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  white-space: nowrap;
+  transition: ${UI_ANIMATIONS.FAST};
+  position: relative;
+  overflow: hidden;
   
-  &:hover:not(:disabled) {
-    background-color: ${theme.colors.primaryHover};
-  }
-  
-  &:active:not(:disabled) {
-    background-color: ${theme.colors.primaryHover};
-    transform: scale(0.98);
+  /* 优化的发光效果，更柔和，与主题协调 */
+  &.code-button-active {
+    color: ${UI_COLORS.PRIMARY};
+    border-color: ${UI_COLORS.PRIMARY_LIGHT};
+    background-color: ${UI_COLORS.PRIMARY_LIGHT}10;
+    
+    &:hover {
+      background-color: ${UI_COLORS.PRIMARY_LIGHT}30;
+      box-shadow: 0 0 8px ${UI_COLORS.PRIMARY_SHADOW};
+    }
+    
+    &:active {
+      transform: scale(0.98);
+      box-shadow: 0 0 5px ${UI_COLORS.PRIMARY_SHADOW};
+    }
+    
+    /* 微妙的光晕效果 */
+    &::after {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      right: -10%;
+      bottom: -10%;
+      background: radial-gradient(
+        circle at center,
+        ${UI_COLORS.PRIMARY_LIGHT}40 0%,
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    &:hover::after {
+      opacity: 0.7;
+    }
   }
 `;
 
@@ -123,25 +156,52 @@ export const FormCodeButton = styled.button`
  */
 export const FormSubmitButton = styled.button`
   width: 100%;
-  height: 44px;
-  margin-top: 24px;
-  margin-bottom: 12px;
-  border: none;
-  border-radius: 8px;
-  background-color: ${props => props.disabled ? '#e0e0e0' : theme.colors.primary};
+  height: 42px;
+  background-color: ${props => props.disabled ? '#e0e0e0' : UI_COLORS.PRIMARY};
   color: white;
-  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 500;
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  transition: all 0.2s ease;
+  transition: ${UI_ANIMATIONS.FAST};
+  margin-top: 8px;
   
   &:hover:not(:disabled) {
-    background-color: ${theme.colors.primaryHover};
+    background-color: ${UI_COLORS.PRIMARY_HOVER};
+    box-shadow: ${UI_SHADOWS.BUTTON};
   }
   
   &:active:not(:disabled) {
-    background-color: ${theme.colors.primaryHover};
     transform: scale(0.98);
+    box-shadow: ${UI_SHADOWS.BUTTON_ACTIVE};
+  }
+  
+  &.submit-button {
+    margin-top: 12px;
+    position: relative;
+    overflow: hidden;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%
+      );
+      transform: skewX(-25deg);
+      transition: all 0.75s ease;
+    }
+    
+    &:hover::after {
+      left: 150%;
+    }
   }
 `;
 
@@ -149,9 +209,9 @@ export const FormSubmitButton = styled.button`
  * 错误消息
  */
 export const FormErrorMessage = styled.div`
-  margin-top: 6px;
-  color: ${theme.colors.error};
-  font-size: 12px;
+  color: ${UI_COLORS.ERROR};
+  font-size: 11px;
+  margin-top: 4px;
 `;
 
 /**
@@ -159,53 +219,96 @@ export const FormErrorMessage = styled.div`
  */
 export const FormCheckboxContainer = styled.div`
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-  margin-top: 12px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  position: relative;
 `;
 
 /**
  * 复选框
  */
 export const FormCheckbox = styled.input.attrs({ type: 'checkbox' })`
-  width: 18px;
-  height: 18px;
-  accent-color: ${theme.colors.primary};
-  cursor: pointer;
+  position: absolute;
+  opacity: 0;
+  
+  &:checked + label::before {
+    background-color: ${UI_COLORS.PRIMARY};
+    border-color: ${UI_COLORS.PRIMARY};
+  }
+  
+  &:checked + label::after {
+    opacity: 1;
+  }
+  
+  &.custom-checkbox + label::before {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+  }
+  
+  &.custom-checkbox + label::after {
+    top: 2.5px;
+    left: 5.5px;
+    width: 5px;
+    height: 10px;
+    border-width: 0 2px 2px 0;
+  }
 `;
 
 /**
  * 复选框标签
  */
 export const FormCheckboxLabel = styled.label`
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #4B5563;
+  margin-left: 24px;
+  line-height: 1.4;
+  position: relative;
   cursor: pointer;
   
-  a {
-    color: ${theme.colors.primary};
-    text-decoration: none;
-    
-    &:hover {
-      text-decoration: underline;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -24px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background-color: white;
+    transition: all 0.2s ease;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: -18px;
+    width: 6px;
+    height: 11px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  
+  &:hover::before {
+    border-color: ${UI_COLORS.PRIMARY};
   }
 `;
 
 /**
- * 底部链接
+ * 表单底部链接
  */
 export const FormBottomLink = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 8px;
-  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #6B7280;
   
   a {
-    color: ${theme.colors.primary};
-    margin-left: 4px;
+    color: ${UI_COLORS.PRIMARY};
     text-decoration: none;
     font-weight: 500;
     
@@ -216,13 +319,13 @@ export const FormBottomLink = styled.div`
 `;
 
 /**
- * 底部文本
+ * 表单页脚文本
  */
 export const FormFooterText = styled.div`
   text-align: center;
-  color: #999;
-  font-size: 12px;
-  margin-top: 12px;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 8px;
 `;
 
 /**

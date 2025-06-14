@@ -2,11 +2,9 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useAuth } from '../../App';
-import { useTheme } from '../useTheme';
-
-// 默认头像 - 与 Profile 组件保持一致
-const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';
+import { useAuth } from '../../../App';
+import { useTheme } from '../../useTheme';
+import { UI_COLORS, UI_SIZES, UI_SHADOWS, UI_ANIMATIONS } from '../../styles/uiConstants';
 
 // 样式组件
 const NavContainer = styled.div`
@@ -16,9 +14,9 @@ const NavContainer = styled.div`
   right: 0;
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background-color: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  background-color: ${UI_COLORS.BG_WHITE};
+  box-shadow: ${UI_SHADOWS.NAV};
+  transition: ${UI_ANIMATIONS.NORMAL};
   ${({ className }) => className && className}
 `;
 
@@ -27,8 +25,8 @@ const NavWrapper = styled.div`
   justify-content: space-around;
   align-items: center;
   padding: 10px 0;
-  height: 56px;
-  max-width: 520px;
+  height: ${UI_SIZES.NAV_HEIGHT};
+  max-width: ${UI_SIZES.CONTENT_MAX_WIDTH};
   margin: 0 auto;
   position: relative;
   
@@ -51,15 +49,15 @@ const NavItem = styled(Link)`
   justify-content: center;
   text-decoration: none;
   padding: 6px 12px;
-  font-size: 12px;
-  color: ${({ active, theme }) => active ? theme.colors.primary : theme.colors.textSub};
+  font-size: ${UI_SIZES.NAV_TEXT_SIZE};
+  color: ${({ active }) => active ? UI_COLORS.PRIMARY : UI_COLORS.TEXT_LIGHT};
   position: relative;
-  transition: all 0.2s ease;
+  transition: ${UI_ANIMATIONS.FAST};
   flex: 1;
   
   &:hover {
     transform: translateY(-2px);
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${UI_COLORS.PRIMARY};
   }
   
   &:active {
@@ -67,12 +65,12 @@ const NavItem = styled(Link)`
   }
   
   i {
-    font-size: 18px;
-    margin-bottom: 3px;
+    font-size: ${UI_SIZES.NAV_ICON_SIZE};
+    margin-bottom: ${UI_SIZES.NAV_TEXT_SPACING};
   }
   
   span {
-    font-size: 12px;
+    font-size: ${UI_SIZES.NAV_TEXT_SIZE};
     font-weight: 500;
   }
 `;
@@ -84,9 +82,9 @@ const NavIndicator = styled.div`
   transform: translateX(-50%);
   width: 20px;
   height: 3px;
-  background: ${({ theme }) => theme.colors.primary};
+  background: ${UI_COLORS.PRIMARY};
   border-radius: 3px;
-  transition: all 0.3s ease;
+  transition: ${UI_ANIMATIONS.NORMAL};
 `;
 
 const CenterButtonContainer = styled.div`
@@ -105,15 +103,15 @@ const CenterButton = styled.a`
   width: 40px;
   height: 40px;
   border-radius: 20px;
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: ${UI_COLORS.PRIMARY};
   color: white;
-  box-shadow: 0 4px 10px rgba(91, 71, 232, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: ${UI_SHADOWS.BUTTON_HOVER};
+  transition: ${UI_ANIMATIONS.NORMAL};
   transform: translateY(-8px);
   
   &:hover {
     transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 6px 15px rgba(91, 71, 232, 0.4);
+    box-shadow: 0 6px 15px ${UI_COLORS.PRIMARY_SHADOW};
   }
   
   &:active {
@@ -185,15 +183,14 @@ const NavBar = ({ className }) => {
         <NavItem 
           to="/daily" 
           active={isActive('/') || isActive('/daily')} 
-          theme={theme}
         >
           <i className="fas fa-calendar-day"></i>
           <span>每日</span>
-          {(isActive('/') || isActive('/daily')) && <NavIndicator theme={theme} />}
+          {(isActive('/') || isActive('/daily')) && <NavIndicator />}
         </NavItem>
         
         <CenterButtonContainer>
-          <CenterButton href="#" onClick={handleCenterClick} theme={theme}>
+          <CenterButton href="#" onClick={handleCenterClick}>
             {!isNotAuthPage && isLoggedIn && userInfo?.avatar ? (
               <img
                 src={userInfo.avatar}
@@ -216,11 +213,10 @@ const NavBar = ({ className }) => {
         <NavItem 
           to="/discover" 
           active={isActive('/discover')} 
-          theme={theme}
         >
           <i className="fas fa-compass"></i>
           <span>发现</span>
-          {isActive('/discover') && <NavIndicator theme={theme} />}
+          {isActive('/discover') && <NavIndicator />}
         </NavItem>
       </NavWrapper>
     </NavContainer>

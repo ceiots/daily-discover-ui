@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import instance from "../../utils/axios";
-import { BasePage } from "../../theme";
-import TopBar from "../../theme/components/TopBar";
+import { BasePage, PageTitle } from "../../theme";
 import styled from "styled-components";
-import "./RegisterPage.css";
 import {
   FormContainer,
   FormFrame,
@@ -20,49 +18,24 @@ import {
   FormCheckboxLabel,
   FormBottomLink,
   FormFooterText,
-  validators
-} from "../../theme/components/Form";
+  validators,
+  SimpleToast,
+  showToast
+} from "../../theme/components";
+import { UI_COLORS, UI_SIZES, UI_BORDERS, UI_SHADOWS } from "../../theme/styles/uiConstants";
 
 // 定制样式组件
 const RegisterContainer = styled.div`
-  background-color: #f8f8fb;
+  background-color: ${UI_COLORS.BG_LIGHT};
   min-height: calc(100vh - 54px); // 54px是TopBar的高度
+  overflow-y: auto; // 添加垂直滚动条
+  max-height: calc(100vh - 54px); // 设置最大高度，防止溢出
 `;
 
 const RegisterFormContainer = styled(FormContainer)`
-  padding-top: 20px;
+  padding-top: 12px;
   background-color: transparent;
   min-height: auto;
-`;
-
-const PageTitle = styled.div`
-  background-color: #5B47E8;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 1px;
-`;
-
-const Toast = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
-  
-  &.show {
-    opacity: 1;
-    visibility: visible;
-  }
 `;
 
 const RegisterPage = () => {
@@ -166,26 +139,15 @@ const RegisterPage = () => {
     setCountdown(60);
   };
 
-  const showToast = (message) => {
-    const toast = document.getElementById("toast");
-    if (toast) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 3000);
-    }
-  };
-
   return (
     <BasePage padding={false} showHeader={false}>
-      <PageTitle>注册账号</PageTitle>
+      <PageTitle title="注册账号" />
       <RegisterContainer>
         <RegisterFormContainer>
           <FormFrame>
             <form onSubmit={handleSubmit}>
-              <FormGroup>
-                <FormLabel>请输入手机号码</FormLabel>
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请输入手机号码</FormLabel>
                 <FormInput
                   type="tel"
                   name="mobile"
@@ -193,12 +155,22 @@ const RegisterPage = () => {
                   onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
                   placeholder="请输入手机号码"
                   $error={!!errors.phoneNumber}
+                  style={{
+                    fontSize: UI_SIZES.FONT_MEDIUM,
+                    padding: UI_SIZES.INPUT_SPACING,
+                    borderColor: errors.phoneNumber ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
+                    '&:focus': {
+                      borderColor: UI_COLORS.PRIMARY,
+                      outline: 'none'
+                    }
+                  }}
+                  className="input-focus-effect"
                 />
-                {errors.phoneNumber && <FormErrorMessage>{errors.phoneNumber}</FormErrorMessage>}
+                {errors.phoneNumber && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.phoneNumber}</FormErrorMessage>}
               </FormGroup>
               
-              <FormGroup>
-                <FormLabel>请输入验证码</FormLabel>
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请输入验证码</FormLabel>
                 <FormInputGroup>
                   <FormInput
                     type="text"
@@ -206,6 +178,15 @@ const RegisterPage = () => {
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     placeholder="请输入验证码"
+                    style={{
+                      fontSize: UI_SIZES.FONT_MEDIUM,
+                      padding: UI_SIZES.INPUT_SPACING,
+                      borderColor: UI_COLORS.BORDER_LIGHT,
+                      '&:focus': {
+                        borderColor: UI_COLORS.PRIMARY,
+                        outline: 'none'
+                      }
+                    }}
                     className="input-focus-effect"
                   />
                   <FormCodeButton 
@@ -219,8 +200,8 @@ const RegisterPage = () => {
                 </FormInputGroup>
               </FormGroup>
               
-              <FormGroup>
-                <FormLabel>请设置登录密码</FormLabel>
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请设置登录密码</FormLabel>
                 <FormInput
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -228,13 +209,22 @@ const RegisterPage = () => {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="请设置登录密码"
                   $error={!!errors.password}
+                  style={{
+                    fontSize: UI_SIZES.FONT_MEDIUM,
+                    padding: UI_SIZES.INPUT_SPACING,
+                    borderColor: errors.password ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
+                    '&:focus': {
+                      borderColor: UI_COLORS.PRIMARY,
+                      outline: 'none'
+                    }
+                  }}
                   className="input-focus-effect"
                 />
-                {errors.password && <FormErrorMessage>{errors.password}</FormErrorMessage>}
+                {errors.password && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.password}</FormErrorMessage>}
               </FormGroup>
               
-              <FormGroup>
-                <FormLabel>确认密码</FormLabel>
+              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>确认密码</FormLabel>
                 <FormInput
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
@@ -242,23 +232,38 @@ const RegisterPage = () => {
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder="请再次输入密码"
                   $error={!!errors.confirmPassword}
+                  style={{
+                    fontSize: UI_SIZES.FONT_MEDIUM,
+                    padding: UI_SIZES.INPUT_SPACING,
+                    borderColor: errors.confirmPassword ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
+                    '&:focus': {
+                      borderColor: UI_COLORS.PRIMARY,
+                      outline: 'none'
+                    }
+                  }}
                   className="input-focus-effect"
                 />
-                {errors.confirmPassword && <FormErrorMessage>{errors.confirmPassword}</FormErrorMessage>}
+                {errors.confirmPassword && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.confirmPassword}</FormErrorMessage>}
               </FormGroup>
               
-              <FormCheckboxContainer>
+              <FormCheckboxContainer style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
                 <FormCheckbox
                   id="agreeToTerms"
                   checked={agreeToTerms}
                   onChange={() => setAgreeToTerms(!agreeToTerms)}
                   className="custom-checkbox"
                 />
-                <FormCheckboxLabel htmlFor="agreeToTerms">
-                  我已阅读并同意 <Link to="/terms">《用户协议》</Link> 和 <Link to="/privacy">《隐私政策》</Link>
+                <FormCheckboxLabel 
+                  htmlFor="agreeToTerms" 
+                  style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}
+                >
+                  我已阅读并同意 
+                  <Link to="/terms" style={{ color: UI_COLORS.PRIMARY }}>《用户协议》</Link> 
+                  和 
+                  <Link to="/privacy" style={{ color: UI_COLORS.PRIMARY }}>《隐私政策》</Link>
                 </FormCheckboxLabel>
               </FormCheckboxContainer>
-              {errors.terms && <FormErrorMessage>{errors.terms}</FormErrorMessage>}
+              {errors.terms && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.terms}</FormErrorMessage>}
               
               <FormSubmitButton
                 type="submit"
@@ -268,19 +273,20 @@ const RegisterPage = () => {
                 {loading ? "注册中..." : "注册"}
               </FormSubmitButton>
 
-              <FormBottomLink>
-                已有账号？<Link to="/login">立即登录</Link>
+              <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
+                已有账号？<Link to="/login" style={{ color: UI_COLORS.PRIMARY }}>立即登录</Link>
               </FormBottomLink>
             </form>
           </FormFrame>
           
-          <FormFooterText>
+          <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
             Daily Discover &copy; {new Date().getFullYear()} All Rights Reserved
           </FormFooterText>
         </RegisterFormContainer>
       </RegisterContainer>
       
-      <Toast id="toast" className="toast" />
+      {/* 使用通用Toast组件 */}
+      <SimpleToast id="toast" />
     </BasePage>
   );
 };

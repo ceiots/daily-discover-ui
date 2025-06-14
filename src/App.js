@@ -37,8 +37,6 @@ import Discover from './components/Discover';
 import { ThemeProvider, GlobalStyles } from './theme';
 import ProfileEdit from './components/settings/ProfileEdit';
 import OrderSuccess from './components/order/OrderSuccess'; // 添加订单成功页面
-import ThemeTestPage from './pages/ThemeTestPage';
-import SimpleThemeTest from './pages/SimpleThemeTest';
 
 // 创建认证上下文
 const AuthContext = createContext();
