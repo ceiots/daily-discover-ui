@@ -11,6 +11,7 @@ import SnakeGame from "../components/games/SnakeGame/SnakeGame";
 import VideoList from "../components/videos/VideoList/VideoList";
 import { BasePage } from "../theme";
 
+// Re-trigger compilation
 const DEFAULT_AVATAR = "/default-avatar.png";
 const DEFAULT_IMAGE = "/default-image.png";
 

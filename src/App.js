@@ -27,7 +27,6 @@ const ProductDetail = lazy(() => import("./components/product/ProductDetail"));
 const RefundForm = lazy(() => import("./pages/RefundForm"));
 const RefundDetail = lazy(() => import("./pages/RefundDetail"));
 const AddressList = lazy(() => import('./components/myService/AddressList'));
-const EventDetail = lazy(() => import("./components/EventDetail"));
 const CategoryPage = lazy(() => import("./components/CategoryPage"));
 const SearchResultsPage = lazy(() => import('./components/SearchResultsPage'));
 const PaymentPassword = lazy(() => import('./components/settings/PaymentPassword'));
@@ -91,7 +90,6 @@ const AppContent = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/shop-detail/:id" element={<ShopDetailPage />} />

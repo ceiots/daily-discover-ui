@@ -30,7 +30,7 @@
   - `src/SimpleApp.js`
 - [ ] **账户页面迁移**: 创建 `src/pages/account` 目录，并将 `LoginPage`, `ForgotPasswordPage` 等相关页面移入。
 - [ ] **认证逻辑抽离**: 将 `App.js` 中的认证相关逻辑完全抽离到 `src/hooks/useAuth.js`。
-- [ ] **页面组件归位**: 将 `src/components` 中的 `Discover.js` 和 `Daily.js` 移动到 `src/pages`。
+- [x] **页面组件归位**: 将 `src/components` 中的 `Discover.js` 和 `Daily.js` 移动到 `src/pages`。
 
 #### 阶段2：性能优化
 
@@ -73,4 +73,11 @@
 - **[功能]** 根据UI/UX设计稿，继续开发或优化其他页面功能
 - **[测试]** 为核心组件和Hooks编写单元测试
 - **[重构]** 将账户页面目录结构，将 `LoginPage`, `ForgotPasswordPage`, `RegisterPage` 移至 `src/pages/account`
-- **[重构]** 将认证逻辑从 `App.js` 抽离至 `src/hooks/useAuth.js` 
+- **[重构]** 将认证逻辑从 `App.js` 抽离至 `src/hooks/useAuth.js`
+
+## 8.5 新增已完成项 (最近更新)
+
+- **[修复]** 解决了因循环依赖导致的 `useToast` 和 `ToastProvider` 运行时初始化错误。通过将 `ToastContext` 抽离到独立文件，成功解耦模块。
+- **[修复]** 修正了 `App.js` 中对已删除组件 `EventDetail` 的引用问题。
+- **[修复]** 通过重建 `src/theme/components/index.js`，彻底解决了因缓存或文件损坏导致的模块导出失败问题。
+- **[重构]** 将 `Discover.js` 和 `Daily.js` 及其附属的 CSS 文件从 `src/components` 迁移至 `src/pages`，使其目录结构更符合项目规范。 
