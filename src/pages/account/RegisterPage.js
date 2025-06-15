@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance"; // 修正路径
 import { BasePage, PageTitle } from "../../theme";
 import styled from "styled-components";
+import validators from '../../utils/validators'; // 修正路径
 import {
   FormContainer,
   FormFrame,
@@ -18,7 +19,6 @@ import {
   FormCheckboxLabel,
   FormBottomLink,
   FormFooterText,
-  validators,
   SimpleToast,
   showToast
 } from "../../theme/components";
@@ -248,45 +248,38 @@ const RegisterPage = () => {
               
               <FormCheckboxContainer style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
                 <FormCheckbox
+                  type="checkbox"
                   id="agreeToTerms"
                   checked={agreeToTerms}
                   onChange={() => setAgreeToTerms(!agreeToTerms)}
-                  className="custom-checkbox"
                 />
-                <FormCheckboxLabel 
-                  htmlFor="agreeToTerms" 
-                  style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}
-                >
-                  我已阅读并同意 
-                  <Link to="/terms" style={{ color: UI_COLORS.PRIMARY }}>《用户协议》</Link> 
-                  和 
-                  <Link to="/privacy" style={{ color: UI_COLORS.PRIMARY }}>《隐私政策》</Link>
+                <FormCheckboxLabel htmlFor="agreeToTerms" style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
+                  我已阅读并同意
+                  <Link to="/terms" style={{ color: UI_COLORS.PRIMARY }}>用户协议</Link>和
+                  <Link to="/privacy" style={{ color: UI_COLORS.PRIMARY }}>隐私政策</Link>
                 </FormCheckboxLabel>
+                {errors.terms && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.terms}</FormErrorMessage>}
               </FormCheckboxContainer>
-              {errors.terms && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.terms}</FormErrorMessage>}
-              
-              <FormSubmitButton
+
+              <FormSubmitButton 
                 type="submit"
                 disabled={loading}
-                className="submit-button"
+                className={loading ? "" : "submit-button-active"}
               >
                 {loading ? "注册中..." : "注册"}
               </FormSubmitButton>
-
-              <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
-                已有账号？<Link to="/login" style={{ color: UI_COLORS.PRIMARY }}>立即登录</Link>
-              </FormBottomLink>
             </form>
+            
+            <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
+              已有账号？<Link to="/login">立即登录</Link>
+            </FormBottomLink>
+            
+            <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
+              Copyright © {new Date().getFullYear()} All Rights Reserved
+            </FormFooterText>
           </FormFrame>
-          
-          <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
-            Daily Discover &copy; {new Date().getFullYear()} All Rights Reserved
-          </FormFooterText>
         </RegisterFormContainer>
       </RegisterContainer>
-      
-      {/* 使用通用Toast组件 */}
-      <SimpleToast id="toast" />
     </BasePage>
   );
 };

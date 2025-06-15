@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import instance from "../../utils/axios";
-import { useAuth } from "../../App";
+import instance from "../../services/http/instance";
+import { useAuth } from "../../hooks/useAuth";
 import { useTheme } from "../../theme";
 import { ScrollableSection } from "../../theme/components"; // 导入ScrollableSection组件
 import "./Recommendations.css";

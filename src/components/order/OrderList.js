@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaStore } from "react-icons/fa";
-import instance from "../../utils/axios";
-import { useAuth } from "../../App";
+import instance from "../../services/http/instance";
+import { useAuth } from "../../hooks/useAuth";
 import { formatSpecifications } from "../../utils/orderUtils";
 import OrderCountdown from "../OrderCountdown";
 import { BasePage } from "../../theme";

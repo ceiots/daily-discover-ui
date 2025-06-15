@@ -6,7 +6,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { useComponentPerformance } from '../../../../utils/performance';
+import useComponentPerformance from '../../../../hooks/useComponentPerformance';
+
 
 /**
  * 基础页面组件
@@ -128,4 +129,4 @@ BasePage.propTypes = {
 // 添加displayName便于性能分析
 BasePage.displayName = 'BasePage';
 
-export default BasePage; 
+export default BasePage;

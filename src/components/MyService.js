@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from 'prop-types';
-import { useAuth } from "../App";
-import instance from "../utils/axios";
+import { useAuth } from "../../hooks/useAuth";
+import instance from "../../services/http/instance";
 import { useNavigate } from "react-router-dom";
-import { BasePage } from "../theme";
+import { BasePage } from "../../theme";
 
 // 默认头像 - 更适合的用户头像
 const DEFAULT_AVATAR = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0iIzc2NmRlOCIvPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjkwIiByPSI0MCIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAsMTk4LjE5QTE0OS40MSwxNDkuNDEsMCwwLDEsMTI4LDIyNCw0OS4xLDQ5LjEsMCwwLDEsNDYsMTk4LjE5LDEyOCwxMjgsMCwwLDAsMjEwLDE5OC4xOVoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=';

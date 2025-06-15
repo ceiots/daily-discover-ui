@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import instance from '../../services/http/instance';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../App';
-import instance from '../../utils/axios';
+import { BasePage } from '../../theme';
 import PropTypes from 'prop-types';
 import './ShopDetailPage.css';
 

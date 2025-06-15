@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import instance from '../../utils/axios';
+import instance from '../../services/http/instance';
 import { BasePage, useTheme } from '../../theme';
 import PropTypes from 'prop-types'; 
-import { useAuth } from '../../App'; // 导入useAuth
+import { useAuth } from '../../hooks/useAuth';
 
 const PaymentPassword = () => {
   const navigate = useNavigate();

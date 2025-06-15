@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import instance from "../../utils/axios";
-import { useAuth } from "../../App";
+import instance from "../../services/http/instance";
+import { useAuth } from "../../hooks/useAuth";
 import { BasePage } from "../../theme";
 import { FaMapMarkerAlt, FaEdit, FaTrashAlt, FaCheckCircle, FaTimes, FaChevronRight } from "react-icons/fa";
 

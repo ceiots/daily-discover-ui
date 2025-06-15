@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../App';
-import instance from '../../utils/axios';
+import { useAuth } from '../../hooks/useAuth';
+import instance from '../../services/http/instance';
 import PropTypes from 'prop-types';
 import './MyShopPage.css';
 

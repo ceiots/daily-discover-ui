@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../App';
+import { useAuth } from '../../hooks/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
-import instance from '../../utils/axios';
+import instance from '../../services/http/instance';
 import { BasePage } from '../../theme';
 import styled from 'styled-components';
 import { UI_COLORS, UI_SIZES } from '../../theme/styles/uiConstants';
+import validators from '../../utils/validators';
 import {
   FormContainer,
   FormFrame,
@@ -25,7 +26,6 @@ import {
   FormEyeIcon,
   FormBrandText,
   SimpleToast,
-  validators,
   showToast
 } from '../../theme/components';
 
@@ -180,11 +180,11 @@ const LoginPage = () => {
                   placeholder="请输入手机号"
                   $error={!!errors.mobile}
                 />
-                {errors.mobile && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.mobile}</Form.ErrorMessage>}
+                {errors.mobile && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.mobile}</FormErrorMessage>}
               </FormGroup>
               
               <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>密码</Form.Label>
+                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>密码</FormLabel>
                 <FormInputGroup style={{ display: 'flex', gap: '10px' }}>
                   <FormInput style={{ fontSize: UI_SIZES.FONT_MEDIUM, padding: UI_SIZES.INPUT_SPACING }}
                     type={showPassword ? "text" : "password"}
@@ -203,8 +203,8 @@ const LoginPage = () => {
                     <FormEyeIcon closed={!showPassword} />
                   </button>
                 </FormInputGroup>
-                {errors.password && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.password}</Form.ErrorMessage>}
-              </Form.Group>
+                {errors.password && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.password}</FormErrorMessage>}
+              </FormGroup>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <FormCheckboxContainer style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
@@ -216,8 +216,8 @@ const LoginPage = () => {
                   />
                   <FormCheckboxLabel htmlFor="rememberMe" style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
                     记住我
-                  </Form.CheckboxLabel>
-                </Form.CheckboxContainer>
+                  </FormCheckboxLabel>
+                </FormCheckboxContainer>
                 
                 <Link to="/forgot-password" style={{
                   fontSize: UI_SIZES.FONT_SMALL,
@@ -232,27 +232,41 @@ const LoginPage = () => {
               <FormSubmitButton type="submit" disabled={loading} style={{ backgroundColor: UI_COLORS.PRIMARY, padding: UI_SIZES.BUTTON_PADDING }}>
                 {loading && <FormLoader />}
                 登录
-              </Form.SubmitButton>
+              </FormSubmitButton>
             </form>
             
             <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
               还没有账号?<Link to="/register">立即注册</Link>
-            </Form.BottomLink>
+            </FormBottomLink>
             
             <FormBrandText style={{ color: UI_COLORS.TEXT_MEDIUM }}>
               畅享发现生活中的每一份惊喜
-            </Form.BrandText>
+            </FormBrandText>
             
             <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
               Copyright © {new Date().getFullYear()} All Rights Reserved
-            </Form.FooterText>
+            </FormFooterText>
           </LoginFormContainer>
-        </Form.Frame>
-        
-        <SimpleToast id="toast" />
+        </FormFrame>
       </LoginContainer>
     </BasePage>
   );
 };
+
+const LoginContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: ${UI_COLORS.BACKGROUND_LIGHT};
+`;
+
+const LoginFormContainer = styled.div`
+  max-width: ${UI_SIZES.FORM_MAX_WIDTH};
+  width: 100%;
+  padding: 3rem 2rem;
+  box-sizing: border-box;
+  text-align: center;
+`;
 
 export default LoginPage;

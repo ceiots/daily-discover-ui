@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../../App";
+import { useAuth } from "../../hooks/useAuth";
 import instance from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
 import { BasePage } from "../../theme";

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import instance from '../../services/http/instance';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../App';
-import instance from '../../utils/axios';
 import './MyShopPage.css';
+import { BasePage } from '../../theme';
 
 const ShopEditPage = () => {
   const { id } = useParams();

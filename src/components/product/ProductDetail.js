@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./ProductDetail.css"; // Keep your existing styles
-import instance from "../../utils/axios";
-import { useAuth } from "../../App"; // 添加上下文导入
+import instance from "../../services/http/instance";
+import { useAuth } from "../../hooks/useAuth";
 import { BasePage, Button } from "../../theme";
 import getDeviceInfo from "../../utils/deviceInfo";
 import Toast from "../../theme/components/Toast";

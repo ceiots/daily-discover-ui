@@ -2,7 +2,9 @@
  * 性能监控工具
  * 提供组件渲染性能监控和分析功能
  */
+import React from 'react';
 import { useRef, useEffect } from 'react';
+import { UI_COLORS } from '../styles/uiConstants';
 
 /**
  * 使用Web Vitals库收集核心性能指标

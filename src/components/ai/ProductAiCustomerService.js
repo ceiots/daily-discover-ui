@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./ProductAiCustomerService.css";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import PropTypes from "prop-types";
-import { useAuth } from "../../App";
+import { useAuth } from "../../hooks/useAuth";
 
 /**
  * 商品AI客服组件
