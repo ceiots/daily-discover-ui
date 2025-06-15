@@ -5,13 +5,13 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 // Global components
-import NavBar from './theme/components/NavBar';
+import NavBar from './theme/components/organisms/NavBar';
 import CommonHelmet from './components/CommonHelmet';
 
 // Page components
 import Daily from './components/Daily';
 import Discover from './components/Discover';
-import MyService from './components/MyService';
+import MyService from './pages/MyService';
 import Settings from './components/settings/Settings';
 
 // Auth pages
@@ -24,8 +24,8 @@ const OrderList = lazy(() => import('./components/order/OrderList'));
 const OrderDetail = lazy(() => import('./components/order/OrderDetail'));
 const LogisticsTracker = lazy(() => import('./components/LogisticsTracker'));
 const ProductDetail = lazy(() => import("./components/product/ProductDetail"));
-const RefundForm = lazy(() => import("./components/RefundForm"));
-const RefundDetail = lazy(() => import("./components/RefundDetail"));
+const RefundForm = lazy(() => import("./pages/RefundForm"));
+const RefundDetail = lazy(() => import("./pages/RefundDetail"));
 const AddressList = lazy(() => import('./components/myService/AddressList'));
 const EventDetail = lazy(() => import("./components/EventDetail"));
 const CategoryPage = lazy(() => import("./components/CategoryPage"));
@@ -34,7 +34,7 @@ const PaymentPassword = lazy(() => import('./components/settings/PaymentPassword
 const ProfileEdit = lazy(() => import('./components/settings/ProfileEdit'));
 const ContentCreationPage = lazy(() => import('./components/ContentCreationPage'));
 const EcommerceCreationPage = lazy(() => import('./components/creation/EcommerceCreationPage'));
-const MyContentPage = lazy(() => import('./components/MyContentPage'));
+const MyContentPage = lazy(() => import('./pages/MyContentPage'));
 const MyShopPage = lazy(() => import('./components/shop/MyShopPage'));
 const ProductManagePage = lazy(() => import('./components/product/ProductManagePage'));
 const ShopCreationPage = lazy(() => import('./components/shop/ShopCreationPage'));
@@ -83,23 +83,23 @@ const AppContent = () => {
       <CommonHelmet />
       <div className="page-container">
         <Suspense fallback={<div>Loading Page...</div>}>
-          <Routes>
+        <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Daily />} />
             <Route path="/daily" element={<Daily />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
-            <Route path="/event/:id" element={<EventDetail />} />
-            <Route path="/category/:id" element={<CategoryPage />} />
+          <Route path="/event/:id" element={<EventDetail />} />
+          <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/shop-detail/:id" element={<ShopDetailPage />} />
 
             {/* Protected Routes */}
             <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
             <Route path="/my-service" element={<ProtectedRoute><MyService /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/order-list/:status" element={<ProtectedRoute><OrderList /></ProtectedRoute>} />
             <Route path="/order-detail/:orderId" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
             <Route path="/logistics/:orderId" element={<ProtectedRoute><LogisticsTracker /></ProtectedRoute>} />
@@ -109,16 +109,16 @@ const AppContent = () => {
             <Route path="/settings/payment-password" element={<ProtectedRoute><PaymentPassword /></ProtectedRoute>} />
             <Route path="/settings/profile" element={<ProtectedRoute><ProfileEdit /></ProtectedRoute>} />
             <Route path="/creation" element={<ProtectedRoute><ContentCreationPage /></ProtectedRoute>} />
-            <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
-            <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
-            <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
-            <Route path="/product-manage" element={<ProtectedRoute><ProductManagePage /></ProtectedRoute>} />
+          <Route path="/ecommerce-creation" element={<ProtectedRoute><EcommerceCreationPage /></ProtectedRoute>} />
+          <Route path="/my-content" element={<ProtectedRoute><MyContentPage /></ProtectedRoute>} />
+          <Route path="/my-shop" element={<ProtectedRoute><MyShopPage /></ProtectedRoute>} />
+          <Route path="/product-manage" element={<ProtectedRoute><ProductManagePage /></ProtectedRoute>} />
             <Route path="/shop-creation" element={<ProtectedRoute><ShopCreationPage /></ProtectedRoute>} />
-            <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
+          <Route path="/shop-edit/:id" element={<ProtectedRoute><ShopEditPage /></ProtectedRoute>} />
             <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
             <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
             <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
-          </Routes>
+        </Routes>
         </Suspense>
       </div>
       {shouldShowNavBar && <NavBar className="bottom-nav" />}
@@ -131,7 +131,7 @@ function App() {
     <ThemeProvider>
       <GlobalStyles />
       <AuthProvider>
-        <AppContent />
+      <AppContent />
       </AuthProvider>
     </ThemeProvider>
   );

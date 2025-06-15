@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
-import { useAuth } from "../App";
+import { useAuth } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";

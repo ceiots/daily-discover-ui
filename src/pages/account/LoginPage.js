@@ -22,9 +22,7 @@ import {
   FormFooterText,
   FormTitle,
   FormBrandLogo,
-  FormLoader,
   FormEyeIcon,
-  FormBrandText,
   SimpleToast,
   showToast
 } from '../../theme/components';
@@ -154,9 +152,6 @@ const LoginPage = () => {
     }
   };
 
-  // 使用导入的showToast函数，移除自定义实现
-  
-
   return (
     <BasePage padding={false} showHeader={false}>
       <LoginContainer>
@@ -230,18 +225,13 @@ const LoginPage = () => {
               </div>
               
               <FormSubmitButton type="submit" disabled={loading} style={{ backgroundColor: UI_COLORS.PRIMARY, padding: UI_SIZES.BUTTON_PADDING }}>
-                {loading && <FormLoader />}
-                登录
+                {loading ? '登录中...' : '登录'}
               </FormSubmitButton>
             </form>
             
             <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
               还没有账号?<Link to="/register">立即注册</Link>
             </FormBottomLink>
-            
-            <FormBrandText style={{ color: UI_COLORS.TEXT_MEDIUM }}>
-              畅享发现生活中的每一份惊喜
-            </FormBrandText>
             
             <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
               Copyright © {new Date().getFullYear()} All Rights Reserved
@@ -253,20 +243,7 @@ const LoginPage = () => {
   );
 };
 
-const LoginContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: ${UI_COLORS.BACKGROUND_LIGHT};
-`;
-
-const LoginFormContainer = styled.div`
-  max-width: ${UI_SIZES.FORM_MAX_WIDTH};
-  width: 100%;
-  padding: 3rem 2rem;
-  box-sizing: border-box;
-  text-align: center;
-`;
-
 export default LoginPage;
+
+const LoginContainer = styled(FormContainer)``;
+const LoginFormContainer = styled.div``;

@@ -16,10 +16,8 @@ import {
   FormInputGroup,
   FormCodeButton,
   FormBottomLink,
-  FormBrandText,
   FormFooterText,
   FormEyeIcon,
-  FormLoader,
   FormTitle,
   FormBrandLogo,
   showToast
@@ -265,8 +263,7 @@ const ForgotPasswordPage = () => {
                 </FormGroup>
                 
                 <FormSubmitButton type="submit" disabled={loading}>
-                  {loading && <FormLoader />}
-                  确认重置
+                  {loading ? "处理中..." : "重置密码"}
                 </FormSubmitButton>
               </form>
             )}
@@ -274,11 +271,7 @@ const ForgotPasswordPage = () => {
             <FormBottomLink>
               <Link to="/login">返回登录</Link>
             </FormBottomLink>
-
-            <FormBrandText>
-              畅享发现生活中的每一份惊喜
-            </FormBrandText>
-
+            
             <FormFooterText>
               Copyright © {new Date().getFullYear()} All Rights Reserved
             </FormFooterText>

@@ -20,8 +20,8 @@ export {
   TopBar,
   Toast,
   SimpleToast,
-  ToastComponent,
   showToast,
+  ToastContainer,
   BasePage
 } from './components';
 

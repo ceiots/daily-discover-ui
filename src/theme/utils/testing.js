@@ -2,9 +2,10 @@
  * 测试辅助工具
  * 提供组件测试相关的工具函数
  */
+/* eslint-env jest */
 import React from 'react';
 import { render } from '@testing-library/react';
-import { ThemeProvider } from '../ThemeProvider';
+import ThemeProvider from '../ThemeProvider';
 
 /**
  * 使用主题包装的渲染函数
