@@ -5,7 +5,7 @@
 
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { useAuth } from '../../../App';
+import { useAuth } from '../../../hooks/useAuth';
 
 /**
  * NavBar组件的逻辑钩子

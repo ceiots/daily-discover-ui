@@ -137,13 +137,14 @@ const NavBar = ({ className }) => {
   useComponentPerformance('NavBar');
   
   const { theme } = useTheme();
+  const navBarProps = useNavBar();
   const {
     isActive,
     isNotAuthPage,
     isLoggedIn,
     userInfo,
     handleCenterClick
-  } = useNavBar();
+  } = navBarProps;
 
   return (
     <NavContainer className={className} theme={theme}>
