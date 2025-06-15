@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import instance from '../services/http/instance';
+import httpClient from '../services/http/instance';
 import PropTypes from 'prop-types';
-import '../components/MyContentPage.css';
+import './MyContentPage.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -37,7 +37,7 @@ const MyContentPage = () => {
         return;
       }
       
-      const response = await instance.get(`/content/list?status=${activeTab}`, {
+      const response = await httpClient.get(`/content/list?status=${activeTab}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -108,7 +108,7 @@ const MyContentPage = () => {
         status: activeTab
       };
       
-      const response = await instance.post('/content/save', contentDto, {
+      const response = await httpClient.post('/content/save', contentDto, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -167,7 +167,7 @@ const MyContentPage = () => {
         return;
       }
       
-      const response = await instance.delete(`/content/${id}`, {
+      const response = await httpClient.delete(`/content/${id}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

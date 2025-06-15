@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Link } from "react-router-dom";
 import "./Daily.css";
 import instance from "../utils/axios";
 import { useNavigate } from "react-router-dom";
-import AiAssistant from "./ai/AiAssistant"; // 引入AI助手组件
-import Recommendations from "./recommendation/Recommendations"; // Import the new Recommendations component
+import AiAssistant from "../components/ai/AiAssistant"; // 引入AI助手组件
+import Recommendations from "../components/recommendation/Recommendations"; // Import the new Recommendations component
 import { BasePage } from "../theme";
 // Helper function to get Lunar Date (simplified)
 const getLunarDate = (date) => {
@@ -195,4 +194,4 @@ const Daily = () => {
   );
 };
 
-export default Daily;
+export default Daily; 

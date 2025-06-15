@@ -9,8 +9,8 @@ import NavBar from './theme/components/organisms/NavBar';
 import CommonHelmet from './components/CommonHelmet';
 
 // Page components
-import Daily from './components/Daily';
-import Discover from './components/Discover';
+import Daily from './pages/Daily';
+import Discover from './pages/Discover';
 import MyService from './pages/MyService';
 import Settings from './components/settings/Settings';
 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
 
@@ -26,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
   if (!isLoggedIn) {
     // 保存当前路径到sessionStorage，登录成功后可以跳转回来
     sessionStorage.setItem('redirectUrl', location.pathname + location.search);
-    return <Navigate to="/account/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // 已登录，渲染原始组件

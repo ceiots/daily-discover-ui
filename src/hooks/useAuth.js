@@ -1,3 +1,4 @@
+import React from 'react';
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import httpClient from '../services/http/instance';
 import { API_PATHS } from '../constants/api';

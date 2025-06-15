@@ -18,4 +18,5 @@
 - **[07_TESTING_STRATEGY.md](./07_TESTING_STRATEGY.md)**: 项目的单元测试、组件测试和端到端测试策略。
 
 ## 4. 项目管理 （每次修改都要更新）
-- **[08_PROJECT_STATUS_AND_TODOLIST.md](./08_PROJECT_STATUS_AND_TODOLIST.md)**: 当前工程状态、技术债务、重构计划和待办事项。 
+- **[08_PROJECT_STATUS_AND_TODOLIST.md](./08_PROJECT_STATUS_AND_TODOLIST.md)**: 当前工程状态、技术债务、重构计划和待办事项。
+- **[09_CORE_TECHNOLOGIES.md](./09_CORE_TECHNOLOGIES.md)**: 项目核心技术栈的实现原理与最佳实践详解。 
