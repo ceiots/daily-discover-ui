@@ -150,9 +150,24 @@ export const SocialLoginWrapper = styled.div`
   text-align: center;
 `;
 
-export const SocialButton = styled(StyledFormButton)`
-  background-color: #27ae60;
-  margin-bottom: ${({ theme }) => theme.spacing.md};
+export const WeChatButton = styled(StyledFormButton)`
+  background-color: #07C160; /* WeChat Green */
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background-color: #06AD56; /* Darker shade for hover */
+  }
+
+  /* 简单的微信图标 */
+  &::before {
+    content: '\\f1d7'; /* Font Awesome WeChat icon unicode */
+    font-family: 'Font Awesome 5 Brands';
+    margin-right: 8px;
+    font-size: 1.2rem;
+  }
 `;
 
 export const AlternateAction = styled.div`

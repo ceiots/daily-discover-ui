@@ -61,11 +61,13 @@ export const VerificationCodeInput = ({ label, id, error, onSendCode, isSending,
 /**
  * A styled container for social login buttons.
  */
-export const SocialLogin = () => (
+export const SocialLogin = ({ onWeChatLogin }) => (
     <>
         <S.Divider>或</S.Divider>
         <S.SocialLoginWrapper>
-            <S.SocialButton>使用微信登陆</S.SocialButton>
+            <S.WeChatButton onClick={onWeChatLogin} type="button">
+                使用微信登陆
+            </S.WeChatButton>
         </S.SocialLoginWrapper>
     </>
 );

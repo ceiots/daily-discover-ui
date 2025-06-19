@@ -77,7 +77,6 @@ const useNavBar = () => {
   
   // 判断是否为登录、注册、找回密码页面
   const isNotAuthPage = path.startsWith('/login') ||
-    path.startsWith('/register') ||
     path.startsWith('/forgot-password');
   
   // 处理中心按钮点击

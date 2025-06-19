@@ -53,6 +53,10 @@ function showNavBar(pathname) {
     '/payment',
     '/payment-password',
     '/order-success',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/wechat-callback'
   ];
 
   if (pathname.startsWith('/product/')) {

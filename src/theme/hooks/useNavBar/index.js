@@ -41,13 +41,14 @@ export const useNavBar = () => {
   };
 
   // 监听登录状态变化
+  /*
   useEffect(() => {
     // 只在登录状态变化时输出日志，而不是每次 userInfo 变化
     console.log("NavBar 检测到登录状态变化:", isLoggedIn);
     
     // 添加登录状态变化的事件监听器
     const handleLoginStateChanged = () => {
-      console.log("NavBar 检测到登录事件触发");
+      console.log("NavBar 事件检测 - 登录事件触发");
       // 重新获取token和userId状态
       const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
@@ -61,6 +62,7 @@ export const useNavBar = () => {
       window.removeEventListener('loginStateChanged', handleLoginStateChanged);
     };
   }, [isLoggedIn]); // 只依赖 isLoggedIn
+  */
   
   return {
     path,

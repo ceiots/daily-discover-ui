@@ -16,7 +16,7 @@ export {
     VerificationCodeWrapper, 
     Divider, 
     SocialLoginWrapper, 
-    SocialButton, 
+    WeChatButton, 
     AlternateAction, 
     ErrorMessage 
 } from './styles'; 
