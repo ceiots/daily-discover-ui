@@ -5,7 +5,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 // Global components
-import NavBar from './theme/components/organisms/NavBar';
+import NavBar, { TopBar } from './theme/components/organisms/NavBar';
 import CommonHelmet from './components/CommonHelmet';
 
 // Page components
@@ -78,6 +78,7 @@ const AppContent = () => {
   return (
     <>
       <CommonHelmet />
+      <TopBar />
       <div className="page-container">
         <Suspense fallback={<div>Loading Page...</div>}>
         <Routes>

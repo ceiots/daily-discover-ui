@@ -22,7 +22,25 @@ export {
   SimpleToast,
   showToast,
   ToastContainer,
-  BasePage
+  BasePage,
+  // Form components
+  FormInput, 
+  SubmitButton, 
+  VerificationCodeInput, 
+  SocialLogin, 
+  AlternateAuthAction,
+  FormContainer, 
+  FormWrapper, 
+  FormTitle, 
+  FormGroup, 
+  Label, 
+  Input, 
+  VerificationCodeWrapper, 
+  Divider, 
+  SocialLoginWrapper, 
+  SocialButton, 
+  AlternateAction, 
+  ErrorMessage 
 } from './components';
 
 // 导出钩子

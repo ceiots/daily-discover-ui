@@ -2,7 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { authService } from '../../services/api';
-import { FormContainer, FormFrame, FormInput, FormCodeButton, FormSubmitButton, FormErrorMessage } from '../../theme/components/Form';
+import { 
+  FormContainer, 
+  FormWrapper, 
+  FormTitle,
+  FormInput, 
+  SubmitButton, 
+  VerificationCodeInput,
+  ErrorMessage,
+  AlternateAuthAction
+} from '../../theme';
 import { Helmet } from 'react-helmet-async';
 
 const ForgotPasswordPage = () => {
@@ -13,6 +22,7 @@ const ForgotPasswordPage = () => {
   const [step, setStep] = useState(1); // 1: 输入邮箱, 2: 输入验证码和新密码
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -27,11 +37,13 @@ const ForgotPasswordPage = () => {
         return;
     }
 
+    setIsSendingCode(true);
     setLoading(true);
     setError('');
     try {
       const response = await authService.sendVerificationCode(email, 3); // 3 for reset password
-      if (response && response.success) {
+      if (response && response.data.success) {
+        toast.success('验证码已发送，请注意查收');
         setStep(2); // 进入下一步
         setCountdown(60);
         const timer = setInterval(() => {
@@ -43,10 +55,13 @@ const ForgotPasswordPage = () => {
             return prev - 1;
           });
         }, 1000);
+      } else {
+        setError(response.data.message || '发送验证码失败');
       }
     } catch (err) {
       setError(err.response?.data?.message || '发送验证码失败，请确认邮箱是否已注册');
     } finally {
+      setIsSendingCode(false);
       setLoading(false);
     }
   };
@@ -57,14 +72,20 @@ const ForgotPasswordPage = () => {
       setError('两次输入的密码不一致');
       return;
     }
+    if (!password) {
+      setError('请输入新密码');
+      return;
+    }
     setError('');
 
     try {
       setSubmitting(true);
       const response = await authService.resetPassword({ email, code, password });
-      if (response && response.success) {
+      if (response && response.data.success) {
         toast.success('密码重置成功！即将跳转到登录页。');
-        navigate('/login');
+        setTimeout(() => navigate('/login'), 2000);
+      } else {
+        setError(response.data.message || '密码重置失败');
       }
     } catch (err) {
       setError(err.response?.data?.message || '密码重置失败，请检查验证码或稍后再试');
@@ -75,45 +96,49 @@ const ForgotPasswordPage = () => {
 
   return (
     <FormContainer>
-      <FormFrame title="重置密码">
-        {error && <div className="error-message">{error}</div>}
+      <Helmet>
+        <title>重置密码 - 每日发现</title>
+      </Helmet>
+      <FormWrapper>
+        <FormTitle>重置密码</FormTitle>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
         
         {step === 1 && (
-          <div>
+          <form onSubmit={(e) => { e.preventDefault(); handleSendCode(); }}>
             <FormInput
+              label="注册邮箱"
+              id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="请输入您的注册邮箱"
               required
             />
-            <FormSubmitButton onClick={handleSendCode} disabled={loading}>
-              {loading ? '发送中...' : '发送验证码'}
-            </FormSubmitButton>
-          </div>
+            <SubmitButton type="submit" disabled={isSendingCode || loading}>
+              {isSendingCode ? '发送中...' : '发送验证码'}
+            </SubmitButton>
+          </form>
         )}
 
         {step === 2 && (
           <form onSubmit={handleResetPassword}>
-            <p>验证码已发送到: {email}</p>
-            <div className="form-group-inline">
-              <FormInput
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="邮箱验证码"
-                required
-                className="code-input"
-              />
-              <FormCodeButton
-                type="button"
-                onClick={handleSendCode}
-                disabled={loading || countdown > 0}
-              >
-                {countdown > 0 ? `${countdown}秒后重发` : '发送验证码'}
-              </FormCodeButton>
-            </div>
+            <p>验证码已发送到: <strong>{email}</strong></p>
+            <VerificationCodeInput
+              label="验证码"
+              id="code"
+              error={error}
+              onSendCode={handleSendCode}
+              isSending={isSendingCode || countdown > 0}
+              inputProps={{
+                value: code,
+                onChange: (e) => setCode(e.target.value),
+                placeholder: "邮箱验证码",
+                required: true
+              }}
+            />
             <FormInput
+              label="新密码"
+              id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,26 +146,25 @@ const ForgotPasswordPage = () => {
               required
             />
             <FormInput
+              label="确认新密码"
+              id="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="确认新密码"
               required
             />
-            <FormSubmitButton 
+            <SubmitButton 
               type="submit" 
-              disabled={loading}
-              style={{ marginBottom: '10px' }}
+              disabled={submitting}
             >
-              {loading ? '重置中...' : '重置密码'}
-            </FormSubmitButton>
+              {submitting ? '重置中...' : '重置密码'}
+            </SubmitButton>
           </form>
         )}
 
-        <div className="form-footer">
-          <Link to="/login">返回登录</Link>
-        </div>
-      </FormFrame>
+        <AlternateAuthAction text="记起密码了？" linkText="返回登录" to="/login" />
+      </FormWrapper>
     </FormContainer>
   );
 };

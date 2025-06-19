@@ -11,6 +11,16 @@ import { useNavBar } from '../../../hooks/useNavBar';
 import { UI_COLORS, UI_SIZES, UI_SHADOWS, UI_ANIMATIONS } from '../../../styles/uiConstants';
 import { useComponentPerformance } from '../../../utils/performance';
 
+export const TopBar = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: ${({ theme }) => `linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.secondary})`};
+  z-index: 100;
+`;
+
 // 样式组件
 const NavContainer = styled.div`
   position: fixed;

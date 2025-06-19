@@ -5,5 +5,6 @@
 export { default as InfoCard } from './InfoCard';
 export { default as Card } from './Card';
 export { default as ShopInfo } from './ShopInfo';
+export { default as ScrollableSection } from './ScrollableSection';
 
 // 更多分子组件将在这里添加 
