@@ -23,3 +23,5 @@
 - **代码分割优化**：AI检测到大型组件或页面时，自动应用React.lazy和Suspense
 - **渲染优化**：检测到不必要的重渲染时，自动应用React.memo、useMemo和useCallback
 - **资源优化**：自动检测并优化大型图片、未压缩资源等
+
+- [Performance Warning] 中列出了所有性能问题，要解决。
