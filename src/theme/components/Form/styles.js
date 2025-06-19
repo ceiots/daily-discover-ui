@@ -4,47 +4,32 @@ export const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
   padding: ${({ theme }) => theme.spacing.xl};
   background-color: ${({ theme }) => theme.colors.background};
-  background-image: url('https://images.unsplash.com/photo-1549887552-cb107269b520');
-  background-size: cover;
-  background-position: center;
   position: relative;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(3px);
-    z-index: 0;
-  }
 `;
 
 export const FormWrapper = styled.div`
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 400px;
-  padding: ${({ theme }) => theme.spacing.xl};
-  background: ${({ theme }) => theme.colors.surface};
-  border-radius: ${({ theme }) => theme.borderRadius.medium};
-  box-shadow: ${({ theme }) => theme.shadows.medium};
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  max-width: 440px;
+  padding: ${({ theme }) => theme.spacing['3xl']};
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: ${({ theme }) => theme.borderRadius.xl};
+  box-shadow: ${({ theme }) => theme.shadows.xl};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  margin-top: ${({ theme }) => theme.spacing['4xl']};
+  margin-bottom: ${({ theme }) => theme.spacing['4xl']};
 `;
 
 export const FormTitle = styled.h2`
   text-align: center;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
   font-family: ${({ theme }) => theme.typography.fontFamilyHeading};
-  font-size: ${({ theme }) => theme.typography.h2};
-  color: ${({ theme }) => theme.colors.primary};
-  font-weight: 400;
+  font-size: ${({ theme }) => theme.typography.fontSize['3xl']};
+  color: ${({ theme }) => theme.colors.textMain};
+  font-weight: 600;
 `;
 
 export const FormGroup = styled.div`
@@ -55,70 +40,92 @@ export const Label = styled.label`
   display: block;
   margin-bottom: ${({ theme }) => theme.spacing.sm};
   font-weight: 500;
-  font-size: ${({ theme }) => theme.typography.fontSizeBase};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
   color: ${({ theme }) => theme.colors.textMain};
 `;
 
 export const Input = styled.input`
   width: 100%;
-  padding: ${({ theme }) => {
-    console.log('Theme in Input component:', theme);
-    return theme.components.input.padding;
-  }};
-  border: 1px solid #ccc;
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-  font-size: ${({ theme }) => theme.typography.fontSizeBase};
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
   font-family: ${({ theme }) => theme.typography.fontFamilyBase};
   transition: all ${({ theme }) => theme.animations.fast};
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: ${({ theme }) => theme.colors.white};
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.textSub};
+  }
 
   &:focus {
     outline: none;
     border-color: ${({ theme }) => theme.colors.primary};
-    box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.state.focus};
+    background-color: ${({ theme }) => theme.colors.white};
   }
 `;
 
 export const VerificationCodeWrapper = styled.div`
   display: flex;
+  align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
 `;
 
 export const StyledFormButton = styled.button`
   width: 100%;
-  padding: ${({ theme }) => theme.components.button.padding};
+  padding: ${({ theme }) => theme.spacing.md};
   border: none;
-  border-radius: ${({ theme }) => theme.borderRadius.small};
-  background-color: ${({ theme, $primary }) => ($primary ? theme.colors.primary : theme.colors.secondary)};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.white};
-  font-size: ${({ theme }) => theme.typography.fontSizeLarge};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
   font-family: ${({ theme }) => theme.typography.fontFamilyBase};
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all ${({ theme }) => theme.animations.fast};
+  margin-top: ${({ theme }) => theme.spacing.xl};
 
-  &:hover {
-    opacity: 0.9;
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.primaryHover};
     transform: translateY(-1px);
+    box-shadow: ${({ theme }) => theme.shadows.md};
   }
 
   &:disabled {
-    background-color: #bdc3c7;
+    background-color: ${({ theme }) => theme.colors.state.disabled};
     cursor: not-allowed;
   }
+`;
 
-  ${({ secondary }) =>
-    secondary &&
-    css`
-      background-color: ${({ theme }) => theme.colors.accent};
-    `}
+export const SendCodeButton = styled.button`
+  flex-shrink: 0;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => theme.borderRadius.base};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  font-weight: 500;
+  cursor: pointer;
+  transition: all ${({ theme }) => theme.animations.fast};
+  min-width: 120px;
+  text-align: center;
+
+  &:hover:not(:disabled) {
+    background-color: ${({ theme }) => theme.colors.state.focus};
+  }
+
+  &:disabled {
+    border-color: ${({ theme }) => theme.colors.neutral[300]};
+    color: ${({ theme }) => theme.colors.neutral[400]};
+  }
 `;
 
 export const Divider = styled.div`
   text-align: center;
-  margin: ${({ theme }) => theme.spacing.lg} 0;
-  color: ${({ theme }) => theme.colors.textLight};
-  font-size: ${({ theme }) => theme.typography.fontSizeSmall};
+  margin: ${({ theme }) => theme.spacing.xl} 0;
+  color: ${({ theme }) => theme.colors.textSub};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
   position: relative;
   
   &::before, &::after {
@@ -127,7 +134,7 @@ export const Divider = styled.div`
     top: 50%;
     width: 40%;
     height: 1px;
-    background-color: #e0e0e0;
+    background-color: ${({ theme }) => theme.colors.border};
   }
   
   &::before {
@@ -150,13 +157,15 @@ export const SocialButton = styled(StyledFormButton)`
 
 export const AlternateAction = styled.div`
   text-align: center;
-  margin-top: ${({ theme }) => theme.spacing.lg};
-  font-size: ${({ theme }) => theme.typography.fontSizeBase};
+  margin-top: ${({ theme }) => theme.spacing.xl};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
+  color: ${({ theme }) => theme.colors.textSub};
 
   a {
-    color: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.primary};
     text-decoration: none;
     font-weight: 500;
+    margin-left: 4px;
 
     &:hover {
       text-decoration: underline;
@@ -166,8 +175,25 @@ export const AlternateAction = styled.div`
 
 export const ErrorMessage = styled.p`
   color: ${({ theme }) => theme.colors.error};
-  font-size: ${({ theme }) => theme.typography.fontSizeSmall};
+  font-size: ${({ theme }) => theme.typography.fontSize.base};
   margin-top: ${({ theme }) => theme.spacing.xs};
   text-align: left;
   min-height: 16px; /* 避免布局晃动 */
+`;
+
+export const HeaderBar = styled.div`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing.lg} 0;
+  background-color: ${({ theme }) => theme.colors.primary};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`;
+
+export const HeaderTitle = styled.h1`
+  color: ${({ theme }) => theme.colors.white};
+  font-size: ${({ theme }) => theme.typography.fontSize['4xl']};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
+  margin: 0;
 `; 

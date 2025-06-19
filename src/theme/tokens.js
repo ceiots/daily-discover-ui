@@ -12,7 +12,7 @@ export const colors = {
   // 主色调
   primary: "#5B47E8",    // 主色，用于按钮、高亮元素，保持不变
   primaryHover: "#4a39d1", // 主色悬停状态，鲜明，颜色稍深
-  background: "#f8f9fa",  // 浅灰色背景，更柔和且现代
+  background: "#eceff1",  // 更改为更柔和、高级的浅灰色背景
   white: "#FFFFFF",     // 白色，卡片/输入框背景，保持不变
   border: "#e7e7e7",    // 极浅灰色边框，增加柔和感
   textMain: "#2c2c2c",  // 深灰色主文字，与背景形成高对比度，更清晰

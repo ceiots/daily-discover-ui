@@ -41,15 +41,16 @@ export const SubmitButton = ({ children, disabled, ...rest }) => (
  * @param {string} props.error - The error message to display.
  * @param {function} props.onSendCode - The function to call when the send code button is clicked.
  * @param {boolean} props.isSending - Whether the code is currently being sent.
+ * @param {number} props.countdown - The countdown time for the send code button.
  * @param {object} props.inputProps - Props to pass to the input element.
  */
-export const VerificationCodeInput = ({ label, id, error, onSendCode, isSending, inputProps }) => (
+export const VerificationCodeInput = ({ label, id, error, onSendCode, isSending, countdown, inputProps }) => (
     <S.FormGroup>
         {label && <S.Label htmlFor={id}>{label}</S.Label>}
         <S.VerificationCodeWrapper>
             <S.Input id={id} {...inputProps} />
-            <S.StyledFormButton onClick={onSendCode} disabled={isSending} type="button" $primary>
-                {isSending ? '发送中...' : '发送验证码'}
+            <S.StyledFormButton onClick={onSendCode} disabled={isSending} type="button">
+                {isSending ? (countdown > 0 ? `${countdown}s 后重发` : '发送中...') : '发送验证码'}
             </S.StyledFormButton>
         </S.VerificationCodeWrapper>
         {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
@@ -64,7 +65,7 @@ export const SocialLogin = () => (
     <>
         <S.Divider>或</S.Divider>
         <S.SocialLoginWrapper>
-            <S.SocialButton>使用微信注册</S.SocialButton>
+            <S.SocialButton>使用微信登陆</S.SocialButton>
         </S.SocialLoginWrapper>
     </>
 );

@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useTheme } from '../../../useTheme';
 import { useNavBar } from '../../../hooks/useNavBar';
-import { UI_COLORS, UI_SIZES, UI_SHADOWS, UI_ANIMATIONS } from '../../../styles/uiConstants';
 import { useComponentPerformance } from '../../../utils/performance';
 
 export const TopBar = styled.div`
@@ -29,9 +28,9 @@ const NavContainer = styled.div`
   right: 0;
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  background-color: ${UI_COLORS.BG_WHITE};
-  box-shadow: ${UI_SHADOWS.NAV};
-  transition: ${UI_ANIMATIONS.NORMAL};
+  background-color: ${({ theme }) => theme.colors.white};
+  box-shadow: ${({ theme }) => theme.shadows.md};
+  transition: ${({ theme }) => theme.animations.normal};
   ${({ className }) => className && className}
 `;
 
@@ -39,9 +38,9 @@ const NavWrapper = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 10px 0;
-  height: ${UI_SIZES.NAV_HEIGHT};
-  max-width: ${UI_SIZES.CONTENT_MAX_WIDTH};
+  padding: ${({ theme }) => theme.spacing.sm} 0;
+  height: ${({ theme }) => theme.spacing['xl']}; /* 假设 NAV_HEIGHT 对应 theme.spacing.xl */
+  max-width: 100%; /* 假设 CONTENT_MAX_WIDTH 对应 100% */
   margin: 0 auto;
   position: relative;
   
@@ -63,16 +62,16 @@ const NavItem = styled(Link)`
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  padding: 6px 12px;
-  font-size: ${UI_SIZES.NAV_TEXT_SIZE};
-  color: ${({ $active }) => $active ? UI_COLORS.PRIMARY : UI_COLORS.TEXT_LIGHT};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  font-size: ${({ theme }) => theme.typography.fontSize.caption};
+  color: ${({ $active, theme }) => $active ? theme.colors.primary : theme.colors.textSub};
   position: relative;
-  transition: ${UI_ANIMATIONS.FAST};
+  transition: ${({ theme }) => theme.animations.fast};
   flex: 1;
   
   &:hover {
     transform: translateY(-2px);
-    color: ${UI_COLORS.PRIMARY};
+    color: ${({ theme }) => theme.colors.primary};
   }
   
   &:active {
@@ -80,13 +79,13 @@ const NavItem = styled(Link)`
   }
   
   i {
-    font-size: ${UI_SIZES.NAV_ICON_SIZE};
-    margin-bottom: ${UI_SIZES.NAV_TEXT_SPACING};
+    font-size: ${({ theme }) => theme.typography.fontSize.lg}; /* 假设 NAV_ICON_SIZE 对应 theme.typography.fontSize.lg */
+    margin-bottom: ${({ theme }) => theme.spacing.xs}; /* 假设 NAV_TEXT_SPACING 对应 theme.spacing.xs */
   }
   
   span {
-    font-size: ${UI_SIZES.NAV_TEXT_SIZE};
-    font-weight: 500;
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
   }
 `;
 
@@ -97,9 +96,9 @@ const NavIndicator = styled.div`
   transform: translateX(-50%);
   width: 20px;
   height: 3px;
-  background: ${UI_COLORS.PRIMARY};
+  background: ${({ theme }) => theme.colors.primary};
   border-radius: 3px;
-  transition: ${UI_ANIMATIONS.NORMAL};
+  transition: ${({ theme }) => theme.animations.normal};
 `;
 
 const CenterButtonContainer = styled.div`
@@ -115,18 +114,18 @@ const CenterButton = styled.a`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  background-color: ${UI_COLORS.PRIMARY};
-  color: white;
-  box-shadow: ${UI_SHADOWS.BUTTON_HOVER};
-  transition: ${UI_ANIMATIONS.NORMAL};
+  width: ${({ theme }) => theme.spacing['10']};
+  height: ${({ theme }) => theme.spacing['10']};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.white};
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+  transition: ${({ theme }) => theme.animations.normal};
   transform: translateY(-8px);
   
   &:hover {
     transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 6px 15px ${UI_COLORS.PRIMARY_SHADOW};
+    box-shadow: ${({ theme }) => theme.shadows.xl};
   }
   
   &:active {
@@ -134,7 +133,7 @@ const CenterButton = styled.a`
   }
   
   i {
-    font-size: 18px;
+    font-size: ${({ theme }) => theme.typography.fontSize.xl};
   }
 `;
 
@@ -176,12 +175,12 @@ const NavBar = ({ className }) => {
                 src={userInfo.avatar}
                 alt="头像"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: theme.spacing[8],
+                  height: theme.spacing[8],
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  border: '2px solid #fff',
-                  background: '#eee'
+                  border: `2px solid ${theme.colors.white}`,
+                  background: theme.colors.neutral[200],
                 }}
               />
             ) : (
@@ -204,7 +203,7 @@ const NavBar = ({ className }) => {
 };
 
 NavBar.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
 };
 
 // 添加displayName用于性能监控

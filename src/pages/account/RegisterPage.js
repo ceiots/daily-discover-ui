@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../../services/api';
 import { wechatAppId } from '../../config';
-import { FormInput, SubmitButton, VerificationCodeInput, SocialLogin, AlternateAuthAction } from '../../theme/components/Form/components';
+import { SocialLogin, AlternateAuthAction } from '../../theme/components/Form/components';
 import * as S from '../../theme/components/Form/styles';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
@@ -50,8 +50,8 @@ const RegisterPage = () => {
   };
 
   const handleSendCode = async () => {
-    if (!formData.email) {
-      setErrors({ ...errors, email: '发送前请输入邮箱' });
+    if (!formData.email || !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(formData.email)) {
+      setErrors({ ...errors, email: '发送前请输入有效的邮箱地址' });
       return;
     }
     setSendingCode(true);
@@ -90,99 +90,78 @@ const RegisterPage = () => {
   };
 
   return (
-    <S.FormContainer>
+    <>
       <Helmet>
         <title>创建新账户 - 每日发现</title>
       </Helmet>
-      <S.FormWrapper>
-        <form onSubmit={handleSubmit} noValidate>
-          <S.FormTitle>创建新账户</S.FormTitle>
-          
-          {errors.form && <S.ErrorMessage style={{ textAlign: 'center', marginBottom: '12px' }}>{errors.form}</S.ErrorMessage>}
+      <S.HeaderBar>
+        <S.HeaderTitle>创建新账户</S.HeaderTitle>
+      </S.HeaderBar>
+      <S.FormContainer>
+        <S.FormWrapper>
+          <form onSubmit={handleSubmit} noValidate>
+            {/* <S.FormTitle>创建新账户</S.FormTitle> */}
+            
+            {errors.form && <S.ErrorMessage style={{ textAlign: 'center', marginBottom: '16px' }}>{errors.form}</S.ErrorMessage>}
 
-          <FormInput
-            id="username"
-            label="用户名"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            error={errors.username}
-            placeholder="4-16位字母、数字或下划线"
-            required
-          />
-          
-          <FormInput
-            id="password"
-            label="密码"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            error={errors.password}
-            placeholder="8-20位，包含大小写字母和数字"
-            required
-          />
-          
-          <FormInput
-            id="confirmPassword"
-            label="确认密码"
-            type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            error={errors.confirmPassword}
-            placeholder="请再次输入密码"
-            required
-          />
-          
-          <FormInput
-            id="nickname"
-            label="昵称"
-            name="nickname"
-            value={formData.nickname}
-            onChange={handleChange}
-            error={errors.nickname}
-            placeholder="给自己取个好听的名字吧"
-            required
-          />
+            <S.FormGroup>
+              <S.Label htmlFor="username">用户名</S.Label>
+              <S.Input id="username" name="username" value={formData.username} onChange={handleChange} placeholder="4-16位字母、数字或下划线" required />
+              {errors.username && <S.ErrorMessage>{errors.username}</S.ErrorMessage>}
+            </S.FormGroup>
 
-          <VerificationCodeInput
-            label="电子邮箱"
-            id="email"
-            error={errors.email || errors.code}
-            onSendCode={handleSendCode}
-            isSending={sendingCode || countdown > 0}
-            inputProps={{
-              type: "email",
-              name: "email",
-              placeholder: "用于接收验证码",
-              value: formData.email,
-              onChange: handleChange,
-              required: true
-            }}
-            codeInputProps={{
-              name: "code",
-              placeholder: "验证码",
-              value: formData.code,
-              onChange: handleChange,
-              required: true
-            }}
-          />
-          
-          <SubmitButton type="submit" disabled={loading}>
-            {loading ? '注册中...' : '立即注册'}
-          </SubmitButton>
-          
-          <SocialLogin />
+            <S.FormGroup>
+              <S.Label htmlFor="nickname">昵称</S.Label>
+              <S.Input id="nickname" name="nickname" value={formData.nickname} onChange={handleChange} placeholder="给自己取个好听的名字吧" required />
+              {errors.nickname && <S.ErrorMessage>{errors.nickname}</S.ErrorMessage>}
+            </S.FormGroup>
 
-          <AlternateAuthAction
-            text="已有账户?"
-            linkText="立即登录"
-            to="/login"
-          />
-        </form>
-      </S.FormWrapper>
-    </S.FormContainer>
+            <S.FormGroup>
+              <S.Label htmlFor="password">密码</S.Label>
+              <S.Input id="password" type="password" name="password" value={formData.password} onChange={handleChange} placeholder="8-20位，包含大小写字母和数字" required />
+              {errors.password && <S.ErrorMessage>{errors.password}</S.ErrorMessage>}
+            </S.FormGroup>
+            
+            <S.FormGroup>
+              <S.Label htmlFor="confirmPassword">确认密码</S.Label>
+              <S.Input id="confirmPassword" type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="请再次输入密码" required />
+              {errors.confirmPassword && <S.ErrorMessage>{errors.confirmPassword}</S.ErrorMessage>}
+            </S.FormGroup>
+
+            <S.FormGroup>
+               <S.Label htmlFor="email">电子邮箱</S.Label>
+               <S.VerificationCodeWrapper>
+                  <S.Input id="email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="用于接收验证码" required />
+                  <S.SendCodeButton type="button" onClick={handleSendCode} disabled={sendingCode || countdown > 0}>
+                    {sendingCode ? '发送中...' : countdown > 0 ? `${countdown}s` : '发送验证码'}
+                  </S.SendCodeButton>
+               </S.VerificationCodeWrapper>
+               {errors.email && <S.ErrorMessage>{errors.email}</S.ErrorMessage>}
+            </S.FormGroup>
+
+            <S.FormGroup>
+              <S.Label htmlFor="code">验证码</S.Label>
+              <S.Input id="code" name="code" value={formData.code} onChange={handleChange} placeholder="请输入邮箱验证码" required />
+              {errors.code && <S.ErrorMessage>{errors.code}</S.ErrorMessage>}
+            </S.FormGroup>
+            
+            <S.StyledFormButton type="submit" disabled={loading}>
+              {loading ? '注册中...' : '立即注册'}
+            </S.StyledFormButton>
+            
+            <S.Divider>或</S.Divider>
+
+            {/* <SocialLogin onWeChatLogin={handleWeChatLogin}/> */}
+
+            <AlternateAuthAction
+              text="已有账户?"
+              linkText="立即登录"
+              to="/login"
+            />
+          </form>
+        </S.FormWrapper>
+      </S.FormContainer>
+    </>
   );
 };
 
