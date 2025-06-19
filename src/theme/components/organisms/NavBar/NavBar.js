@@ -210,4 +210,4 @@ NavBar.propTypes = {
 // 添加displayName用于性能监控
 NavBar.displayName = 'NavBar';
 
-export default NavBar; 
+export default React.memo(NavBar); 

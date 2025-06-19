@@ -14,8 +14,8 @@ const GlobalStyles = createGlobalStyle`
   
   /* 设置根字体大小和行高 */
   html {
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 12px; /* 根据tokens.js调整，整体缩小 */
+    line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }
@@ -23,7 +23,7 @@ const GlobalStyles = createGlobalStyle`
   /* 基础字体设置 */
   body {
     font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 14px; /* 基础字体稍小，更紧凑 */
+    font-size: 12px; /* 基础字体稍小，更紧凑 */
     font-weight: 400;
     color: ${({ theme }) => theme.colors.textMain};
     background-color: ${({ theme }) => theme.colors.background};
@@ -68,48 +68,49 @@ const GlobalStyles = createGlobalStyle`
     font-family: 'Ma Shan Zheng', cursive; /* 应用手写体 */
   }
 
-  h1 { font-size: 2rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
-  h2 { font-size: 1.6rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
-  h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.4em; }
-  h4 { font-size: 1.1rem; font-weight: 500; line-height: 1.3; margin-bottom: 0.4em; }
-  h5 { font-size: 1rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
-  h6 { font-size: 0.9rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
+  h1 { font-size: 1.8rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
+  h2 { font-size: 1.5rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
+  h3 { font-size: 1.2rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.4em; }
+  h4 { font-size: 1rem; font-weight: 500; line-height: 1.3; margin-bottom: 0.4em; }
+  h5 { font-size: 0.9rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
+  h6 { font-size: 0.8rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
   
   /* 常用间距类 */
   .mt-1 { margin-top: 0.2rem; }
-  .mt-2 { margin-top: 0.5rem; }
-  .mt-3 { margin-top: 0.75rem; }
-  .mt-4 { margin-top: 1rem; }
-  .mb-1 { margin-bottom: 0.25rem; }
-  .mb-2 { margin-bottom: 0.5rem; }
-  .mb-3 { margin-bottom: 0.75rem; }
-  .mb-4 { margin-bottom: 1rem; }
-  .ml-1 { margin-left: 0.25rem; }
-  .ml-2 { margin-left: 0.5rem; }
-  .mr-1 { margin-right: 0.25rem; }
-  .mr-2 { margin-right: 0.5rem; }
+  .mt-2 { margin-top: 0.4rem; }
+  .mt-3 { margin-top: 0.6rem; }
+  .mt-4 { margin-top: 0.8rem; }
+  .mb-1 { margin-bottom: 0.2rem; }
+  .mb-2 { margin-bottom: 0.4rem; }
+  .mb-3 { margin-bottom: 0.6rem; }
+  .mb-4 { margin-bottom: 0.8rem; }
+  .ml-1 { margin-left: 0.2rem; }
+  .ml-2 { margin-left: 0.4rem; }
+  .mr-1 { margin-right: 0.2rem; }
+  .mr-2 { margin-right: 0.4rem; }
   
   /* 常用内边距类 */
-  .p-1 { padding: 0.25rem; }
-  .p-2 { padding: 0.5rem; }
-  .p-3 { padding: 0.75rem; }
-  .p-4 { padding: 1rem; }
-  .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
-  .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
-  .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-  .px-4 { padding-left: 1rem; padding-right: 1rem; }
-  .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-  .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-  .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-  .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+  .p-1 { padding: 0.2rem; }
+  .p-2 { padding: 0.4rem; }
+  .p-3 { padding: 0.6rem; }
+  .p-4 { padding: 0.8rem; }
+  .px-1 { padding-left: 0.2rem; padding-right: 0.2rem; }
+  .px-2 { padding-left: 0.4rem; padding-right: 0.4rem; }
+  .px-3 { padding-left: 0.6rem; padding-right: 0.6rem; }
+  .px-4 { padding-left: 0.8rem; padding-right: 0.8rem; }
+  .py-1 { padding-top: 0.2rem; padding-bottom: 0.2rem; }
+  .py-2 { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  .py-3 { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+  .py-4 { padding-top: 0.8rem; padding-bottom: 0.8rem; }
   
   /* 文本类 */
   .text-center { text-align: center; }
   .text-left { text-align: left; }
   .text-right { text-align: right; }
-  .text-sm { font-size: 0.8rem; }
-  .text-md { font-size: 0.9rem; }
-  .text-lg { font-size: 1rem; }
+  .text-xs { font-size: 0.7rem; } /* 缩小 */
+  .text-sm { font-size: 0.8rem; } /* 缩小 */
+  .text-md { font-size: 0.9rem; } /* 缩小 */
+  .text-lg { font-size: 1rem; } /* 缩小 */
   .text-bold { font-weight: 600; }
   .text-normal { font-weight: 400; }
   
@@ -148,16 +149,16 @@ const GlobalStyles = createGlobalStyle`
   
   /* 表单样式重置 */
   input, select, textarea {
-    border: 1px solid ${({ theme }) => theme.colors.border};
-    border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 0.9rem;
+    border: 1px solid ${({ theme }) => theme.colors.border}; /* 窄边框 */
+    border-radius: 4px; /* 略微减小圆角 */
+    padding: 7px 9px; /* 调整内边距 */
+    font-size: 0.85rem; /* 调整字体大小 */
     transition: all 0.2s ease;
     
     &:focus {
       outline: none;
       border-color: ${({ theme }) => theme.colors.primary};
-      box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}20`};
+      box-shadow: 0 0 0 1px ${({ theme }) => `${theme.colors.primary}20`}; /* 调整阴影 */
     }
   }
   
