@@ -4,7 +4,7 @@
  */
 
 // API基础配置
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api.daily-discover.com';
+export const API_BASE_URL = 'https://api.daily-discover.com';
 export const API_VERSION = 'v1';
 export const API_TIMEOUT = 30000; // 30秒
 
@@ -12,13 +12,15 @@ export const API_TIMEOUT = 30000; // 30秒
 export const API_PATHS = {
   // 用户认证
   AUTH: {
-    LOGIN: `/api/${API_VERSION}/auth/login`,
-    REGISTER: `/api/${API_VERSION}/auth/register`,
+    LOGIN: `/api/${API_VERSION}/users/login`,
+    REGISTER: `/api/${API_VERSION}/users/register`,
     LOGOUT: `/api/${API_VERSION}/auth/logout`,
     REFRESH_TOKEN: `/api/${API_VERSION}/auth/refresh`,
-    FORGOT_PASSWORD: `/api/${API_VERSION}/auth/forgot-password`,
-    RESET_PASSWORD: `/api/${API_VERSION}/auth/reset-password`,
+    FORGOT_PASSWORD_REQUEST_CODE: `/api/${API_VERSION}/users/password/reset/code`,
+    RESET_PASSWORD_SUBMIT: `/api/${API_VERSION}/users/password/reset`,
     VERIFY_CODE: `/api/${API_VERSION}/auth/verify`,
+    SEND_CODE: `/api/${API_VERSION}/auth/send-code`,
+    SEND_EMAIL_CODE: `/api/${API_VERSION}/users/send-code`,
   },
   
   // 用户管理

@@ -23,7 +23,7 @@ const GlobalStyles = createGlobalStyle`
   /* 基础字体设置 */
   body {
     font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.9rem;
+    font-size: 14px; /* 基础字体稍小，更紧凑 */
     font-weight: 400;
     color: ${({ theme }) => theme.colors.textMain};
     background-color: ${({ theme }) => theme.colors.background};
@@ -64,15 +64,19 @@ const GlobalStyles = createGlobalStyle`
   }
   
   /* 标题字体大小设置 - 紧凑美观 */
-  h1 { font-size: 1.5rem; font-weight: 600; line-height: 1.3; }
-  h2 { font-size: 1.3rem; font-weight: 600; line-height: 1.3; }
-  h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
-  h4 { font-size: 1.05rem; font-weight: 500; line-height: 1.4; }
-  h5 { font-size: 0.95rem; font-weight: 500; line-height: 1.4; }
-  h6 { font-size: 0.9rem; font-weight: 500; line-height: 1.4; }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ma Shan Zheng', cursive; /* 应用手写体 */
+  }
+
+  h1 { font-size: 2rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
+  h2 { font-size: 1.6rem; font-weight: 600; line-height: 1.2; margin-bottom: 0.5em; }
+  h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.3; margin-bottom: 0.4em; }
+  h4 { font-size: 1.1rem; font-weight: 500; line-height: 1.3; margin-bottom: 0.4em; }
+  h5 { font-size: 1rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
+  h6 { font-size: 0.9rem; font-weight: 500; line-height: 1.4; margin-bottom: 0.3em; }
   
   /* 常用间距类 */
-  .mt-1 { margin-top: 0.25rem; }
+  .mt-1 { margin-top: 0.2rem; }
   .mt-2 { margin-top: 0.5rem; }
   .mt-3 { margin-top: 0.75rem; }
   .mt-4 { margin-top: 1rem; }

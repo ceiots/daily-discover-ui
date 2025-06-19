@@ -4,7 +4,7 @@ import "./ProductDetail.css"; // Keep your existing styles
 import instance from "../../services/http/instance";
 import { useAuth } from "../../hooks/useAuth";
 import { BasePage, Button } from "../../theme";
-import getDeviceInfo from "../../utils/deviceInfo";
+import { getDeviceInfo } from '../../utils/deviceInfo';
 import Toast from "../../theme/components/Toast";
 // 导入AI客服组件
 import ProductAiCustomerService from "../ai/ProductAiCustomerService";

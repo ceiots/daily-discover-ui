@@ -1,70 +1,86 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import instance from "../../services/http/instance"; // 修正路径
-import { BasePage, PageTitle } from "../../theme";
-import styled from "styled-components";
-import validators from '../../utils/validators'; // 修正路径
-import {
-  FormContainer,
-  FormFrame,
-  FormGroup,
-  FormLabel,
-  FormInput,
-  FormSubmitButton,
-  FormErrorMessage,
-  FormInputGroup,
-  FormCodeButton,
-  FormCheckboxContainer,
-  FormCheckbox,
-  FormCheckboxLabel,
-  FormBottomLink,
-  FormFooterText,
-  SimpleToast,
-  showToast
-} from "../../theme/components";
-import { UI_COLORS, UI_SIZES, UI_BORDERS, UI_SHADOWS } from "../../theme/styles/uiConstants";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { authService } from '../../services/api';
+import { wechatAppId } from '../../config'; // 假设你的微信AppId在一个配置文件中
+import { 
+  FormContainer, 
+  FormFrame, 
+  FormGroup, 
+  FormInput, 
+  FormInputGroup, 
+  FormCodeButton, 
+  FormSubmitButton, 
+  FormErrorMessage 
+} from '../../theme/components/Form';
+import styled from 'styled-components';
+import toast from 'react-hot-toast';
+import { Helmet } from 'react-helmet-async';
 
-// 定制样式组件
-const RegisterContainer = styled.div`
-  background-color: ${UI_COLORS.BG_LIGHT};
-  min-height: calc(100vh - 54px); // 54px是TopBar的高度
-  overflow-y: auto; // 添加垂直滚动条
-  max-height: calc(100vh - 54px); // 设置最大高度，防止溢出
+// 使用styled-components创建必要的样式组件
+const PageTitle = styled.h2`
+  margin-bottom: 20px;
+  text-align: center;
+  color: ${({ theme }) => theme.colors.textMain};
+  font-weight: 600;
 `;
 
-const RegisterFormContainer = styled(FormContainer)`
-  padding-top: 12px;
-  background-color: transparent;
-  min-height: auto;
+const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  
+  &::before, &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  }
+  
+  span {
+    padding: 0 10px;
+    color: ${({ theme }) => theme.colors.textSub};
+    font-size: 12px;
+  }
+`;
+
+const WeChatButton = styled(FormSubmitButton)`
+  background-color: #07C160;
+  
+  &:hover:not(:disabled) {
+    background-color: #06AD56;
+  }
+`;
+
+const LoginLink = styled.p`
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  
+  a {
+    color: ${({ theme }) => theme.colors.primary};
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const RegisterPage = () => {
-  const navigate = useNavigate();
-  
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    mobile: "",
-    nickname: "",
-    email: "",
-    deviceId: "web",
-    deviceType: 5,
-    deviceModel: "browser",
-    osVersion: navigator.userAgent,
-    appVersion: "1.0.0",
-    code: "",
-    codeType: 1
+    username: '',
+    password: '',
+    confirmPassword: '',
+    email: '',
+    code: '',
+    nickname: ''
   });
-  
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendingCode, setSendingCode] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const navigate = useNavigate();
 
-  // 倒计时效果
+  // 处理倒计时
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -72,215 +88,164 @@ const RegisterPage = () => {
     }
   }, [countdown]);
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSendCode = async () => {
+    if (!formData.email) {
+      setError('请输入邮箱');
+      return;
+    }
+    setError('');
+    try {
+      setSendingCode(true);
+      const response = await authService.sendVerificationCode(formData.email, 2); // 2 for register
+      if (response && response.success) {
+        toast.success('验证码已发送，请查收！');
+        setCountdown(60);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || '发送验证码失败，请稍后再试');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
 
-    const newErrors = {};
-
-    if (!formData.mobile) {
-      newErrors.phoneNumber = "请输入手机号";
-    } else if (!validators.isValidPhoneNumber(formData.mobile)) {
-      newErrors.phoneNumber = "请输入正确的手机号格式";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "请输入密码";
-    } else if (!validators.isValidPassword(formData.password)) {
-      newErrors.password = "密码长度至少为8个字符，且必须包含数字和字母";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "请确认密码";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "两次输入的密码不一致";
-    }
-
-    if (!agreeToTerms) {
-      newErrors.terms = "请阅读并同意用户协议和隐私政策";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    // 表单验证
+    if (formData.password !== formData.confirmPassword) {
+      setError('两次输入的密码不一致');
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await instance.post("/users/register", formData);
-      if (response.data.code === 200) {
-        showToast("注册成功");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
-      } else {
-        showToast(response.data.message || "注册失败");
+      const response = await authService.register(formData);
+      if (response && response.success) {
+        toast.success('注册成功！即将跳转到登录页...');
+        setTimeout(() => navigate('/login'), 2000);
       }
-    } catch (error) {
-      console.error("注册错误:", error);
-      showToast(error.response?.data?.message || "注册失败，请稍后重试");
+    } catch (err) {
+      setError(err.response?.data?.message || '注册失败，请稍后再试');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGetCode = () => {
-    if (!formData.mobile) {
-      setErrors({...errors, phoneNumber: "请先输入手机号"});
-      return;
-    }
-    
-    if (!validators.isValidPhoneNumber(formData.mobile)) {
-      setErrors({...errors, phoneNumber: "请输入正确的手机号格式"});
-      return;
-    }
-    
-    // 这里添加获取验证码逻辑
-    showToast("验证码已发送");
-    setCountdown(60);
+  const handleWeChatLogin = () => {
+    const redirectUri = encodeURIComponent(`${window.location.origin}/wechat-callback`);
+    const state = 'wechat_register_state'; // 用于防止CSRF攻击，应为随机字符串
+    const wechatAuthUrl = `https://open.weixin.qq.com/connect/qrconnect?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_login&state=${state}#wechat_redirect`;
+    window.location.href = wechatAuthUrl;
   };
 
   return (
-    <BasePage padding={false} showHeader={false}>
-      <PageTitle title="注册账号" />
-      <RegisterContainer>
-        <RegisterFormContainer>
-          <FormFrame>
-            <form onSubmit={handleSubmit}>
-              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请输入手机号码</FormLabel>
-                <FormInput
-                  type="tel"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                  placeholder="请输入手机号码"
-                  $error={!!errors.phoneNumber}
-                  style={{
-                    fontSize: UI_SIZES.FONT_MEDIUM,
-                    padding: UI_SIZES.INPUT_SPACING,
-                    borderColor: errors.phoneNumber ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
-                    '&:focus': {
-                      borderColor: UI_COLORS.PRIMARY,
-                      outline: 'none'
-                    }
-                  }}
-                  className="input-focus-effect"
-                />
-                {errors.phoneNumber && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.phoneNumber}</FormErrorMessage>}
-              </FormGroup>
-              
-              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请输入验证码</FormLabel>
-                <FormInputGroup>
-                  <FormInput
-                    type="text"
-                    name="code"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    placeholder="请输入验证码"
-                    style={{
-                      fontSize: UI_SIZES.FONT_MEDIUM,
-                      padding: UI_SIZES.INPUT_SPACING,
-                      borderColor: UI_COLORS.BORDER_LIGHT,
-                      '&:focus': {
-                        borderColor: UI_COLORS.PRIMARY,
-                        outline: 'none'
-                      }
-                    }}
-                    className="input-focus-effect"
-                  />
-                  <FormCodeButton 
-                    type="button"
-                    onClick={handleGetCode} 
-                    disabled={countdown > 0}
-                    className={countdown > 0 ? "" : "code-button-active"}
-                  >
-                    {countdown > 0 ? `${countdown}秒` : "获取验证码"}
-                  </FormCodeButton>
-                </FormInputGroup>
-              </FormGroup>
-              
-              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>请设置登录密码</FormLabel>
-                <FormInput
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="请设置登录密码"
-                  $error={!!errors.password}
-                  style={{
-                    fontSize: UI_SIZES.FONT_MEDIUM,
-                    padding: UI_SIZES.INPUT_SPACING,
-                    borderColor: errors.password ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
-                    '&:focus': {
-                      borderColor: UI_COLORS.PRIMARY,
-                      outline: 'none'
-                    }
-                  }}
-                  className="input-focus-effect"
-                />
-                {errors.password && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.password}</FormErrorMessage>}
-              </FormGroup>
-              
-              <FormGroup style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormLabel style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>确认密码</FormLabel>
-                <FormInput
-                  type={showConfirmPassword ? "text" : "password"}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  placeholder="请再次输入密码"
-                  $error={!!errors.confirmPassword}
-                  style={{
-                    fontSize: UI_SIZES.FONT_MEDIUM,
-                    padding: UI_SIZES.INPUT_SPACING,
-                    borderColor: errors.confirmPassword ? UI_COLORS.ERROR : UI_COLORS.BORDER_LIGHT,
-                    '&:focus': {
-                      borderColor: UI_COLORS.PRIMARY,
-                      outline: 'none'
-                    }
-                  }}
-                  className="input-focus-effect"
-                />
-                {errors.confirmPassword && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.confirmPassword}</FormErrorMessage>}
-              </FormGroup>
-              
-              <FormCheckboxContainer style={{ marginBottom: UI_SIZES.FORM_GROUP_SPACING }}>
-                <FormCheckbox
-                  type="checkbox"
-                  id="agreeToTerms"
-                  checked={agreeToTerms}
-                  onChange={() => setAgreeToTerms(!agreeToTerms)}
-                />
-                <FormCheckboxLabel htmlFor="agreeToTerms" style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
-                  我已阅读并同意
-                  <Link to="/terms" style={{ color: UI_COLORS.PRIMARY }}>用户协议</Link>和
-                  <Link to="/privacy" style={{ color: UI_COLORS.PRIMARY }}>隐私政策</Link>
-                </FormCheckboxLabel>
-                {errors.terms && <FormErrorMessage style={{ color: UI_COLORS.ERROR }}>{errors.terms}</FormErrorMessage>}
-              </FormCheckboxContainer>
+    <FormContainer>
+      <FormFrame>
+        <form onSubmit={handleSubmit}>
+          <PageTitle>创建新账户</PageTitle>
+          {error && <FormErrorMessage>{error}</FormErrorMessage>}
+          
+          <FormGroup>
+            <FormInput
+              type="text"
+              name="username"
+              placeholder="用户名"
+              value={formData.username}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          
+          <FormGroup>
+            <FormInput
+              type="password"
+              name="password"
+              placeholder="密码"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          
+          <FormGroup>
+            <FormInput
+              type="password"
+              name="confirmPassword"
+              placeholder="确认密码"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          
+          <FormGroup>
+            <FormInput
+              type="text"
+              name="nickname"
+              placeholder="昵称"
+              value={formData.nickname}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          
+          <FormGroup>
+            <FormInput
+              type="email"
+              name="email"
+              placeholder="电子邮箱"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </FormGroup>
+          
+          <FormInputGroup>
+            <FormInput
+              type="text"
+              name="code"
+              placeholder="验证码"
+              value={formData.code}
+              onChange={handleChange}
+              required
+            />
+            <FormCodeButton 
+              type="button" 
+              onClick={handleSendCode}
+              disabled={countdown > 0}
+            >
+              {countdown > 0 ? `${countdown}秒后重发` : '发送验证码'}
+            </FormCodeButton>
+          </FormInputGroup>
+          
+          <FormSubmitButton 
+            type="submit" 
+            disabled={loading}
+          >
+            {loading ? '注册中...' : '注册'}
+          </FormSubmitButton>
+          
+          <Divider>
+            <span>或</span>
+          </Divider>
 
-              <FormSubmitButton 
-                type="submit"
-                disabled={loading}
-                className={loading ? "" : "submit-button-active"}
-              >
-                {loading ? "注册中..." : "注册"}
-              </FormSubmitButton>
-            </form>
-            
-            <FormBottomLink style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_SMALL }}>
-              已有账号？<Link to="/login">立即登录</Link>
-            </FormBottomLink>
-            
-            <FormFooterText style={{ color: UI_COLORS.TEXT_MEDIUM, fontSize: UI_SIZES.FONT_TINY }}>
-              Copyright © {new Date().getFullYear()} All Rights Reserved
-            </FormFooterText>
-          </FormFrame>
-        </RegisterFormContainer>
-      </RegisterContainer>
-    </BasePage>
+          <WeChatButton
+            type="button"
+            onClick={handleWeChatLogin}
+          >
+            使用微信注册
+          </WeChatButton>
+
+          <LoginLink>
+            已有账户? <Link to="/login">立即登录</Link>
+          </LoginLink>
+        </form>
+      </FormFrame>
+    </FormContainer>
   );
 };
 

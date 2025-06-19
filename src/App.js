@@ -18,6 +18,7 @@ import Settings from './components/settings/Settings';
 import LoginPage from './pages/account/LoginPage';
 import RegisterPage from './pages/account/RegisterPage';
 import ForgotPasswordPage from './pages/account/ForgotPasswordPage';
+import WeChatCallbackPage from './pages/account/WeChatCallbackPage';
 
 // Lazy-loaded pages
 const OrderList = lazy(() => import('./components/order/OrderList'));
@@ -52,9 +53,6 @@ function showNavBar(pathname) {
     '/payment',
     '/payment-password',
     '/order-success',
-    '/login',
-    '/register',
-    '/forgot-password',
   ];
 
   if (pathname.startsWith('/product/')) {
@@ -89,6 +87,7 @@ const AppContent = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/wechat-callback" element={<WeChatCallbackPage />} />
             <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
             <Route path="/search" element={<SearchResultsPage />} />

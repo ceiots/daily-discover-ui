@@ -55,7 +55,7 @@ const NavItem = styled(Link)`
   text-decoration: none;
   padding: 6px 12px;
   font-size: ${UI_SIZES.NAV_TEXT_SIZE};
-  color: ${({ active }) => active ? UI_COLORS.PRIMARY : UI_COLORS.TEXT_LIGHT};
+  color: ${({ $active }) => $active ? UI_COLORS.PRIMARY : UI_COLORS.TEXT_LIGHT};
   position: relative;
   transition: ${UI_ANIMATIONS.FAST};
   flex: 1;
@@ -152,7 +152,7 @@ const NavBar = ({ className }) => {
       <NavWrapper>
         <NavItem 
           to="/daily" 
-          active={isActive('/') || isActive('/daily')} 
+          $active={isActive('/') || isActive('/daily')} 
         >
           <i className="fas fa-calendar-day"></i>
           <span>每日</span>
@@ -182,7 +182,7 @@ const NavBar = ({ className }) => {
         
         <NavItem 
           to="/discover" 
-          active={isActive('/discover')} 
+          $active={isActive('/discover')} 
         >
           <i className="fas fa-compass"></i>
           <span>发现</span>

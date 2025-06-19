@@ -4,16 +4,6 @@
  */
 
 /**
- * 验证手机号码格式
- * @param {string} phone - 要验证的手机号码
- * @returns {boolean} - 是否是有效的手机号码
- */
-export const isValidPhoneNumber = (phone) => {
-  const phoneRegex = /^1[3-9]\d{9}$/;
-  return phoneRegex.test(phone);
-};
-
-/**
  * 验证密码强度
  * 密码长度至少为8个字符，且必须包含数字和字母
  * @param {string} password - 要验证的密码
@@ -106,7 +96,6 @@ export const isEqual = (value1, value2) => {
  * 集中导出所有验证函数
  */
 export const validators = {
-  isValidPhoneNumber,
   isValidPassword,
   getPasswordStrength,
   isValidEmail,

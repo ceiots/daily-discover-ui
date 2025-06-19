@@ -6,6 +6,7 @@ import React, { createContext, useState, useEffect } from 'react';
 import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import PropTypes from 'prop-types';
 import { theme as defaultTheme } from './tokens';
+import GlobalStyles from './GlobalStyles';
 
 // 创建主题上下文
 export const ThemeContext = createContext();
@@ -87,6 +88,7 @@ const ThemeProvider = ({ children, initialMode = 'light' }) => {
   return (
     <ThemeContext.Provider value={contextValue}>
       <StyledThemeProvider theme={currentTheme}>
+        <GlobalStyles />
         {children}
       </StyledThemeProvider>
     </ThemeContext.Provider>
