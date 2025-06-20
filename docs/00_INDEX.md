@@ -19,4 +19,7 @@
 
 ## 4. 项目管理 （每次修改都要更新）
 - **[08_PROJECT_STATUS_AND_TODOLIST.md](./08_PROJECT_STATUS_AND_TODOLIST.md)**: 当前工程状态、技术债务、重构计划和待办事项。
-- **[09_CORE_TECHNOLOGIES.md](./09_CORE_TECHNOLOGIES.md)**: 项目核心技术栈的实现原理与最佳实践详解。 
+- **[09_CORE_TECHNOLOGIES.md](./09_CORE_TECHNOLOGIES.md)**: 项目核心技术栈的实现原理与最佳实践详解。
+
+## 5. 交互与调试
+- **[11_FRONTEND_BACKEND_INTERACTION_AND_DEBUGGING.md](./11_FRONTEND_BACKEND_INTERACTION_AND_DEBUGGING.md)**: 前后端交互、API契约和调试指南。 

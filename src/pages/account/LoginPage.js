@@ -1,10 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { authService } from '../../services/api';
-import { wechatAppId } from '../../config';
-import toast from 'react-hot-toast';
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import styled from 'styled-components';
 import {
   PageWrapper,
   MicroNavBar,
@@ -20,68 +16,20 @@ import {
   Divider,
   ErrorMessage,
   BottomLink,
-  WeChatButton,
   ForgotPasswordLink
 } from '../../theme/components/AuthLayoutComponents';
-import { colors, typography, spacing, radius, shadows, transitions } from '../../theme/tokens';
-
+import { useLoginPage } from './useLoginPage'; // 引入Hook
 
 // 主页面组件 - 使用React.memo优化整体性能
 const LoginPage = React.memo(() => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
-
-  // 表单变更处理 - 使用useCallback优化
-  const handleChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  }, []);
-
-  // 表单提交 - 使用useCallback优化
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await authService.login(formData);
-      if (response && response.data.success) {
-        toast.success('登录成功！');
-        const { token, ...userInfo } = response.data.data; 
-
-        if (token) {
-          localStorage.setItem('userToken', token);
-          localStorage.setItem('userInfo', JSON.stringify(userInfo));
-          // 触发一个全局事件，通知其他组件（如App.js或NavBar）用户信息已更新
-          const event = new CustomEvent('userLoggedIn', { detail: userInfo });
-          window.dispatchEvent(event);
-          navigate('/'); // 登录成功，跳转到首页
-        } else {
-           setError('登录失败，无效的响应');
-        }
-      } else {
-        setError('登录失败，请检查您的用户名和密码');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || '登录失败，请检查您的用户名和密码');
-    } finally {
-      setLoading(false);
-    }
-  }, [formData, navigate]);
-
-  // 微信登录 - 使用useCallback优化
-  const handleWeChatLogin = useCallback(() => {
-    const redirectUri = encodeURIComponent(`${window.location.origin}/wechat-callback`);
-    const state = 'wechat_login_state'; // 用于防止CSRF攻击，应为随机字符串
-    const wechatAuthUrl = `https://open.weixin.qq.com/connect/qrconnect?appid=${wechatAppId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_login&state=${state}#wechat_redirect`;
-    window.location.href = wechatAuthUrl;
-  }, []);
+  const { 
+    formData, 
+    error, 
+    loading, 
+    handleChange, 
+    handleSubmit 
+  } = useLoginPage();
 
   return (
     <>
@@ -89,7 +37,6 @@ const LoginPage = React.memo(() => {
         <title>登录 - Daily Discover</title>
         <meta name="description" content="登录Daily Discover，探索更多精彩内容。" />
       </Helmet>
-      {/* <TopColorBar /> */}
       <PageWrapper key={location.pathname}>
         <MicroNavBar>
           <Logo>Daily <span>Discover</span></Logo>
@@ -138,6 +85,7 @@ const LoginPage = React.memo(() => {
             
             <Divider><span>或</span></Divider>
             
+            {/* 微信登录按钮暂时注释，因为缺少 handleWeChatLogin 逻辑 */}
             {/* <WeChatButton type="button" onClick={handleWeChatLogin}>
               使用微信登录
             </WeChatButton> */}

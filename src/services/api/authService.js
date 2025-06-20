@@ -1,4 +1,4 @@
-import api from './index';
+import httpClient from '../http/instance'; // 引入封装的axios实例
 import { getDeviceInfo } from '../../utils/deviceInfo'; // 假设你有一个工具函数获取设备信息
 
 /**
@@ -10,10 +10,18 @@ const authService = {
    * @param {string} email - 目标邮箱
    * @param {number} type - 验证码类型 (2: 注册, 3: 重置密码)
    */
-  sendVerificationCode(email, type) {
-    return api.post('/users/send-code', null, {
-      params: { email, type },
-    });
+  async sendVerificationCode(email, type) {
+    console.log(`[authService] Sending verification code to: ${email}, type: ${type}`);
+    try {
+      const response = await httpClient.post('/users/send-code', null, {
+        params: { email, type },
+      });
+      console.log('[authService] sendVerificationCode success response:', response);
+      return response;
+    } catch (error) {
+      console.error('[authService] sendVerificationCode error:', error.response?.data || error.message);
+      throw error; // 重新抛出错误，让调用者（useRegisterPage）处理
+    }
   },
 
   /**
@@ -23,7 +31,7 @@ const authService = {
   register(userData) {
     const deviceInfo = getDeviceInfo();
     const data = { ...userData, ...deviceInfo, codeType: 2 }; // 2 for email
-    return api.post('/users/register', data);
+    return httpClient.post('/users/register', data);
   },
 
   /**
@@ -33,7 +41,7 @@ const authService = {
   login(credentials) {
     const deviceInfo = getDeviceInfo();
     const data = { ...credentials, ...deviceInfo };
-    return api.post('/users/login', data);
+    return httpClient.post('/users/login', data);
   },
 
   /**
@@ -41,7 +49,7 @@ const authService = {
    * @param {object} data - { email, code, password }
    */
   resetPassword(data) {
-    return api.put('/users/password/reset', null, {
+    return httpClient.put('/users/password/reset', null, {
       params: data,
     });
   },
@@ -53,7 +61,7 @@ const authService = {
    */
   loginWithWechat(code) {
     const deviceInfo = getDeviceInfo();
-    return api.post('/users/login/third-party', null, {
+    return httpClient.post('/users/login/third-party', null, {
       params: {
         type: 'wechat',
         code,
@@ -70,7 +78,7 @@ const authService = {
     // 假设你的后端有一个/me的接口来获取当前用户信息
     // 实际项目中，用户信息和token通常在登录后就保存到状态管理（如Redux/Context）
     // 这里仅为示例
-    // return api.get('/users/me'); 
+    // return httpClient.get('/users/me'); 
     console.log("获取当前用户信息的功能需要后端提供相应接口，例如 /users/me");
     return Promise.resolve(null); // 暂时返回null
   },
@@ -83,7 +91,7 @@ const authService = {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userInfo');
     // 如果后端有登出接口，也需要调用
-    // return api.post('/users/logout');
+    // return httpClient.post('/users/logout');
     return Promise.resolve();
   },
 };
