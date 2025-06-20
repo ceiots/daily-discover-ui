@@ -76,16 +76,16 @@ export const NavLinks = styled.div`
 export const AuthCard = styled.div`
   width: 100%;
   max-width: 380px;
-  padding: ${spacing[6]} ${spacing[4]}; /* 24px 16px */
+  padding: ${spacing[4]} ${spacing[4]}; /* 16px 16px */
   background: transparent;
 `;
 
 // 表单标题 - 更紧凑
 export const FormTitle = styled.h1`
-  font-size: ${typography.fontSize['3xl']}; /* 2rem */
+  font-size: ${typography.fontSize['2xl']}; /* 1.8rem */
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.textMain};
-  margin-bottom: ${spacing[6]}; /* 24px */
+  margin-bottom: ${spacing[4]}; /* 16px */
   text-align: center;
   letter-spacing: ${typography.letterSpacing.tight}; /* -0.5px */
 `;
@@ -97,7 +97,7 @@ export const Form = styled.form`
 
 // 输入框组 - 更紧凑
 export const InputGroup = styled.div`
-  margin-bottom: ${spacing[3.5]}; /* 14px */
+  margin-bottom: ${spacing[2.5]}; /* 10px */
   position: relative;
 `;
 
@@ -105,27 +105,27 @@ export const InputGroup = styled.div`
 export const Label = styled.label`
   display: flex;
   align-items: center;
-  margin-bottom: ${spacing[1.5]}; /* 6px */
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  margin-bottom: ${spacing[1]}; /* 4px */
+  font-size: ${typography.fontSize.sm}; /* 0.8rem */
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.textMain};
   
   i {
-    margin-right: ${spacing[2]}; /* 8px */
+    margin-right: ${spacing[1.5]}; /* 6px */
     color: ${colors.primary};
-    font-size: ${typography.fontSize.xl}; /* 1.1rem */
+    font-size: ${typography.fontSize.lg}; /* 0.95rem */
   }
 `;
 
 // 输入框 - 无边框设计，更紧凑
 export const Input = styled.input`
   width: 100%;
-  height: ${spacing[12]}; /* 48px */
+  height: ${spacing[10]}; /* 40px */
   background: rgba(255, 255, 255, 0.8);
   border: none;
-  border-radius: ${radius.lg}; /* 12px */
-  padding: 0 ${spacing[4]}; /* 0 16px */
-  font-size: ${typography.fontSize.lg}; /* 1rem */
+  border-radius: ${radius.md}; /* 10px */
+  padding: 0 ${spacing[3]}; /* 0 12px */
+  font-size: ${typography.fontSize.base}; /* 0.9rem */
   color: ${colors.textMain};
   box-shadow: ${shadows.xs};
   transition: all ${transitions.normal};
@@ -138,27 +138,27 @@ export const Input = styled.input`
   
   &::placeholder {
     color: ${colors.neutral[400]};
-    font-size: ${typography.fontSize.base}; /* 0.9rem */
+    font-size: ${typography.fontSize.sm}; /* 0.8rem */
   }
 `;
 
 // 验证码输入框组
 export const VerificationGroup = styled.div`
   display: flex;
-  gap: ${spacing[2]}; /* 8px */
+  gap: ${spacing[1.5]}; /* 6px */
 `;
 
 // 验证码按钮 - 更紧凑
 export const CodeButton = styled.button`
   flex-shrink: 0;
-  height: ${spacing[12]}; /* 48px */
-  padding: 0 ${spacing[4]}; /* 0 16px */
+  height: ${spacing[10]}; /* 40px */
+  padding: 0 ${spacing[3]}; /* 0 12px */
   background: rgba(91, 71, 232, 0.08);
   color: ${colors.primary};
   border: none;
-  border-radius: ${radius.lg}; /* 12px */
+  border-radius: ${radius.md}; /* 10px */
   font-weight: ${typography.fontWeight.semibold};
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  font-size: ${typography.fontSize.sm}; /* 0.8rem */
   cursor: pointer;
   transition: all ${transitions.normal};
   white-space: nowrap;
@@ -176,15 +176,15 @@ export const CodeButton = styled.button`
 // 提交按钮 - 更紧凑
 export const SubmitButton = styled.button`
   width: 100%;
-  height: ${spacing[12]}; /* 48px */
+  height: ${spacing[10]}; /* 40px */
   background: ${colors.primary};
   color: ${colors.white};
   border: none;
-  border-radius: ${radius.lg}; /* 12px */
-  font-size: ${typography.fontSize.lg}; /* 1rem */
+  border-radius: ${radius.md}; /* 10px */
+  font-size: ${typography.fontSize.base}; /* 0.9rem */
   font-weight: ${typography.fontWeight.semibold};
   cursor: pointer;
-  margin-top: ${spacing[4]}; /* 16px */
+  margin-top: ${spacing[3]}; /* 12px */
   transition: all ${transitions.normal};
   
   &:hover:not(:disabled) {
@@ -202,9 +202,9 @@ export const SubmitButton = styled.button`
 export const Divider = styled.div`
   display: flex;
   align-items: center;
-  margin: ${spacing[6]} 0; /* 24px 0 */
+  margin: ${spacing[4]} 0; /* 16px 0 */
   color: ${colors.neutral[400]};
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  font-size: ${typography.fontSize.xs}; /* 0.75rem */
   
   &::before, &::after {
     content: '';
@@ -214,16 +214,16 @@ export const Divider = styled.div`
   }
   
   span {
-    padding: 0 ${spacing[3]}; /* 0 12px */
+    padding: 0 ${spacing[2]}; /* 0 8px */
   }
 `;
 
 // 错误消息 - 更紧凑
 export const ErrorMessage = styled.div`
   color: ${colors.secondary};
-  font-size: ${typography.fontSize.base}; /* 0.85rem */
-  margin-top: ${spacing[1]}; /* 4px */
-  padding-left: ${spacing[1]}; /* 4px */
+  font-size: ${typography.fontSize.xs}; /* 0.75rem */
+  margin-top: ${spacing[0.5]}; /* 2px */
+  padding-left: ${spacing[0.5]}; /* 2px */
 `;
 
 // 进度条 - 更紧凑
@@ -231,7 +231,7 @@ export const ProgressBar = styled.div`
   height: 3px;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 3px;
-  margin-bottom: ${spacing[4]}; /* 16px */
+  margin-bottom: ${spacing[3]}; /* 12px */
   overflow: hidden;
 `;
 
@@ -245,15 +245,14 @@ export const ProgressIndicator = styled.div`
 // 底部链接 - 更紧凑
 export const BottomLink = styled.div`
   text-align: center;
-  margin-top: ${spacing[5]}; /* 20px */
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  margin-top: ${spacing[3.5]}; /* 14px */
+  font-size: ${typography.fontSize.sm}; /* 0.8rem */
   color: ${colors.neutral[600]};
   
   a {
     color: ${colors.primary};
-    font-weight: ${typography.fontWeight.semibold};
     text-decoration: none;
-    margin-left: ${spacing[1]}; /* 4px */
+    font-weight: ${typography.fontWeight.medium};
     
     &:hover {
       text-decoration: underline;
@@ -264,13 +263,14 @@ export const BottomLink = styled.div`
 // 忘记密码链接
 export const ForgotPasswordLink = styled.div`
   text-align: right;
-  margin-bottom: ${spacing[4]}; /* 16px */
-  font-size: ${typography.fontSize.base}; /* 0.8rem */
+  margin-top: ${spacing[1.5]}; /* 6px */
+  margin-bottom: ${spacing[2.5]}; /* 10px */
+  font-size: ${typography.fontSize.sm}; /* 0.8rem */
   
   a {
     color: ${colors.primary};
-    font-weight: ${typography.fontWeight.medium};
     text-decoration: none;
+    font-weight: ${typography.fontWeight.medium};
     
     &:hover {
       text-decoration: underline;
@@ -281,15 +281,15 @@ export const ForgotPasswordLink = styled.div`
 // 微信登录按钮 - 更紧凑
 export const WeChatButton = styled.button`
   width: 100%;
-  height: ${spacing[12]}; /* 48px */
-  background: #07C160;
+  height: ${spacing[10]}; /* 40px */
+  background: ${colors.success}; /* 微信的绿色 */
   color: ${colors.white};
   border: none;
-  border-radius: ${radius.lg}; /* 12px */
-  font-size: ${typography.fontSize.lg}; /* 1rem */
+  border-radius: ${radius.md}; /* 10px */
+  font-size: ${typography.fontSize.base}; /* 0.9rem */
   font-weight: ${typography.fontWeight.semibold};
   cursor: pointer;
-  transition: all ${transitions.normal};
+  margin-top: ${spacing[3]}; /* 12px */
   display: flex;
   align-items: center;
   justify-content: center;

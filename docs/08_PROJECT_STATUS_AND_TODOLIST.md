@@ -28,8 +28,12 @@
   - `src/logo.svg`
   - `src/styles.css`
   - `src/SimpleApp.js`
-- [ ] **账户页面迁移**: 创建 `src/pages/account` 目录，并将 `LoginPage`, `ForgotPasswordPage` 等相关页面移入。
-- [ ] **认证逻辑抽离**: 将 `App.js` 中的认证相关逻辑完全抽离到 `src/hooks/useAuth.js`。
+- [x] **账户页面迁移**: 创建 `src/pages/account` 目录，并将 `LoginPage`, `ForgotPasswordPage` 等相关页面移入。
+- [ ] **认证逻辑抽离 (Hook-First原则)**: 
+    - [ ] 将 `LoginPage` 的全部逻辑抽离到 `src/pages/account/useLoginPage.js`。
+    - [ ] 将 `RegisterPage` 的全部逻辑抽离到 `src/pages/account/useRegisterPage.js`。
+    - [ ] 将 `ForgotPasswordPage` 的全部逻辑抽离到 `src/pages/account/useForgotPasswordPage.js`。
+    - [ ] 将 `App.js` 中的全局认证相关逻辑抽离到 `src/hooks/useAuth.js`。
 - [x] **页面组件归位**: 将 `src/components` 中的 `Discover.js` 和 `Daily.js` 移动到 `src/pages`。
 
 #### 阶段2：性能优化
@@ -48,7 +52,8 @@
 
 ## TODO for Next Phase (P1 - High Priority)
 
-- [ ] **功能验证 (E2E Testing)**: 项目虽然可以运行，但核心功能（登录、注册、内容展示、商品购买等）需要端到端验证，确保在重构后未引入逻辑 bug。
+- [ ] **【`MANDATORY`】代码对齐新规范**: **立即执行**上述"阶段1"中的"认证逻辑抽离"任务，使现有代码库遵循最新的 **Hook-First** 核心架构原则。这是当前最高优先级的技术债务。
+- [ ] **功能验证 (E2E Testing)**: 在完成Hook抽离重构后，对登录、注册、找回密码等核心功能进行端到端验证，确保在重构后未引入逻辑 bug。
 - [ ] **UI/UX 一致性检查**: 检查所有页面，确保 UI 元素、间距、颜色、字体等符合设计规范。
 - [ ] **性能优化**: 分析应用性能，特别是 `Discover` 和 `Daily` 等复杂页面，识别并优化渲染瓶颈。
 - [ ] **代码质量提升**: 
@@ -83,6 +88,10 @@
 
 ## 8.5 新增已完成项 (最近更新)
 
+- **[文档]** **(2025-06-19)** **完成了对前端开发文档体系的全面升级和强化**。
+    - **具体化**: 在 `09_CORE_TECHNOLOGIES.md` 中为核心技术（Services, Styled-components, Helmet等）补充了源于真实代码的最佳实践示例。
+    - **规则化**: 在 `04_UI_DESIGN_SYSTEM.md` 和 `05_CORE_DEVELOPMENT_RULES.md` 中建立了以"Hook-First"为核心的、给AI的、极其明确和严格的【`MANDATORY`】开发指令集。
+    - **同步化**: 更新了所有相关文档，确保了整个文档体系的高度一致性、权威性和可执行性。
 - **[修复]** 解决了因循环依赖导致的 `useToast` 和 `ToastProvider` 运行时初始化错误。通过将 `ToastContext` 抽离到独立文件，成功解耦模块。
 - **[修复]** 修正了 `App.js` 中对已删除组件 `EventDetail` 的引用问题。
 - **[修复]** 通过重建 `src/theme/components/index.js`，彻底解决了因缓存或文件损坏导致的模块导出失败问题。
@@ -91,7 +100,7 @@
 
 ## 8.6 待办事项清单 📝
 
-- **[功能]** 根据UI/UX设计稿，继续开发或优化其他页面功能
-- **[测试]** 为核心组件和Hooks编写单元测试
-- **[重构]** 将账户页面目录结构，将 `LoginPage`, `ForgotPasswordPage`, `RegisterPage` 移至 `src/pages/account`
+- **[重构]【`最优先`】** **遵循Hook-First原则**: 将 `LoginPage`, `ForgotPasswordPage`, `RegisterPage` 的业务逻辑抽离到各自独立的Hook文件中。
+- **[功能]** 根据UI/UX设计稿，继续开发或优化其他页面功能。
+- **[测试]** 为核心组件和Hooks编写单元测试。
 - **[重构]** 将认证逻辑从 `App.js` 抽离至 `src/hooks/useAuth.js` 

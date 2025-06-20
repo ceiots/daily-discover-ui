@@ -138,9 +138,9 @@ const LoginPage = React.memo(() => {
             
             <Divider><span>或</span></Divider>
             
-            <WeChatButton type="button" onClick={handleWeChatLogin}>
+            {/* <WeChatButton type="button" onClick={handleWeChatLogin}>
               使用微信登录
-            </WeChatButton>
+            </WeChatButton> */}
             
             <BottomLink>
               还没有账户？<Link to="/register">立即注册</Link>
