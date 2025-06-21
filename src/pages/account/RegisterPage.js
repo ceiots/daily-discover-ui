@@ -39,10 +39,6 @@ const RegisterForm = ({
     <Form onSubmit={handleSubmit} noValidate>
       {errors.form && <ErrorMessage>{errors.form}</ErrorMessage>}
       
-      <ProgressBar>
-        <ProgressIndicator $progress={(formProgress / 5) * 100} />
-      </ProgressBar>
-
       <InputGroup>
         <Label htmlFor="username"><i className="fas fa-user"></i>用户名</Label>
         <Input

@@ -36,7 +36,7 @@ export const MicroNavBar = styled.div`
 
 // 更紧凑的Logo
 export const Logo = styled.div`
-  font-size: ${typography.fontSize['xl']}; /* 1.2rem */
+  font-size: ${typography.fontSize['2xl']}; /* 1.2rem -> 20px */
   font-weight: ${typography.fontWeight.semibold};
   color: ${colors.textMain};
   letter-spacing: ${typography.letterSpacing.tight}; /* -0.3px */
@@ -54,7 +54,7 @@ export const NavLinks = styled.div`
   a {
     color: ${colors.textMain};
     text-decoration: none;
-    font-size: ${typography.fontSize.base}; /* 0.95rem */
+    font-size: ${typography.fontSize.lg}; /* 0.95rem -> 15px */
     font-weight: ${typography.fontWeight.medium};
     transition: color ${transitions.normal}, background-color ${transitions.normal};
     padding: ${spacing[1.5]} ${spacing[3]}; /* 6px 12px */
@@ -82,7 +82,7 @@ export const AuthCard = styled.div`
 
 // 表单标题 - 更紧凑
 export const FormTitle = styled.h1`
-  font-size: ${typography.fontSize['2xl']}; /* 1.8rem */
+  font-size: ${typography.fontSize['3xl']}; /* 1.8rem -> 24px */
   font-weight: ${typography.fontWeight.bold};
   color: ${colors.textMain};
   margin-bottom: ${spacing[4]}; /* 16px */
@@ -106,14 +106,14 @@ export const Label = styled.label`
   display: flex;
   align-items: center;
   margin-bottom: ${spacing[1]}; /* 4px */
-  font-size: ${typography.fontSize.sm}; /* 0.8rem */
+  font-size: ${typography.fontSize.base}; /* 0.8rem -> 13px */
   font-weight: ${typography.fontWeight.medium};
   color: ${colors.textMain};
   
   i {
     margin-right: ${spacing[1.5]}; /* 6px */
     color: ${colors.primary};
-    font-size: ${typography.fontSize.lg}; /* 0.95rem */
+    font-size: ${typography.fontSize.xl}; /* 0.95rem -> 17px */
   }
 `;
 
@@ -125,7 +125,7 @@ export const Input = styled.input`
   border: none;
   border-radius: ${radius.md}; /* 10px */
   padding: 0 ${spacing[3]}; /* 0 12px */
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  font-size: ${typography.fontSize.lg}; /* 0.9rem -> 15px */
   color: ${colors.textMain};
   box-shadow: ${shadows.xs};
   transition: all ${transitions.normal};
@@ -138,7 +138,7 @@ export const Input = styled.input`
   
   &::placeholder {
     color: ${colors.neutral[400]};
-    font-size: ${typography.fontSize.sm}; /* 0.8rem */
+    font-size: ${typography.fontSize.base}; /* 0.8rem -> 13px */
   }
 `;
 
@@ -158,7 +158,7 @@ export const CodeButton = styled.button`
   border: none;
   border-radius: ${radius.md}; /* 10px */
   font-weight: ${typography.fontWeight.semibold};
-  font-size: ${typography.fontSize.sm}; /* 0.8rem */
+  font-size: ${typography.fontSize.base}; /* 0.8rem -> 13px */
   cursor: pointer;
   transition: all ${transitions.normal};
   white-space: nowrap;
@@ -181,7 +181,7 @@ export const SubmitButton = styled.button`
   color: ${colors.white};
   border: none;
   border-radius: ${radius.md}; /* 10px */
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  font-size: ${typography.fontSize.lg}; /* 0.9rem -> 15px */
   font-weight: ${typography.fontWeight.semibold};
   cursor: pointer;
   margin-top: ${spacing[3]}; /* 12px */
@@ -204,7 +204,7 @@ export const Divider = styled.div`
   align-items: center;
   margin: ${spacing[4]} 0; /* 16px 0 */
   color: ${colors.neutral[400]};
-  font-size: ${typography.fontSize.xs}; /* 0.75rem */
+  font-size: ${typography.fontSize.sm}; /* 0.75rem -> 11px */
   
   &::before, &::after {
     content: '';
@@ -221,7 +221,7 @@ export const Divider = styled.div`
 // 错误消息 - 更紧凑
 export const ErrorMessage = styled.div`
   color: ${colors.secondary};
-  font-size: ${typography.fontSize.xs}; /* 0.75rem */
+  font-size: ${typography.fontSize.sm}; /* 0.75rem -> 11px */
   margin-top: ${spacing[0.5]}; /* 2px */
   padding-left: ${spacing[0.5]}; /* 2px */
 `;
@@ -246,7 +246,7 @@ export const ProgressIndicator = styled.div`
 export const BottomLink = styled.div`
   text-align: center;
   margin-top: ${spacing[3.5]}; /* 14px */
-  font-size: ${typography.fontSize.sm}; /* 0.8rem */
+  font-size: ${typography.fontSize.base}; /* 0.8rem -> 13px */
   color: ${colors.neutral[600]};
   
   a {
@@ -265,7 +265,7 @@ export const ForgotPasswordLink = styled.div`
   text-align: right;
   margin-top: ${spacing[1.5]}; /* 6px */
   margin-bottom: ${spacing[2.5]}; /* 10px */
-  font-size: ${typography.fontSize.sm}; /* 0.8rem */
+  font-size: ${typography.fontSize.base}; /* 0.8rem -> 13px */
   
   a {
     color: ${colors.primary};
@@ -286,7 +286,7 @@ export const WeChatButton = styled.button`
   color: ${colors.white};
   border: none;
   border-radius: ${radius.md}; /* 10px */
-  font-size: ${typography.fontSize.base}; /* 0.9rem */
+  font-size: ${typography.fontSize.lg}; /* 0.9rem -> 15px */
   font-weight: ${typography.fontWeight.semibold};
   cursor: pointer;
   margin-top: ${spacing[3]}; /* 12px */
@@ -303,6 +303,6 @@ export const WeChatButton = styled.button`
     content: '\f1d7';
     font-family: 'Font Awesome 5 Brands';
     margin-right: ${spacing[2]}; /* 8px */
-    font-size: ${typography.fontSize.xl}; /* 1.1rem */
+    font-size: ${typography.fontSize['2xl']}; /* 1.1rem -> 20px */
   }
 `; 

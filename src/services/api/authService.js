@@ -13,7 +13,8 @@ const authService = {
   async sendVerificationCode(email, type) {
     console.log(`[authService] Sending verification code to: ${email}, type: ${type}`);
     try {
-      const response = await httpClient.post('/users/send-code', null, {
+      // 使用正确的API路径
+      const response = await httpClient.post('/api/v1/users/send-code', null, {
         params: { email, type },
       });
       console.log('[authService] sendVerificationCode success response:', response);
@@ -31,7 +32,7 @@ const authService = {
   register(userData) {
     const deviceInfo = getDeviceInfo();
     const data = { ...userData, ...deviceInfo, codeType: 2 }; // 2 for email
-    return httpClient.post('/users/register', data);
+    return httpClient.post('/api/v1/users/register', data);
   },
 
   /**
@@ -41,7 +42,7 @@ const authService = {
   login(credentials) {
     const deviceInfo = getDeviceInfo();
     const data = { ...credentials, ...deviceInfo };
-    return httpClient.post('/users/login', data);
+    return httpClient.post('/api/v1/users/login', data);
   },
 
   /**
@@ -49,7 +50,7 @@ const authService = {
    * @param {object} data - { email, code, password }
    */
   resetPassword(data) {
-    return httpClient.put('/users/password/reset', null, {
+    return httpClient.put('/api/v1/users/password/reset', null, {
       params: data,
     });
   },
@@ -61,7 +62,7 @@ const authService = {
    */
   loginWithWechat(code) {
     const deviceInfo = getDeviceInfo();
-    return httpClient.post('/users/login/third-party', null, {
+    return httpClient.post('/api/v1/users/login/third-party', null, {
       params: {
         type: 'wechat',
         code,

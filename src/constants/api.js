@@ -5,7 +5,7 @@
 
 // API基础配置
 export const API_VERSION = 'v1';
-export const API_BASE_URL = `https://dailydiscover.top/daily-discover/api/${API_VERSION}`;
+export const API_BASE_URL = `https://dailydiscover.top/daily-discover`;
 export const API_TIMEOUT = 30000; // 30秒
 
 // 各模块API路径
