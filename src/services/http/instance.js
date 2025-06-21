@@ -24,6 +24,10 @@ httpClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // 添加X-Requested-With头，帮助后端识别AJAX请求
+    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    
     return config;
   },
   (error) => Promise.reject(error)
