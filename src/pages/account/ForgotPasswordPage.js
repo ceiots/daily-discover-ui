@@ -1,14 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import AuthLayout from '../../theme/components/AuthLayout';
 import {
-  PageWrapper,
-  MicroNavBar,
-  Logo,
-  NavLinks,
-  AuthCard,
-  FormTitle,
   Form,
   InputGroup,
   Label,
@@ -52,7 +46,6 @@ const Step = styled.div`
 
 // 主页面组件 - 使用React.memo优化整体性能
 const ForgotPasswordPage = React.memo(() => {
-  const location = useLocation();
   const {
     email, setEmail,
     code, setCode,
@@ -68,27 +61,12 @@ const ForgotPasswordPage = React.memo(() => {
   } = useForgotPasswordPage();
 
   return (
-    <>
-      <Helmet>
-        <title>重置密码 - Daily Discover</title>
-        <meta name="description" content="重置您的Daily Discover账户密码。" />
-      </Helmet>
-      <PageWrapper>
-        <MicroNavBar>
-          <Logo>Daily <span>Discover</span></Logo>
-          <NavLinks>
-            <Link to="/daily" className={location.pathname === '/daily' ? 'active' : ''}>每日</Link>
-            <Link to="/discover" className={location.pathname === '/discover' ? 'active' : ''}>发现</Link>
-          </NavLinks>
-        </MicroNavBar>
-        
-        <AuthCard>
-          <FormTitle>重置密码</FormTitle>
-          <StepIndicator>
-            <Step $active={step === 1} />
-            <Step $active={step === 2} />
-          </StepIndicator>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+    <AuthLayout
+      title="重置密码"
+      description="重置您的Daily Discover账户密码。"
+      formTitle="重置密码"
+    >
+      {error && <ErrorMessage>{error}</ErrorMessage>}
           
           {step === 1 && (
             <Form onSubmit={(e) => { e.preventDefault(); handleSendCode(); }} noValidate>
@@ -172,9 +150,7 @@ const ForgotPasswordPage = React.memo(() => {
               </BottomLink>
             </Form>
           )}
-        </AuthCard>
-      </PageWrapper>
-    </>
+    </AuthLayout>
   );
 });
 

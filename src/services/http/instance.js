@@ -11,7 +11,8 @@ const httpClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-  }
+  },
+  withCredentials: true // 支持跨域携带Cookie
 });
 
 /**

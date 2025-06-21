@@ -13,7 +13,7 @@ const authService = {
   async sendVerificationCode(email, type) {
     console.log(`[authService] Sending verification code to: ${email}, type: ${type}`);
     try {
-      // 使用正确的API路径
+      // 使用POST请求，符合RESTful规范（发送验证码是有副作用的操作）
       const response = await httpClient.post('/api/v1/users/send-code', null, {
         params: { email, type },
       });

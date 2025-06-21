@@ -1,13 +1,7 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import AuthLayout from '../../theme/components/AuthLayout';
 import {
-  PageWrapper,
-  MicroNavBar,
-  Logo,
-  NavLinks,
-  AuthCard,
-  FormTitle,
   Form,
   InputGroup,
   Label,
@@ -22,7 +16,6 @@ import { useLoginPage } from './useLoginPage'; // 引入Hook
 
 // 主页面组件 - 使用React.memo优化整体性能
 const LoginPage = React.memo(() => {
-  const location = useLocation();
   const { 
     formData, 
     error, 
@@ -32,23 +25,12 @@ const LoginPage = React.memo(() => {
   } = useLoginPage();
 
   return (
-    <>
-      <Helmet>
-        <title>登录 - Daily Discover</title>
-        <meta name="description" content="登录Daily Discover，探索更多精彩内容。" />
-      </Helmet>
-      <PageWrapper key={location.pathname}>
-        <MicroNavBar>
-          <Logo>Daily <span>Discover</span></Logo>
-          <NavLinks>
-            <Link to="/daily" className={location.pathname === '/daily' ? 'active' : ''}>每日</Link>
-            <Link to="/discover" className={location.pathname === '/discover' ? 'active' : ''}>发现</Link>
-          </NavLinks>
-        </MicroNavBar>
-        
-        <AuthCard>
-          <FormTitle>登录您的账户</FormTitle>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+    <AuthLayout
+      title="登录"
+      description="登录Daily Discover，探索更多精彩内容。"
+      formTitle="登录您的账户"
+    >
+      {error && <ErrorMessage>{error}</ErrorMessage>}
           <Form onSubmit={handleSubmit} noValidate>
             <InputGroup>
               <Label htmlFor="username"><i className="fas fa-user"></i>用户名或邮箱</Label>
@@ -94,9 +76,7 @@ const LoginPage = React.memo(() => {
               还没有账户？<Link to="/register">立即注册</Link>
             </BottomLink>
           </Form>
-        </AuthCard>
-      </PageWrapper>
-    </>
+    </AuthLayout>
   );
 });
 

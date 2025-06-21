@@ -1,14 +1,8 @@
 import React, { useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Helmet } from 'react-helmet-async';
+import AuthLayout from '../../theme/components/AuthLayout';
 import {
-  PageWrapper,
-  MicroNavBar,
-  Logo,
-  NavLinks,
-  AuthCard,
-  FormTitle,
   Form,
   InputGroup,
   Label,
@@ -151,7 +145,6 @@ RegisterForm.displayName = 'RegisterForm';
 
 // 主页面组件 - 使用React.memo优化整体性能
 const RegisterPage = React.memo(() => {
-  const location = useLocation();
   const {
     formData,
     errors,
@@ -175,22 +168,11 @@ const RegisterPage = React.memo(() => {
   }, [formData]);
 
   return (
-    <>
-      <Helmet>
-        <title>创建新账户 - Daily Discover</title>
-        <meta name="description" content="加入Daily Discover，开始您的新旅程。" />
-      </Helmet>
-      <PageWrapper key={location.pathname}>
-        <MicroNavBar>
-          <Logo>Daily <span>Discover</span></Logo>
-          <NavLinks>
-            <Link to="/daily" className={location.pathname === '/daily' ? 'active' : ''}>每日</Link>
-            <Link to="/discover" className={location.pathname === '/discover' ? 'active' : ''}>发现</Link>
-          </NavLinks>
-        </MicroNavBar>
-        
-        <AuthCard>
-          <FormTitle>创建新账户</FormTitle>
+    <AuthLayout
+      title="创建新账户"
+      description="加入Daily Discover，开始您的新旅程。"
+      formTitle="创建新账户"
+    >
           <RegisterForm
             formData={formData}
             errors={errors}
@@ -202,9 +184,7 @@ const RegisterPage = React.memo(() => {
             handleSendCode={handleSendCode}
             handleSubmit={handleSubmit}
           />
-        </AuthCard>
-      </PageWrapper>
-    </>
+    </AuthLayout>
   );
 });
 
