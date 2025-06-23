@@ -1,7 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { useRegisterPage } from '../../pages/account/useRegisterPage';
+
+const FormContainer = styled.form`
+  padding-top: 16px;
+`;
 
 const InputWrapper = styled.div`
   margin-bottom: 16px;
@@ -12,15 +15,16 @@ const Label = styled.label`
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #555;
+  color: #333;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
+  padding: 12px;
+  border: 1px solid #E0E0E0;
   border-radius: 4px;
   box-sizing: border-box;
+  font-size: 16px;
   transition: border-color 0.3s;
   
   &:focus {
@@ -36,7 +40,7 @@ const VerificationCodeWrapper = styled.div`
 `;
 
 const CodeButton = styled.button`
-  padding: 10px 15px;
+  padding: 12px 15px;
   background-color: ${props => props.disabled ? '#ccc' : '#5B47E8'};
   color: white;
   border: none;
@@ -47,7 +51,7 @@ const CodeButton = styled.button`
   transition: background-color 0.3s;
   
   &:hover:not(:disabled) {
-    background-color: #4936d8;
+    background-color: #4936D8;
   }
 `;
 
@@ -70,23 +74,7 @@ const SubmitButton = styled.button`
   }
   
   &:hover:not(:disabled) {
-    background-color: #4936d8;
-  }
-`;
-
-const FormFooter = styled.div`
-  margin-top: 16px;
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-`;
-
-const StyledLink = styled(Link)`
-  color: #5B47E8;
-  text-decoration: none;
-  
-  &:hover {
-    text-decoration: underline;
+    background-color: #4936D8;
   }
 `;
 
@@ -102,7 +90,7 @@ function RegisterForm() {
   } = useRegisterPage();
 
   return (
-    <form onSubmit={handleSubmit}>
+    <FormContainer onSubmit={handleSubmit}>
       <InputWrapper>
         <Label htmlFor="username">用户名</Label>
         <Input 
@@ -176,10 +164,7 @@ function RegisterForm() {
       <SubmitButton type="submit" disabled={isLoading}>
         {isLoading ? '注册中...' : '注册'}
       </SubmitButton>
-      <FormFooter>
-        已有账户？<StyledLink to="/login">立即登录</StyledLink>
-      </FormFooter>
-    </form>
+    </FormContainer>
   );
 }
 
