@@ -2,10 +2,9 @@
  * ShopInfo 分子组件
  * 以一致的方式展示商店头像和名称
  */
-import React from 'react';
-import styled from 'styled-components';
+import React, { useContext } from 'react';
+import styled, { ThemeContext } from 'styled-components';
 import PropTypes from 'prop-types';
-import { useTheme } from '../../useTheme';
 import { useComponentPerformance } from '../../utils/performance';
 
 /**
@@ -21,7 +20,7 @@ const ShopInfo = ({ shopName, shopAvatarUrl, size = 'sm', style = {} }) => {
   // 性能监控
   useComponentPerformance('ShopInfo');
   
-  const { theme } = useTheme();
+  const theme = useContext(ThemeContext);
   
   // 尺寸变体
   const sizes = {

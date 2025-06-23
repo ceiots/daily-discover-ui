@@ -2,10 +2,9 @@
  * TopBar 有机体组件
  * 顶部区域组件，显示页面标题和操作按钮
  */
-import React from 'react';
-import { useTheme } from '../../useTheme';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { ThemeContext } from 'styled-components';
 import { useComponentPerformance } from '../../utils/performance';
 
 const TopBarContainer = styled.div`
@@ -40,7 +39,7 @@ const TopBar = ({ title, actionButton }) => {
   // 性能监控
   useComponentPerformance('TopBar');
   
-  const { theme } = useTheme();
+  const theme = useContext(ThemeContext);
 
   return (
     <TopBarContainer theme={theme}>

@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import instance from "../../services/http/instance";
 import { useAuth } from "../../hooks/useAuth";
-import { useTheme, ScrollableSection } from "../../theme";
+import { useTheme } from "../../theme/useTheme";
+import ScrollableSection from "../common/ScrollableSection";
 import "./Recommendations.css";
 
 // 默认头像常量

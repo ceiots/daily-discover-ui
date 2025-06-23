@@ -2,11 +2,10 @@
  * NavBar 有机体组件
  * 底部导航栏组件
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { useTheme } from '../../../useTheme';
+import styled, { ThemeContext } from 'styled-components';
 import { useNavBar } from '../../../hooks/useNavBar';
 import { useComponentPerformance } from '../../../utils/performance';
 

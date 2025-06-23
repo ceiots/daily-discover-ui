@@ -1,74 +1,63 @@
-import React, { useRef } from "react";
-import PropTypes from "prop-types";
-import { useTheme } from ".../ThemeProvider";
-import "./ScrollableSection.css";
+import { useState, useEffect } from "react";
+import { useTheme } from "../../theme/useTheme";
 
 /**
- * ScrollableSection - A reusable component for horizontally scrollable content
- * 
- * @param {Object} props - Component props
- * @param {React.ReactNode} props.children - Content to be scrolled
- * @param {string} props.title - Section title
- * @param {React.ReactNode} props.titleIcon - Icon to display before title
- * @param {React.ReactNode} props.actionButton - Optional button to display next to title
- * @param {string} props.className - Additional CSS class
+ * 用户活动跟踪钩子
+ * 跟踪用户在推荐页面的活动，用于个性化推荐
  */
-const ScrollableSection = ({
-  children,
-  title,
-  titleIcon,
-  actionButton,
-  className = "",
-}) => {
+const useUserActivity = () => {
   const theme = useTheme();
-  const scrollRef = useRef(null);
+  const [userActivity, setUserActivity] = useState({
+    clicks: 0,
+    views: {},
+    categories: {},
+    lastActive: Date.now()
+  });
 
-  const handleScroll = (direction) => {
-    if (scrollRef.current) {
-      const scrollAmount = direction === "left" ? -200 : 200;
-      scrollRef.current.scrollBy({
-        left: scrollAmount,
-        behavior: "smooth",
-      });
-    }
+  // 记录点击
+  const trackClick = (itemId, itemType, category) => {
+    setUserActivity(prev => ({
+      ...prev,
+      clicks: prev.clicks + 1,
+      categories: {
+        ...prev.categories,
+        [category]: (prev.categories[category] || 0) + 1
+      },
+      lastActive: Date.now()
+    }));
   };
 
-  return (
-    <div className={`theme-scrollable-section ${className}`}>
-      <div className="theme-scrollable-header">
-        <h3 style={{ fontSize: theme.fontSize["2xl"] }}>
-          {titleIcon && <span className="theme-scrollable-icon">{titleIcon}</span>}
-          {title}
-          {actionButton && <span className="theme-scrollable-action">{actionButton}</span>}
-        </h3>
-        <div className="theme-scroll-controls">
-          <button
-            className="theme-scroll-control-btn"
-            onClick={() => handleScroll("left")}
-          >
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button
-            className="theme-scroll-control-btn"
-            onClick={() => handleScroll("right")}
-          >
-            <i className="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-      <div className="theme-scrollable-content" ref={scrollRef}>
-        {children}
-      </div>
-    </div>
-  );
+  // 记录浏览
+  const trackView = (itemId, itemType, duration) => {
+    setUserActivity(prev => ({
+      ...prev,
+      views: {
+        ...prev.views,
+        [itemId]: (prev.views[itemId] || 0) + duration
+      },
+      lastActive: Date.now()
+    }));
+  };
+
+  // 获取活跃度分数
+  const getActivityScore = () => {
+    const timeSinceLastActive = (Date.now() - userActivity.lastActive) / 1000 / 60; // 分钟
+    const baseScore = userActivity.clicks * 2 + Object.keys(userActivity.views).length;
+    
+    // 如果用户最近活跃，增加分数
+    if (timeSinceLastActive < 30) {
+      return baseScore * (1 + (30 - timeSinceLastActive) / 30);
+    }
+    
+    return baseScore;
+  };
+
+  return {
+    trackClick,
+    trackView,
+    getActivityScore,
+    userActivity
+  };
 };
 
-ScrollableSection.propTypes = {
-  children: PropTypes.node.isRequired,
-  title: PropTypes.string.isRequired,
-  titleIcon: PropTypes.node,
-  actionButton: PropTypes.node,
-  className: PropTypes.string,
-};
-
-export default ScrollableSection;
+export default useUserActivity;

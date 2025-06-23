@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import instance from '../../services/http/instance';
-import { BasePage, useTheme } from '../../theme';
+import { useTheme } from '../../theme/useTheme';
+import BasePage from '../../theme/components/templates/BasePage';
 import PropTypes from 'prop-types'; 
 import { useAuth } from '../../hooks/useAuth';
 
