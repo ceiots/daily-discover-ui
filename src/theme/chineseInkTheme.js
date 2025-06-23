@@ -1,4 +1,6 @@
-import { colors, spacing, typography, shadows, radius, transitions } from './tokens';
+import theme from './tokens'; // Import the default export
+
+const { colors, spacing, typography, shadows, radius, transitions } = theme; // Destructure
 
 const chineseInkTheme = {
   colors: {

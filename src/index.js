@@ -8,7 +8,9 @@ import { BrowserRouter } from 'react-router-dom';
 
 // A more modern approach to global styles
 import { createGlobalStyle } from 'styled-components';
-import { typography, colors } from './theme/tokens';
+import theme from './theme/tokens'; // Import the default export
+
+const { typography, colors } = theme; // Destructure
 
 const GlobalStyle = createGlobalStyle`
   body {

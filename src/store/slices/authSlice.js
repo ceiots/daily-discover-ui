@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import authService from '../../services/api/authService';
+// Use named import for service functions
+import { login, register } from '../../services/api/authService';
 
 // Attempt to load user and token from localStorage
 const user = JSON.parse(localStorage.getItem('user'));
@@ -19,7 +20,7 @@ export const registerUser = createAsyncThunk(
   async (userData, thunkAPI) => {
     try {
       // The service returns the user object upon successful registration
-      const response = await authService.register(userData);
+      const response = await register(userData);
       return response; // This will be the action payload
     } catch (error) {
       const message =
@@ -39,7 +40,7 @@ export const loginUser = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       // The service returns { user, token }
-      const data = await authService.login(credentials);
+      const data = await login(credentials);
       return data;
     } catch (error) {
       const message =

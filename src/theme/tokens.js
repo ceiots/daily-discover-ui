@@ -9,8 +9,8 @@
  * 颜色系统
  * 采用简洁配色方案
  */
-const colors = {
-  primary: '#007BFF',
+export const colors = {
+  primary: '#5B47E8',
   primaryDark: '#0056b3',
   secondary: '#6c757d',
   success: '#28a745',
@@ -30,7 +30,7 @@ const colors = {
 /**
  * 基于4px网格的间距系统
  */
-const spacing = {
+export const spacing = {
   xs: '4px',
   sm: '8px',
   md: '16px',
@@ -41,7 +41,7 @@ const spacing = {
 /**
  * 字体排版系统
  */
-const typography = {
+export const typography = {
   fontFamily: "'Helvetica Neue', Arial, sans-serif",
   size: {
     sm: '0.875rem', // 14px
@@ -59,7 +59,7 @@ const typography = {
  * 阴影效果
  * 采用扁平化设计的微妙阴影
  */
-const shadows = {
+export const shadows = {
   sm: '0 1px 3px rgba(0,0,0,0.1)',
   md: '0 4px 6px rgba(0,0,0,0.1)',
 };
@@ -67,7 +67,7 @@ const shadows = {
 /**
  * 圆角半径
  */
-const radius = {
+export const radius = {
   none: '0',
   sm: '4px',
   base: '6px',
@@ -81,7 +81,7 @@ const radius = {
 /**
  * 过渡动画
  */
-const transitions = {
+export const transitions = {
   fast: 'all 0.15s ease',
   normal: 'all 0.3s ease',
   slow: 'all 0.5s ease-in-out',
