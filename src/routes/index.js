@@ -1,13 +1,13 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+// import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const DiscoverPage = lazy(() => import('../pages/Discover'));
 
 const AppRoutes = () => {
     return (
-        <Suspense fallback={<LoadingSpinner />}>
+        <Suspense fallback={<div>Loading...</div>}>
             <Routes>
                 <Route path="/" element={<div>Root Layout</div>}>
                     {/* <Route index element={<HomePage />} /> */}

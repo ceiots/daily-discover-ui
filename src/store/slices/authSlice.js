@@ -19,9 +19,8 @@ export const registerUser = createAsyncThunk(
   'auth/register',
   async (userData, thunkAPI) => {
     try {
-      // The service returns the user object upon successful registration
       const response = await register(userData);
-      return response; // This will be the action payload
+      return response;
     } catch (error) {
       const message =
         (error.response &&
@@ -39,7 +38,6 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (credentials, thunkAPI) => {
     try {
-      // The service returns { user, token }
       const data = await login(credentials);
       return data;
     } catch (error) {

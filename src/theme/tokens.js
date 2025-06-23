@@ -9,9 +9,9 @@
  * 颜色系统
  * 采用简洁配色方案
  */
-export const colors = {
+const colors = {
   primary: '#5B47E8',
-  primaryDark: '#0056b3',
+  primaryDark: '#4a3ac8',
   secondary: '#6c757d',
   success: '#28a745',
   danger: '#dc3545',
@@ -25,12 +25,17 @@ export const colors = {
     700: '#495057',
     900: '#212529',
   },
+  // Add neutral for borders
+  neutral: {
+    200: '#e7e7e7',
+    300: '#ced4da',
+  }
 };
 
 /**
  * 基于4px网格的间距系统
  */
-export const spacing = {
+const spacing = {
   xs: '4px',
   sm: '8px',
   md: '16px',
@@ -41,7 +46,7 @@ export const spacing = {
 /**
  * 字体排版系统
  */
-export const typography = {
+const typography = {
   fontFamily: "'Helvetica Neue', Arial, sans-serif",
   size: {
     sm: '0.875rem', // 14px
@@ -59,7 +64,7 @@ export const typography = {
  * 阴影效果
  * 采用扁平化设计的微妙阴影
  */
-export const shadows = {
+const shadows = {
   sm: '0 1px 3px rgba(0,0,0,0.1)',
   md: '0 4px 6px rgba(0,0,0,0.1)',
 };
@@ -67,7 +72,7 @@ export const shadows = {
 /**
  * 圆角半径
  */
-export const radius = {
+const radius = {
   none: '0',
   sm: '4px',
   base: '6px',
@@ -81,7 +86,7 @@ export const radius = {
 /**
  * 过渡动画
  */
-export const transitions = {
+const transitions = {
   fast: 'all 0.15s ease',
   normal: 'all 0.3s ease',
   slow: 'all 0.5s ease-in-out',
@@ -108,8 +113,8 @@ const borders = {
   thin: `1px solid ${colors.neutral[200]}`,
   normal: `1px solid ${colors.neutral[300]}`,
   thick: `2px solid ${colors.neutral[300]}`,
-  primary: `1px solid ${colors.primary[500]}`,
-  error: `1px solid ${colors.error}`
+  primary: `1px solid ${colors.primary}`,
+  error: `1px solid ${colors.danger}`
 };
 
 /**

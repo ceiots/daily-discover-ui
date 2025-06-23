@@ -9,7 +9,9 @@ import TetrisGame from "../components/games/TetrisGame/TetrisGame";
 import SnakeGame from "../components/games/SnakeGame/SnakeGame";
 // 引入视频组件
 import VideoList from "../components/videos/VideoList/VideoList";
-import { BasePage } from "../theme";
+import ArticleCard from '../components/ai/ArticleCard';
+import BasePage from '../theme/components/templates/BasePage';
+import TopBar from "../theme/components/organisms/TopBar";
 
 // Re-trigger compilation
 const DEFAULT_AVATAR = "/default-avatar.png";

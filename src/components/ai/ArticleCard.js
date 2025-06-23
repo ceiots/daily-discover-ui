@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ArticleCard.css';
-import { getImage } from '../Discover';
+// import { getImage } from '../Discover'; // Removed incorrect dependency on a page
+
+// Placeholder function, assuming images are handled differently now
+const getImage = (imageName) => imageName || 'default-image.png';
 
 const ArticleCard = ({ article, onClick }) => {
   const { title, summary, date, category, tags, coverImage } = article;
