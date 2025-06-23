@@ -1,159 +1,73 @@
 /**
- * 设计令牌 (Design Tokens)
- * 合并了colors、spacing、typography、shadows、breakpoints的内容
- * 用于确保UI设计的一致性
+ * Design Tokens
+ * ---
+ * The single source of truth for all stylistic values.
+ * Following the "Token-First" principle from docs/04_FRONTEND.md
  */
 
 /**
  * 颜色系统
  * 采用简洁配色方案
  */
-export const colors = {
-  // 主色调
-  primary: "#5B47E8",    // 主色，用于按钮、高亮元素
-  primaryHover: "#4a39d1", // 主色悬停状态，鲜明，颜色稍深
-  secondary: "#E8614F",  // 辅助色：中国红
-  textMain: "#2D3748",   // 文字主色
-  bgLight: "#F8FAFC",   // 背景色：浅灰色
-  white: "#FFFFFF",     // 白色，卡片/输入框背景
-  border: "#e7e7e7",    // 极浅灰色边框，增加柔和感
-  textSub: "#6b6b6b",   // 中灰色次要文字，有层次感
-  error: "#ff4d4f",     // 更鲜艳的红色错误提示，更醒目
-  success: "#52c41a",   // 新增成功提示色，用于成功反馈
-  info: "#1890ff",      // 新增信息提示色，用于信息反馈
-  
-  // 保留中性色谱供高级组件使用
-  neutral: {
-    50: '#fafafa',
-    100: '#f5f5f5',
-    200: '#e5e5e5',
-    300: '#d4d4d4',
-    400: '#a3a3a3',
-    500: '#737373',
-    600: '#525252',
-    700: '#404040',
-    800: '#262626',
-    900: '#171717',
-    950: '#0a0a0a'
+const colors = {
+  primary: '#007BFF',
+  primaryDark: '#0056b3',
+  secondary: '#6c757d',
+  success: '#28a745',
+  danger: '#dc3545',
+  warning: '#ffc107',
+  white: '#FFFFFF',
+  black: '#000000',
+  grey: {
+    100: '#f8f9fa',
+    300: '#dee2e6',
+    500: '#adb5bd',
+    700: '#495057',
+    900: '#212529',
   },
-  
-  // 各种状态色
-  state: {
-    active: '#5B47E8',
-    hover: '#4a39d1',
-    disabled: '#d4d4d4',
-    focus: 'rgba(91, 71, 232, 0.2)'
-  },
-  
-  // 评分星级颜色
-  rating: {
-    filled: '#FACC15',
-    unfilled: '#E5E7EB'
-  },
-  
-  // 营销场景特殊色
-  marketing: {
-    discount: '#FF4D4F',
-    new: '#36CFC9',
-    hot: '#FA541C'
-  }
 };
 
 /**
  * 基于4px网格的间距系统
  */
-export const spacing = {
-  0: '0',
-  0.5: '1.5px',
-  1: '3px',
-  1.5: '4.5px',
-  2: '6px',
-  2.5: '7.5px',
-  3: '9px',
-  3.5: '10.5px',
-  4: '12px',
-  5: '15px',
-  6: '18px',
-  7: '21px',
-  8: '24px',
-  9: '27px',
-  10: '30px',
-  12: '36px',
-  14: '42px',
-  16: '48px',
-  20: '60px',
-  24: '72px',
-  28: '84px',
-  32: '96px',
-  36: '108px',
-  40: '120px'
+const spacing = {
+  xs: '4px',
+  sm: '8px',
+  md: '16px',
+  lg: '24px',
+  xl: '32px',
 };
 
 /**
  * 字体排版系统
  */
-export const typography = {
-  // 字体家族
-  fontFamily: {
-    sans: "'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+const typography = {
+  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+  size: {
+    sm: '0.875rem', // 14px
+    md: '1rem',      // 16px
+    lg: '1.25rem',   // 20px
+    xl: '1.5rem',    // 24px
   },
-  
-  // 字体大小
-  fontSize: {
-    xs: '10px',
-    sm: '11px',
-    caption: '11px',
-    body: '13px',
-    base: '13px',
-    lg: '15px',
-    xl: '17px',
-    '2xl': '20px',
-    '3xl': '24px',
-    '4xl': '28px',
-    '5xl': '34px',
-    '6xl': '44px'
-  },
-  
-  // 行高
-  lineHeight: {
-    none: '1',
-    tight: '1.25',
-    snug: '1.375',
-    normal: '1.5',
-    relaxed: '1.625',
-    loose: '2'
-  },
-  
-  // 字重
-  fontWeight: {
-    thin: '100',
-    extralight: '200',
-    light: '300',
-    normal: '400',
-    regular: '400',
-    medium: '500',
-    semibold: '600',
-    bold: '700',
-    extrabold: '800',
-    black: '900'
-  },
-  
-  // 字符间距
-  letterSpacing: {
-    tighter: '-0.05em',
-    tight: '-0.025em',
-    normal: '0',
-    wide: '0.025em',
-    wider: '0.05em',
-    widest: '0.1em'
+  weight: {
+    regular: 400,
+    bold: 700,
   }
+};
+
+/**
+ * 阴影效果
+ * 采用扁平化设计的微妙阴影
+ */
+const shadows = {
+  sm: '0 1px 3px rgba(0,0,0,0.1)',
+  md: '0 4px 6px rgba(0,0,0,0.1)',
 };
 
 /**
  * 圆角半径
  */
-export const radius = {
+const radius = {
   none: '0',
   sm: '4px',
   base: '6px',
@@ -165,24 +79,9 @@ export const radius = {
 };
 
 /**
- * 阴影效果
- * 采用扁平化设计的微妙阴影
- */
-export const shadows = {
-  none: 'none',
-  xs: '0 1px 2px rgba(0, 0, 0, 0.05)',
-  sm: '0 1px 3px rgba(0, 0, 0, 0.08)',
-  md: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  lg: '0 2px 6px rgba(0, 0, 0, 0.12)',
-  xl: '0 3px 8px rgba(0, 0, 0, 0.14)',
-  '2xl': '0 4px 12px rgba(0, 0, 0, 0.16)',
-  inner: 'inset 0 2px 4px rgba(0, 0, 0, 0.06)'
-};
-
-/**
  * 过渡动画
  */
-export const transitions = {
+const transitions = {
   fast: 'all 0.15s ease',
   normal: 'all 0.3s ease',
   slow: 'all 0.5s ease-in-out',
@@ -192,7 +91,7 @@ export const transitions = {
 /**
  * 响应式断点
  */
-export const breakpoints = {
+const breakpoints = {
   xs: '375px',
   sm: '640px',
   md: '768px',
@@ -204,7 +103,7 @@ export const breakpoints = {
 /**
  * 边框样式
  */
-export const borders = {
+const borders = {
   none: 'none',
   thin: `1px solid ${colors.neutral[200]}`,
   normal: `1px solid ${colors.neutral[300]}`,
@@ -216,7 +115,7 @@ export const borders = {
 /**
  * 卡片预设样式
  */
-export const cardPresets = {
+const cardPresets = {
   flat: {
     borderRadius: radius.lg,
     boxShadow: shadows.none,
@@ -242,7 +141,7 @@ export const cardPresets = {
 /**
  * z-index层级系统
  */
-export const zIndex = {
+const zIndex = {
   hide: -1,
   auto: 'auto',
   base: 0,
@@ -259,7 +158,7 @@ export const zIndex = {
 /**
  * 完整主题对象
  */
-export const theme = {
+const theme = {
   colors,
   spacing,
   typography,
@@ -275,7 +174,7 @@ export const theme = {
 /**
  * 样式工具函数
  */
-export const styleUtils = {
+const styleUtils = {
   // 创建渐变背景
   gradient: (fromColor = colors.primary[500], toColor = colors.primary[700], direction = '135deg') => 
     `linear-gradient(${direction}, ${fromColor} 0%, ${toColor} 100%)`,

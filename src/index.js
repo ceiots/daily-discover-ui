@@ -1,30 +1,38 @@
 // index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import './index.css';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { store } from './store';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+
+// A more modern approach to global styles
+import { createGlobalStyle } from 'styled-components';
+import { typography, colors } from './theme/tokens';
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    margin: 0;
+    font-family: ${typography.fontFamily};
+    background-color: ${colors.grey[100]};
+    color: ${colors.grey[900]};
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+`;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <HelmetProvider>
-      <BrowserRouter future={{ 
-        v7_startTransition: true,
-        v7_relativeSplatPath: true
-      }}>
+    <Provider store={store}>
+      <BrowserRouter>
+        <GlobalStyle />
         <App />
       </BrowserRouter>
-    </HelmetProvider>
+    </Provider>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
