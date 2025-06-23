@@ -2,8 +2,6 @@ import { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { login as loginService } from '../../services/api/authService';
-import { setCredentials } from '../../store/slices/userSlice';
 import { loginUser } from '../../store/slices/authSlice';
 
 export const useLoginPage = () => {
@@ -29,13 +27,6 @@ export const useLoginPage = () => {
             const resultAction = await dispatch(loginUser(formData));
             
             if (loginUser.fulfilled.match(resultAction)) {
-                const userData = resultAction.payload;
-                
-                dispatch(setCredentials({ 
-                    user: userData.user, 
-                    token: userData.token 
-                }));
-                
                 toast.success('登录成功！');
                 navigate(from, { replace: true });
             } else {

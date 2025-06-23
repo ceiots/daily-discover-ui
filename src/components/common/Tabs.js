@@ -6,25 +6,25 @@ const TabsContext = createContext();
 const StyledTabs = styled.div``;
 
 const TabListWrapper = styled.div`
-  border-bottom: 2px solid #E0E0E0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.border.main};
   display: flex;
-  margin-bottom: 24px;
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
 `;
 
 const TabButton = styled.button`
-  padding: 12px 20px;
-  font-size: 18px;
-  font-weight: 600;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   background: none;
   border: none;
   cursor: pointer;
-  color: ${props => (props.active ? '#5B47E8' : '#666666')};
-  border-bottom: 2px solid ${props => (props.active ? '#5B47E8' : 'transparent')};
-  margin-bottom: -2px; /* Align with the wrapper's border */
-  transition: all 0.3s;
+  color: ${({ theme, $active }) => ($active ? theme.colors.primary.main : theme.colors.text.secondary)};
+  border-bottom: 2px solid ${({ theme, $active }) => ($active ? theme.colors.primary.main : 'transparent')};
+  margin-bottom: -1px; /* Align with the wrapper's border */
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    color: #5B47E8;
+    color: ${({ theme }) => theme.colors.primary.main};
   }
 `;
 
@@ -53,7 +53,7 @@ export const Tab = ({ value, children }) => {
   const { activeTab, changeTab } = useContext(TabsContext);
   const active = activeTab === value;
   return (
-    <TabButton active={active} onClick={() => changeTab(value)}>
+    <TabButton $active={active} onClick={() => changeTab(value)}>
       {children}
     </TabButton>
   );

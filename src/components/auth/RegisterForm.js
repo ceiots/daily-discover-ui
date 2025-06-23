@@ -1,82 +1,16 @@
-import React from 'react';
-import styled from 'styled-components';
+import React, { useState } from 'react';
 import { useRegisterPage } from '../../pages/account/useRegisterPage';
-
-const FormContainer = styled.form`
-  padding-top: 16px;
-`;
-
-const InputWrapper = styled.div`
-  margin-bottom: 16px;
-  text-align: left;
-`;
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #E0E0E0;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 16px;
-  transition: border-color 0.3s;
-  
-  &:focus {
-    border-color: #5B47E8;
-    outline: none;
-  }
-`;
-
-const VerificationCodeWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
-
-const CodeButton = styled.button`
-  padding: 12px 15px;
-  background-color: ${props => props.disabled ? '#ccc' : '#5B47E8'};
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  font-weight: 500;
-  white-space: nowrap;
-  transition: background-color 0.3s;
-  
-  &:hover:not(:disabled) {
-    background-color: #4936D8;
-  }
-`;
-
-const SubmitButton = styled.button`
-  width: 100%;
-  padding: 12px;
-  background-color: #5B47E8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 600;
-  transition: background-color 0.3s;
-  margin-top: 10px;
-
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-  
-  &:hover:not(:disabled) {
-    background-color: #4936D8;
-  }
-`;
+import { 
+  FormContainer, 
+  InputGroup, 
+  BorderlessInput, 
+  FloatingLabel, 
+  FocusBorder,
+  CompactButton,
+  ButtonsContainer,
+  VerificationCodeWrapper,
+  CompactCodeButton
+} from '../../theme/components/auth/AuthComponents';
 
 function RegisterForm() {
   const { 
@@ -88,82 +22,132 @@ function RegisterForm() {
     handleSubmit, 
     handleSendCode 
   } = useRegisterPage();
+  
+  const [focusedField, setFocusedField] = useState(null);
+  
+  const isFieldActive = (field) => focusedField === field || formData[field];
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <InputWrapper>
-        <Label htmlFor="username">用户名</Label>
-        <Input 
+      <InputGroup>
+        <FloatingLabel 
+          htmlFor="username" 
+          $isActive={isFieldActive('username')}
+        >
+          用户名
+        </FloatingLabel>
+        <BorderlessInput 
           type="text" 
           id="username" 
           name="username"
           value={formData.username}
           onChange={handleChange}
-          placeholder="请输入您的用户名"
           required 
+          onFocus={() => setFocusedField('username')}
+          onBlur={() => setFocusedField(null)}
         />
-      </InputWrapper>
-      <InputWrapper>
-        <Label htmlFor="email">邮箱</Label>
-        <Input 
+        <FocusBorder />
+      </InputGroup>
+      
+      <InputGroup>
+        <FloatingLabel 
+          htmlFor="email" 
+          $isActive={isFieldActive('email')}
+        >
+          邮箱
+        </FloatingLabel>
+        <BorderlessInput 
           type="email" 
           id="email" 
           name="email" 
           value={formData.email}
           onChange={handleChange}
-          placeholder="请输入您的邮箱"
           required
+          onFocus={() => setFocusedField('email')}
+          onBlur={() => setFocusedField(null)}
         />
-      </InputWrapper>
-      <InputWrapper>
-        <Label htmlFor="code">验证码</Label>
+        <FocusBorder />
+      </InputGroup>
+      
+      <InputGroup>
+        <FloatingLabel 
+          htmlFor="code" 
+          $isActive={isFieldActive('code')}
+        >
+          验证码
+        </FloatingLabel>
         <VerificationCodeWrapper>
-          <Input 
+          <BorderlessInput 
             type="text" 
             id="code" 
             name="code" 
             value={formData.code}
             onChange={handleChange}
-            placeholder="请输入验证码"
             required
             style={{ flex: 1 }}
+            onFocus={() => setFocusedField('code')}
+            onBlur={() => setFocusedField(null)}
           />
-          <CodeButton 
+          <CompactCodeButton 
             type="button" 
             onClick={handleSendCode} 
             disabled={isSendingCode || countdown > 0}
           >
             {isSendingCode ? '发送中...' : (countdown > 0 ? `${countdown}s` : '发送验证码')}
-          </CodeButton>
+          </CompactCodeButton>
         </VerificationCodeWrapper>
-      </InputWrapper>
-      <InputWrapper>
-        <Label htmlFor="password">密码</Label>
-        <Input 
+        <FocusBorder />
+      </InputGroup>
+      
+      <InputGroup>
+        <FloatingLabel 
+          htmlFor="password" 
+          $isActive={isFieldActive('password')}
+        >
+          密码
+        </FloatingLabel>
+        <BorderlessInput 
           type="password" 
           id="password" 
           name="password" 
           value={formData.password}
           onChange={handleChange}
-          placeholder="请设置密码（至少8位）"
           required
+          onFocus={() => setFocusedField('password')}
+          onBlur={() => setFocusedField(null)}
         />
-      </InputWrapper>
-      <InputWrapper>
-        <Label htmlFor="confirmPassword">确认密码</Label>
-        <Input 
+        <FocusBorder />
+      </InputGroup>
+      
+      <InputGroup>
+        <FloatingLabel 
+          htmlFor="confirmPassword" 
+          $isActive={isFieldActive('confirmPassword')}
+        >
+          确认密码
+        </FloatingLabel>
+        <BorderlessInput 
           type="password" 
           id="confirmPassword" 
           name="confirmPassword" 
           value={formData.confirmPassword}
           onChange={handleChange}
-          placeholder="请再次输入密码"
           required
+          onFocus={() => setFocusedField('confirmPassword')}
+          onBlur={() => setFocusedField(null)}
         />
-      </InputWrapper>
-      <SubmitButton type="submit" disabled={isLoading}>
-        {isLoading ? '注册中...' : '注册'}
-      </SubmitButton>
+        <FocusBorder />
+      </InputGroup>
+      
+      <ButtonsContainer>
+        <CompactButton 
+          type="submit" 
+          disabled={isLoading}
+          $pill
+        >
+          {isLoading ? '创建中...' : '创建账户'}
+        </CompactButton>
+      </ButtonsContainer>
     </FormContainer>
   );
 }

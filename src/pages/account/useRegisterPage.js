@@ -1,10 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { register, sendVerificationCode } from '../../services/api/authService';
+import { sendVerificationCode } from '../../services/api/authService';
+import { registerUser } from '../../store/slices/authSlice';
 
 export const useRegisterPage = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
     const [isSendingCode, setIsSendingCode] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -37,7 +40,7 @@ export const useRegisterPage = () => {
         }
         setIsSendingCode(true);
         try {
-            await sendVerificationCode(formData.email);
+            await sendVerificationCode({ contact: formData.email, scene: 'REGISTER' });
             toast.success('验证码已发送，请注意查收！');
             setCountdown(60);
         } catch (error) {
@@ -56,17 +59,23 @@ export const useRegisterPage = () => {
         }
         setIsLoading(true);
         try {
-            const { confirmPassword, ...registerData } = formData;
-            await register(registerData);
-            toast.success('注册成功！正在跳转到登录页...');
-            setTimeout(() => navigate('/login'), 2000);
+            const resultAction = await dispatch(registerUser(formData));
+
+            if (registerUser.fulfilled.match(resultAction)) {
+                toast.success('注册成功！正在跳转到登录页...');
+                setTimeout(() => navigate('/login'), 2000);
+            } else {
+                const errorMessage = resultAction.payload || '注册失败，请稍后重试。';
+                toast.error(errorMessage);
+            }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || '注册失败，请稍后重试。';
+            console.error('注册错误:', error);
+            const errorMessage = error.message || '注册失败，请稍后重试。';
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);
         }
-    }, [formData, navigate]);
+    }, [formData, dispatch, navigate]);
 
     return {
         isLoading,
