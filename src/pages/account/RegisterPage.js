@@ -1,13 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet';
 import RegisterForm from '../../components/auth/RegisterForm';
 
 const RegisterPageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #f0f2f5;
+  padding: 20px;
 `;
 
 const FormWrapper = styled.div`
@@ -29,6 +31,10 @@ const FormWrapper = styled.div`
 const RegisterPage = () => {
   return (
     <RegisterPageContainer>
+      <Helmet>
+        <title>注册 - Daily Discover</title>
+        <meta name="description" content="创建您的Daily Discover账户，开始您的个性化探索之旅" />
+      </Helmet>
       <FormWrapper>
         <h1>创建您的账户</h1>
         <RegisterForm />

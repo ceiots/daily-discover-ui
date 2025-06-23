@@ -1,13 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
-import LoginForm from '../../components/auth/LoginForm'; 
+import { Helmet } from 'react-helmet';
+import LoginForm from '../../components/auth/LoginForm';
 
 const LoginPageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #f0f2f5;
+  padding: 20px;
 `;
 
 const FormWrapper = styled.div`
@@ -29,6 +31,10 @@ const FormWrapper = styled.div`
 const LoginPage = () => {
   return (
     <LoginPageContainer>
+      <Helmet>
+        <title>登录 - Daily Discover</title>
+        <meta name="description" content="登录您的Daily Discover账户，开启您的个性化体验" />
+      </Helmet>
       <FormWrapper>
         <h1>登录到您的账户</h1>
         <LoginForm />

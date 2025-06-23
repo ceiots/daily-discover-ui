@@ -2,8 +2,9 @@ import { useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
-import { login } from '../../services/api/authService';
+import { login as loginService } from '../../services/api/authService';
 import { setCredentials } from '../../store/slices/userSlice';
+import { loginUser } from '../../store/slices/authSlice';
 
 export const useLoginPage = () => {
     const navigate = useNavigate();
@@ -23,13 +24,27 @@ export const useLoginPage = () => {
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        
         try {
-            const userData = await login(formData);
-            dispatch(setCredentials({ user: userData.data.user, token: userData.data.token }));
-            toast.success('登录成功！');
-            navigate(from, { replace: true });
+            const resultAction = await dispatch(loginUser(formData));
+            
+            if (loginUser.fulfilled.match(resultAction)) {
+                const userData = resultAction.payload;
+                
+                dispatch(setCredentials({ 
+                    user: userData.user, 
+                    token: userData.token 
+                }));
+                
+                toast.success('登录成功！');
+                navigate(from, { replace: true });
+            } else {
+                const errorMessage = resultAction.payload || '登录失败，请检查您的凭据。';
+                toast.error(errorMessage);
+            }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || '登录失败，请检查您的凭据。';
+            console.error('登录错误:', error);
+            const errorMessage = error.message || '登录失败，请稍后重试。';
             toast.error(errorMessage);
         } finally {
             setIsLoading(false);

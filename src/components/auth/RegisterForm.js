@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { useRegisterPage } from '../../pages/account/useRegisterPage';
 
 const InputWrapper = styled.div`
@@ -17,15 +18,37 @@ const Label = styled.label`
 const Input = styled.input`
   width: 100%;
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 4px;
   box-sizing: border-box;
+  transition: border-color 0.3s;
+  
+  &:focus {
+    border-color: #5B47E8;
+    outline: none;
+  }
 `;
 
 const VerificationCodeWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+`;
+
+const CodeButton = styled.button`
+  padding: 10px 15px;
+  background-color: ${props => props.disabled ? '#ccc' : '#5B47E8'};
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.3s;
+  
+  &:hover:not(:disabled) {
+    background-color: #4936d8;
+  }
 `;
 
 const SubmitButton = styled.button`
@@ -39,10 +62,31 @@ const SubmitButton = styled.button`
   font-size: 16px;
   font-weight: 600;
   transition: background-color 0.3s;
+  margin-top: 10px;
 
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: #4936d8;
+  }
+`;
+
+const FormFooter = styled.div`
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+`;
+
+const StyledLink = styled(Link)`
+  color: #5B47E8;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -67,6 +111,7 @@ function RegisterForm() {
           name="username"
           value={formData.username}
           onChange={handleChange}
+          placeholder="请输入您的用户名"
           required 
         />
       </InputWrapper>
@@ -78,6 +123,7 @@ function RegisterForm() {
           name="email" 
           value={formData.email}
           onChange={handleChange}
+          placeholder="请输入您的邮箱"
           required
         />
       </InputWrapper>
@@ -90,17 +136,17 @@ function RegisterForm() {
             name="code" 
             value={formData.code}
             onChange={handleChange}
+            placeholder="请输入验证码"
             required
             style={{ flex: 1 }}
           />
-          <button 
+          <CodeButton 
             type="button" 
             onClick={handleSendCode} 
             disabled={isSendingCode || countdown > 0}
-            style={{ padding: '10px 15px', flexShrink: 0 }}
           >
             {isSendingCode ? '发送中...' : (countdown > 0 ? `${countdown}s` : '发送验证码')}
-          </button>
+          </CodeButton>
         </VerificationCodeWrapper>
       </InputWrapper>
       <InputWrapper>
@@ -111,6 +157,7 @@ function RegisterForm() {
           name="password" 
           value={formData.password}
           onChange={handleChange}
+          placeholder="请设置密码（至少8位）"
           required
         />
       </InputWrapper>
@@ -122,12 +169,16 @@ function RegisterForm() {
           name="confirmPassword" 
           value={formData.confirmPassword}
           onChange={handleChange}
+          placeholder="请再次输入密码"
           required
         />
       </InputWrapper>
       <SubmitButton type="submit" disabled={isLoading}>
         {isLoading ? '注册中...' : '注册'}
       </SubmitButton>
+      <FormFooter>
+        已有账户？<StyledLink to="/login">立即登录</StyledLink>
+      </FormFooter>
     </form>
   );
 }
