@@ -1,50 +1,25 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { Link } from 'react-router-dom';
 
 // 容器和布局组件
 export const AuthPageContainer = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.background.page};
-  background-image: linear-gradient(135deg, rgba(91, 71, 232, 0.02) 0%, rgba(0, 0, 0, 0) 100%);
   position: relative;
-  padding: ${({ theme }) => theme.spacing.md};
-  padding-top: max(${({ theme }) => theme.spacing.lg}, env(safe-area-inset-top));
-  padding-bottom: max(${({ theme }) => theme.spacing.lg}, env(safe-area-inset-bottom));
   box-sizing: border-box;
   overflow: hidden;
-  
-  &::before {
-    content: "";
-    position: absolute;
-    top: -10%;
-    right: -5%;
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(91, 71, 232, 0.05) 0%, rgba(91, 71, 232, 0) 70%);
-    z-index: 0;
-  }
-  
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -10%;
-    left: -5%;
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(91, 71, 232, 0.03) 0%, rgba(91, 71, 232, 0) 70%);
-    z-index: 0;
-  }
 `;
 
 export const AuthContentWrapper = styled.div`
   width: 100%;
   max-width: ${({ theme }) => theme.layout.maxWidthForm};
-  padding: ${({ theme }) => theme.spacing.xl} ${({ theme }) => theme.spacing.xl};
+  padding: ${({ theme }) => theme.spacing.xl};
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   position: relative;
   z-index: 1;
   
@@ -53,59 +28,17 @@ export const AuthContentWrapper = styled.div`
   }
 `;
 
-export const LogoContainer = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacing.xxl};
-  text-align: center;
-  position: relative;
-  
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -${({ theme }) => theme.spacing.md};
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 2px;
-    background: linear-gradient(to right, rgba(91, 71, 232, 0), rgba(91, 71, 232, 0.6), rgba(91, 71, 232, 0));
-  }
-`;
-
-export const Logo = styled.div`
-  width: 60px;
-  height: 60px;
-  margin: 0 auto ${({ theme }) => theme.spacing.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  
-  &::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-    background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary.light} 0%, ${({ theme }) => theme.colors.primary.main} 100%);
-    transform: rotate(45deg);
-    box-shadow: 0 2px 10px rgba(91, 71, 232, 0.2);
-  }
-  
-  &::after {
-    content: "DD";
-    position: relative;
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  }
+export const FormContainer = styled.form`
+  margin-top: ${({ theme }) => theme.spacing.xl};
 `;
 
 export const Title = styled.h2`
-  font-size: ${({ theme }) => theme.typography.fontSize.xxl};
+  font-size: ${({ theme }) => theme.typography.fontSize.xl};
   font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
   color: ${({ theme }) => theme.colors.text.primary};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
   letter-spacing: -0.5px;
+  text-align: center;
 `;
 
 export const Subtitle = styled.p`
@@ -115,13 +48,10 @@ export const Subtitle = styled.p`
   max-width: 280px;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
 `;
 
 // 表单组件
-export const FormContainer = styled.form`
-  /* No additional styling needed */
-`;
-
 export const InputGroup = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl}; 
   position: relative;
@@ -162,7 +92,7 @@ export const FloatingLabel = styled.label`
   transition: all 0.2s ease;
   pointer-events: none;
   
-  ${props => props.$isActive && `
+  ${props => props.$isActive && css`
     animation: ${floatLabel} 0.2s ease forwards;
   `}
 `;

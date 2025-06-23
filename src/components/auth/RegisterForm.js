@@ -45,6 +45,7 @@ function RegisterForm() {
           required 
           onFocus={() => setFocusedField('username')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="username"
         />
         <FocusBorder />
       </InputGroup>
@@ -65,6 +66,7 @@ function RegisterForm() {
           required
           onFocus={() => setFocusedField('email')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="email"
         />
         <FocusBorder />
       </InputGroup>
@@ -87,6 +89,7 @@ function RegisterForm() {
             style={{ flex: 1 }}
             onFocus={() => setFocusedField('code')}
             onBlur={() => setFocusedField(null)}
+            autoComplete="off"
           />
           <CompactCodeButton 
             type="button" 
@@ -115,6 +118,7 @@ function RegisterForm() {
           required
           onFocus={() => setFocusedField('password')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="new-password"
         />
         <FocusBorder />
       </InputGroup>
@@ -135,6 +139,7 @@ function RegisterForm() {
           required
           onFocus={() => setFocusedField('confirmPassword')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="new-password"
         />
         <FocusBorder />
       </InputGroup>

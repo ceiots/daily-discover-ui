@@ -34,6 +34,7 @@ function LoginForm() {
           required 
           onFocus={() => setFocusedField('email')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="email"
         />
         <FocusBorder />
       </InputGroup>
@@ -54,6 +55,7 @@ function LoginForm() {
           required 
           onFocus={() => setFocusedField('password')}
           onBlur={() => setFocusedField(null)}
+          autoComplete="current-password"
         />
         <FocusBorder />
       </InputGroup>

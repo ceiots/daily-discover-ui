@@ -1,11 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import LoginForm from '../../components/auth/LoginForm';
+import Header from '../../theme/components/common/Header';
 import { 
   AuthPageContainer, 
   AuthContentWrapper,
-  LogoContainer,
-  Logo,
   Title, 
   Subtitle,
   Footer,
@@ -20,12 +19,11 @@ const LoginPage = () => {
         <meta name="description" content="登录您的Daily Discover账户，开启您的个性化体验" />
       </Helmet>
       
+      <Header title="登录" onBack={null} variant="primary" />
+      
       <AuthContentWrapper>
-        <LogoContainer>
-          <Logo />
-          <Title>登录</Title>
-          <Subtitle>欢迎回来，请登录您的账户</Subtitle>
-        </LogoContainer>
+        <Title>欢迎回来</Title>
+        <Subtitle>请登录您的账户以继续</Subtitle>
         
         <LoginForm />
         

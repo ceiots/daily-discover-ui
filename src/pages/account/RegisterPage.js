@@ -1,11 +1,10 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import RegisterForm from '../../components/auth/RegisterForm';
+import Header from '../../theme/components/common/Header';
 import { 
   AuthPageContainer, 
   AuthContentWrapper,
-  LogoContainer,
-  Logo,
   Title, 
   Subtitle,
   Footer,
@@ -20,12 +19,11 @@ const RegisterPage = () => {
         <meta name="description" content="创建您的Daily Discover账户，开始您的个性化探索之旅" />
       </Helmet>
       
+      <Header title="创建账户" onBack={null} variant="primary" />
+      
       <AuthContentWrapper>
-        <LogoContainer>
-          <Logo />
-          <Title>创建账户</Title>
-          <Subtitle>填写以下信息，开启您的探索之旅</Subtitle>
-        </LogoContainer>
+        <Title>加入我们</Title>
+        <Subtitle>填写以下信息，开启您的探索之旅</Subtitle>
         
         <RegisterForm />
         
