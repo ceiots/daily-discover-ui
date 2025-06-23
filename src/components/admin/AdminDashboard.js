@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BasePage } from '../../theme';
-import instance from '../../utils/axios';
+import instance from '../../services/http/instance';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();

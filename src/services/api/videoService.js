@@ -1,4 +1,4 @@
-import axios from '../../utils/axios';
+import axios from '../http/instance';
 
 /**
  * 视频服务API
@@ -73,4 +73,4 @@ const videoService = {
   }
 };
 
-export { videoService }; 
+export { videoService };

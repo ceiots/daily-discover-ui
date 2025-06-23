@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import { useNavigate } from "react-router-dom";
 import { BasePage } from "../../theme";
 

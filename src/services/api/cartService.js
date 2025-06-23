@@ -1,4 +1,4 @@
-import axios from '../../utils/axios';
+import axios from '../http/instance';
 
 /**
  * 购物车服务API
@@ -58,4 +58,4 @@ const cartService = {
   }
 };
 
-export { cartService }; 
+export { cartService };

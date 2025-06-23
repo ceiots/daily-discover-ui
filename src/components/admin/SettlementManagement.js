@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import { BasePage, Button, Card, Tabs, Tab, Modal } from "../../theme";
 import { format } from "date-fns";
 

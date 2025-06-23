@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import instance from "../utils/axios";
+import instance from "../services/http/instance";
 //import "./SearchResultsPage.css"; // 确保样式文件存在
 
 const SearchResultsPage = () => {

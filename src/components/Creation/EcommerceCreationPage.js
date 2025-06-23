@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./EcommerceCreationPage.css";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import { BasePage, Button, Card } from "../../theme";
 // 由于主题中缺少 Input, Typography 和 Select 组件，使用自定义组件
 import { Input, Typography, Select } from '../common/FormComponents';

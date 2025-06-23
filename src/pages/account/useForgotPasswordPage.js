@@ -38,17 +38,29 @@ export const useForgotPasswordPage = () => {
     setIsSendingCode(true);
     setError('');
     try {
+      console.log('发送验证码请求开始，邮箱:', email);
       // 重置密码场景下，type为3
       const response = await authService.sendVerificationCode(email, 3);
+      console.log('发送验证码响应:', response);
+      
       if (response && response.success) {
         toast.success('验证码已发送，请注意查收');
         setStep(2); // 进入下一步
         setCountdown(60);
       } else {
+        console.error('发送验证码失败，后端返回失败状态:', response);
         setError(response.message || '发送验证码失败');
       }
     } catch (err) {
-      setError(err.response?.data?.message || '发送验证码失败，请确认邮箱是否已注册');
+      console.error('发送验证码请求异常:', err);
+      
+      if (err.code === 'ECONNABORTED') {
+        setError('请求超时，请检查网络连接或稍后再试');
+      } else if (!err.response) {
+        setError('网络连接错误，请检查您的网络设置');
+      } else {
+        setError(err.response?.data?.message || '发送验证码失败，请确认邮箱是否已注册');
+      }
     } finally {
       setIsSendingCode(false);
     }
@@ -69,15 +81,27 @@ export const useForgotPasswordPage = () => {
 
     setSubmitting(true);
     try {
+      console.log('重置密码请求开始，邮箱:', email);
       const response = await authService.resetPassword({ email, code, password });
+      console.log('重置密码响应:', response);
+      
       if (response && response.success) {
         toast.success('密码重置成功！即将跳转到登录页。');
         setTimeout(() => navigate('/login'), 2000);
       } else {
+        console.error('重置密码失败，后端返回失败状态:', response);
         setError(response.message || '密码重置失败');
       }
     } catch (err) {
-      setError(err.response?.data?.message || '密码重置失败，请检查验证码或稍后再试');
+      console.error('重置密码请求异常:', err);
+      
+      if (err.code === 'ECONNABORTED') {
+        setError('请求超时，请检查网络连接或稍后再试');
+      } else if (!err.response) {
+        setError('网络连接错误，请检查您的网络设置');
+      } else {
+        setError(err.response?.data?.message || '密码重置失败，请检查验证码或稍后再试');
+      }
     } finally {
       setSubmitting(false);
     }

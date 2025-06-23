@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import "./Daily.css";
-import instance from "../utils/axios";
+import instance from "../services/http/instance";
 import { useNavigate } from "react-router-dom";
 import AiAssistant from "../components/ai/AiAssistant"; // 引入AI助手组件
 import Recommendations from "../components/recommendation/Recommendations"; // Import the new Recommendations component
@@ -194,4 +194,4 @@ const Daily = () => {
   );
 };
 
-export default Daily; 
+export default Daily;

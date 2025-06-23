@@ -14,7 +14,7 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
 } from "react-icons/fa";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import { formatSpecifications } from "../../utils/orderUtils";
 // 新增：导入 OrderCountdown 组件
 import OrderCountdown from "../OrderCountdown";

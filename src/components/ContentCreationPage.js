@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ContentCreationPage.css';
-import instance from "../utils/axios";
+import instance from "../services/http/instance";
 
 const ContentCreationPage = () => {
   const navigate = useNavigate();

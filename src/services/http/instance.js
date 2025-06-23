@@ -20,13 +20,16 @@ const httpClient = axios.create({
  */
 httpClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('userToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
     // 添加X-Requested-With头，帮助后端识别AJAX请求
     config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    
+    // 打印请求信息
+    console.log(`[HTTP] ${config.method.toUpperCase()} ${config.url}`, config);
     
     return config;
   },
@@ -38,6 +41,8 @@ httpClient.interceptors.request.use(
  */
 httpClient.interceptors.response.use(
   (response) => {
+    // 打印响应信息
+    console.log(`[HTTP] Response from ${response.config.url}:`, response.data);
     // 仅返回服务器响应的数据部分
     return response.data;
   },
@@ -45,11 +50,17 @@ httpClient.interceptors.response.use(
     // 统一错误处理
     if (error.response) {
       // 服务器返回错误状态码
+      console.error(`[HTTP] Error ${error.response.status} from ${error.config?.url}:`, error.response.data);
+      
       switch (error.response.status) {
         case 401:
           // 未授权，清除token并重定向到登录页
-          localStorage.removeItem('auth_token');
-          window.location.href = '/account/login';
+          localStorage.removeItem('userToken');
+          localStorage.removeItem('userInfo');
+          // 避免在登录页面重定向，防止无限循环
+          if (!window.location.pathname.includes('/login')) {
+            window.location.href = '/login';
+          }
           break;
         case 403:
           // 权限不足
@@ -65,6 +76,7 @@ httpClient.interceptors.response.use(
     } else if (error.request) {
       // 请求已发送但未收到响应
       console.error('网络错误,请检查您的网络连接:', error.request);
+      console.error('请求详情:', error.config);
     } else {
       // 请求配置错误
       console.error('请求配置错误:', error.message);

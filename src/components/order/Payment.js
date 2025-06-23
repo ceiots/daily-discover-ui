@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import instance from "../../utils/axios";
+import instance from "../../services/http/instance";
 import { BasePage, Button, Card } from "../../theme";
 
 const Payment = () => {

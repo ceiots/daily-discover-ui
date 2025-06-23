@@ -13,8 +13,8 @@ const authService = {
   async sendVerificationCode(email, type) {
     console.log(`[authService] Sending verification code to: ${email}, type: ${type}`);
     try {
-      // 使用POST请求，符合RESTful规范（发送验证码是有副作用的操作）
-      // API_BASE_URL已经包含了/daily-discover前缀，所以这里不需要重复添加
+      // 根据后端接口定义，使用查询参数而不是请求体
+      // 注意：UserController.java中的sendCode方法使用@RequestParam接收参数
       const response = await httpClient.post('/api/v1/users/send-code', null, {
         params: { email, type },
       });
@@ -42,8 +42,38 @@ const authService = {
    */
   login(credentials) {
     const deviceInfo = getDeviceInfo();
-    const data = { ...credentials, ...deviceInfo };
-    return httpClient.post('/api/v1/users/login', data);
+    
+    // 确保明确指定所有必要字段，特别是密码
+    const data = {
+      username: credentials.username,
+      password: credentials.password,
+      deviceId: deviceInfo.deviceId,
+      deviceType: deviceInfo.deviceType,
+      deviceModel: deviceInfo.deviceModel,
+      osVersion: deviceInfo.osVersion,
+      appVersion: deviceInfo.appVersion
+    };
+    
+    // 添加详细日志
+    console.log('[authService] Attempting login with:', {
+      username: credentials.username,
+      passwordProvided: !!credentials.password,
+      passwordLength: credentials.password ? credentials.password.length : 0,
+      deviceInfo: {
+        deviceId: deviceInfo.deviceId,
+        deviceType: deviceInfo.deviceType
+      }
+    });
+    
+    return httpClient.post('/api/v1/users/login', data)
+      .then(response => {
+        console.log('[authService] Login success response:', response);
+        return response;
+      })
+      .catch(error => {
+        console.error('[authService] Login error:', error.response?.data || error.message);
+        throw error;
+      });
   },
 
   /**
@@ -51,9 +81,17 @@ const authService = {
    * @param {object} data - { email, code, password }
    */
   resetPassword(data) {
-    return httpClient.put('/api/v1/users/password/reset', null, {
-      params: data,
-    });
+    // 确保明确指定所有必要字段
+    const resetData = {
+      email: data.email,
+      code: data.code,
+      password: data.password
+    };
+    
+    console.log('[authService] Resetting password for email:', data.email);
+    
+    // 使用请求体而不是URL参数，确保密码安全传输
+    return httpClient.put('/api/v1/users/password/reset', resetData);
   },
 
   /**
