@@ -70,8 +70,8 @@ export const resetPassword = async (data) => {
  */
 export const logout = async () => {
   const response = await httpClient.post(`${BASE_URL}/logout`);
-  // 清除本地存储的令牌
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+    // 清除本地存储的令牌
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   return response.data;
 }; 

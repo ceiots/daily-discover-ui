@@ -77,7 +77,7 @@ const Logo = React.memo(({
       </LogoIcon>
       {!iconOnly && (
         <LogoText>
-          {/* <LogoTextChinese variant={variant} size={size}>每日发现</LogoTextChinese> */}
+          {<LogoTextChinese variant={variant} size={size}>每日发现</LogoTextChinese>}
           <LogoTextEnglish variant={variant} size={size}>Daily Discover</LogoTextEnglish>
         </LogoText>
       )}

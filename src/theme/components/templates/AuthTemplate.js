@@ -109,7 +109,7 @@ const AuthTemplate = ({ children }) => {
       
       {/* 页脚 */}
       <FooterContainer>
-        © {new Date().getFullYear()} 每日发现
+        © {new Date().getFullYear()}
       </FooterContainer>
     </AuthContainer>
   );
