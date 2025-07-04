@@ -1,5 +1,7 @@
 import axios from 'axios';
-import { API_BASE_URL, API_TIMEOUT } from '../../constants/api';
+import { API_BASE_URL } from '../../config';
+
+const API_TIMEOUT = 10000; // 10 seconds timeout
 
 /**
  * Axios实例 - 应用的HTTP客户端基础配置

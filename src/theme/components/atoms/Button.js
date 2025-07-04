@@ -1,129 +1,278 @@
- /**
+/**
  * Button 原子组件
  * 基础按钮组件，支持不同的变体和样式
  */
 import React from 'react';
+import styled, { keyframes } from 'styled-components';
+import tokens from '../../tokens';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useComponentPerformance } from '../../utils/performance';
 
+// 光影扫过动画
+const lightSweep = keyframes`
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+`;
+
+// 按钮基础样式
+const ButtonBase = styled.button`
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ${tokens.typography.fontFamily};
+  font-weight: ${tokens.typography.fontWeight.semibold};
+  text-align: center;
+  user-select: none;
+  cursor: pointer;
+  transition: all ${tokens.animation.duration.normal} ${tokens.animation.easing.easeInOut};
+  border: none;
+  outline: none;
+  border-radius: ${({ pill }) => pill ? '100px' : tokens.layout.borderRadius.md};
+  width: ${({ block }) => block ? '100%' : 'auto'};
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* 光影效果伪元素 */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: translateX(-100%);
+    opacity: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    
+    &::before {
+      animation: ${lightSweep} 1.5s ${tokens.animation.easing.easeInOut} forwards;
+      opacity: 1;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: none;
+  }
+`;
+
+// 主要按钮样式
+const PrimaryButton = styled(ButtonBase)`
+  background: linear-gradient(to right, ${tokens.colors.primary.main}, ${tokens.colors.primary.dark});
+  color: ${tokens.colors.text.onPrimary};
+  height: ${({ size }) => 
+    size === 'large' ? '48px' :
+    size === 'small' ? '32px' : 
+    '40px'
+  };
+  padding: ${({ size }) => 
+    size === 'large' ? `0 ${tokens.spacing.xl}` :
+    size === 'small' ? `0 ${tokens.spacing.md}` : 
+    `0 ${tokens.spacing.lg}`
+  };
+  font-size: ${({ size }) => 
+    size === 'large' ? tokens.typography.fontSize.lg :
+    size === 'small' ? tokens.typography.fontSize.xs : 
+    tokens.typography.fontSize.sm
+  };
+  box-shadow: 0 5px 15px rgba(91, 71, 232, 0.25);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 8px 20px rgba(91, 71, 232, 0.3);
+  }
+`;
+
+// 次要按钮样式
+const SecondaryButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: ${tokens.colors.primary.main};
+  border: 1px solid ${tokens.colors.primary.main};
+  height: ${({ size }) => 
+    size === 'large' ? '48px' :
+    size === 'small' ? '32px' : 
+    '40px'
+  };
+  padding: ${({ size }) => 
+    size === 'large' ? `0 ${tokens.spacing.xl}` :
+    size === 'small' ? `0 ${tokens.spacing.md}` : 
+    `0 ${tokens.spacing.lg}`
+  };
+  font-size: ${({ size }) => 
+    size === 'large' ? tokens.typography.fontSize.lg :
+    size === 'small' ? tokens.typography.fontSize.xs : 
+    tokens.typography.fontSize.sm
+  };
+
+  &:hover:not(:disabled) {
+    background-color: ${tokens.colors.primary.light};
+  }
+`;
+
+// 文本按钮样式
+const TextButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: ${tokens.colors.primary.main};
+  height: ${({ size }) => 
+    size === 'large' ? '48px' :
+    size === 'small' ? '32px' : 
+    '40px'
+  };
+  padding: ${({ size }) => 
+    size === 'large' ? `0 ${tokens.spacing.lg}` :
+    size === 'small' ? `0 ${tokens.spacing.sm}` : 
+    `0 ${tokens.spacing.md}`
+  };
+  font-size: ${({ size }) => 
+    size === 'large' ? tokens.typography.fontSize.lg :
+    size === 'small' ? tokens.typography.fontSize.xs : 
+    tokens.typography.fontSize.sm
+  };
+
+  &:hover:not(:disabled) {
+    background-color: ${tokens.colors.primary.light};
+  }
+`;
+
+// 危险按钮样式
+const DangerButton = styled(ButtonBase)`
+  background: linear-gradient(to right, ${tokens.colors.feedback.error}, #d32f2f);
+  color: ${tokens.colors.text.onPrimary};
+  height: ${({ size }) => 
+    size === 'large' ? '48px' :
+    size === 'small' ? '32px' : 
+    '40px'
+  };
+  padding: ${({ size }) => 
+    size === 'large' ? `0 ${tokens.spacing.xl}` :
+    size === 'small' ? `0 ${tokens.spacing.md}` : 
+    `0 ${tokens.spacing.lg}`
+  };
+  font-size: ${({ size }) => 
+    size === 'large' ? tokens.typography.fontSize.lg :
+    size === 'small' ? tokens.typography.fontSize.xs : 
+    tokens.typography.fontSize.sm
+  };
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.25);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+  }
+`;
+
+// 加载指示器
+const LoadingSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: ${({ variant }) => 
+    variant === 'secondary' || variant === 'text' 
+      ? tokens.colors.primary.main 
+      : tokens.colors.text.onPrimary
+  };
+  animation: spin 0.8s linear infinite;
+  margin-right: ${tokens.spacing.sm};
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+// 图标容器
+const IconWrapper = styled.span`
+  margin-right: ${tokens.spacing.sm};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 /**
  * 按钮组件
+ * 支持多种变体、尺寸和状态
+ * 
  * @param {Object} props - 组件属性
- * @param {React.ReactNode} props.children - 子元素
- * @param {string} props.type - 按钮类型：'primary', 'secondary', 'outline', 'text', 'danger'
- * @param {string} props.htmlType - 原生按钮类型：'button', 'submit', 'reset'
+ * @param {React.ReactNode} props.children - 按钮内容
+ * @param {string} props.variant - 按钮变体：'primary', 'secondary', 'text', 'danger'
  * @param {string} props.size - 按钮尺寸：'small', 'medium', 'large'
- * @param {boolean} props.block - 是否块级按钮
+ * @param {string} props.type - 按钮类型：'button', 'submit', 'reset'
  * @param {boolean} props.disabled - 是否禁用
- * @param {boolean} props.loading - 是否加载中
+ * @param {boolean} props.loading - 是否显示加载状态
+ * @param {boolean} props.block - 是否块级按钮（占满容器宽度）
+ * @param {boolean} props.pill - 是否胶囊形状
  * @param {React.ReactNode} props.icon - 按钮图标
- * @param {string} props.className - 自定义类名
  * @param {Function} props.onClick - 点击事件处理函数
- * @returns {React.ReactElement} 按钮组件
  */
-const Button = ({
+const Button = React.memo(({
   children,
-  type = 'primary',
-  htmlType,
+  variant = 'primary',
   size = 'medium',
-  block = false,
+  type = 'button',
   disabled = false,
   loading = false,
+  block = false,
+  pill = false,
   icon = null,
-  className = '',
   onClick,
   ...props
 }) => {
   // 性能监控
   useComponentPerformance('Button');
   
-  // 按钮类型样式映射
-  const typeClasses = {
-    primary: 'bg-primary-500 hover:bg-primary-600 text-white',
-    secondary: 'bg-neutral-200 hover:bg-neutral-300 text-neutral-800',
-    outline: 'border border-primary-500 text-primary-500 hover:bg-primary-50',
-    text: 'text-primary-500 hover:bg-primary-50',
-    danger: 'bg-error-DEFAULT hover:bg-error-dark text-white',
-  };
-
-  // 按钮尺寸样式映射
-  const sizeClasses = {
-    small: 'py-1 px-3 text-sm',
-    medium: 'py-2 px-4',
-    large: 'py-3 px-6 text-lg',
-  };
-
-  // 组合所有样式
-  const buttonClasses = classNames(
-    'rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50',
-    typeClasses[type],
-    sizeClasses[size],
-    {
-      'w-full': block,
-      'opacity-50 cursor-not-allowed': disabled || loading,
-      'flex items-center justify-center': icon || loading,
-    },
-    className
-  );
-
-  // 处理点击事件
-  const handleClick = (e) => {
-    if (disabled || loading) return;
-    onClick && onClick(e);
-  };
-
-  // 提取htmlType属性，不直接传递给DOM元素
-  const buttonProps = { ...props };
-  if (htmlType) {
-    buttonProps.type = htmlType;
-  }
+  // 根据变体选择适合的按钮组件
+  const ButtonComponent = 
+    variant === 'secondary' ? SecondaryButton :
+    variant === 'text' ? TextButton :
+    variant === 'danger' ? DangerButton :
+    PrimaryButton;
 
   return (
-    <button
-      className={buttonClasses}
-      onClick={handleClick}
+    <ButtonComponent
+      type={type}
+      size={size}
       disabled={disabled || loading}
-      {...buttonProps}
+      block={block}
+      pill={pill}
+      onClick={onClick}
+      {...props}
     >
-      {loading && (
-        <svg
-          className="animate-spin -ml-1 mr-2 h-4 w-4 text-current"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-      )}
-      {icon && !loading && <span className="mr-2">{icon}</span>}
+      {loading && <LoadingSpinner variant={variant} />}
+      {icon && !loading && <IconWrapper>{icon}</IconWrapper>}
       {children}
-    </button>
+    </ButtonComponent>
   );
-};
+});
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
-  type: PropTypes.oneOf(['primary', 'secondary', 'outline', 'text', 'danger']),
-  htmlType: PropTypes.string,
+  variant: PropTypes.oneOf(['primary', 'secondary', 'text', 'danger']),
   size: PropTypes.oneOf(['small', 'medium', 'large']),
-  block: PropTypes.bool,
+  type: PropTypes.string,
   disabled: PropTypes.bool,
   loading: PropTypes.bool,
+  block: PropTypes.bool,
+  pill: PropTypes.bool,
   icon: PropTypes.node,
-  className: PropTypes.string,
   onClick: PropTypes.func,
 };
 

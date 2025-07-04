@@ -8,12 +8,12 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleAuthResponse = (response) => {
-        // Assuming the API returns { success: true, data: { user, token } }
-        const { user: userData, token } = response.data;
+    const handleAuthResponse = (data) => {
+        // The data is already the `response.data` from the service
+        const { user: userData, token } = data;
         setUser(userData);
         localStorage.setItem('authToken', token);
-        return response;
+        return data;
     };
 
     const login = useCallback(async (credentials) => {

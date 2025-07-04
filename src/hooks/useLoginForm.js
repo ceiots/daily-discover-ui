@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from './useAuth';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { login } from '../services/api/authService';
 
 /**
  * Hook to manage the logic for the login form.
@@ -9,66 +9,58 @@ import toast from 'react-hot-toast';
  */
 export const useLoginForm = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { login, isLoading, error, status, isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordShown, setPasswordShown] = useState(false);
 
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
+  const handleEmailChange = useCallback((e) => {
+    setEmail(e.target.value);
+  }, []);
 
-  const [errors, setErrors] = useState({});
+  const handlePasswordChange = useCallback((e) => {
+    setPassword(e.target.value);
+  }, []);
 
-  // Redirect if user is already logged in or after successful login
-  useEffect(() => {
-    if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/';
-      toast.success('Login successful!');
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, navigate, location.state]);
+  const togglePasswordVisibility = useCallback(() => {
+    setPasswordShown(prev => !prev);
+  }, []);
 
-  // Handle login errors
-  useEffect(() => {
-    if (status === 'failed' && error) {
-      toast.error(`Login failed: ${error}`);
-    }
-  }, [status, error]);
-
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    if (!formData.username) newErrors.username = 'Username is required';
-    if (!formData.password) newErrors.password = 'Password is required';
-    return newErrors;
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
-    const newErrors = validate();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    
+    if (!email || !password) {
+      toast.error('请输入邮箱和密码');
       return;
     }
-    setErrors({});
-    login({
-      username: formData.username,
-      password: formData.password,
-    });
-  };
+    
+    setIsLoading(true);
+    try {
+      const response = await login({ email, password });
+      toast.success('登录成功');
+      navigate('/daily'); // 登录成功后导航到主页
+    } catch (error) {
+      toast.error(error.response?.data?.message || '登录失败，请检查您的凭据');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [email, password, navigate]);
+
+  const handleCancel = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   return {
-    formData,
-    handleChange,
-    handleSubmit,
-    errors,
+    email,
+    password,
     isLoading,
+    passwordShown,
+    handleEmailChange,
+    handlePasswordChange,
+    togglePasswordVisibility,
+    handleSubmit,
+    handleCancel
   };
-}; 
+};
+
+export default useLoginForm; 

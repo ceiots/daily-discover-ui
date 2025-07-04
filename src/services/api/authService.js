@@ -1,6 +1,6 @@
-import axios from '../http/axios';
+import httpClient from '../http/instance';
 
-const API_BASE_URL = '/api/auth';
+const BASE_URL = '/api/auth';
 
 /**
  * authService 提供所有与认证相关的API调用功能。
@@ -9,88 +9,69 @@ const API_BASE_URL = '/api/auth';
  */
 
 /**
- * 用户注册
- * @param {object} userData - 包含 username, email, password, code 的对象
- * @returns {Promise<object>} 返回注册结果
+ * 用户登录
+ * @param {Object} credentials - 登录凭据
+ * @param {string} credentials.email - 用户邮箱
+ * @param {string} credentials.password - 用户密码
+ * @returns {Promise<Object>} 登录结果，包含用户信息和token
  */
-export const register = async (userData) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/register`, userData);
-    return response;
-  } catch (error) {
-    console.error('注册失败:', error);
-    throw error;
-  }
+export const login = async (credentials) => {
+  const response = await httpClient.post(`${BASE_URL}/login`, credentials);
+  return response.data;
 };
 
 /**
- * 用户登录
- * @param {object} credentials - 包含 email, password 的对象
- * @returns {Promise<object>} 返回登录结果，包含用户信息和令牌
+ * 用户注册
+ * @param {Object} userData - 用户数据
+ * @returns {Promise<Object>} 注册结果
  */
-export const login = async (credentials) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/login`, credentials);
-    return response;
-  } catch (error) {
-    console.error('登录失败:', error);
-    throw error;
-  }
+export const register = async (userData) => {
+  const response = await httpClient.post(`${BASE_URL}/register`, userData);
+  return response.data;
 };
 
 /**
  * 发送验证码
- * @param {string} email - 接收验证码的邮箱
- * @param {string} [type='register'] - 验证码类型: 'register' 或 'reset'
- * @returns {Promise<object>} 返回发送结果
+ * @param {Object} data - 请求数据
+ * @param {string} data.email - 用户邮箱
+ * @param {string} data.type - 验证码类型（'register'|'reset'）
+ * @returns {Promise<Object>} 发送结果
  */
-export const sendVerificationCode = async (email, type = 'register') => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/send-verification-code`, { 
-      email, 
-      type 
-    });
-    return response;
-  } catch (error) {
-    console.error('验证码发送失败:', error);
-    throw error;
-  }
+export const sendVerificationCode = async (data) => {
+  const response = await httpClient.post(`${BASE_URL}/send-code`, data);
+  return response.data;
 };
 
 /**
- * 验证邮箱验证码
- * @param {string} email - 邮箱
- * @param {string} code - 验证码
- * @returns {Promise<object>} 返回验证结果
+ * 验证验证码
+ * @param {Object} data - 验证数据
+ * @param {string} data.email - 用户邮箱
+ * @param {string} data.code - 验证码
+ * @returns {Promise<Object>} 验证结果
  */
-export const verifyCode = async (email, code) => {
-  try {
-    const response = await axios.post(`${API_BASE_URL}/verify-code`, { 
-      email, 
-      code 
-    });
-    return response;
-  } catch (error) {
-    console.error('验证码验证失败:', error);
-    throw error;
-  }
+export const verifyCode = async (data) => {
+  const response = await httpClient.post(`${BASE_URL}/verify-code`, data);
+  return response.data;
+};
+
+/**
+ * 重置密码
+ * @param {Object} data - 重置密码数据
+ * @returns {Promise<Object>} 重置结果
+ */
+export const resetPassword = async (data) => {
+  const response = await httpClient.post(`${BASE_URL}/reset-password`, data);
+  return response.data;
 };
 
 /**
  * 退出登录
- * @returns {Promise<void>}
+ * @returns {Promise<Object>} 退出登录结果
  */
 export const logout = async () => {
-  try {
-    await axios.post(`${API_BASE_URL}/logout`);
-    // 清除本地存储的令牌
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  } catch (error) {
-    console.error('退出登录失败:', error);
-    // 即使API调用失败，也清除本地状态
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    throw error;
-  }
+  const response = await httpClient.post(`${BASE_URL}/logout`);
+  // 清除本地存储的令牌
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  return response.data;
 }; 

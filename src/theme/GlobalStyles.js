@@ -20,7 +20,7 @@ const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     font-family: ${({ theme }) => theme.typography.fontFamily};
-    background-color: ${({ theme }) => theme.colors.background.page};
+    background-color: ${({ theme }) => theme.colors.bg.page};
     color: ${({ theme }) => theme.colors.text.primary};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

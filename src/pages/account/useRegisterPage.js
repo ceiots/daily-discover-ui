@@ -40,7 +40,7 @@ export const useRegisterPage = () => {
         }
         setIsSendingCode(true);
         try {
-            await sendVerificationCode({ contact: formData.email, scene: 'REGISTER' });
+            await sendVerificationCode({ email: formData.email, type: 'REGISTER' });
             toast.success('验证码已发送，请注意查收！');
             setCountdown(60);
         } catch (error) {

@@ -1,0 +1,90 @@
+.super-mario-game {
+  width: 100%;
+  height: 100%;
+  background-color: #5c94fc;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.super-mario-game-world {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #5c94fc;
+  transform: scale(2); /* Let's make it bigger */
+  transform-origin: top left;
+}
+
+.level {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.level-row {
+    position: relative;
+    height: 32px; /* TILE_SIZE */
+}
+
+.tile {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-size: cover;
+}
+
+.ground {
+  background-color: #e69a53;
+  border-top: 4px solid #b97b41;
+}
+
+.brick {
+  background-color: #c44c29;
+  border: 2px solid #9B2E1F;
+}
+
+.coin {
+  background-color: #f7d808;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin: 8px; /* center it a bit */
+}
+
+.pipe {
+  background-color: #00a800;
+  border: 4px solid #008000;
+}
+
+.mario {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background-color: red;
+  border-radius: 5px;
+}
+
+.on-screen-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.on-screen-controls button {
+  padding: 15px 25px;
+  font-size: 18px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 2px solid #333;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+} 

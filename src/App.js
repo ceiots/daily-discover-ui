@@ -3,12 +3,12 @@ import { ThemeProvider } from 'styled-components';
 import { Toaster } from 'react-hot-toast';
 import AppRoutes from './routes';
 import { AuthProvider } from './hooks/useAuth';     
-import theme from './theme/tokens';
+import tokens from './theme/tokens';
 import GlobalStyles from './theme/GlobalStyles';    
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={tokens}>
       <GlobalStyles />
       <Toaster
         position="top-center"

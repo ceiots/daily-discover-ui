@@ -7,6 +7,7 @@ import NavBar from "../theme/components/organisms/NavBar";
 import MatchThree from "../components/games/MatchThree/MatchThree";
 import TetrisGame from "../components/games/TetrisGame/TetrisGame";
 import SnakeGame from "../components/games/SnakeGame/SnakeGame";
+import SuperMarioGame from "../components/games/SuperMarioGame/SuperMarioGame";
 // 引入视频组件
 import VideoList from "../components/videos/VideoList/VideoList";
 import ArticleCard from '../components/ai/ArticleCard';
@@ -134,6 +135,16 @@ const mockDiscoverData = {
       playerCount: "1.7M",
       aiRecommend: "匹配度91%：训练反应速度和决策能力",
     },
+    {
+      id: "super-mario",
+      name: "超级马里奥",
+      icon: "https://images.unsplash.com/photo-1593492583567-9342f53f3454?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+      description: "经典的平台跳跃游戏",
+      category: "冒险",
+      popularity: "经典",
+      playerCount: "5.2M",
+      aiRecommend: "匹配度95%：怀旧经典，不容错过",
+    }
   ],
 
   // 3. 热门商品
@@ -353,6 +364,8 @@ const DiscoverPage = () => {
         return <TetrisGame onExit={handleGameExit} />;
       case "snake":
         return <SnakeGame onExit={handleGameExit} />;
+      case "super-mario":
+        return <SuperMarioGame onExit={handleGameExit} />;
       default:
         return null;
     }

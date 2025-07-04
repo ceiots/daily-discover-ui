@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国风连连看</title>
+    <style>
+        /* 中国风基础样式 */
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background: url('https://img.freepik.com/free-vector/chinese-pattern-background_53876-90035.jpg') center/cover no-repeat;
+            margin: 0;
+            padding: 20px;
+            color: #5c3317;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 253, 245, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid #d4a76a;
+            padding: 20px;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .game-container:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #8b0000, #d4a76a, #8b0000);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #8b0000;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            aspect-ratio: 1;
+            background: #fff;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #d4a76a;
+            background: linear-gradient(135deg, #fff4e6, #fff);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .card.selected {
+            border-color: #8b0000;
+            background: linear-gradient(135deg, #fff, #ffe4e1);
+        }
+        
+        .card.matched {
+            visibility: hidden;
+        }
+        
+        .card .icon {
+            font-size: 30px;
+            color: #8b0000;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(to right, #8b0000, #a52a2a);
+            color: #fff4e6;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #a52a2a, #8b0000);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 600px) {
+            .game-board {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .card .icon {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>中国风连连看</h1>
+        <div class="game-info">
+            <div>时间: <span id="time">0</span>秒</div>
+            <div>分数: <span id="score">0</span></div>
+        </div>
+        <div class="game-board" id="gameBoard"></div>
+        <div class="controls">
+            <button id="restartBtn">重新开始</button>
+        </div>
+    </div>
+
+    <script>
+        // 游戏配置
+        const config = {
+            rows: 4,
+            cols: 6,
+            icons: ['🍎', '??', '🍇', '🍓', '🍉', '🍑', '🍋', '🍍', '??', '🍒', '🍈', '🍐'],
+            totalPairs: 12
+        };
+        
+        // 游戏状态
+        let state = {
+            board: [],
+            selectedCards: [],
+            matchedPairs: 0,
+            score: 0,
+            time: 0,
+            timer: null,
+            gameStarted: false
+        };
+        
+        // DOM元素
+        const gameBoard = document.getElementById('gameBoard');
+        const timeDisplay = document.getElementById('time');
+        const scoreDisplay = document.getElementById('score');
+        const restartBtn = document.getElementById('restartBtn');
+        
+        // 初始化游戏
+        function initGame() {
+            clearInterval(state.timer);
+        function initGame() {
+            console.log('初始化游戏开始');
+            clearInterval(state.timer);
+            
+            // 完全重置状态
+            state = {
+                board: [],
+                selectedCards: [],
+                matchedPairs: 0,
+                score: 0,
+                time: 0,
+                timer: null,
+                gameStarted: false
+            };
+            
+            updateDisplay();
+            createBoard();
+            console.log('初始化游戏完成', state);
+        }
+        function createBoard() {
+            gameBoard.innerHTML = '';
+            
+            // 创建卡片对
+            let cards = [];
+            for (let i = 0; i < config.totalPairs; i++) {
+                cards.push(config.icons[i]);
+                cards.push(config.icons[i]);
+            }
+            
+            // 洗牌
+            cards = shuffleArray(cards);
+            
+            // 创建卡片元素
+            state.board = [];
+            for (let i = 0; i < config.rows * config.cols; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = i;
+                card.dataset.value = cards[i];
+                
+                card.addEventListener('click', () => handleCardClick(card));
+                
+                gameBoard.appendChild(card);
+                state.board.push({
+                    element: card,
+                    value: cards[i],
+                    matched: false
+                });
+            }
+        }
+        function handleCardClick(card) {
+            const index = parseInt(card.dataset.index);
+            const cardData = state.board[index];
+            
+            // 如果卡片已匹配或已选中，则忽略
+            if (cardData.matched || state.selectedCards.length >= 2 || state.selectedCards.includes(index)) {
+                return;
+            }
+            
+            // 开始游戏计时
+            if (!state.gameStarted) {
+                startTimer();
+                state.gameStarted = true;
+            }
+            
+            // 显示卡片
+            card.innerHTML = `<span class="icon">${cardData.value}</span>`;
+            card.classList.add('selected');
+            state.selectedCards.push(index);
+            
+            // 检查匹配
+            if (state.selectedCards.length === 2) {
+                const [firstIndex, secondIndex] = state.selectedCards;
+                const firstCard = state.board[firstIndex];
+                const secondCard = state.board[secondIndex];
+                
+                if (firstCard.value === secondCard.value) {
+                    // 匹配成功
+                    firstCard.matched = true;
+                    secondCard.matched = true;
+                    firstCard.element.classList.add('matched');
+                    secondCard.element.classList.add('matched');
+                    
+                    state.matchedPairs++;
+                    state.score += 10;
+                    updateDisplay();
+                    
+                    state.selectedCards = [];
+                    
+                    // 检查游戏是否结束
+                    if (state.matchedPairs === config.totalPairs) {
+                        endGame();
+                    }
+                } else {
+                    // 匹配失败
+                    setTimeout(() => {
+                        firstCard.element.innerHTML = '';
+                        secondCard.element.innerHTML = '';
+                        firstCard.element.classList.remove('selected');
+                        secondCard.element.classList.remove('selected');
+                        state.selectedCards = [];
+                    }, 800);
+                }
+            }
+        }
+        
+        // 开始计时
+        function startTimer() {
+            state.timer = setInterval(() => {
+                state.time++;
+                updateDisplay();
+            }, 1000);
+        }
+        
+        // 结束游戏
+        function endGame() {
+            clearInterval(state.timer);
+            alert(`游戏结束！\n用时: ${state.time}秒\n得分: ${state.score}`);
+        }
+        
+        // 更新显示
+        function updateDisplay() {
+            timeDisplay.textContent = state.time;
+            scoreDisplay.textContent = state.score;
+        }
+        
+        // 洗牌算法
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // 事件监听
+        restartBtn.addEventListener('click', () => {
+            console.log('重新开始按钮点击');
+            clearInterval(state.timer);
+            gameBoard.innerHTML = ''; // 清空游戏板
+            initGame();
+            console.log('游戏已重置', state);
+        });
+        
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>
